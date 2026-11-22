@@ -36,14 +36,15 @@ VIEW_TYPES = (
     "graph",
     "calendar",
     "timeline",
+    "hierarchy",
 )
 # {view type: module}: the module that adds the type to ir.ui.view.type, which
 # the editor names when the type is missing from the database.
-OPTIONAL_VIEW_MODULES = {"timeline": "web_timeline"}
+OPTIONAL_VIEW_MODULES = {"timeline": "web_timeline", "hierarchy": "web_hierarchy"}
 POSITIONS = ("before", "after", "inside")
 
 # The QWeb views: their fields show from a template under <templates>.
-TEMPLATED_TYPES = ("kanban", "timeline")
+TEMPLATED_TYPES = ("kanban", "timeline", "hierarchy")
 # The template elements a node can be dropped into.
 TEMPLATE_DROPS = ("t", "main", "aside", "footer", "header", "div", "section")
 # The QWeb directives that replace or ignore the body of their element: the
@@ -82,6 +83,7 @@ CONTAINERS = {
     "graph": ("graph",),
     "calendar": ("calendar",),
     "timeline": ("timeline", "templates") + TEMPLATE_DROPS,
+    "hierarchy": ("hierarchy", "templates") + TEMPLATE_DROPS,
 }
 DROP_CONTAINERS = {
     "form": ("sheet", "group", "page", "div"),
@@ -92,6 +94,9 @@ DROP_CONTAINERS = {
     "graph": ("graph",),
     "calendar": ("calendar",),
     "timeline": ("timeline",) + TEMPLATE_DROPS,
+    # A hierarchy takes nothing new outside its card: its fields show from
+    # the « hierarchy-box » template.
+    "hierarchy": TEMPLATE_DROPS,
 }
 
 # How a view type hides a node: an attribute, or the node removed from the
@@ -101,6 +106,7 @@ HIDE_MODES = {
     "list": "column_invisible",
     "kanban": "invisible",
     "timeline": "invisible",
+    "hierarchy": "invisible",
     # An invisible calendar field leaves the popover of the events; with
     # « filters », it stays in the side panel.
     "calendar": "invisible",
@@ -238,6 +244,18 @@ VIEW_OPERATIONS = {
         "hide",
         "set_attribute",
     ),
+    # The operations of a kanban but « add_widget »: the widgets of WIDGETS
+    # belong to a kanban card.
+    "hierarchy": (
+        "add_field",
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "set_attribute",
+        "update_field",
+        "rename_field",
+    ),
 }
 
 # The attributes « set_attribute » may write: view type -> tag ->
@@ -319,6 +337,18 @@ SETTABLE_ATTRIBUTES = {
             "stack": "bool",
             "event_open_popup": "bool",
         },
+    },
+    # web_hierarchy refuses any root attribute but those of its
+    # HIERARCHY_VALID_ATTRIBUTES; without « parent_field », it reads
+    # parent_id.
+    "hierarchy": {
+        "hierarchy": {
+            "parent_field": "parent_field",
+            "child_field": "child_field",
+            "draggable": "bool",
+            "default_order": "order",
+        },
+        "field": {"widget": "widget"},
     },
 }
 # The settable attributes a view needs: they can change, not go away.
@@ -912,6 +942,30 @@ def _attributes_spec(xpath, attrs):
     return spec
 
 
+def _set_attribute_spec(change, view_type):
+    """The spec of a « set_attribute » ``change``: its attribute, and the
+    fields of its ``load`` payload loaded before the templates of the
+    view. A hierarchy loads so the fields its « parent_field » and
+    « child_field » name: web_hierarchy looks for them among the fields
+    its view loads."""
+    payload = change.get("payload") or {}
+    spec = _attributes_spec(
+        change["xpath"], {payload.get("attribute"): payload.get("value")}
+    )
+    if not payload.get("load"):
+        return spec
+    data = etree.Element("data")
+    data.append(spec)
+    load = etree.SubElement(
+        data, "xpath", expr=f"/{view_type}/templates", position="before"
+    )
+    for name in payload["load"]:
+        if not _SAFE_NAME.match(name or ""):
+            raise ArchError(f"Invalid field {name}.", "bad_field", field=name)
+        etree.SubElement(load, "field", name=name)
+    return data
+
+
 def change_spec(change, view_type):
     """The inheritance spec of ``change``, a dict {type, xpath, position,
     payload}: an ``xpath`` element, or a ``data`` of two when a move also
@@ -962,9 +1016,7 @@ def change_spec(change, view_type):
     if ctype == "remove":
         return etree.Element("xpath", expr=change["xpath"], position="replace")
     if ctype == "set_attribute":
-        return _attributes_spec(
-            change["xpath"], {payload.get("attribute"): payload.get("value")}
-        )
+        return _set_attribute_spec(change, view_type)
     spec = etree.Element("xpath", expr=change["xpath"], position="attributes")
     if ctype == "hide":
         name = hide_attribute(view_type)
@@ -1895,6 +1947,7 @@ def default_view_arch(
     date_field=None,
     group_field=None,
     readonly_date=False,
+    parent_field=None,
 ):
     """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
     adds to an existing model, labelled ``label``: the record name
@@ -1904,8 +1957,10 @@ def default_view_arch(
     calendar of the records on ``date_field``, their popover showing the
     record name; a timeline that starts on ``date_field``, one row per
     value of the many2one ``group_field``, its items showing the record
-    name. A calendar on a ``readonly_date`` neither creates nor moves its
-    events (« create » and « edit » False). The arch depends on these values
+    name; a hierarchy of the records under their many2one ``parent_field``,
+    which it loads, its « hierarchy-box » card showing the record name in
+    its header above an empty body. A calendar on a ``readonly_date`` neither creates nor
+    moves its events (« create » and « edit » False). The arch depends on these values
     only: the changes of the editor on the view locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
     if view_type == "form":
@@ -1942,6 +1997,31 @@ def default_view_arch(
             root.set("create", "False")
             root.set("edit", "False")
         etree.SubElement(root, "field", {"name": name_field})
+    elif view_type == "hierarchy":
+        if not parent_field:
+            raise ArchError(
+                "A hierarchy needs a many2one to its own model.", "hierarchy_fields"
+            )
+        root.set("parent_field", parent_field)
+        # web_hierarchy looks for its parent field among the fields the
+        # view loads.
+        etree.SubElement(root, "field", {"name": parent_field})
+        templates = etree.SubElement(root, "templates")
+        card = etree.SubElement(templates, "t", {"t-name": "hierarchy-box"})
+        # The classes web_hierarchy styles the header and the body of a
+        # node with, as its own views write them.
+        header = etree.SubElement(
+            card,
+            "div",
+            {
+                "class": "o_hierarchy_node_header d-flex justify-content-center "
+                "align-items-center"
+            },
+        )
+        etree.SubElement(header, "field", {"name": name_field})
+        etree.SubElement(
+            card, "div", {"class": "o_hierarchy_node_body d-flex flex-column"}
+        )
     elif view_type == "graph":
         root.set("type", "bar")
         if date_field:

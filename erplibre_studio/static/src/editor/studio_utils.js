@@ -19,7 +19,7 @@ export const DRAGGING_CLASS = "o_erplibre_studio_dragging";
 
 const TRUE_VALUES = ["1", "True", "true"];
 // The view types whose fields show from a QWeb template.
-export const TEMPLATED_TYPES = ["kanban", "timeline"];
+export const TEMPLATED_TYPES = ["kanban", "timeline", "hierarchy"];
 export const DATE_TYPES = ["date", "datetime"];
 export const NUMBER_TYPES = ["integer", "float", "monetary"];
 // The options of a new field set before Apply, and the types that take
@@ -213,6 +213,9 @@ export function attributeLabel(attribute, kind) {
             edit: _t("Move and resize events"),
             delete: _t("Delete records"),
             filters: _t("Filter in the side panel"),
+            parent_field: _t("Parent field"),
+            child_field: _t("Children field"),
+            draggable: _t("Drag the cards to change the parent"),
         }[attribute] || attribute
     );
 }

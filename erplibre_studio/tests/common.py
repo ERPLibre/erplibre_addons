@@ -44,6 +44,22 @@ TIMELINE_ARCH = """
 </timeline>
 """
 
+HIERARCHY_ARCH = """
+<hierarchy string="Partners" child_field="child_ids">
+    <field name="child_ids"/>
+    <templates>
+        <t t-name="hierarchy-box">
+            <div class="o_hierarchy_node_header">
+                <field name="name"/>
+            </div>
+            <div class="o_hierarchy_node_body">
+                <field name="email"/>
+            </div>
+        </t>
+    </templates>
+</hierarchy>
+"""
+
 
 def production_rule_patch(env):
     """A patch of the registry class of the projects: the rule of the
@@ -125,6 +141,9 @@ class StudioMixin(DeveloperMixin):
 
     def timeline_available(self):
         return "timeline" in self.Project._view_types()
+
+    def hierarchy_available(self):
+        return "hierarchy" in self.Project._view_types()
 
     def make_users(self):
         """(editor, other): two Settings administrators."""

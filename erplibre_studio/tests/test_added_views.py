@@ -395,3 +395,37 @@ class TestAddedViews(StudioCase):
         self.assertEqual(readonly, date == "create_date")
         if not readonly:
             self.assertFalse(field.readonly)
+
+    def test_hierarchy(self):
+        """A hierarchy added to the contacts reads parent_id; its card shows
+        the name in its header."""
+        if not self.hierarchy_available():
+            self.skipTest("web_hierarchy is not installed")
+        if self.View.default_view("res.partner", "hierarchy"):
+            self.skipTest("res.partner has a hierarchy view in this database")
+        data = self.Editor.add_view(self.project.id, "res.partner", "hierarchy")
+        self.assertEqual(data["view_type"], "hierarchy")
+        self.assertEqual(data["layout"]["card"], "//t[@t-name='hierarchy-box']")
+        line = self.project.view_line_ids
+        root = etree.fromstring(line.arch)
+        self.assertEqual(
+            (root.tag, root.get("parent_field")), ("hierarchy", "parent_id")
+        )
+        self.assertEqual(data["layout"]["loaded_fields"], ["parent_id"])
+        self.assertEqual(
+            root.xpath("//t[@t-name='hierarchy-box']/div[1]/field/@name"), ["name"]
+        )
+        context = self.preview_key(self.project)
+        arch = etree.fromstring(
+            self.env["res.partner"]
+            .with_context(**context)
+            .get_view(False, "hierarchy")["arch"]
+        )
+        self.assertEqual(arch.get("parent_field"), "parent_id")
+        self.project.action_apply()
+        view = line.view_id
+        self.assertEqual((view.mode, view.type), ("primary", "hierarchy"))
+        self.assertEqual(self.View.default_view("res.partner", "hierarchy"), view.id)
+        self.project.action_revert()
+        self.assertFalse(view.exists())
+        self.assertFalse(self.View.default_view("res.partner", "hierarchy"))

@@ -139,6 +139,37 @@ class TestStudioUi(HttpCase):
         self.assertEqual(arch.get("mode"), "week")
         self.assertEqual(arch.get("date_stop"), "write_date")
 
+    def test_hierarchy_tour(self):
+        """A hierarchy view added to the draft of the contacts: the email
+        added to its card with Enter on the palette, the preview renders
+        the hierarchy before Apply."""
+        if "hierarchy" not in self.env["erplibre.studio.project"]._view_types():
+            self.skipTest("web_hierarchy is not installed")
+        if self.env["ir.ui.view"].default_view("res.partner", "hierarchy"):
+            self.skipTest("res.partner has a hierarchy view in this database")
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1",
+            "erplibre_studio_hierarchy_editor",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_hierarchy")]
+        )
+        line = project.view_line_ids
+        self.assertEqual(line.view_type, "hierarchy")
+        self.assertFalse(line.applied)
+        view = self.env["erplibre.studio.editor"]._resolve_view(
+            "res.partner", False, "hierarchy", project
+        )
+        arch, errors = project._draft_arch(view)
+        self.assertFalse(errors)
+        self.assertEqual(arch.get("parent_field"), "parent_id")
+        card = arch.xpath("//t[@t-name='hierarchy-box']")[0]
+        self.assertIn("email", [f.get("name") for f in card.iter("field")])
+
     def timeline_setup(self):
         """A timeline view of the contacts, a contact of a company to show
         in it, and an action that opens the view: (view, action). Skips the

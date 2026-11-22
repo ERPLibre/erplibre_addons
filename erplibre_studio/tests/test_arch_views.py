@@ -774,3 +774,35 @@ class TestArchViews(BaseCase):
         self.assertEqual(
             studio_arch.CHOICES["calendar_mode"], ("day", "week", "month", "year")
         )
+
+    def test_hierarchy_default_arch_and_blocks(self):
+        root = etree.fromstring(
+            studio_arch.default_view_arch(
+                "hierarchy", "Contact", "name", parent_field="parent_id"
+            )
+        )
+        self.assertEqual(
+            dict(root.attrib), {"string": "Contact", "parent_field": "parent_id"}
+        )
+        # The parent field, loaded beside the card.
+        self.assertEqual(root.xpath("/hierarchy/field/@name"), ["parent_id"])
+        card = root.xpath("//t[@t-name='hierarchy-box']")[0]
+        header, body = card
+        self.assertIn("o_hierarchy_node_header", header.get("class"))
+        self.assertEqual([f.get("name") for f in header], ["name"])
+        self.assertIn("o_hierarchy_node_body", body.get("class"))
+        self.assertEqual(len(body), 0)
+        with self.assertRaises(studio_arch.ArchError) as caught:
+            studio_arch.default_view_arch("hierarchy", "Contact", "name")
+        self.assertEqual(caught.exception.code, "hierarchy_fields")
+        blocks = studio_arch.arch_blocks(root, "hierarchy", {})
+        self.assertFalse(blocks["drop"])
+        self.assertEqual(studio_arch.hide_mode("hierarchy"), "invisible")
+        # Nothing new goes outside the card; anything goes in its body.
+        self.assertEqual(
+            studio_arch.drop_refusal("hierarchy", root, "inside").code,
+            "no_drop_inside",
+        )
+        self.assertIsNone(studio_arch.drop_refusal("hierarchy", body, "inside"))
+        self.assertEqual(studio_arch.move_refusal("hierarchy", card).code, "no_move")
+        self.assertEqual(studio_arch.shown_field_names(root, "hierarchy"), {"name"})

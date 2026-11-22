@@ -351,10 +351,11 @@ class ViewExclusion(tuple):
 
 class ErplibreStudioProject(models.Model):
     """A studio project: the changes of views (form, list, kanban, search,
-    pivot, timeline) that make one module. Its life: draft changes (previewed by its editor only), then
-    applied to the database (``x_`` fields, one inherited view per edited
-    view, under external ids of the module ``module_name``). Writing the
-    project as a module is the part of erplibre_studio_generate."""
+    pivot, graph, calendar, timeline, hierarchy) that make one module. Its
+    life: draft changes (previewed by its editor only), then applied to
+    the database (``x_`` fields, one inherited view per edited view,
+    under external ids of the module ``module_name``). Writing the project
+    as a module is the part of erplibre_studio_generate."""
 
     _name = "erplibre.studio.project"
     _description = "ERPLibre studio project"
@@ -2605,6 +2606,10 @@ class ErplibreStudioProject(models.Model):
             return self._groups_value(value), []
         if kind == "calendar_filter":
             return self._calendar_filter_value(view.model, node, value)
+        if kind == "parent_field" and value in (None, "", False):
+            # Without the attribute, web_hierarchy reads parent_id.
+            self._check_child_follows(view.model, node, "parent_id")
+            return "", []
         if value in (None, "", False):
             return "", []
         if not isinstance(value, str):
@@ -2616,6 +2621,8 @@ class ErplibreStudioProject(models.Model):
             "number_field": self._typed_field_value,
             "color_field": self._color_field_value,
             "bool_field": self._bool_field_value,
+            "parent_field": self._parent_field_value,
+            "child_field": self._child_field_value,
             "order": self._order_value,
             "axis": self._axis_value,
             "graph_axis": self._axis_value,
@@ -2685,6 +2692,66 @@ class ErplibreStudioProject(models.Model):
                     "field is needed.",
                     name=value,
                     types="boolean",
+                )
+            )
+        return value, [value]
+
+    def _parent_field_value(self, model, node, kind, value):
+        """The « parent_field » ``value`` of a hierarchy: a stored many2one
+        of ``model`` to itself, which the « child_field » of ``node``, when
+        set, has for inverse; web_hierarchy builds its tree from both."""
+        info = self._field_info(model, value)
+        if (
+            info["type"] != "many2one"
+            or info.get("relation") != model
+            or not info.get("store")
+        ):
+            raise UserError(
+                self.env._(
+                    "The parent of a hierarchy is a stored many2one from "
+                    "%(model)s to itself, not %(name)s.",
+                    model=model,
+                    name=info.get("string") or value,
+                )
+            )
+        self._check_child_follows(model, node, value)
+        return value, [value]
+
+    def _check_child_follows(self, model, node, parent):
+        """UserError when the « child_field » of the hierarchy ``node`` is
+        the inverse of another field than ``parent``: the children would
+        follow one field and the parents another."""
+        child = node.get("child_field")
+        if not child or model not in self.env:
+            return
+        field = self.env[model]._fields.get(child)
+        if field is None or getattr(field, "inverse_name", None) != parent:
+            raise UserError(
+                self.env._(
+                    "Remove the children field first: it follows another "
+                    "parent field."
+                )
+            )
+
+    def _child_field_value(self, model, node, kind, value):
+        """The « child_field » ``value`` of a hierarchy: a one2many of
+        ``model`` to itself whose inverse is the parent field of ``node``
+        (« parent_field », parent_id without it)."""
+        info = self._field_info(model, value)
+        parent = node.get("parent_field") or "parent_id"
+        field = self.env[model]._fields.get(value) if model in self.env else None
+        if (
+            info["type"] != "one2many"
+            or info.get("relation") != model
+            or getattr(field, "inverse_name", None) != parent
+        ):
+            raise UserError(
+                self.env._(
+                    "The children of a hierarchy are the one2many of %(model)s "
+                    "whose inverse is %(parent)s, not %(name)s.",
+                    model=model,
+                    parent=parent,
+                    name=info.get("string") or value,
                 )
             )
         return value, [value]
@@ -3036,15 +3103,20 @@ class ErplibreStudioProject(models.Model):
             and c._payload().get("attribute") == attribute
         )
         replaced = self._replaced_change(view, arch, existing, xpath)
+        base = arch
         if replaced:
-            before, _errors = self._draft_arch_without(view, replaced)
-            original = self._locate(before, xpath).get(attribute)
+            base, _errors = self._draft_arch_without(view, replaced)
+            original = self._locate(base, xpath).get(attribute)
         else:
             original = node.get(attribute)
         if value == self._normal_attribute(kind, original):
             replaced.unlink()
             return replaced.browse()
         payload = {"attribute": attribute, "value": value, "fields": named, **extra}
+        if kind in ("parent_field", "child_field") and value:
+            if value not in self._loaded_fields(base):
+                # The change loads the field beside its templates.
+                payload["load"] = [value]
         if kind == "groups":
             # The external ids the generation depends on and a removal of a
             # group of the project checks.
@@ -4496,6 +4568,28 @@ class ErplibreStudioProject(models.Model):
             return "create_date", True
         return None, False
 
+    @api.model
+    def _studio_parent_field(self, model):
+        """The many2one of ``model`` to itself a hierarchy added to it
+        reads: the parent field of the model (``_parent_name``), else
+        parent_id, else its first such field; None without one. The field
+        is stored: the hierarchy searches by it."""
+        Model = self.env[model]
+        fields = Model._fields
+
+        def fits(fname):
+            field = fields.get(fname)
+            return bool(
+                field
+                and field.type == "many2one"
+                and field.comodel_name == model
+                and field.store
+            )
+
+        preferred = [Model._parent_name, "parent_id"]
+        names = preferred + [n for n in fields if n not in preferred]
+        return next((fname for fname in names if fits(fname)), None)
+
     def _studio_add_view(self, model, view_type):
         """Add to the draft the ``view_type`` view of the existing ``model``,
         which has none of that type: a view line with its default arch
@@ -4567,10 +4661,26 @@ class ErplibreStudioProject(models.Model):
                         model=model,
                     )
                 )
+        parent = None
+        if view_type == "hierarchy":
+            parent = self._studio_parent_field(model)
+            if not parent:
+                raise UserError(
+                    self.env._(
+                        "A hierarchy needs a many2one from %(model)s to itself.",
+                        model=model,
+                    )
+                )
         # The source label of the model: the arch goes as is into a module.
         description = Model._description or model
         arch = studio_arch.default_view_arch(
-            view_type, description, name, date, group, readonly_date=readonly_date
+            view_type,
+            description,
+            name,
+            date,
+            group,
+            readonly_date=readonly_date,
+            parent_field=parent,
         )
         sequence = max(self.view_line_ids.mapped("sequence") or [0]) + 10
         line = (

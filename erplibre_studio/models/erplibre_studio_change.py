@@ -34,6 +34,7 @@ VIEW_TYPES = [
     ("graph", "Graph"),
     ("calendar", "Calendar"),
     ("timeline", "Timeline"),
+    ("hierarchy", "Hierarchy"),
 ]
 
 

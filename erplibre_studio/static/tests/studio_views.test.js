@@ -1271,6 +1271,129 @@ describe("erplibre_studio editor, calendar", () => {
     });
 });
 
+describe("erplibre_studio editor, hierarchy", () => {
+    const BOX = "//t[@t-name='hierarchy-box']";
+    const HEADER = `${BOX}/div[1]`;
+    const BODY = `${BOX}/div[2]`;
+    const HIERARCHY_OPERATIONS = [
+        "add_field",
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "set_attribute",
+        "update_field",
+        "rename_field",
+    ];
+
+    /**
+     * A hierarchy of the contacts: the root attributes ``attrs``, its
+     * « hierarchy-box » card with the name in its header and the fields of
+     * ``body`` in its body.
+     */
+    function hierarchyPayload(attrs = {}, body = ["email"]) {
+        const div = (path, children) => container(path, "div", children, {in_template: true, chain: null});
+        const box = {
+            path: BOX,
+            tag: "t",
+            kind: "template",
+            label: "hierarchy-box",
+            attrs: {"t-name": "hierarchy-box"},
+            movable: false,
+            drop: true,
+            in_template: true,
+            chain: null,
+            template: "hierarchy-box",
+            children: [div(HEADER, [inCard("name")]), div(BODY, body.map((name) => inCard(name)))],
+        };
+        const blocks = container(
+            "/hierarchy",
+            "hierarchy",
+            [container("/hierarchy/templates", "templates", [box], {drop: false, movable: false, in_template: false})],
+            {drop: false, movable: false, attrs}
+        );
+        return payload("hierarchy", blocks, {
+            operations: HIERARCHY_OPERATIONS,
+            layout: {root: "/hierarchy", card: BOX, templates: {"hierarchy-box": BOX}, loaded_fields: [], widgets: {}},
+            settable: {
+                hierarchy: {
+                    parent_field: "parent_field",
+                    child_field: "child_field",
+                    draggable: "bool",
+                    default_order: "order",
+                },
+                field: {widget: "widget"},
+            },
+            choices: {
+                ...CHOICES,
+                parent_field: [["parent_id", "Related Company"]],
+                child_field: [["child_ids", "Contact"]],
+            },
+        });
+    }
+
+    test("the card of the nodes shows; the palette adds to it; no ribbon", async () => {
+        answer = hierarchyPayload({parent_field: "parent_id"});
+        await openEditor("hierarchy");
+        expect(".o_erplibre_studio_hierarchy_caption").toHaveText("The card of each node of the hierarchy");
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field").toHaveCount(2);
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field:eq(0)").toHaveAttribute("data-name", "name");
+        expect(".o_erplibre_studio_template_tab").toHaveCount(0);
+        expect(".o_erplibre_studio_palette [data-tab=other]").toHaveCount(0);
+        expect(hook(BODY, "inside")).toHaveCount(1);
+        // Nothing new goes outside the card.
+        expect(hook("/hierarchy", "inside")).toHaveCount(0);
+
+        respond = () => hierarchyPayload({parent_field: "parent_id"}, ["email", "phone"]);
+        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        await contains(".o_erplibre_studio_existing_field[data-name=phone]").dragAndDrop(hook(BODY, "inside"));
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: BODY,
+            position: "inside",
+            field_name: "phone",
+        });
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field[data-name=phone]").toHaveCount(1);
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "phone");
+    });
+
+    test("the view properties: parent and children fields, drag, order", async () => {
+        answer = hierarchyPayload({parent_field: "parent_id"});
+        await openEditor("hierarchy");
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-tag", "hierarchy");
+        const settable = (attribute) => `.o_erplibre_studio_settable[data-attribute=${attribute}]`;
+        expect(`${settable("parent_field")} label`).toHaveText(/Parent field/);
+        expect(`${settable("parent_field")} select`).toHaveValue("parent_id");
+        expect(queryAllTexts(`${settable("child_field")} option`)).toEqual(["Default", "Contact"]);
+        expect(`${settable("draggable")} label`).toHaveText(/Drag the cards to change the parent/);
+        expect(`${settable("default_order")} input`).toHaveCount(1);
+
+        respond = (operation) => {
+            const data = hierarchyPayload({parent_field: "parent_id", [operation.attribute]: operation.value});
+            data.changes = [{id: 1, type: "set_attribute", summary: "Children field", error: false}];
+            return data;
+        };
+        await contains(`${settable("child_field")} select`).select("child_ids");
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/hierarchy",
+            attribute: "child_field",
+            value: "child_ids",
+        });
+        expect(`${settable("child_field")} select`).toHaveValue("child_ids");
+        await contains(`${settable("draggable")} select`).select("True");
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/hierarchy",
+            attribute: "draggable",
+            value: "True",
+        });
+    });
+});
+
 describe("erplibre_studio editor, form layout", () => {
     const FORM_OPERATIONS = [
         "add_field",

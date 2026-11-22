@@ -31,6 +31,7 @@ from . import (
     test_views_advanced,
     test_views_calendar,
     test_views_graph,
+    test_views_hierarchy,
     test_views_kanban,
     test_views_layout,
     test_views_pivot,

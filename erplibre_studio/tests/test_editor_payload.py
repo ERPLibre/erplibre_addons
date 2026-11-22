@@ -83,6 +83,9 @@ class TestEditorPayload(StudioCase):
         if not self.timeline_available():
             self.assertEqual(entries["timeline"]["reason_code"], "needs_module")
             self.assertIn("web_timeline", entries["timeline"]["reason"])
+        if not self.hierarchy_available():
+            self.assertEqual(entries["hierarchy"]["reason_code"], "needs_module")
+            self.assertIn("web_hierarchy", entries["hierarchy"]["reason"])
 
     def test_view_list_names_a_type_without_a_view(self):
         """A studio type the model has no view of is listed, not editable."""

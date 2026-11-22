@@ -6,10 +6,11 @@ import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {user} from "@web/core/user";
 
-// The view types the editor opens on. A page shows a timeline view only
-// when web_timeline is installed, and the server refuses the type
-// otherwise: the list needs no detection of its own.
-export const STUDIO_VIEW_TYPES = ["form", "list", "kanban", "pivot", "graph", "calendar", "timeline"];
+// The view types the editor opens on. A page shows a timeline or a
+// hierarchy view only when web_timeline or web_hierarchy is installed, and
+// the server refuses the type otherwise: the list needs no detection of
+// its own.
+export const STUDIO_VIEW_TYPES = ["form", "list", "kanban", "pivot", "graph", "calendar", "timeline", "hierarchy"];
 
 /** The client action of the studio editor on a view. */
 export function customizeAction({resModel, viewType, viewId, actionId}) {

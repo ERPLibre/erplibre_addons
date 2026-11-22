@@ -690,6 +690,12 @@ msgstr "Un groupe qui a un identifiant externe : le module y fait référence."
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A hierarchy needs a many2one from %(model)s to itself."
+msgstr "Une hiérarchie demande un many2one de %(model)s vers lui-même."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A many2many shows in a form, a list or a kanban only."
 msgstr ""
 "Un many2many s'affiche dans un formulaire, une liste ou un kanban seulement."
@@ -1280,6 +1286,14 @@ msgstr "Un many2one existant du comodèle"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"An organization chart: each record under its parent, provided by "
+"web_hierarchy."
+msgstr "Un organigramme : chaque enregistrement sous son parent, fourni par web_hierarchy."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "And"
 msgstr "Et"
@@ -1535,6 +1549,12 @@ msgstr "Vérification…"
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Checks"
 msgstr "Vérifications"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Children field"
+msgstr "Champ des enfants"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2730,6 +2750,12 @@ msgstr "Glissez un élément sur une zone de dépôt du canevas, ou appuyez sur 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Drag the cards to change the parent"
+msgstr "Glisser les cartes pour changer le parent"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Drag the records"
 msgstr "Glisser les enregistrements"
 
@@ -3297,6 +3323,16 @@ msgstr "Masqué"
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__hide
 msgid "Hide or show"
 msgstr "Masquer ou afficher"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__hierarchy
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__hierarchy
+msgid "Hierarchy"
+msgstr "Hiérarchie"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4694,6 +4730,12 @@ msgstr "Panneau de la vue"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Parent field"
+msgstr "Champ parent"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__menu_parent_id
 msgid "Parent menu"
@@ -5041,6 +5083,12 @@ msgstr "Retirer du brouillon"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Remove from the view"
 msgstr "Retirer de la vue"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Remove the children field first: it follows another parent field."
+msgstr "Retirez d'abord le champ des enfants : il suit un autre champ parent."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5834,6 +5882,12 @@ msgid "The attribute %(attribute)s of <%(tag)s> cannot be set here."
 msgstr "L'attribut %(attribute)s de <%(tag)s> ne peut pas être défini ici."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "The card of each node of the hierarchy"
+msgstr "La carte de chaque nœud de la hiérarchie"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
@@ -5868,6 +5922,14 @@ msgstr "Les changements des modèles de la base"
 msgid "The chatter of %(name)s cannot be removed once applied."
 msgstr ""
 "Le fil de discussion de %(name)s ne peut plus être retiré une fois appliqué."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The children of a hierarchy are the one2many of %(model)s whose inverse is "
+"%(parent)s, not %(name)s."
+msgstr "Les enfants d'une hiérarchie sont le one2many de %(model)s dont l'inverse est %(parent)s, pas %(name)s."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6485,6 +6547,14 @@ msgid ""
 msgstr ""
 "L'ordre des applications du projet : la première donne l'icône du module "
 "généré."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The parent of a hierarchy is a stored many2one from %(model)s to itself, not"
+" %(name)s."
+msgstr "Le parent d'une hiérarchie est un many2one stocké de %(model)s vers lui-même, pas %(name)s."
 
 #. module: erplibre_studio
 #. odoo-javascript

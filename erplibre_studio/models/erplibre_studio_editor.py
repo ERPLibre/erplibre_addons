@@ -295,6 +295,13 @@ class ErplibreStudioEditor(models.AbstractModel):
         def stored(types):
             return lambda f: f.get("type") in types and f.get("store")
 
+        def to_model(ttype):
+            # A relation of ``model`` to itself: the parent and the
+            # children of a hierarchy.
+            return lambda f: (
+                model and f.get("type") == ttype and f.get("relation") == model
+            )
+
         choices = {
             kind: [[value, value] for value in values]
             for kind, values in studio_arch.CHOICES.items()
@@ -315,6 +322,10 @@ class ErplibreStudioEditor(models.AbstractModel):
             "sort_field": fields_where(lambda f: f.get("sortable")),
             "bool": [["True", "True"], ["False", "False"]],
             "calendar_filter": [["True", "True"]],
+            "parent_field": fields_where(
+                lambda f: to_model("many2one")(f) and f.get("store")
+            ),
+            "child_field": fields_where(to_model("one2many")),
             "axis": [[axis, axis] for axis in studio_arch.PIVOT_AXES],
             "graph_axis": [[axis, axis] for axis in studio_arch.GRAPH_AXES],
             "interval": [[i, i] for i in studio_arch.INTERVALS],
@@ -329,17 +340,26 @@ class ErplibreStudioEditor(models.AbstractModel):
         path = lambda node: studio_arch.node_xpath(arch, node)  # noqa: E731
         root = f"/{arch.tag}"
         loaded = [c.get("name") for c in studio_arch.elements(arch) if c.tag == "field"]
-        if view_type == "kanban":
+        if view_type in ("kanban", "hierarchy"):
+            # A hierarchy draws each node with its « hierarchy-box » card,
+            # compiled as a kanban card; no widget of WIDGETS goes in it.
             templates = studio_arch.templates_of(arch)
-            card = templates.get("card")
-            if card is None:
-                card = templates.get("kanban-box")
+            if view_type == "hierarchy":
+                card = templates.get("hierarchy-box")
+            else:
+                card = templates.get("card")
+                if card is None:
+                    card = templates.get("kanban-box")
             return {
                 "root": root,
                 "card": path(card) if card is not None else False,
                 "templates": {name: path(node) for name, node in templates.items()},
                 "loaded_fields": loaded,
-                "widgets": {k: list(v) for k, v in studio_arch.WIDGETS.items()},
+                "widgets": (
+                    {k: list(v) for k, v in studio_arch.WIDGETS.items()}
+                    if view_type == "kanban"
+                    else {}
+                ),
             }
         if view_type == "timeline":
             item = studio_arch.templates_of(arch).get("timeline-item")
@@ -419,6 +439,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         no installed module adds."""
         labels = {
             "timeline": self.env._("Timeline"),
+            "hierarchy": self.env._("Hierarchy"),
             "calendar": self.env._("Calendar"),
             "graph": self.env._("Graph"),
             "gantt": self.env._("Gantt"),

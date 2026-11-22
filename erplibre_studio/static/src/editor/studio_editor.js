@@ -503,6 +503,7 @@ export class StudioEditor extends Component {
                 graph: _t("A bar, line or pie chart of the records, grouped and measured."),
                 timeline: _t("A chronological band, provided by web_timeline (OCA)."),
                 calendar: _t("The records as events on a day, week, month or year grid."),
+                hierarchy: _t("An organization chart: each record under its parent, provided by web_hierarchy."),
             }[viewType] || ""
         );
     }
@@ -2109,6 +2110,7 @@ export class StudioEditor extends Component {
             graph: _t("Graph"),
             timeline: _t("Timeline"),
             calendar: _t("Calendar"),
+            hierarchy: _t("Hierarchy"),
         };
         return labels[viewType] || viewType;
     }
