@@ -78,7 +78,8 @@ def spec_text(change, view_type):
 
 @tagged("post_install", "-at_install")
 class TestArchViews(BaseCase):
-    """The arch helpers of the kanban, search, pivot and timeline views."""
+    """The arch helpers of the kanban, search, pivot, graph and timeline
+    views."""
 
     def test_template_xpath_by_its_name(self):
         root = etree.fromstring(KANBAN)
@@ -707,3 +708,34 @@ class TestArchViews(BaseCase):
             studio_arch.changes_on_added(root, changes, "form", 1, child="p2"),
             [3],
         )
+
+    def test_graph_default_arch_and_blocks(self):
+        root = etree.fromstring(
+            studio_arch.default_view_arch("graph", "Contact", "name", "create_date")
+        )
+        self.assertEqual(
+            (root.tag, root.get("string"), root.get("type")),
+            ("graph", "Contact", "bar"),
+        )
+        self.assertEqual(
+            [dict(field.attrib) for field in root],
+            [{"name": "create_date", "interval": "month", "type": "row"}],
+        )
+        # Without a date field, one bar counts the records.
+        empty = etree.fromstring(
+            studio_arch.default_view_arch("graph", "Contact", "name")
+        )
+        self.assertEqual((empty.get("type"), len(empty)), ("bar", 0))
+        blocks = studio_arch.arch_blocks(root, "graph", {})
+        self.assertTrue(blocks["drop"])
+        self.assertEqual(
+            [(b["axis"], b["interval"]) for b in blocks["children"]],
+            [("row", "month")],
+        )
+        self.assertEqual(studio_arch.hide_mode("graph"), "remove")
+        self.assertIsNone(studio_arch.drop_refusal("graph", root, "inside"))
+        self.assertEqual(
+            studio_arch.drop_refusal("graph", root[0], "inside").code,
+            "no_drop_inside",
+        )
+        self.assertEqual(studio_arch.CHOICES["graph_type"], studio_arch.GRAPH_TYPES)

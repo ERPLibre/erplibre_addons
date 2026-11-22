@@ -1993,10 +1993,13 @@ class ErplibreStudioProject(models.Model):
             raise UserError(self.env._("Only a date field takes an interval."))
         return interval
 
-    def _check_pivot_axis(self, model, name, axis, interval=None):
-        """The pivot attributes {type, interval} of the field ``name`` on
-        ``axis``: a measure adds up a number, a row or a column groups."""
-        if axis not in studio_arch.PIVOT_AXES:
+    def _check_pivot_axis(
+        self, model, name, axis, interval=None, axes=studio_arch.PIVOT_AXES
+    ):
+        """The attributes {type, interval} of the field ``name`` of a pivot
+        or a graph on ``axis``, one of ``axes`` (see ``AXIS_VIEW_TYPES``):
+        a measure adds up a number, a row or a column groups."""
+        if axis not in axes:
             raise UserError(
                 self.env._(
                     "Choose the axis of the field: row, column or measure.",
@@ -2140,9 +2143,13 @@ class ErplibreStudioProject(models.Model):
                 raise UserError(
                     self.env._("The records cannot be searched by %(name)s.", name=name)
                 )
-        elif view.type == "pivot":
+        elif view.type in studio_arch.AXIS_VIEW_TYPES:
             node_attrs = self._check_pivot_axis(
-                view.model, name, op.get("axis"), op.get("interval")
+                view.model,
+                name,
+                op.get("axis"),
+                op.get("interval"),
+                axes=studio_arch.AXIS_VIEW_TYPES[view.type],
             )
         elif view.type == "kanban" and op.get("widget"):
             node_attrs["widget"] = self._clean_widget(op["widget"])
@@ -2386,8 +2393,8 @@ class ErplibreStudioProject(models.Model):
         )
 
     def _op_move(self, view, arch, op):
-        """Move a node; in a pivot, ``axis`` also moves a field to another
-        axis."""
+        """Move a node; in a pivot or a graph, ``axis`` also moves a field
+        to another axis."""
         target, position, node = self._check_drop(arch, op, view.type)
         source_path = op.get("source")
         source = self._locate(arch, source_path)
@@ -2417,11 +2424,15 @@ class ErplibreStudioProject(models.Model):
         elif source.get("name"):
             payload["node_name"] = source.get("name")
         axis = op.get("axis")
-        if view.type == "pivot" and source.tag == "field" and axis:
+        if view.type in studio_arch.AXIS_VIEW_TYPES and source.tag == "field" and axis:
             if axis != source.get("type"):
                 interval = None if axis == "measure" else source.get("interval")
                 attrs = self._check_pivot_axis(
-                    view.model, source.get("name"), axis, interval
+                    view.model,
+                    source.get("name"),
+                    axis,
+                    interval,
+                    axes=studio_arch.AXIS_VIEW_TYPES[view.type],
                 )
                 if axis == "measure" and source.get("interval"):
                     attrs["interval"] = ""
@@ -2603,10 +2614,11 @@ class ErplibreStudioProject(models.Model):
             "number_field": self._typed_field_value,
             "order": self._order_value,
             "axis": self._axis_value,
+            "graph_axis": self._axis_value,
             "interval": self._interval_value,
             "widget": lambda model, node, kind, value: (self._clean_widget(value), []),
-            "timeline_mode": self._mode_value,
             "field_domain": self._field_domain_value,
+            **{choice: self._choice_value for choice in studio_arch.CHOICES},
         }.get(kind)
         if not check:
             raise UserError(self.env._("Invalid value %(value)s.", value=value))
@@ -2655,12 +2667,17 @@ class ErplibreStudioProject(models.Model):
         return value, sorted(set(names))
 
     def _axis_value(self, model, node, kind, value):
+        """The axis ``value`` of a pivot field (kind « axis ») or of a graph
+        field (« graph_axis »)."""
         interval = node.get("interval")
         if value == "measure" and interval:
             raise UserError(
                 self.env._("A measure takes no interval: remove the interval first.")
             )
-        self._check_pivot_axis(model, node.get("name"), value, interval)
+        axes = (
+            studio_arch.GRAPH_AXES if kind == "graph_axis" else studio_arch.PIVOT_AXES
+        )
+        self._check_pivot_axis(model, node.get("name"), value, interval, axes=axes)
         return value, []
 
     def _interval_value(self, model, node, kind, value):
@@ -2850,8 +2867,10 @@ class ErplibreStudioProject(models.Model):
                 result.append(item)
         return ",".join(result)
 
-    def _mode_value(self, model, node, kind, value):
-        if value not in studio_arch.TIMELINE_MODES:
+    def _choice_value(self, model, node, kind, value):
+        """``value`` of an attribute of a kind of ``CHOICES``: one of its
+        values."""
+        if value not in studio_arch.CHOICES[kind]:
             raise UserError(self.env._("Invalid value %(value)s.", value=value))
         return value, []
 
@@ -4351,14 +4370,18 @@ class ErplibreStudioProject(models.Model):
         Editor = self.env["erplibre.studio.editor"]
         label = Editor._view_type_labels().get(view_type, view_type)
         if view_type not in self._view_types():
-            if view_type == "timeline":
-                raise UserError(Editor._view_reason("needs_module", label, model))
+            if view_type in studio_arch.OPTIONAL_VIEW_MODULES:
+                raise UserError(
+                    Editor._view_reason("needs_module", label, model, view_type)
+                )
             raise UserError(
                 self.env._("The studio does not edit %(type)s views.", type=label)
             )
         if model not in self.env:
             if self._studio_pending_line(model):
-                raise UserError(Editor._view_reason("apply_first", label, model))
+                raise UserError(
+                    Editor._view_reason("apply_first", label, model, view_type)
+                )
             raise UserError(self.env._("Unknown model %(model)s.", model=model))
         Model = self.env[model]
         if Model._abstract or Model._transient:

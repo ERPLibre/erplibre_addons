@@ -43,11 +43,11 @@ DIGEST_ACTIONS = ("action_apply", "action_revert")
 PREVIEW_MODES = ("simulation", "real")
 # The view types the editor lists after VIEW_TYPES, with why it does not
 # edit them.
-UNSUPPORTED_VIEW_TYPES = ("calendar", "graph", "gantt", "activity")
+UNSUPPORTED_VIEW_TYPES = ("calendar", "gantt", "activity")
 # The ``reason_code`` of a view type the editor does not open (``_view_list``):
-# a timeline without web_timeline, a type the studio does not edit, a type no
-# installed module provides, a type a model not created yet cannot have
-# before Apply, a type the model has no view of.
+# a type of OPTIONAL_VIEW_MODULES without its module, a type the studio does
+# not edit, a type no installed module provides, a type a model not created
+# yet cannot have before Apply, a type the model has no view of.
 VIEW_REASONS = (
     "needs_module",
     "not_editable",
@@ -233,8 +233,8 @@ class ErplibreStudioEditor(models.AbstractModel):
     @api.model
     def _palette(self, view_type, arch, fields_info):
         """The fields the editor offers to drop: those the view does not
-        show yet, that its type can use. A pivot field says on which
-        ``axes`` it goes."""
+        show yet, that its type can use. A pivot or a graph field says on
+        which ``axes`` it goes: a graph groups by « row » only."""
         if view_type == "search":
             shown = {n.get("name") for n in arch.iter("field")}
         else:
@@ -250,8 +250,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             }
             if view_type == "search" and not info.get("searchable"):
                 continue
-            if view_type == "pivot":
-                axes = ["row", "col"] if info.get("groupable") else []
+            if view_type in studio_arch.AXIS_VIEW_TYPES:
+                axes = [
+                    axis
+                    for axis in studio_arch.AXIS_VIEW_TYPES[view_type]
+                    if axis != "measure" and info.get("groupable")
+                ]
                 if self._measurable(info):
                     axes.append("measure")
                 if not axes:
@@ -267,10 +271,12 @@ class ErplibreStudioEditor(models.AbstractModel):
         )
 
     @api.model
-    def _choices(self, fields_info):
+    def _choices(self, fields_info, model=None):
         """The values the editor offers for each kind of attribute value
-        (see ``SETTABLE_ATTRIBUTES``): [[value, label]] lists. A field of
-        the project not yet applied is in none of them."""
+        (see ``SETTABLE_ATTRIBUTES``): [[value, label]] lists, those of
+        ``CHOICES`` included. A field of the project not yet applied is in
+        none of them. ``model`` is the model of the view, for the kinds
+        whose values depend on it."""
 
         def fields_where(predicate):
             items = [
@@ -283,7 +289,12 @@ class ErplibreStudioEditor(models.AbstractModel):
         def stored(types):
             return lambda f: f.get("type") in types and f.get("store")
 
+        choices = {
+            kind: [[value, value] for value in values]
+            for kind, values in studio_arch.CHOICES.items()
+        }
         return {
+            **choices,
             "group_field": fields_where(lambda f: f.get("groupable")),
             "relation_group_field": fields_where(
                 lambda f: f.get("groupable")
@@ -296,8 +307,8 @@ class ErplibreStudioEditor(models.AbstractModel):
             "sort_field": fields_where(lambda f: f.get("sortable")),
             "bool": [["True", "True"], ["False", "False"]],
             "axis": [[axis, axis] for axis in studio_arch.PIVOT_AXES],
+            "graph_axis": [[axis, axis] for axis in studio_arch.GRAPH_AXES],
             "interval": [[i, i] for i in studio_arch.INTERVALS],
-            "timeline_mode": [[m, m] for m in studio_arch.TIMELINE_MODES],
             "widget": [[w, w] for w in studio_arch.WIDGETS],
         }
 
@@ -347,13 +358,16 @@ class ErplibreStudioEditor(models.AbstractModel):
                     for ttype, ops in studio_arch.SEARCH_OPERATORS.items()
                 },
             }
-        if view_type == "pivot":
-            axes = {axis: [] for axis in studio_arch.PIVOT_AXES}
+        if view_type in studio_arch.AXIS_VIEW_TYPES:
+            axes = {axis: [] for axis in studio_arch.AXIS_VIEW_TYPES[view_type]}
             others = []
             for node in studio_arch.elements(arch):
                 if node.tag != "field":
                     continue
                 axis = node.get("type")
+                if view_type == "graph" and axis == "col":
+                    # The graph reads a « col » field as a group-by.
+                    axis = "row"
                 (axes[axis] if axis in axes else others).append(path(node))
             return {"root": root, "axes": axes, "others": others}
         return {"root": root}
@@ -446,7 +460,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                         len(project._view_changes(record)) if project else 0
                     )
             if view_type not in editable_types:
-                if view_type == "timeline":
+                if view_type in studio_arch.OPTIONAL_VIEW_MODULES:
                     code = "needs_module"
                 elif view_type in known:
                     code = "not_editable"
@@ -460,17 +474,20 @@ class ErplibreStudioEditor(models.AbstractModel):
                 code = False
             entry["editable"] = not code
             entry["reason_code"] = code
-            entry["reason"] = self._view_reason(code, label, model)
+            entry["reason"] = self._view_reason(code, label, model, view_type)
             result.append(entry)
         return result
 
     @api.model
-    def _view_reason(self, code, label, model):
-        """The text of the ``reason_code`` ``code`` of ``_view_list``, or
-        False for none."""
+    def _view_reason(self, code, label, model, view_type=None):
+        """The text of the ``reason_code`` ``code`` of ``_view_list`` for
+        the view type ``view_type`` labelled ``label``, or False for none.
+        « needs_module » names the module of OPTIONAL_VIEW_MODULES."""
         if code == "needs_module":
             return self.env._(
-                "Install the web_timeline module to edit a timeline view."
+                "Install the %(module)s module to edit a %(type)s view.",
+                module=studio_arch.OPTIONAL_VIEW_MODULES[view_type],
+                type=label.lower(),
             )
         if code == "not_editable":
             return self.env._(
@@ -569,7 +586,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 for (vtype, tag), names in studio_arch.REQUIRED_ATTRIBUTES.items()
                 if vtype == view.type
             },
-            "choices": self._choices(fields_info),
+            "choices": self._choices(fields_info, model),
             "fields": fields_info,
             "palette": self._palette(view.type, arch, fields_info),
             "field_types": list(NEW_FIELD_TYPES),

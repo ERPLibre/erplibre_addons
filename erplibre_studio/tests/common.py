@@ -17,6 +17,13 @@ PIVOT_ARCH = """
 </pivot>
 """
 
+GRAPH_ARCH = """
+<graph string="Partners" type="bar">
+    <field name="country_id" type="row"/>
+    <field name="partner_latitude" type="measure"/>
+</graph>
+"""
+
 TIMELINE_ARCH = """
 <timeline date_start="create_date" date_stop="write_date" default_group_by="user_id">
     <field name="name"/>

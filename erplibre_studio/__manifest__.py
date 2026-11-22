@@ -16,8 +16,8 @@ ERPLibre studio
 A drag-and-drop editor of views whose changes are recorded in a **studio
 project**, applied to the database, and can become a module.
 
-* **Views**: form, list, kanban, search and pivot views, and timeline
-  views once *web_timeline* is installed. **Customize this view**, in the
+* **Views**: form, list, kanban, search, pivot and graph views, and
+  timeline views once *web_timeline* is installed. **Customize this view**, in the
   debug menu or the *Developer panel*, opens the editor on the view of the
   page. Fields move by drag and drop; the palette adds existing fields and
   new ``x_`` fields, the side panel edits their properties. **Add a view**

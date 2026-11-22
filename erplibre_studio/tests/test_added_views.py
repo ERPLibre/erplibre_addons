@@ -318,3 +318,30 @@ class TestAddedViews(StudioCase):
         self.assertEqual(arch.get("date_start"), "create_date")
         self.project.action_apply()
         self.assertEqual(line.view_id.type, "timeline")
+
+    def test_graph(self):
+        if self.View.default_view("res.partner", "graph"):
+            self.skipTest("res.partner has a graph view in this database")
+        data = self.Editor.add_view(self.project.id, "res.partner", "graph")
+        self.assertEqual(data["view_type"], "graph")
+        line = self.project.view_line_ids
+        root = etree.fromstring(line.arch)
+        self.assertEqual((root.tag, root.get("type")), ("graph", "bar"))
+        self.assertEqual(
+            [(f.get("name"), f.get("type"), f.get("interval")) for f in root],
+            [("create_date", "row", "month")],
+        )
+        context = self.preview_key(self.project)
+        arch = etree.fromstring(
+            self.env["res.partner"]
+            .with_context(**context)
+            .get_view(False, "graph")["arch"]
+        )
+        self.assertEqual(arch.xpath("/graph/field/@name"), ["create_date"])
+        self.project.action_apply()
+        view = line.view_id
+        self.assertEqual((view.mode, view.type), ("primary", "graph"))
+        self.assertEqual(self.View.default_view("res.partner", "graph"), view.id)
+        self.project.action_revert()
+        self.assertFalse(view.exists())
+        self.assertFalse(self.View.default_view("res.partner", "graph"))

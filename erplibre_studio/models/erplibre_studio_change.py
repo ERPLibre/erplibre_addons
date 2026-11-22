@@ -31,6 +31,7 @@ VIEW_TYPES = [
     ("kanban", "Kanban"),
     ("search", "Search"),
     ("pivot", "Pivot"),
+    ("graph", "Graph"),
     ("timeline", "Timeline"),
 ]
 

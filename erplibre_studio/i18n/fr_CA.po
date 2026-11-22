@@ -3023,6 +3023,8 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__graph
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__graph
 msgid "Graph"
 msgstr "Graphique"
 
@@ -3294,8 +3296,8 @@ msgstr "Inspecteur"
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
-msgid "Install the web_timeline module to edit a timeline view."
-msgstr "Installez le module web_timeline pour modifier une vue chronologie."
+msgid "Install the %(module)s module to edit a %(type)s view."
+msgstr "Installez le module %(module)s pour modifier une vue %(type)s."
 
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__module_state__installed

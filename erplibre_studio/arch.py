@@ -25,9 +25,12 @@ import unicodedata
 from lxml import etree
 from odoo.tools.template_inheritance import apply_inheritance_specs
 
-# « timeline » exists only when web_timeline adds it to ir.ui.view.type:
-# the editor offers the view types of this tuple that the registry knows.
-VIEW_TYPES = ("form", "list", "kanban", "search", "pivot", "timeline")
+# The editor offers the view types of this tuple that the registry knows:
+# those of OPTIONAL_VIEW_MODULES exist only once their module is installed.
+VIEW_TYPES = ("form", "list", "kanban", "search", "pivot", "graph", "timeline")
+# {view type: module}: the module that adds the type to ir.ui.view.type, which
+# the editor names when the type is missing from the database.
+OPTIONAL_VIEW_MODULES = {"timeline": "web_timeline"}
 POSITIONS = ("before", "after", "inside")
 
 # The QWeb views: their fields show from a template under <templates>.
@@ -67,6 +70,7 @@ CONTAINERS = {
     "kanban": ("kanban", "templates") + TEMPLATE_DROPS,
     "search": ("search", "group"),
     "pivot": ("pivot",),
+    "graph": ("graph",),
     "timeline": ("timeline", "templates") + TEMPLATE_DROPS,
 }
 DROP_CONTAINERS = {
@@ -75,11 +79,12 @@ DROP_CONTAINERS = {
     "kanban": TEMPLATE_DROPS,
     "search": ("search", "group"),
     "pivot": ("pivot",),
+    "graph": ("graph",),
     "timeline": ("timeline",) + TEMPLATE_DROPS,
 }
 
 # How a view type hides a node: an attribute, or the node removed from the
-# arch (a filter or a pivot field has no « invisible » of its own).
+# arch (a filter, a pivot or a graph field has no « invisible » of its own).
 HIDE_MODES = {
     "form": "invisible",
     "list": "column_invisible",
@@ -87,6 +92,7 @@ HIDE_MODES = {
     "timeline": "invisible",
     "search": "remove",
     "pivot": "remove",
+    "graph": "remove",
 }
 
 # The node attributes the editor shows; ``settable`` ones are added.
@@ -195,6 +201,14 @@ VIEW_OPERATIONS = {
         "relabel",
         "set_attribute",
     ),
+    "graph": (
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "relabel",
+        "set_attribute",
+    ),
     "timeline": (
         "add_existing_field",
         "move",
@@ -238,6 +252,16 @@ SETTABLE_ATTRIBUTES = {
         },
         "field": {"type": "axis", "interval": "interval"},
     },
+    "graph": {
+        "graph": {
+            "type": "graph_type",
+            "stacked": "bool",
+            "order": "graph_order",
+            "disable_linking": "bool",
+            "cumulated": "bool",
+        },
+        "field": {"type": "graph_axis", "interval": "interval"},
+    },
     "timeline": {
         "timeline": {
             "date_start": "date_field",
@@ -259,8 +283,23 @@ REQUIRED_ATTRIBUTES = {
 }
 
 PIVOT_AXES = ("row", "col", "measure")
+# A graph reads its group-bys in arch order, whatever their type, « row »
+# or « col »: the first is the X axis, the next ones split it into series.
+# Its measure is the last field of type « measure ».
+GRAPH_AXES = ("row", "measure")
+# {view type: axes}: the views whose fields take an axis in their « type ».
+AXIS_VIEW_TYPES = {"pivot": PIVOT_AXES, "graph": GRAPH_AXES}
 INTERVALS = ("day", "week", "month", "quarter", "year")
 TIMELINE_MODES = ("day", "week", "month", "fit")
+GRAPH_TYPES = ("bar", "line", "pie")
+GRAPH_ORDERS = ("asc", "desc")
+# {kind: values}: the attribute kinds of SETTABLE_ATTRIBUTES whose value is
+# one of a fixed list.
+CHOICES = {
+    "timeline_mode": TIMELINE_MODES,
+    "graph_type": GRAPH_TYPES,
+    "graph_order": GRAPH_ORDERS,
+}
 DATE_TYPES = ("date", "datetime")
 NUMBER_TYPES = ("integer", "float", "monetary")
 # The fields web_timeline groups its items by, one row per record.
@@ -1576,7 +1615,9 @@ def arch_blocks(root, view_type, fields):
             block["domain"] = node.get("domain") or ""
         elif block["kind"] == "group_by":
             block["group_by"] = group_by_of(node)
-        if view_type == "pivot" and node.tag == "field":
+        if view_type in AXIS_VIEW_TYPES and node.tag == "field":
+            # A graph field of type « col » keeps it: the graph reads it as
+            # a group-by, like « row ».
             block["axis"] = node.get("type") if node.get("type") in PIVOT_AXES else None
             block["interval"] = node.get("interval") or None
         return block
@@ -1777,10 +1818,12 @@ def default_view_arch(view_type, label, name_field, date_field=None, group_field
     """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
     adds to an existing model, labelled ``label``: the record name
     ``name_field`` in a form, a list, a search view and a kanban card; an
-    empty pivot (it counts the records); a timeline that starts on
-    ``date_field``, one row per value of the many2one ``group_field``, its
-    items showing the record name. The arch depends on these values only:
-    the changes of the editor on the view locate their nodes in it."""
+    empty pivot (it counts the records); a bar graph that counts the
+    records by month of ``date_field``, or in one bar without it; a
+    timeline that starts on ``date_field``, one row per value of the
+    many2one ``group_field``, its items showing the record name. The arch
+    depends on these values only: the changes of the editor on the view
+    locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
     if view_type == "form":
         sheet = etree.SubElement(root, "sheet")
@@ -1807,6 +1850,14 @@ def default_view_arch(view_type, label, name_field, date_field=None, group_field
         item = etree.SubElement(templates, "t", {"t-name": "timeline-item"})
         body = etree.SubElement(item, "div")
         etree.SubElement(body, "span", {"t-esc": f"record.{name_field}"})
+    elif view_type == "graph":
+        root.set("type", "bar")
+        if date_field:
+            etree.SubElement(
+                root,
+                "field",
+                {"name": date_field, "interval": "month", "type": "row"},
+            )
     elif view_type != "pivot":
         raise ArchError(
             f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
