@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from lxml import etree
 from odoo.addons.erplibre_studio.tests.common import StudioCase
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 MODULE = "studio_test_generate_added"
@@ -357,3 +358,167 @@ class TestGenerateAddedLeaflet(StudioCase):
         self.assertIn('name="field_title">email<', text)
         self.assertIn(f'name="field_address">{self.address}<', text)
         self.assertIn(self.address, self.read("models", "res_partner.py"))
+
+
+@tagged("post_install", "-at_install")
+class TestGenerateLeafletDate(StudioCase):
+    """A map added to the industries, which have no date_localization, on a
+    development database: Add a view creates the field with the map, Apply
+    creates both, Revert removes both, and the generated module defines
+    the field, when web_view_leaflet_map is installed."""
+
+    module = "studio_test_generate_leaflet_date"
+    model = "res.partner.industry"
+    date = "date_localization"
+    # The rule this module reads from the database.
+    production_rule_pinned = False
+
+    def setUp(self):
+        super().setUp()
+        if "leaflet_map" not in self.Project._view_types():
+            self.skipTest("web_view_leaflet_map is not installed")
+        if self.Project._studio_field_name_rule()["prefix_required"]:
+            self.skipTest("the database requires the x_ prefix")
+        self.View = self.env["ir.ui.view"]
+        if self.View.default_view(self.model, "leaflet_map"):
+            self.skipTest(f"{self.model} has a leaflet_map view in this database")
+        if self.date in self.env[self.model]._fields:
+            self.skipTest(f"{self.model} has {self.date} in this database")
+        self.destination = tempfile.mkdtemp(prefix="erplibre_studio_test_")
+        self.addCleanup(shutil.rmtree, self.destination, True)
+        choices = [(self.destination, self.destination)]
+        patcher = patch.object(
+            type(self.Project), "_destination_choices", lambda self_: choices
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.project = self.make_project(self.module, destination=self.destination)
+
+    def entry(self):
+        data = self.Editor.get_editor_data(self.model, False, "list", self.project.id)
+        return next(e for e in data["view_list"] if e["type"] == "leaflet_map")
+
+    def resolve(self):
+        return self.Editor._resolve_view(self.model, False, "leaflet_map", self.project)
+
+    def add_map(self):
+        """The map, and its two coordinates as new fields of its lanes."""
+        self.Editor.add_view(self.project.id, self.model, "leaflet_map")
+        line = self.project.view_line_ids
+        for attribute, label in (
+            ("field_latitude", "Map latitude"),
+            ("field_longitude", "Map longitude"),
+        ):
+            self.op(
+                self.project,
+                self.resolve(),
+                type="add_field",
+                target="/leaflet_map",
+                position="inside",
+                attribute=attribute,
+                field={"ttype": "float", "field_description": label},
+            )
+        return line
+
+    def date_change(self):
+        return self.project.change_ids.filtered(lambda c: c.field_name == self.date)
+
+    def test_add_view_creates_the_field(self):
+        entry = self.entry()
+        self.assertEqual((entry["reason_code"], entry["editable"]), ("no_view", False))
+        self.assertIn(self.date, entry["description"])
+        self.Editor.add_view(self.project.id, self.model, "leaflet_map")
+        line = self.project.view_line_ids
+        change = self.project.change_ids
+        self.assertEqual(len(change), 1)
+        self.assertEqual(
+            (change.change_type, change.view_line_id, change.xpath, change.position),
+            ("add_field", line, "/leaflet_map", "inside"),
+        )
+        payload = change._payload()
+        self.assertEqual(payload["field_name"], self.date)
+        self.assertFalse(payload["name_auto"])
+        self.assertNotIn("root_attribute", payload)
+        self.assertEqual(
+            (payload["field"]["ttype"], payload["field"]["field_description"]),
+            ("date", "Geolocation Date"),
+        )
+        arch = self.draft(self.project, self.resolve())
+        self.assertEqual(arch.xpath("/leaflet_map/field/@name"), [self.date])
+        self.assertNotIn(self.date, arch.attrib.values())
+        # Not a lane: the lanes name the root attributes only.
+        layout = self.Editor.get_editor_data(
+            self.model, False, "leaflet_map", self.project.id
+        )["layout"]
+        self.assertNotIn(self.date, layout["lanes"].values())
+        # The renderer reads the field by its name: a rename is refused, a
+        # new label keeps it. A map takes neither operation: they come from
+        # another view of the model.
+        view = self.Editor._resolve_view(self.model, False, "list", self.project)
+        for op in (
+            {"type": "rename_field", "field_name": self.date, "new_name": "geo_date"},
+            {"type": "rename_field", "field_name": self.date, "auto": True},
+        ):
+            with self.subTest(op=op), self.assertRaisesRegex(UserError, self.date):
+                self.op(self.project, view, **op)
+        self.op(
+            self.project,
+            view,
+            type="update_field",
+            field_name=self.date,
+            field={"field_description": "Map date"},
+        )
+        self.assertEqual(self.date_change().field_name, self.date)
+
+    def test_production_rule_refuses(self):
+        with self.production_rule():
+            entry = self.entry()
+            self.assertEqual(entry["reason_code"], "needs_field")
+            self.assertFalse(entry["description"])
+            with self.assertRaisesRegex(UserError, self.date):
+                self.Editor.add_view(self.project.id, self.model, "leaflet_map")
+        self.assertFalse(self.project.view_line_ids)
+
+    def test_apply_and_revert(self):
+        line = self.add_map()
+        self.project.action_apply()
+        Model = self.env[self.model]
+        self.assertEqual(Model._fields[self.date].type, "date")
+        field = self.env["ir.model.fields"]._get(self.model, self.date)
+        self.assertEqual((field.state, field.ttype), ("manual", "date"))
+        view = line.view_id
+        self.assertEqual(self.View.default_view(self.model, "leaflet_map"), view.id)
+        arch = etree.fromstring(Model.get_view(view.id, "leaflet_map")["arch"])
+        self.assertEqual(arch.xpath("//field/@name").count(self.date), 1)
+        self.project.action_revert()
+        self.assertFalse(view.exists())
+        self.assertNotIn(self.date, self.env[self.model]._fields)
+        self.assertFalse(self.env["ir.model.fields"]._get(self.model, self.date))
+
+    def test_apply_waits_for_the_field(self):
+        """A map whose date field left the draft (an undo, a removal) is
+        refused at Apply: its markers would read a missing field."""
+        self.add_map()
+        self.date_change().unlink()
+        self.assertIn(self.date, self.Editor.get_review(self.project.id)["blocked"])
+        with self.assertRaisesRegex(UserError, self.date):
+            self.project.action_apply()
+
+    def test_generate(self):
+        self.add_map()
+        with self.server_actions():
+            self.project.action_apply()
+            self.project.action_generate()
+        self.assertIn("web_view_leaflet_map", self.project._dependencies())
+        with open(
+            os.path.join(self.destination, self.module, "__manifest__.py"),
+            encoding="utf-8",
+        ) as fh:
+            self.assertIn("web_view_leaflet_map", fh.read())
+        path = os.path.join(
+            self.destination, self.module, "models", "res_partner_industry.py"
+        )
+        with open(path, encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertRegex(source, rf"{self.date} = fields\.Date\(")
+        self.assertIn("Geolocation Date", source)
