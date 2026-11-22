@@ -207,6 +207,12 @@ export function attributeLabel(attribute, kind) {
             stacked: _t("Stacked"),
             order: _t("Sort"),
             cumulated: _t("Cumulative"),
+            color: _t("Color"),
+            all_day: _t("All day"),
+            create: _t("Create records"),
+            edit: _t("Move and resize events"),
+            delete: _t("Delete records"),
+            filters: _t("Filter in the side panel"),
         }[attribute] || attribute
     );
 }
@@ -221,6 +227,7 @@ export function valueLabel(kind, value) {
         graph_axis: {row: _t("Group by"), measure: _t("Measure")},
         graph_type: {bar: _t("Bar"), line: _t("Line"), pie: _t("Pie")},
         graph_order: {asc: _t("Ascending"), desc: _t("Descending")},
+        calendar_mode: {day: _t("Day"), week: _t("Week"), month: _t("Month"), year: _t("Year")},
     }[kind];
     return (labels && labels[value]) || null;
 }

@@ -142,7 +142,7 @@
                     </button>
                 </div>
             </t>
-            <t t-elif="entry.kind === 'timeline_mode'">
+            <t t-elif="['timeline_mode', 'calendar_mode'].includes(entry.kind)">
                 <span class="form-label d-block mb-1" t-att-id="'o_erplibre_studio_attr_' + entry.attribute" t-esc="entry.label" />
                 <div
                     class="btn-group btn-group-sm w-100 o_erplibre_studio_modes"
@@ -163,7 +163,12 @@
                         t-esc="item.label"
                     />
                 </div>
-                <span t-if="!entry.value" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
+                <t t-if="!entry.value">
+                    <span t-if="entry.kind === 'calendar_mode'" class="d-block text-muted mt-1">
+                        Not set in the view: the calendar opens on the last scale used, else Week.
+                    </span>
+                    <span t-else="" class="d-block text-muted mt-1">Not set in the view: web_timeline opens on Fit.</span>
+                </t>
             </t>
             <t t-elif="entry.kind === 'field_options'">
                 <StudioWidgetOptions
@@ -282,10 +287,10 @@
         </div>
     </t>
 
-    <!-- The properties of a timeline: the lane chosen on the canvas, the
-         other attributes of <timeline>, then the attributes the draft
-         gives it. -->
-    <t t-name="erplibre_studio.Inspector.Timeline">
+    <!-- The properties of a timeline or of a calendar: the lane chosen on
+         the canvas, the other attributes of the view, then the attributes
+         the draft gives it. -->
+    <t t-name="erplibre_studio.Inspector.Lanes">
         <t t-set="lane" t-value="laneInfo" />
         <div
             class="o_erplibre_studio_properties o_erplibre_studio_view_properties small d-flex flex-column gap-3"
@@ -296,10 +301,10 @@
                 <span
                     class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large o_erplibre_studio_glyph_container"
                     aria-hidden="true"
-                    t-esc="lane ? lane.glyph : 'TL'"
+                    t-esc="lane ? lane.glyph : laneViewGlyph"
                 />
                 <div class="o_erplibre_studio_inspector_name">
-                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title" t-esc="lane ? lane.label : timelineLabel" />
+                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title" t-esc="lane ? lane.label : laneViewLabel" />
                     <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="lane ? lane.kind : viewPropertiesLabel" />
                 </div>
             </div>
@@ -314,10 +319,17 @@
                     <t t-if="lane.fields.length" t-esc="lane.fields.join(', ')" />
                     <span t-else="" class="text-muted">none: the items show their name</span>
                 </div>
+                <div t-if="lane.key === 'popover'" class="mb-2 o_erplibre_studio_lane_fields">
+                    <span class="fw-bold">Fields shown</span>
+                    ·
+                    <t t-if="lane.fields.length" t-esc="lane.fields.join(', ')" />
+                    <span t-else="" class="text-muted">none: the popover shows the name and the dates</span>
+                </div>
                 <p class="text-muted mb-0" t-esc="lane.help" />
             </fieldset>
             <fieldset t-if="otherEntries(lane).length" class="o_erplibre_studio_fieldset">
-                <legend class="o_erplibre_studio_section_title">Options of the timeline</legend>
+                <legend t-if="viewType === 'calendar'" class="o_erplibre_studio_section_title">Options of the calendar</legend>
+                <legend t-else="" class="o_erplibre_studio_section_title">Options of the timeline</legend>
                 <t t-foreach="otherEntries(lane)" t-as="entry" t-key="entry.attribute">
                     <t t-call="erplibre_studio.Inspector.SettableEntry" />
                 </t>
@@ -470,7 +482,7 @@
         <div t-if="!selectedBlock and !laneInfo" class="small text-muted o_erplibre_studio_help mb-3">
             Drag a field to move it, or drag a field from the left into the view. Click a field to edit its properties.
         </div>
-        <t t-if="block and isRoot(block) and viewType === 'timeline'" t-call="erplibre_studio.Inspector.Timeline" />
+        <t t-if="block and isRoot(block) and hasLanes" t-call="erplibre_studio.Inspector.Lanes" />
         <div
             t-elif="block and isRoot(block)"
             class="o_erplibre_studio_properties o_erplibre_studio_view_properties small"

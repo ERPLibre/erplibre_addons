@@ -564,39 +564,46 @@
         min-height: 300px;
     }
 
-    // The lanes of a timeline: a grid of drop zones, the item template on
-    // a whole row.
-    .o_erplibre_studio_timeline_lanes {
+    // The lanes of a timeline or of a calendar: a grid of drop zones, the
+    // item template or the popover on a whole row.
+    .o_erplibre_studio_timeline_lanes,
+    .o_erplibre_studio_calendar_lanes {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
         gap: 0.75rem;
     }
 
-    .o_erplibre_studio_timeline_lane {
+    .o_erplibre_studio_timeline_lane,
+    .o_erplibre_studio_calendar_lane {
         min-height: 5rem;
         border-width: 2px !important;
         background-color: $o-view-background-color;
 
-        &[data-lane="template"] {
+        &[data-lane="template"],
+        &[data-lane="popover"] {
             grid-column: 1 / -1;
         }
 
-        .o_erplibre_studio_timeline_lane_pick {
+        .o_erplibre_studio_timeline_lane_pick,
+        .o_erplibre_studio_calendar_lane_pick {
             color: $body-color;
         }
     }
 
-    .o_erplibre_studio_timeline_lane_selected {
+    .o_erplibre_studio_timeline_lane_selected,
+    .o_erplibre_studio_calendar_lane_selected {
         border-color: $primary !important;
         box-shadow: 0 0 0 0.2rem rgba($primary, 0.15);
     }
 
-    .o_erplibre_studio_timeline_chip {
+    .o_erplibre_studio_timeline_chip,
+    .o_erplibre_studio_calendar_chip {
         max-width: 100%;
         background-color: $gray-100;
     }
 
-    .o_erplibre_studio_timeline_chip_changed {
+    .o_erplibre_studio_timeline_chip_changed,
+    .o_erplibre_studio_calendar_chip_changed {
         border-color: $info !important;
         background-color: rgba($info, 0.12);
     }
@@ -666,18 +673,21 @@
 }
 
 // While a field is dragged, the drop hooks open up, and the lanes of a
-// timeline show which ones take it.
+// timeline or of a calendar show which ones take it.
 body.o_erplibre_studio_dragging .o_erplibre_studio {
-    .o_erplibre_studio_timeline_lane_drop {
+    .o_erplibre_studio_timeline_lane_drop,
+    .o_erplibre_studio_calendar_lane_drop {
         border-style: dashed !important;
         border-color: $primary !important;
     }
 
-    .o_erplibre_studio_timeline_lane_over {
+    .o_erplibre_studio_timeline_lane_over,
+    .o_erplibre_studio_calendar_lane_over {
         background-color: rgba($primary, 0.12);
     }
 
-    .o_erplibre_studio_timeline_lane_refused {
+    .o_erplibre_studio_timeline_lane_refused,
+    .o_erplibre_studio_calendar_lane_refused {
         opacity: 0.5;
         border-color: $border-color !important;
     }

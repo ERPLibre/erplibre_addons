@@ -7,8 +7,9 @@ import {_t} from "@web/core/l10n/translation";
 import {X2MANY_TYPES} from "./studio_relations";
 import {tagLabel} from "./studio_outline";
 import {
-    DEFAULT_TIMELINE_MODE,
-    FIELD_LANES,
+    CALENDAR_LANES,
+    DEFAULT_MODES,
+    FIELD_LANES_BY_TYPE,
     LANE_ZONE_PREFIX,
     StudioFrise,
     TIMELINE_LANES,
@@ -288,7 +289,8 @@ StudioBlock.components = {StudioBlock};
 /**
  * The canvas of the editor: the arch tree of a form or a list, the template
  * of a kanban card or of a timeline item, the columns of a search view, the
- * axes of a pivot or of a graph. It renders from its props: a component renders again
+ * axes of a pivot or of a graph, the lanes of a timeline or of a calendar.
+ * It renders from its props: a component renders again
  * when its props change, not when the editor reads its own state, so what
  * the canvas shows of that state reaches it as a prop. A drop, a selection
  * or the filter form goes through the editor ``editor``, which holds the
@@ -311,7 +313,8 @@ export class StudioCanvas extends Component {
         template: {type: [String, {value: null}], optional: true},
         // The new filter of a search view being written.
         filterForm: {type: [Object, {value: null}], optional: true},
-        // The lane of a timeline the inspector shows (TIMELINE_LANES), or null.
+        // The lane of a timeline or of a calendar the inspector shows
+        // (VIEW_LANES), or null.
         lane: {type: [String, {value: null}], optional: true},
     };
 
@@ -395,22 +398,28 @@ export class StudioCanvas extends Component {
     }
 
     /**
-     * The lanes of the canvas of a timeline: [{key, label, accepts,
-     * glyph, zone, drop, over, refused, selected, changed, chips, empty}].
-     * A chip is a value of the lane: a field of an attribute (removable
-     * unless the view needs it), a color rule (removable when the editor
-     * can write the others again).
+     * The lanes ``defs`` of the canvas (VIEW_LANES): [{key, label,
+     * accepts, glyph, zone, drop, over, refused, selected, changed, chips,
+     * empty, classes}]. A chip is a value of the lane: a field of an
+     * attribute (removable unless the view needs it), a color rule
+     * (removable when the editor can write the others again). A field of
+     * the palette drops on the lanes of ``fieldLanes``. ``classes`` names
+     * the lane and its flags after the view type
+     * (« o_erplibre_studio_calendar_lane_selected »).
      */
-    get timelineLanes() {
+    attributeLanes(defs, fieldLanes) {
         const attrs = (this.root && this.root.attrs) || {};
         const changed = this.changedAttributes;
         const required = (this.data.required_attributes || {})[this.root.tag] || [];
         const dragging = this.props.dragging;
         const rules = this.layout.colors || [];
         const writable = writableColorRules(rules);
-        return TIMELINE_LANES.map((lane) => {
+        const viewType = this.viewType;
+        const prefix = `o_erplibre_studio_${viewType}`;
+        return defs.map((lane) => {
             const zone = `${LANE_ZONE_PREFIX}${lane.key}`;
-            const drop = FIELD_LANES.includes(lane.key) && Boolean(this.project);
+            const drop = fieldLanes.includes(lane.key) && Boolean(this.project);
+            const laneName = laneLabel(lane.key, viewType);
             let chips = [];
             let empty = "";
             if (lane.key === "colors") {
@@ -421,9 +430,10 @@ export class StudioCanvas extends Component {
                     text: rule.expression,
                     remove: writable && this.project ? () => this.editor.deleteColorRule(index) : null,
                     removeLabel: _t("Remove the rule %(rule)s", {rule: rule.expression}),
+                    classes: `${prefix}_chip`,
                 }));
                 empty = _t("Default color");
-            } else if (FIELD_LANES.includes(lane.key)) {
+            } else if (fieldLanes.includes(lane.key)) {
                 chips = lane.attributes
                     .filter((attribute) => attrs[attribute])
                     .map((attribute) => {
@@ -435,43 +445,83 @@ export class StudioCanvas extends Component {
                             attribute,
                             text: `${text} · ${name}`,
                             changed: changed.has(attribute),
+                            classes: [`${prefix}_chip`, changed.has(attribute) && `${prefix}_chip_changed`]
+                                .filter(Boolean)
+                                .join(" "),
                             remove:
                                 required.includes(attribute) || !this.project
                                     ? null
                                     : () => this.editor.setNodeAttribute(this.root, attribute, ""),
-                            removeLabel: _t("Remove %(field)s from %(lane)s", {field: label, lane: laneLabel(lane.key)}),
+                            removeLabel: _t("Remove %(field)s from %(lane)s", {field: label, lane: laneName}),
                         };
                     });
                 empty = _t("Drop a field here");
             }
-            return {
-                ...lane,
-                zone,
-                label: laneLabel(lane.key),
-                accepts: laneAccepts(lane.key),
+            const state = {
                 drop,
                 over: this.activeHook === this.editor.hookKey(this.root.path, "lane", zone),
                 refused: Boolean(drop && dragging && !this.editor.accepts(dragging, zone)),
                 selected: this.props.lane === lane.key,
+            };
+            return {
+                ...lane,
+                ...state,
+                zone,
+                label: laneName,
+                accepts: laneAccepts(lane.key, viewType),
                 changed: lane.attributes.some((attribute) => changed.has(attribute)),
                 chips,
                 empty,
+                classes: [`${prefix}_lane`]
+                    .concat(Object.keys(state).filter((flag) => state[flag]).map((flag) => `${prefix}_lane_${flag}`))
+                    .join(" "),
             };
         });
     }
 
-    /** The scales of a timeline: [{value, label, pressed}]. */
-    get timelineModes() {
-        const current = (this.root.attrs || {}).mode || DEFAULT_TIMELINE_MODE;
-        return ((this.data.choices || {}).timeline_mode || []).map(([value, label]) => ({
+    /** The lanes of the canvas of a timeline (attributeLanes). */
+    get timelineLanes() {
+        return this.attributeLanes(TIMELINE_LANES, FIELD_LANES_BY_TYPE.timeline);
+    }
+
+    /** The lanes of the canvas of a calendar (attributeLanes). */
+    get calendarLanes() {
+        return this.attributeLanes(CALENDAR_LANES, FIELD_LANES_BY_TYPE.calendar);
+    }
+
+    /** The field blocks of the popover of a calendar, in their order. */
+    get popoverBlocks() {
+        const byPath = (path) => findBlock(this.root, (b) => b.path === path);
+        return (this.layout.popover || []).map(byPath).filter(Boolean);
+    }
+
+    /** The scale of the view on opening: its « mode », else the default of its type. */
+    get currentMode() {
+        return (this.root.attrs || {}).mode || DEFAULT_MODES[this.viewType];
+    }
+
+    /**
+     * The scales of a timeline or of a calendar: [{value, label, pressed}],
+     * from the choices of the kind of its « mode » (timeline_mode,
+     * calendar_mode).
+     */
+    get modes() {
+        const kind = `${this.viewType}_mode`;
+        const current = this.currentMode;
+        return ((this.data.choices || {})[kind] || []).map(([value, label]) => ({
             value,
-            label: valueLabel("timeline_mode", value) || label,
+            label: valueLabel(kind, value) || label,
             pressed: value === current,
         }));
     }
 
+    /** The scales of a timeline (modes). */
+    get timelineModes() {
+        return this.modes;
+    }
+
     setMode(value) {
-        if (value !== ((this.root.attrs || {}).mode || DEFAULT_TIMELINE_MODE)) {
+        if (value !== this.currentMode) {
             return this.editor.setNodeAttribute(this.root, "mode", value);
         }
     }

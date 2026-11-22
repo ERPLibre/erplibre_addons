@@ -111,6 +111,34 @@ class TestStudioUi(HttpCase):
         # the X axis into series.
         self.assertEqual(arch.xpath("//field")[-1].get("name"), "country_id")
 
+    def test_calendar_tour(self):
+        """A calendar view added to the draft of the contacts: the week
+        scale chosen in the canvas in place of the month, a date dropped
+        on its end date, the preview renders the calendar before Apply."""
+        if self.env["ir.ui.view"].default_view("res.partner", "calendar"):
+            self.skipTest("res.partner has a calendar view in this database")
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1",
+            "erplibre_studio_calendar_editor",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_calendar")]
+        )
+        line = project.view_line_ids
+        self.assertEqual(line.view_type, "calendar")
+        self.assertFalse(line.applied)
+        view = self.env["erplibre.studio.editor"]._resolve_view(
+            "res.partner", False, "calendar", project
+        )
+        arch, errors = project._draft_arch(view)
+        self.assertFalse(errors)
+        self.assertEqual(arch.get("mode"), "week")
+        self.assertEqual(arch.get("date_stop"), "write_date")
+
     def timeline_setup(self):
         """A timeline view of the contacts, a contact of a company to show
         in it, and an action that opens the view: (view, action). Skips the

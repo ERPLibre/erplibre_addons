@@ -518,7 +518,7 @@
                             comodels="state.comodels"
                             tab="state.inspectorTab"
                             hasProject="!!project"
-                            lane="viewType === 'timeline' ? state.timelineLane : null"
+                            lane="['timeline', 'calendar'].includes(viewType) ? state.timelineLane : null"
                             preview="previewInfo"
                         />
                     </aside>

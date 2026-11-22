@@ -24,7 +24,7 @@ import {StudioPalette} from "./studio_palette";
 import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
 import {StudioReview} from "./studio_review";
-import {laneOfZone, timelineLane, writableColorRules} from "./studio_timeline";
+import {laneOf, laneOfZone, writableColorRules} from "./studio_timeline";
 import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relations";
 import {
     DATE_TYPES,
@@ -193,8 +193,8 @@ export class StudioEditor extends Component {
             template: null,
             filterForm: null,
             colors: null,
-            // The lane of a timeline the inspector shows (TIMELINE_LANES),
-            // null for none.
+            // The lane of a timeline or of a calendar the inspector shows
+            // (VIEW_LANES), null for none.
             timelineLane: null,
             // The space the rail shows (SPACES): the centre of the editor.
             space: "view",
@@ -502,6 +502,7 @@ export class StudioEditor extends Component {
                 pivot: _t("Cross analysis: rows, columns and measures."),
                 graph: _t("A bar, line or pie chart of the records, grouped and measured."),
                 timeline: _t("A chronological band, provided by web_timeline (OCA)."),
+                calendar: _t("The records as events on a day, week, month or year grid."),
             }[viewType] || ""
         );
     }
@@ -990,7 +991,8 @@ export class StudioEditor extends Component {
         }
         const lane = laneOfZone(zone);
         if (lane) {
-            // A field dropped on a lane of a timeline becomes its attribute.
+            // A field dropped on a lane of a timeline or of a calendar
+            // becomes its attribute.
             const attribute = this.laneAttribute(lane, item.name);
             if (await this.operate({type: "set_attribute", target, attribute, value: item.name})) {
                 Object.assign(this.state, {timelineLane: lane, selected: null, inspectorTab: "properties"});
@@ -1680,11 +1682,14 @@ export class StudioEditor extends Component {
         }
     }
 
-    // ── the lanes and the colors of a timeline ──────────────────────────
+    // ── the lanes of a timeline or a calendar, the colors of a timeline ──
 
-    /** Show the lane ``key`` of a timeline (TIMELINE_LANES) in the inspector. */
+    /**
+     * Show the lane ``key`` of the timeline or the calendar on screen
+     * (VIEW_LANES) in the inspector.
+     */
     selectLane(key) {
-        if (timelineLane(key)) {
+        if (laneOf(this.viewType, key)) {
             Object.assign(this.state, {timelineLane: key, selected: null, colors: null, inspectorTab: "properties"});
         }
     }
@@ -1694,7 +1699,7 @@ export class StudioEditor extends Component {
      * values the server offers for its kind (``choices``); null for none.
      */
     laneAttribute(key, name) {
-        const lane = timelineLane(key);
+        const lane = laneOf(this.viewType, key);
         const settable = (this.data.settable || {})[this.root && this.root.tag] || {};
         const choices = this.data.choices || {};
         const fits = (attribute) =>
@@ -2097,6 +2102,7 @@ export class StudioEditor extends Component {
             pivot: _t("Pivot"),
             graph: _t("Graph"),
             timeline: _t("Timeline"),
+            calendar: _t("Calendar"),
         };
         return labels[viewType] || viewType;
     }

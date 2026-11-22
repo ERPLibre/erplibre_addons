@@ -9,12 +9,13 @@ import {StudioFieldName} from "./studio_field_name";
 import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {
-    DEFAULT_TIMELINE_MODE,
+    DEFAULT_MODES,
+    fieldLabels,
     laneHelp,
     laneLabel,
+    laneOf,
     openingTag,
     templateFieldLabels,
-    timelineLane,
     writableColorRules,
 } from "./studio_timeline";
 import {
@@ -87,7 +88,7 @@ export class StudioInspector extends Component {
         tab: {type: String, optional: true},
         // Whether a project holds the draft: the review needs one.
         hasProject: {type: Boolean, optional: true},
-        // The lane of a timeline shown (TIMELINE_LANES), or null.
+        // The lane of a timeline or of a calendar shown (VIEW_LANES), or null.
         lane: {type: [String, {value: null}], optional: true},
         // The preview on screen (StudioEditor.previewInfo), or null: the
         // tab « Properties » then describes it.
@@ -801,10 +802,21 @@ export class StudioInspector extends Component {
         return this.editor.removeSelected();
     }
 
-    // ── the lanes of a timeline ─────────────────────────────────────────
+    // ── the lanes of a timeline or of a calendar ────────────────────────
 
-    get timelineLabel() {
-        return _t("Timeline");
+    /** Whether the view on screen shows its settings as lanes (VIEW_LANES). */
+    get hasLanes() {
+        return ["timeline", "calendar"].includes(this.viewType);
+    }
+
+    /** The title of the properties of the view when no lane is shown. */
+    get laneViewLabel() {
+        return this.viewType === "calendar" ? _t("Calendar") : _t("Timeline");
+    }
+
+    /** The glyph of the view when no lane is shown. */
+    get laneViewGlyph() {
+        return this.viewType === "calendar" ? "Ca" : "TL";
     }
 
     get viewPropertiesLabel() {
@@ -812,31 +824,49 @@ export class StudioInspector extends Component {
     }
 
     /**
-     * The lane of the timeline shown, or null: {key, label, glyph, kind,
-     * help, entries (the attributes it sets), fields (what the item shows,
-     * for the template)}.
+     * The lane of the timeline or of the calendar shown, or null: {key,
+     * label, glyph, kind, help, entries (the attributes it sets), fields
+     * (what the item of a timeline or the popover of a calendar shows)}.
      */
     get laneInfo() {
-        const lane = this.viewType === "timeline" && timelineLane(this.props.lane);
+        const viewType = this.viewType;
+        const lane = this.hasLanes && laneOf(viewType, this.props.lane);
         if (!lane || !this.root) {
             return null;
         }
         const entries = this.settableOf(this.root).filter((entry) => lane.attributes.includes(entry.attribute));
-        const template = this.layout.template && findBlock(this.root, (b) => b.path === this.layout.template);
+        const fields = this.data.fields || {};
+        let shown = [];
+        if (viewType === "calendar") {
+            const blocks = (this.layout.popover || []).map((path) => findBlock(this.root, (b) => b.path === path));
+            shown = fieldLabels(blocks.filter(Boolean), fields);
+        } else {
+            const template = this.layout.template && findBlock(this.root, (b) => b.path === this.layout.template);
+            shown = template ? templateFieldLabels(template, fields) : [];
+        }
+        const attributes = lane.attributes.join(", ");
+        let kind;
+        if (viewType === "calendar") {
+            kind = attributes
+                ? _t("Lane of the calendar · %(attributes)s", {attributes})
+                : _t("Lane of the calendar");
+        } else {
+            kind = attributes
+                ? _t("Lane of the timeline · %(attributes)s", {attributes})
+                : _t("Lane of the timeline");
+        }
         return {
             key: lane.key,
             glyph: lane.glyph,
-            label: laneLabel(lane.key),
-            kind: lane.attributes.length
-                ? _t("Lane of the timeline · %(attributes)s", {attributes: lane.attributes.join(", ")})
-                : _t("Lane of the timeline"),
-            help: laneHelp(lane.key),
+            label: laneLabel(lane.key, viewType),
+            kind,
+            help: laneHelp(lane.key, viewType),
             entries,
-            fields: template ? templateFieldLabels(template, this.data.fields || {}) : [],
+            fields: shown,
         };
     }
 
-    /** The attributes of the timeline outside the lane ``lane`` (laneInfo). */
+    /** The attributes of the view outside the lane ``lane`` (laneInfo). */
     otherEntries(lane) {
         const own = lane ? lane.entries.map((entry) => entry.attribute) : [];
         return this.settableOf(this.root).filter((entry) => !own.includes(entry.attribute));
@@ -844,7 +874,7 @@ export class StudioInspector extends Component {
 
     /** The scales of ``entry`` (« mode »): [{value, label, pressed}]. */
     modesOf(entry, block) {
-        const current = entry.value || DEFAULT_TIMELINE_MODE;
+        const current = entry.value || DEFAULT_MODES[this.viewType];
         return this.choicesOf(entry, block).map(([value, label]) => ({value, label, pressed: value === current}));
     }
 

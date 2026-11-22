@@ -19,17 +19,40 @@ export const TIMELINE_LANES = [
     {key: "scale", attributes: ["mode"], glyph: "Sc"},
     {key: "template", attributes: [], glyph: "Aa"},
 ];
+// The lanes of the canvas of a calendar, in their order: each one holds
+// the attributes of <calendar> it sets. « popover » holds the <field>
+// children, which the popover of an event shows, and sets no attribute.
+export const CALENDAR_LANES = [
+    {key: "start", attributes: ["date_start"], glyph: "D"},
+    {key: "stop", attributes: ["date_stop", "date_delay"], glyph: "D"},
+    {key: "color", attributes: ["color"], glyph: "Co"},
+    {key: "all_day", attributes: ["all_day"], glyph: "AD"},
+    {key: "scale", attributes: ["mode"], glyph: "Sc"},
+    {key: "popover", attributes: [], glyph: "Aa"},
+];
+// {view type: lanes}: the views whose canvas shows attribute lanes.
+export const VIEW_LANES = {timeline: TIMELINE_LANES, calendar: CALENDAR_LANES};
 // The lanes a field of the palette is dropped on: their attributes name a
 // field.
 export const FIELD_LANES = ["start", "stop", "group"];
+// FIELD_LANES by view type.
+export const FIELD_LANES_BY_TYPE = {timeline: FIELD_LANES, calendar: ["start", "stop", "color", "all_day"]};
 // The scale web_timeline opens on when the view sets no « mode ».
 export const DEFAULT_TIMELINE_MODE = "fit";
+// The scale a view opens on when it sets no « mode », by view type. The
+// calendar opens on the last scale of the browser session, else the week.
+export const DEFAULT_MODES = {timeline: DEFAULT_TIMELINE_MODE, calendar: "week"};
 // The drop zone of a lane, as the drag and drop of the editor names zones.
 export const LANE_ZONE_PREFIX = "lane:";
 
+/** The lane ``key`` of a ``viewType`` view (VIEW_LANES), or null. */
+export function laneOf(viewType, key) {
+    return (VIEW_LANES[viewType] || []).find((lane) => lane.key === key) || null;
+}
+
 /** The lane of ``key`` (TIMELINE_LANES), or null. */
 export function timelineLane(key) {
-    return TIMELINE_LANES.find((lane) => lane.key === key) || null;
+    return laneOf("timeline", key);
 }
 
 /** The key of the lane a drop zone names, or null for another zone. */
@@ -37,8 +60,18 @@ export function laneOfZone(zone) {
     return zone && zone.startsWith(LANE_ZONE_PREFIX) ? zone.slice(LANE_ZONE_PREFIX.length) : null;
 }
 
-/** The label of the lane ``key``. */
-export function laneLabel(key) {
+/** The label of the lane ``key`` of a ``viewType`` view, a timeline by default. */
+export function laneLabel(key, viewType = "timeline") {
+    if (viewType === "calendar") {
+        const label = {
+            color: _t("Color"),
+            all_day: _t("All day"),
+            popover: _t("Popover"),
+        }[key];
+        if (label) {
+            return label;
+        }
+    }
     return (
         {
             start: _t("Start date"),
@@ -51,8 +84,18 @@ export function laneLabel(key) {
     );
 }
 
-/** What the lane ``key`` takes, under its label. */
-export function laneAccepts(key) {
+/** What the lane ``key`` of a ``viewType`` view takes, under its label. */
+export function laneAccepts(key, viewType = "timeline") {
+    if (viewType === "calendar") {
+        const accepts = {
+            color: _t("many2one, selection, integer or char"),
+            all_day: _t("boolean"),
+            popover: _t("fields shown"),
+        }[key];
+        if (accepts) {
+            return accepts;
+        }
+    }
     return (
         {
             start: _t("date"),
@@ -65,8 +108,22 @@ export function laneAccepts(key) {
     );
 }
 
-/** What the lane ``key`` does, for the inspector. */
-export function laneHelp(key) {
+/** What the lane ``key`` of a ``viewType`` view does, for the inspector. */
+export function laneHelp(key, viewType = "timeline") {
+    if (viewType === "calendar") {
+        return (
+            {
+                start: _t("A date or date and time field. Required."),
+                stop: _t(
+                    "The end date wins over the duration; without either, an event lasts one day or one hour."
+                ),
+                color: _t("One color per value of this field."),
+                all_day: _t("A boolean field: true shows the event over the whole day."),
+                scale: _t("The scale when the calendar opens."),
+                popover: _t("The fields the popover of an event shows, in this order."),
+            }[key] || ""
+        );
+    }
     return (
         {
             start: _t(
@@ -85,14 +142,19 @@ export function laneHelp(key) {
     );
 }
 
+/** The labels of the field blocks ``blocks``, in their order. */
+export function fieldLabels(blocks, fields = {}) {
+    return blocks
+        .filter((block) => block.kind === "field" && block.name)
+        .map((block) => (fields[block.name] && fields[block.name].string) || block.label || block.name);
+}
+
 /**
  * The field labels of the item template ``template`` (a block), in their
  * order: what each item of the timeline shows.
  */
 export function templateFieldLabels(template, fields = {}) {
-    return allBlocks(template)
-        .filter((block) => block.kind === "field" && block.name)
-        .map((block) => (fields[block.name] && fields[block.name].string) || block.label || block.name);
+    return fieldLabels(allBlocks(template), fields);
 }
 
 function escapeAttribute(value) {

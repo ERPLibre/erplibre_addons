@@ -172,6 +172,9 @@
             <p t-if="viewType === 'timeline'" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag a date field onto Start date or End date, a many2one or a many2many onto Group by.
             </p>
+            <p t-elif="viewType === 'calendar'" class="small text-muted border-top pt-2 mt-auto mb-0">
+                Drag a date field onto Start date or End date, a field onto Color, or any field into the popover.
+            </p>
             <p t-else="" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag an item onto a drop zone of the canvas, or press Enter on it: it goes into the selected group or page, after the selected element, else at the end of the view.
             </p>

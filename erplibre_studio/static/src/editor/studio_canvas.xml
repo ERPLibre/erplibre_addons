@@ -6,7 +6,7 @@
          tree of blocks of a form or a list. -->
     <t t-name="erplibre_studio.Canvas">
         <t
-            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline'].includes(viewType)"
+            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
@@ -536,9 +536,128 @@
         </div>
     </t>
 
+    <!-- The lanes « lanes » of a timeline or of a calendar (attributeLanes),
+         their classes named after « prefix » (« o_erplibre_studio_timeline »):
+         the fields of a lane dropped onto it, its scale, its color rules,
+         the item template or the popover in its lane. -->
+    <t t-name="erplibre_studio.Canvas.lanes">
+        <div
+            t-foreach="lanes"
+            t-as="lane"
+            t-key="lane.key"
+            class="border rounded p-2 d-flex flex-column gap-2"
+            t-att-class="lane.classes"
+            t-att-data-lane="lane.key"
+            t-on-dragenter="(ev) => lane.drop and editor.overHook(ev, root.path, 'lane', lane.zone)"
+            t-on-dragover="(ev) => lane.drop and editor.overHook(ev, root.path, 'lane', lane.zone)"
+            t-on-dragleave="() => lane.drop and editor.leaveHook(root.path, 'lane', lane.zone)"
+            t-on-drop="(ev) => lane.drop and editor.dropOnHook(ev, root.path, 'lane', lane.zone)"
+        >
+            <button
+                type="button"
+                class="btn btn-sm p-0 border-0 text-start d-flex align-items-center gap-2"
+                t-att-class="prefix + '_lane_pick'"
+                t-att-aria-pressed="lane.selected ? 'true' : 'false'"
+                t-on-click.stop="() => editor.selectLane(lane.key)"
+            >
+                <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="lane.glyph" />
+                <span class="fw-bold" t-esc="lane.label" />
+                <span class="small text-muted" t-esc="lane.accepts" />
+                <span
+                    t-if="lane.changed"
+                    class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed ms-auto"
+                    title="Changed by the draft"
+                    aria-label="Changed by the draft"
+                    role="img"
+                />
+            </button>
+            <div t-if="lane.chips.length" class="d-flex flex-wrap gap-1">
+                <span
+                    t-foreach="lane.chips"
+                    t-as="chip"
+                    t-key="chip.key"
+                    class="d-inline-flex align-items-center gap-1 border rounded px-2 py-1 small"
+                    t-att-class="chip.classes"
+                    t-att-data-attribute="chip.attribute or false"
+                    t-att-data-index="chip.index"
+                >
+                    <span
+                        t-if="chip.color"
+                        class="o_erplibre_studio_swatch d-inline-block rounded"
+                        t-att-style="'background-color: ' + chip.color"
+                        aria-hidden="true"
+                    />
+                    <span class="text-truncate" t-esc="chip.text" />
+                    <span t-if="chip.changed" class="visually-hidden">(changed in this draft)</span>
+                    <button
+                        t-if="chip.remove"
+                        type="button"
+                        class="btn btn-link btn-sm p-0 text-body"
+                        t-att-class="prefix + '_chip_remove'"
+                        t-att-aria-label="chip.removeLabel"
+                        t-att-title="chip.removeLabel"
+                        t-att-disabled="props.busy"
+                        t-on-click.stop="chip.remove"
+                    >
+                        <i class="fa fa-times" aria-hidden="true" />
+                    </button>
+                </span>
+            </div>
+            <div t-elif="lane.empty" class="small text-muted fst-italic" t-esc="lane.empty" />
+            <div
+                t-if="lane.key === 'scale'"
+                class="btn-group btn-group-sm"
+                t-att-class="prefix + '_scales'"
+                role="group"
+                t-att-aria-label="lane.label"
+            >
+                <button
+                    t-foreach="modes"
+                    t-as="mode"
+                    t-key="mode.value"
+                    type="button"
+                    class="btn"
+                    t-att-class="prefix + '_scale ' + (mode.pressed ? 'btn-primary' : 'btn-outline-secondary')"
+                    t-att-data-value="mode.value"
+                    t-att-aria-pressed="mode.pressed ? 'true' : 'false'"
+                    t-att-disabled="props.busy or !project"
+                    t-on-click.stop="() => this.setMode(mode.value)"
+                    t-esc="mode.label"
+                />
+            </div>
+            <t t-if="lane.key === 'colors'">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link p-0 align-self-start o_erplibre_studio_timeline_add_rule"
+                    t-att-disabled="props.busy or !project"
+                    t-on-click.stop="() => editor.addColorRule()"
+                >
+                    <i class="fa fa-plus me-1" aria-hidden="true" />
+                    Add a rule
+                </button>
+            </t>
+            <t t-if="lane.key === 'template'">
+                <div t-if="timelineTemplate" class="o_erplibre_studio_card border rounded p-2 shadow-sm">
+                    <StudioBlock block="timelineTemplate" editor="editor" viewType="viewType" />
+                </div>
+                <div t-else="" class="text-muted small">This view has no item template: its items show their name.</div>
+            </t>
+            <t t-if="lane.key === 'popover'">
+                <t t-set="popover" t-value="popoverBlocks" />
+                <div t-if="!popover.length" class="small text-muted fst-italic o_erplibre_studio_popover_empty">
+                    None: the popover shows the name and the dates.
+                </div>
+                <t t-call="erplibre_studio.Lane">
+                    <t t-set="zone" t-value="false" />
+                    <t t-set="blocks" t-value="popover" />
+                    <t t-set="end" t-value="endHook(popover, root.path)" />
+                </t>
+            </t>
+        </div>
+    </t>
+
     <!-- The canvas of a timeline view: a lane per setting of <timeline>
-         (TIMELINE_LANES), the fields of a lane dropped onto it, the item
-         template in its lane, the fields the view loads, then the timeline
+         (TIMELINE_LANES), the fields the view loads, then the timeline
          itself rendered with the draft. -->
     <t t-name="erplibre_studio.Canvas.timeline">
         <div class="o_erplibre_studio_timeline d-flex flex-column gap-3">
@@ -546,110 +665,10 @@
                 class="o_erplibre_studio_timeline_lanes o_erplibre_studio_timeline_summary"
                 aria-label="Settings of the timeline"
             >
-                <div
-                    t-foreach="timelineLanes"
-                    t-as="lane"
-                    t-key="lane.key"
-                    class="o_erplibre_studio_timeline_lane border rounded p-2 d-flex flex-column gap-2"
-                    t-att-class="{
-                        'o_erplibre_studio_timeline_lane_selected': lane.selected,
-                        'o_erplibre_studio_timeline_lane_drop': lane.drop,
-                        'o_erplibre_studio_timeline_lane_over': lane.over,
-                        'o_erplibre_studio_timeline_lane_refused': lane.refused,
-                    }"
-                    t-att-data-lane="lane.key"
-                    t-on-dragenter="(ev) => lane.drop and editor.overHook(ev, root.path, 'lane', lane.zone)"
-                    t-on-dragover="(ev) => lane.drop and editor.overHook(ev, root.path, 'lane', lane.zone)"
-                    t-on-dragleave="() => lane.drop and editor.leaveHook(root.path, 'lane', lane.zone)"
-                    t-on-drop="(ev) => lane.drop and editor.dropOnHook(ev, root.path, 'lane', lane.zone)"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-sm p-0 border-0 text-start d-flex align-items-center gap-2 o_erplibre_studio_timeline_lane_pick"
-                        t-att-aria-pressed="lane.selected ? 'true' : 'false'"
-                        t-on-click.stop="() => editor.selectLane(lane.key)"
-                    >
-                        <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="lane.glyph" />
-                        <span class="fw-bold" t-esc="lane.label" />
-                        <span class="small text-muted" t-esc="lane.accepts" />
-                        <span
-                            t-if="lane.changed"
-                            class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed ms-auto"
-                            title="Changed by the draft"
-                            aria-label="Changed by the draft"
-                            role="img"
-                        />
-                    </button>
-                    <div t-if="lane.chips.length" class="d-flex flex-wrap gap-1">
-                        <span
-                            t-foreach="lane.chips"
-                            t-as="chip"
-                            t-key="chip.key"
-                            class="o_erplibre_studio_timeline_chip d-inline-flex align-items-center gap-1 border rounded px-2 py-1 small"
-                            t-att-class="{'o_erplibre_studio_timeline_chip_changed': chip.changed}"
-                            t-att-data-attribute="chip.attribute or false"
-                            t-att-data-index="chip.index"
-                        >
-                            <span
-                                t-if="chip.color"
-                                class="o_erplibre_studio_swatch d-inline-block rounded"
-                                t-att-style="'background-color: ' + chip.color"
-                                aria-hidden="true"
-                            />
-                            <span class="text-truncate" t-esc="chip.text" />
-                            <span t-if="chip.changed" class="visually-hidden">(changed in this draft)</span>
-                            <button
-                                t-if="chip.remove"
-                                type="button"
-                                class="btn btn-link btn-sm p-0 text-body o_erplibre_studio_timeline_chip_remove"
-                                t-att-aria-label="chip.removeLabel"
-                                t-att-title="chip.removeLabel"
-                                t-att-disabled="props.busy"
-                                t-on-click.stop="chip.remove"
-                            >
-                                <i class="fa fa-times" aria-hidden="true" />
-                            </button>
-                        </span>
-                    </div>
-                    <div t-elif="lane.empty" class="small text-muted fst-italic" t-esc="lane.empty" />
-                    <div
-                        t-if="lane.key === 'scale'"
-                        class="btn-group btn-group-sm o_erplibre_studio_timeline_scales"
-                        role="group"
-                        aria-label="Scale of the timeline"
-                    >
-                        <button
-                            t-foreach="timelineModes"
-                            t-as="mode"
-                            t-key="mode.value"
-                            type="button"
-                            class="btn o_erplibre_studio_timeline_scale"
-                            t-att-class="mode.pressed ? 'btn-primary' : 'btn-outline-secondary'"
-                            t-att-data-value="mode.value"
-                            t-att-aria-pressed="mode.pressed ? 'true' : 'false'"
-                            t-att-disabled="props.busy or !project"
-                            t-on-click.stop="() => this.setMode(mode.value)"
-                            t-esc="mode.label"
-                        />
-                    </div>
-                    <t t-if="lane.key === 'colors'">
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-link p-0 align-self-start o_erplibre_studio_timeline_add_rule"
-                            t-att-disabled="props.busy or !project"
-                            t-on-click.stop="() => editor.addColorRule()"
-                        >
-                            <i class="fa fa-plus me-1" aria-hidden="true" />
-                            Add a rule
-                        </button>
-                    </t>
-                    <t t-if="lane.key === 'template'">
-                        <div t-if="timelineTemplate" class="o_erplibre_studio_card border rounded p-2 shadow-sm">
-                            <StudioBlock block="timelineTemplate" editor="editor" viewType="viewType" />
-                        </div>
-                        <div t-else="" class="text-muted small">This view has no item template: its items show their name.</div>
-                    </t>
-                </div>
+                <t t-call="erplibre_studio.Canvas.lanes">
+                    <t t-set="lanes" t-value="timelineLanes" />
+                    <t t-set="prefix" t-value="'o_erplibre_studio_timeline'" />
+                </t>
             </section>
             <t t-call="erplibre_studio.Canvas.loaded" />
             <section class="o_erplibre_studio_frise border rounded p-2" aria-label="Preview of the timeline">
@@ -659,6 +678,23 @@
                 </div>
                 <StudioFrise t-if="friseAvailable" viewProps="editor.previewProps" viewKey="editor.previewKey" />
                 <div t-else="" class="small text-muted o_erplibre_studio_frise_unavailable" t-esc="friseUnavailable" />
+            </section>
+        </div>
+    </t>
+
+    <!-- The canvas of a calendar view: a lane per setting of <calendar>
+         (CALENDAR_LANES), the popover fields in their lane. The Preview of
+         the toolbar shows the calendar itself. -->
+    <t t-name="erplibre_studio.Canvas.calendar">
+        <div class="o_erplibre_studio_calendar">
+            <section
+                class="o_erplibre_studio_calendar_lanes o_erplibre_studio_calendar_summary"
+                aria-label="Settings of the calendar"
+            >
+                <t t-call="erplibre_studio.Canvas.lanes">
+                    <t t-set="lanes" t-value="calendarLanes" />
+                    <t t-set="prefix" t-value="'o_erplibre_studio_calendar'" />
+                </t>
             </section>
         </div>
     </t>

@@ -56,6 +56,7 @@ const OPERATIONS = {
     pivot: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
     graph: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
     timeline: ["add_existing_field", "move", "remove", "hide", "set_attribute"],
+    calendar: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
 };
 
 const CHOICES = {
@@ -82,6 +83,13 @@ const CHOICES = {
     graph_axis: ["row", "measure"].map((a) => [a, a]),
     graph_type: ["bar", "line", "pie"].map((t) => [t, t]),
     graph_order: ["asc", "desc"].map((o) => [o, o]),
+    calendar_mode: ["day", "week", "month", "year"].map((m) => [m, m]),
+    color_field: [
+        ["color", "Color"],
+        ["country_id", "Country"],
+        ["name", "Name"],
+    ],
+    bool_field: [["active", "Active"]],
 };
 
 function field(path, name, extra = {}) {
@@ -307,6 +315,39 @@ function timelinePayload(attrs, loaded = ["name"], colors = []) {
             },
         },
         required_attributes: {timeline: ["date_start", "default_group_by"]},
+    });
+}
+
+/**
+ * A calendar of the contacts: the root attributes ``attrs``, the fields of
+ * ``popover`` as its <field> children, which the popover of an event shows.
+ */
+function calendarPayload(attrs, popover = ["name"]) {
+    const children = popover.map((name) => field(named("field", name), name));
+    return payload("calendar", container("/calendar", "calendar", children, {movable: false, attrs}), {
+        layout: {
+            root: "/calendar",
+            popover: children.map((child) => child.path),
+            loaded_by_attributes: Object.values(attrs),
+        },
+        hide_mode: "invisible",
+        settable: {
+            calendar: {
+                date_start: "date_field",
+                date_stop: "date_field",
+                date_delay: "number_field",
+                color: "color_field",
+                all_day: "bool_field",
+                mode: "calendar_mode",
+                quick_create: "bool",
+                event_open_popup: "bool",
+                create: "bool",
+                edit: "bool",
+                delete: "bool",
+            },
+            field: {filters: "calendar_filter"},
+        },
+        required_attributes: {calendar: ["date_start"]},
     });
 }
 
@@ -1102,6 +1143,120 @@ describe("erplibre_studio editor, timeline", () => {
         // Saving replaces the rules: the form starts with a new one only.
         expect(".o_erplibre_studio_color_rule").toHaveCount(1);
         expect(".o_erplibre_studio_colors_form").toHaveText(/Saving replaces the rules above/);
+    });
+});
+
+describe("erplibre_studio editor, calendar", () => {
+    const lane = (key) => `.o_erplibre_studio_calendar_lane[data-lane=${key}]`;
+
+    test("the lanes, a chip removed, a drop on a lane and the scale", async () => {
+        answer = calendarPayload({date_start: "create_date", date_stop: "create_date"});
+        await openEditor("calendar");
+        expect(".o_erplibre_studio_calendar_lane").toHaveCount(6);
+        for (const key of ["start", "stop", "color", "all_day", "scale", "popover"]) {
+            expect(lane(key)).toHaveCount(1);
+        }
+        expect(".o_erplibre_studio_timeline_lane").toHaveCount(0);
+        expect(".o_erplibre_studio_palette").toHaveText(/a field onto Color, or any field into the popover/);
+        // The start date is required: its chip stays.
+        expect(`${lane("start")} .o_erplibre_studio_calendar_chip`).toHaveText("Created on · create_date");
+        expect(`${lane("start")} .o_erplibre_studio_calendar_chip_remove`).toHaveCount(0);
+        expect(lane("color")).toHaveText(/Drop a field here/);
+        await contains(`${lane("stop")} .o_erplibre_studio_calendar_chip_remove`).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/calendar",
+            attribute: "date_stop",
+            value: "",
+        });
+
+        // A number does not fit the start date; a date fits the end date.
+        const dragging = await contains(".o_erplibre_studio_existing_field[data-name=color]").drag();
+        expect(lane("start")).toHaveClass("o_erplibre_studio_calendar_lane_refused");
+        expect(lane("color")).not.toHaveClass("o_erplibre_studio_calendar_lane_refused");
+        await dragging.drop(lane("start"));
+        expect.verifySteps([]);
+        await contains(".o_erplibre_studio_existing_field[data-name=create_date]").dragAndDrop(lane("stop"));
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/calendar",
+            attribute: "date_stop",
+            value: "create_date",
+        });
+        // The inspector shows the lane of the drop and what it does.
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-lane", "stop");
+        expect(".o_erplibre_studio_inspector_kind").toHaveText(/Lane of the calendar/);
+        expect(".o_erplibre_studio_lane_props").toHaveText(/The end date wins over the duration/);
+        expect(lane("stop")).toHaveClass("o_erplibre_studio_calendar_lane_selected");
+
+        // Without « mode », the calendar opens on the week.
+        const scale = `${lane("scale")} .o_erplibre_studio_calendar_scale`;
+        expect(queryAllTexts(scale)).toEqual(["Day", "Week", "Month", "Year"]);
+        expect(`${scale}[data-value=week]`).toHaveAttribute("aria-pressed", "true");
+        await contains(`${scale}[data-value=week]`).click();
+        expect.verifySteps([]);
+        await contains(`${scale}[data-value=month]`).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({type: "set_attribute", target: "/calendar", attribute: "mode", value: "month"});
+    });
+
+    test("the popover lane takes any field, the inspector names its fields", async () => {
+        answer = calendarPayload({date_start: "create_date"}, ["name", "email"]);
+        await openEditor("calendar");
+        expect(`${lane("popover")} .o_erplibre_studio_field`).toHaveCount(2);
+        await contains(".o_erplibre_studio_existing_field[data-name=phone]").dragAndDrop(
+            `${lane("popover")} ${hook(named("field", "email"), "after")}`
+        );
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: named("field", "email"),
+            position: "after",
+            field_name: "phone",
+        });
+
+        await contains(`${lane("popover")} .o_erplibre_studio_calendar_lane_pick`).click();
+        expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-lane", "popover");
+        expect(".o_erplibre_studio_inspector_title").toHaveText("Popover");
+        expect(".o_erplibre_studio_lane_fields").toHaveText(/Name, Email/);
+        expect(".o_erplibre_studio_lane_props").toHaveText(/The fields the popover of an event shows/);
+        // The other attributes of the calendar keep their own section.
+        expect(".o_erplibre_studio_view_properties legend").toHaveCount(2);
+        expect(".o_erplibre_studio_view_properties legend:last").toHaveText(/options of the calendar/i);
+        expect(".o_erplibre_studio_settable[data-attribute=edit]").toHaveText(/Move and resize events/);
+
+        // A field of the popover: the lane leaves the inspector.
+        await contains(`${lane("popover")} .o_erplibre_studio_field[data-name=name]`).click();
+        expect(".o_erplibre_studio_properties[data-name=name]").toHaveCount(1);
+        expect(".o_erplibre_studio_calendar_lane_selected").toHaveCount(0);
+    });
+
+    test("a color field and an all-day boolean drop on their lanes", async () => {
+        answer = calendarPayload({date_start: "create_date"});
+        await openEditor("calendar");
+        // The view itself, no lane chosen: its scale as a group of buttons.
+        expect(".o_erplibre_studio_inspector_title").toHaveText("Calendar");
+        expect(".o_erplibre_studio_settable[data-attribute=mode] .o_erplibre_studio_mode").toHaveCount(4);
+        expect(".o_erplibre_studio_settable[data-attribute=mode]").toHaveText(/opens on the last scale used, else Week/);
+        await contains(".o_erplibre_studio_existing_field[data-name=country_id]").dragAndDrop(lane("color"));
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/calendar",
+            attribute: "color",
+            value: "country_id",
+        });
+        await contains(".o_erplibre_studio_existing_field[data-name=active]").dragAndDrop(lane("all_day"));
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/calendar",
+            attribute: "all_day",
+            value: "active",
+        });
+        expect(".o_erplibre_studio_inspector_title").toHaveText("All day");
     });
 });
 

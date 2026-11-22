@@ -521,6 +521,12 @@ msgid "A bar, line or pie chart of the records, grouped and measured."
 msgstr "Un graphique à barres, à lignes ou en secteurs des enregistrements, regroupés et mesurés."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "A boolean field: true shows the event over the whole day."
+msgstr "Un champ booléen : vrai affiche l'événement sur toute la journée."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A calendar needs a stored date field on %(model)s."
@@ -612,6 +618,12 @@ msgid ""
 msgstr ""
 "Champ date ou date et heure du modèle. Obligatoire : sans lui, la frise ne "
 "place rien."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "A date or date and time field. Required."
+msgstr "Un champ date ou date et heure. Requis."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1193,6 +1205,13 @@ msgstr "Tout"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "All day"
+msgstr "Toute la journée"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Allowed companies"
 msgstr "Sociétés autorisées"
@@ -1609,6 +1628,12 @@ msgstr "Les champs créés hors du code portent x_ sur une base de production."
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Filter %(label)s"
 msgstr "Filtre %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Filter in the side panel"
+msgstr "Filtre du panneau latéral"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2032,8 +2057,11 @@ msgid "By"
 msgstr "Par"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__calendar
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__calendar
 msgid "Calendar"
@@ -2283,6 +2311,8 @@ msgstr "Replier %(label)s"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Color"
 msgstr "Couleur"
 
@@ -2530,6 +2560,12 @@ msgstr "Supprimer des colonnes"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Delete records"
+msgstr "Supprimer des enregistrements"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Delete the model and its records"
 msgstr "Supprimer le modèle et ses données"
@@ -2625,6 +2661,14 @@ msgstr "Brouillon"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__draft_revision
 msgid "Draft Revision"
 msgstr "Révision du brouillon"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid ""
+"Drag a date field onto Start date or End date, a field onto Color, or any "
+"field into the popover."
+msgstr "Glissez un champ date sur Date de début ou Date de fin, un champ sur Couleur, ou tout champ dans la fenêtre contextuelle."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3514,6 +3558,18 @@ msgstr "Couloir"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Lane of the calendar"
+msgstr "Couloir du calendrier"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Lane of the calendar · %(attributes)s"
+msgstr "Couloir du calendrier · %(attributes)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Lane of the timeline"
 msgstr "Couloir de la chronologie"
 
@@ -3885,6 +3941,12 @@ msgstr "Déplacement"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Move and resize events"
+msgstr "Déplacer et redimensionner les événements"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Multiline text"
 msgstr "Texte multiligne"
 
@@ -4245,6 +4307,12 @@ msgid "None: the model does not exist"
 msgstr "Aucun : le modèle n'existe pas"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "None: the popover shows the name and the dates."
+msgstr "Aucun : la fenêtre contextuelle affiche le nom et les dates."
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__module_state__uninstalled
 msgid "Not Installed"
 msgstr "Non installé"
@@ -4278,6 +4346,13 @@ msgid ""
 "Not on this model; the studio adds it only to the models of the project."
 msgstr ""
 "Absente de ce modèle ; le studio ne l'ajoute qu'aux modèles du projet."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"Not set in the view: the calendar opens on the last scale used, else Week."
+msgstr "Absent de la vue : le calendrier s'ouvre sur la dernière échelle utilisée, sinon sur « Semaine »."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4374,6 +4449,12 @@ msgstr "Sur %(model)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Once applied, the chatter cannot be removed."
 msgstr "Une fois appliqué, le fil de discussion ne peut plus être retiré."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "One color per value of this field."
+msgstr "Une couleur par valeur de ce champ."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4641,6 +4722,12 @@ msgstr "Plan"
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Plus the automatic fields: Created on, Created by, Last updated on."
 msgstr "Plus les champs automatiques : Créé le, Créé par, Modifié le."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "Popover"
+msgstr "Fenêtre contextuelle"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__position
@@ -5229,12 +5316,6 @@ msgstr "Échelle"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
-msgid "Scale of the timeline"
-msgstr "Échelle de la frise"
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Scope"
@@ -5348,6 +5429,12 @@ msgstr "Se règle avant l'Apply seulement : la colonne existe."
 msgid "Set by Odoo for a model created outside code: they do not change."
 msgstr ""
 "Fixés par Odoo pour un modèle créé hors du code : ils ne changent pas."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Settings of the calendar"
+msgstr "Réglages du calendrier"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5865,6 +5952,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid ""
+"The end date wins over the duration; without either, an event lasts one day "
+"or one hour."
+msgstr "La date de fin l'emporte sur la durée; sans l'une ni l'autre, un événement dure un jour ou une heure."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 msgid "The existing groups"
 msgstr "Les groupes existants"
@@ -6000,6 +6095,12 @@ msgid ""
 msgstr ""
 "Champs affichés dans chaque élément, dans cet ordre. Glissez un champ de la "
 "palette dans l'élément pour l'ajouter."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "The fields the popover of an event shows, in this order."
+msgstr "Les champs qu'affiche la fenêtre contextuelle d'un événement, dans cet ordre."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6454,6 +6555,12 @@ msgstr "Les enregistrements en cartes, en colonnes par regroupement."
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The records as events on a day, week, month or year grid."
+msgstr "Les enregistrements comme des événements sur une grille de jour, de semaine, de mois ou d'année."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "The records as rows, one column per field."
 msgstr "Les enregistrements en lignes, une colonne par champ."
 
@@ -6607,6 +6714,12 @@ msgid ""
 msgstr ""
 "Échelle à l'ouverture de la frise. L'utilisateur en change ensuite depuis la"
 " frise."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "The scale when the calendar opens."
+msgstr "L'échelle à l'ouverture du calendrier."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7672,6 +7785,12 @@ msgid "auto"
 msgstr "auto"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "boolean"
+msgstr "booléen"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change of the project %(project)s"
@@ -7874,6 +7993,12 @@ msgid "many2one / many2many"
 msgstr "many2one / many2many"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
+msgid "many2one, selection, integer or char"
+msgstr "many2one, sélection, entier ou caractère"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "menu %(name)s"
@@ -7941,6 +8066,12 @@ msgstr "aucun"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "none: the items show their name"
 msgstr "aucun : les éléments affichent leur nom"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "none: the popover shows the name and the dates"
+msgstr "aucun : la fenêtre contextuelle affiche le nom et les dates"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8181,6 +8312,12 @@ msgstr "Bloquer la suppression"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Create a one2many on the comodel"
 msgstr "Créer un one2many sur le comodèle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Create records"
+msgstr "Créer des enregistrements"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8455,12 +8592,18 @@ msgstr "Options"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Options of the calendar"
+msgstr "Options du calendrier"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Options of the widget: JSON or a Python dictionary. Empty: none."
 msgstr "Options du widget : JSON ou un dictionnaire Python. Vide : aucune."
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "{\"no_create\": true}"
 msgstr "{\"no_create\": true}"
