@@ -1475,6 +1475,49 @@ export class StudioEditor extends Component {
         }
     }
 
+    // ── technical names of the new models ───────────────────────────────
+
+    /**
+     * The rule the technical names of new models follow on this database
+     * (``model_name_rule`` of the payload): {prefix_required, mode, label,
+     * text, detail}, or null when the payload has none, which the parts
+     * read as the production rule (x_ required).
+     */
+    get modelNameRule() {
+        return (this.data && this.data.model_name_rule) || null;
+    }
+
+    /**
+     * What the technical name ``name`` of a new model gives
+     * (``check_model_name``): {name, proposed, status, message, detail,
+     * checks, rule}. ``lineId``: the model line renamed, ``label`` its
+     * label. A read; an error answers the status « invalid » with its
+     * message and ``error`` set, which no part takes as a verdict on the
+     * name.
+     */
+    async checkModelName(name, lineId, label) {
+        const refused = (message) => ({
+            name,
+            proposed: false,
+            status: "invalid",
+            message,
+            detail: "",
+            checks: [],
+            error: true,
+        });
+        if (!this.project) {
+            return refused(_t("Choose or create a studio project first."));
+        }
+        try {
+            return await this.orm.call(MODEL, "check_model_name", [this.project.id, name], {
+                line_id: lineId || false,
+                label: label || false,
+            });
+        } catch (error) {
+            return refused(this.errorMessage(error));
+        }
+    }
+
     /**
      * Rename the new field ``old`` of the model on screen to ``name``, or,
      * with ``auto``, to the name its label proposes, which it then follows;
@@ -1719,6 +1762,8 @@ export class StudioEditor extends Component {
                 ...choices.models.map((m) => m[0]),
                 ...this.projectModels.map((m) => m.model),
             ],
+            rule: this.modelNameRule,
+            checkName: (name, label) => this.checkModelName(name, line && line.id, label),
             save: (values) => (line ? this.updateModel(line, values) : this.createModel(values)),
         });
     }

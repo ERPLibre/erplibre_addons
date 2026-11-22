@@ -2,9 +2,11 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, useState} from "@odoo/owl";
+import {Component, onMounted, onWillUnmount, status, useState} from "@odoo/owl";
 import {Dialog} from "@web/core/dialog/dialog";
 import {_t} from "@web/core/l10n/translation";
+import {useDebounced} from "@web/core/utils/timing";
+import {NAME_CHECK_DELAY} from "./studio_field_name";
 
 // The longest model name the server accepts (arch.MODEL_NAME_SIZE).
 export const MODEL_NAME_SIZE = 50;
@@ -123,6 +125,16 @@ export function menuPlace(line, apps) {
  * the model, or under an existing menu (MENU_PLACES); the dialog shows
  * the path of the menu it makes. ``save(values)`` sends it and answers
  * whether the server took it.
+ *
+ * The technical name follows the rule of the database (``rule``, the
+ * ``model_name_rule`` of the payload; none is the production rule, x_
+ * required). With ``checkName(name, label)``, the name is checked once
+ * the typing pauses (NAME_CHECK_DELAY), and on opening for a line not
+ * applied yet; each check is a request numbered in order, and an answer
+ * that arrives after a newer request, or once the dialog is gone, is
+ * dropped. Save waits while the last answer about the name on screen
+ * says it does not apply; an answer that is an error of the call blocks
+ * nothing, the server checks the name again on save.
  */
 export class StudioModelDialog extends Component {
     static template = "erplibre_studio.ModelDialog";
@@ -132,6 +144,10 @@ export class StudioModelDialog extends Component {
         choices: Object,
         line: {type: [Object, {value: null}], optional: true},
         taken: {type: Array, optional: true},
+        // The rule of the database (``model_name_rule`` of the payload).
+        rule: {type: [Object, {value: null}], optional: true},
+        // ``checkName(name, label)``: the answer of ``check_model_name``.
+        checkName: {type: Function, optional: true},
         save: Function,
         close: Function,
     };
@@ -156,6 +172,20 @@ export class StudioModelDialog extends Component {
             menuFilter: "",
             menuName: (line && line.menu_name) || "",
             saving: false,
+            // The last answer of ``checkName``, for the name it names
+            // (``check.name``); ``checking``: a request is on its way.
+            check: null,
+            checking: false,
+        });
+        this.request = 0;
+        this.scheduleCheck = useDebounced(() => this.checkName(), NAME_CHECK_DELAY);
+        onMounted(() => {
+            if (this.state.model.trim()) {
+                this.checkName();
+            }
+        });
+        onWillUnmount(() => {
+            this.request++;
         });
     }
 
@@ -190,6 +220,71 @@ export class StudioModelDialog extends Component {
         return Boolean(this.line && this.line.applied);
     }
 
+    /** Whether the name needs x_: the rule says so, or there is no rule. */
+    get prefixRequired() {
+        return !this.props.rule || Boolean(this.props.rule.prefix_required);
+    }
+
+    get rule() {
+        return this.props.rule || null;
+    }
+
+    get nameHelp() {
+        if (this.prefixRequired) {
+            return _t(
+                "Starts with x_, then lower case letters, digits and underscores; it cannot change once applied."
+            );
+        }
+        return _t(
+            "Lower case letters, digits, underscores and dots; x_ is optional on this development database. It cannot change once applied."
+        );
+    }
+
+    /** The answer of the last check when it is about the name on screen, else null. */
+    get nameCheck() {
+        const check = this.state.check;
+        return !this.modelLocked && check && check.name === this.state.model.trim() ? check : null;
+    }
+
+    /** Whether the server said the name on screen does not apply. */
+    get nameRefused() {
+        const check = this.nameCheck;
+        return Boolean(check && !check.error && check.status !== "available");
+    }
+
+    /** The class of the status of the name: available, refused, or none while checking. */
+    get nameStatusClass() {
+        const check = this.nameCheck;
+        if (this.state.checking || !check) {
+            return "text-muted";
+        }
+        return check.status === "available"
+            ? "o_erplibre_studio_name_ok text-success-emphasis bg-success-subtle"
+            : "o_erplibre_studio_name_bad text-danger-emphasis bg-danger-subtle";
+    }
+
+    /**
+     * Ask ``checkName`` what the name on screen gives; an answer of an
+     * older request, or once the dialog is gone, is dropped. No check of
+     * an empty or locked name.
+     */
+    async checkName() {
+        const name = this.state.model.trim();
+        if (!this.props.checkName || this.modelLocked || !name) {
+            this.request++;
+            Object.assign(this.state, {check: null, checking: false});
+            return null;
+        }
+        const request = ++this.request;
+        this.state.checking = true;
+        const check = await this.props.checkName(name, this.state.name.trim());
+        if (request !== this.request || status(this) === "destroyed") {
+            return null;
+        }
+        Object.assign(this.state, {check, checking: false});
+        return check;
+    }
+
     /** Once applied, Odoo keeps the chatter of a model. */
     get chatterLocked() {
         return Boolean(this.line && this.line.applied && this.line.chatter);
@@ -206,7 +301,7 @@ export class StudioModelDialog extends Component {
 
     get canSave() {
         const state = this.state;
-        if (state.saving || !state.name.trim() || !state.model.trim()) {
+        if (state.saving || !state.name.trim() || !state.model.trim() || this.nameRefused) {
             return false;
         }
         if (state.place === "menu") {
@@ -270,7 +365,11 @@ export class StudioModelDialog extends Component {
     setName(value) {
         this.state.name = value;
         if (!this.state.modelEdited) {
-            this.state.model = value.trim() ? modelNameFromLabel(value, this.props.taken || []) : "";
+            const model = value.trim() ? modelNameFromLabel(value, this.props.taken || []) : "";
+            if (model !== this.state.model) {
+                this.state.model = model;
+                this.scheduleCheck();
+            }
         }
         if (!this.state.appNameEdited) {
             this.state.appName = value;
@@ -280,6 +379,7 @@ export class StudioModelDialog extends Component {
     setModel(value) {
         this.state.model = value;
         this.state.modelEdited = true;
+        this.scheduleCheck();
     }
 
     /** The technical name of a new model follows the label again. */

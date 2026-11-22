@@ -156,18 +156,36 @@ export class StudioModelsSpace extends Component {
             : _t("Model of the project · created by Apply");
     }
 
-    /** The technical name without « x_ », which the page shows apart, for a model of the project. */
-    techRest(entry) {
-        return entry.line && entry.model.startsWith("x_") ? entry.model.slice(2) : entry.model;
+    /**
+     * Whether new model names need x_ on this database (``model_name_rule``
+     * of the payload; none is the production rule).
+     */
+    get prefixRequired() {
+        const rule = this.es.data && this.es.data.model_name_rule;
+        return !rule || Boolean(rule.prefix_required);
     }
 
+    /** The technical name the input shows: without « x_ » when the page shows it apart. */
+    techRest(entry) {
+        return this.hasPrefix(entry) ? entry.model.slice(2) : entry.model;
+    }
+
+    /**
+     * Whether the page shows « x_ » apart, before the input: a model of the
+     * project named with it, where the rule requires it. Where x_ is
+     * optional, the input holds the whole name, so x_ can stay or go.
+     */
     hasPrefix(entry) {
-        return Boolean(entry.line) && entry.model.startsWith("x_");
+        return Boolean(entry.line) && entry.model.startsWith("x_") && this.prefixRequired;
     }
 
     nameNote(entry) {
         if (entry.kind === "pending") {
-            return _t("Editable until Apply. Odoo requires the x_ prefix for the models created outside the code.");
+            return this.prefixRequired
+                ? _t("Editable until Apply. Odoo requires the x_ prefix for the models created outside the code.")
+                : _t(
+                      "Editable until Apply. x_ is optional on this development database: the generated module writes the name as is."
+                  );
         }
         if (entry.kind === "created") {
             return _t(
@@ -231,10 +249,16 @@ export class StudioModelsSpace extends Component {
         }
     }
 
-    /** Change the technical name of a model not created yet, « x_ » before what is typed. */
+    /**
+     * Change the technical name of a model not created yet: « x_ » before
+     * what is typed when the page shows it apart (a typed « x_ » is not
+     * doubled), else the name as typed.
+     */
     async renameModel(entry, ev) {
-        const rest = ev.target.value.trim().replace(/^x_/, "");
-        const model = this.hasPrefix(entry) ? `x_${rest}` : rest;
+        const prefixed = this.hasPrefix(entry);
+        const typed = ev.target.value.trim();
+        const rest = prefixed ? typed.replace(/^x_/, "") : typed;
+        const model = prefixed ? `x_${rest}` : rest;
         if (!rest || model === entry.model) {
             ev.target.value = this.techRest(entry);
             return;

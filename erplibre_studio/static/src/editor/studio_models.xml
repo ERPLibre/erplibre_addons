@@ -27,6 +27,10 @@
                         id="o_erplibre_studio_model_name"
                         class="form-control font-monospace o_erplibre_studio_model_name"
                         aria-describedby="o_erplibre_studio_model_name_help"
+                        autocomplete="off"
+                        spellcheck="false"
+                        t-att-class="{'is-invalid': nameRefused}"
+                        t-att-aria-invalid="nameRefused ? 'true' : 'false'"
                         t-att-value="state.model"
                         t-att-disabled="modelLocked"
                         t-on-input="(ev) => this.setModel(ev.target.value)"
@@ -41,7 +45,7 @@
                     </span>
                 </div>
                 <div id="o_erplibre_studio_model_name_help" class="form-text">
-                    Starts with x_, then lower case letters, digits and underscores; it cannot change once applied.
+                    <t t-esc="nameHelp" />
                     <button
                         t-if="!line and state.modelEdited"
                         type="button"
@@ -51,6 +55,70 @@
                         Follow the label
                     </button>
                 </div>
+                <div
+                    t-if="rule and !modelLocked"
+                    class="d-flex align-items-center gap-1 small text-muted mt-1 o_erplibre_studio_model_name_rule"
+                    t-att-data-mode="rule.mode"
+                    t-att-title="rule.detail or ''"
+                >
+                    <i
+                        class="fa fa-fw"
+                        t-att-class="rule.mode === 'development' ? 'fa-code' : 'fa-lock'"
+                        aria-hidden="true"
+                    />
+                    <span class="badge text-bg-light border" t-esc="rule.label" />
+                    <span t-esc="rule.text" />
+                </div>
+                <div
+                    t-if="props.checkName and !modelLocked and state.model.trim()"
+                    class="d-flex align-items-start gap-2 rounded small px-2 py-1 mt-1 o_erplibre_studio_name_status o_erplibre_studio_model_name_status"
+                    t-att-class="nameStatusClass"
+                    t-att-data-status="(!state.checking and nameCheck) ? nameCheck.status : 'checking'"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <t t-if="state.checking or !nameCheck">
+                        <i class="fa fa-spinner fa-spin mt-1" aria-hidden="true" />
+                        <span>Checking…</span>
+                    </t>
+                    <t t-else="">
+                        <i
+                            class="fa mt-1"
+                            t-att-class="nameRefused ? 'fa-exclamation-circle' : 'fa-check-circle'"
+                            aria-hidden="true"
+                        />
+                        <span class="d-flex flex-column">
+                            <span class="fw-bold o_erplibre_studio_model_name_message" t-esc="nameCheck.message" />
+                            <span
+                                t-if="nameCheck.detail"
+                                class="o_erplibre_studio_model_name_detail"
+                                t-esc="nameCheck.detail"
+                            />
+                        </span>
+                    </t>
+                </div>
+                <ul
+                    t-if="nameCheck and nameCheck.checks and nameCheck.checks.length"
+                    class="list-unstyled small mb-0 mt-1 o_erplibre_studio_model_name_checks"
+                    aria-label="Checks"
+                >
+                    <li
+                        t-foreach="nameCheck.checks"
+                        t-as="item"
+                        t-key="item.key"
+                        class="d-flex align-items-center gap-1"
+                        t-att-class="item.ok ? 'o_erplibre_studio_name_check_ok' : 'o_erplibre_studio_name_check_bad text-danger-emphasis'"
+                        t-att-data-key="item.key"
+                        t-att-data-ok="item.ok ? '1' : '0'"
+                    >
+                        <span
+                            class="o_erplibre_studio_name_check_glyph fw-bold text-center"
+                            aria-hidden="true"
+                            t-esc="item.ok ? '✓' : '!'"
+                        />
+                        <span t-esc="item.text" />
+                    </li>
+                </ul>
             </div>
             <div t-if="choices.mail_available" class="form-check mb-3">
                 <input

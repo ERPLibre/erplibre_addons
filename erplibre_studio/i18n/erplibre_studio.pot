@@ -1301,6 +1301,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
 msgstr ""
@@ -1308,6 +1309,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Checks"
 msgstr ""
 
@@ -1388,7 +1390,9 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
-msgid "Fix each name marked below in the inspector of its field, then Apply."
+msgid ""
+"Fix each name marked below, a field in its inspector, a model in the Models "
+"space, then Apply."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5050,7 +5054,23 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
+msgid ""
+"Lower case letters, digits, underscores and dots; x_ is optional on this "
+"development database. It cannot change once applied."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid ""
+"Editable until Apply. x_ is optional on this development database: the "
+"generated module writes the name as is."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
 msgid ""
 "Starts with x_, then lower case letters, digits and underscores; it cannot "
 "change once applied."

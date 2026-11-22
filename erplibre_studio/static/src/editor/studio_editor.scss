@@ -698,3 +698,28 @@ body.o_erplibre_studio_dragging .o_erplibre_studio {
 .o_erplibre_studio_chip_remove {
     font-size: 0.6em;
 }
+
+// The technical name of a new model, in its dialog outside the editor: the
+// status and the checks look like those of a new field.
+.o_erplibre_studio_model_dialog {
+    .o_erplibre_studio_name_status {
+        line-height: 1.4;
+    }
+
+    .o_erplibre_studio_name_ok {
+        border: 1px solid rgba($success, 0.35);
+    }
+
+    .o_erplibre_studio_name_bad {
+        border: 1px solid rgba($danger, 0.35);
+    }
+
+    .o_erplibre_studio_name_check_glyph {
+        flex: none;
+        width: 1rem;
+    }
+
+    .o_erplibre_studio_name_check_ok .o_erplibre_studio_name_check_glyph {
+        color: $success;
+    }
+}

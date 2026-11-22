@@ -407,6 +407,28 @@ describe("erplibre_studio review", () => {
         expect(".o_erplibre_studio_apply").toHaveAttribute("title", "1 technical name(s) block Apply");
     });
 
+    test("the technical name of a new model that blocks Apply", async () => {
+        const message = "Another model uses the table x_visit";
+        const base = review();
+        const models = base.groups.find((group) => group.kind === "model");
+        models.items[0] = {...models.items[0], applied: false, error: message};
+        respond.get_review = () =>
+            review({
+                groups: base.groups,
+                // A model names its line, not a change: no change item takes it.
+                name_blockers: [{line_id: 7, model: VISIT, name: VISIT, message}],
+            });
+        await openReview();
+        expect(".o_erplibre_studio_review_names").toHaveText(/^1 technical name\(s\) block Apply\s*.*Models space/);
+        expect(".o_erplibre_studio_review_name_badge").toHaveCount(1);
+        const problem = ".o_erplibre_studio_review_item[data-key='model:7'] .o_erplibre_studio_review_name_problem";
+        // The error of the item says it already: the name alone.
+        expect(problem).toHaveText(/^Technical name to fix\s*x_visit$/);
+        expect(".o_erplibre_studio_review_item[data-key='change:1'] .o_erplibre_studio_review_name_badge").toHaveCount(
+            0
+        );
+    });
+
     test("Undo on a change of the review", async () => {
         respond.get_change_removal = (args) => ({
             revision: 0,

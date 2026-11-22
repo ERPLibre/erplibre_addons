@@ -138,7 +138,11 @@
                         Technical name
                     </label>
                     <div class="input-group input-group-sm">
-                        <span t-if="hasPrefix(entry)" class="input-group-text font-monospace" t-esc="'x_'" />
+                        <span
+                            t-if="hasPrefix(entry)"
+                            class="input-group-text font-monospace o_erplibre_studio_model_detail_prefix"
+                            t-esc="'x_'"
+                        />
                         <input
                             id="o_erplibre_studio_model_detail_name"
                             class="form-control font-monospace o_erplibre_studio_model_detail_name"

@@ -1,8 +1,8 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {animationFrame} from "@odoo/hoot-mock";
+import {beforeEach, Deferred, describe, expect, test} from "@odoo/hoot";
+import {advanceTime, animationFrame} from "@odoo/hoot-mock";
 import {
     contains,
     defineWebModels,
@@ -16,6 +16,7 @@ import {
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
 import {accessGrid, accessRows, filterMenus, modelNameFromLabel, slug} from "@erplibre_studio/editor/studio_models";
+import {NAME_CHECK_DELAY} from "@erplibre_studio/editor/studio_field_name";
 
 const MODEL = "x_loan_item";
 const BASE_ICON = "base,static/description/icon.png";
@@ -169,12 +170,55 @@ function payload(project = {}, {model = "res.partner", chatter = true, viewId = 
     };
 }
 
+// The rules of the technical names of new models (``model_name_rule``).
+const PRODUCTION_RULE = {
+    prefix_required: true,
+    mode: "production",
+    label: "Production · x_ required",
+    text: "Prefix x_ required on this database",
+    detail: "Models created outside the code carry x_ on a production database.",
+};
+const DEVELOPMENT_RULE = {
+    prefix_required: false,
+    mode: "development",
+    label: "Development · code_generator",
+    text: "Without x_ allowed: development database (code_generator)",
+    detail: "A model without x_ is written as is in the generated module.",
+};
+const MODEL_CHECKS = {
+    format: "Lower case letters, digits, _ and dots",
+    reserved: "Not a reserved name",
+    prefix: "Prefix that fits the rule of the database",
+    unique: "Unique among the models, the tables and the projects",
+};
+
+/** The answer of ``check_model_name`` for ``name``: available, or « taken » (the check « unique » fails). */
+function modelCheck(name, status = "available") {
+    const taken = status === "taken";
+    return {
+        name,
+        proposed: false,
+        status,
+        message: taken ? `The model ${name} already exists.` : "Available",
+        detail: taken ? "Choose another name." : `No model, table nor project uses ${name}.`,
+        checks: Object.entries(MODEL_CHECKS).map(([key, text]) => ({key, ok: !(taken && key === "unique"), text})),
+        rule: DEVELOPMENT_RULE,
+    };
+}
+
+/** ``payload`` with the rule of the technical names of new models ``rule``. */
+function rulePayload(rule, project = {}, options = {}) {
+    return {...payload(project, options), model_name_rule: rule};
+}
+
 // The payload the editor shows, the choices of the dialogs, and how each
 // call answers: ``respond[method](args)``.
 let answer;
 let choices;
 let respond;
 let calls;
+// The calls of ``check_model_name``: [{name, kwargs}], apart from ``calls``.
+let modelChecks;
 
 function editorRpc(method) {
     onRpc("erplibre.studio.editor", method, (args) => {
@@ -191,8 +235,14 @@ beforeEach(() => {
     serverState.debug = "1";
     defineWebModels();
     calls = [];
+    modelChecks = [];
     choices = JSON.parse(JSON.stringify(CHOICES));
     respond = {};
+    onRpc("erplibre.studio.editor", "check_model_name", (args) => {
+        const {line_id, label} = args.kwargs;
+        modelChecks.push({name: args.args[1], kwargs: {line_id, label}});
+        return respond.check_model_name ? respond.check_model_name(args) : modelCheck(args.args[1]);
+    });
     onRpc("erplibre.studio.editor", "get_editor_data", (args) => {
         expect.step(`get_editor_data ${args.args.slice(0, 4).join(" ")}`);
         return respond.get_editor_data ? respond.get_editor_data(args) : answer;
@@ -1092,5 +1142,129 @@ describe("erplibre_studio models", () => {
             expect(accessibleName(document.querySelector(`.o_erplibre_studio_${name}`))).not.toBe("");
         }
         expect(".o_erplibre_studio_model_label").toHaveAttribute("aria-required", "true");
+    });
+    test("production: the dialog and the models space keep x_", async () => {
+        answer = rulePayload(PRODUCTION_RULE, {apps: [LOANS_APP], models: [modelLine()], item_count: 2});
+        await openEditor();
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_detail_prefix").toHaveText("x_");
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("loan_item");
+        expect("#o_erplibre_studio_model_detail_name_note").toHaveText(/Odoo requires the x_ prefix/);
+        // A line not applied yet: its name is checked on opening.
+        await contains(".o_erplibre_studio_edit_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        await animationFrame();
+        expect(modelChecks).toEqual([{name: MODEL, kwargs: {line_id: 7, label: "Loan item"}}]);
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "available");
+        expect("#o_erplibre_studio_model_name_help").toHaveText(/^Starts with x_, then lower case letters/);
+        expect(".o_erplibre_studio_model_name_rule").toHaveAttribute("data-mode", "production");
+        expect(".o_erplibre_studio_model_name_rule").toHaveText(/Production · x_ required/);
+        await contains(".modal-footer .btn-secondary").click();
+        // A new model: its name follows the label, checked once the typing pauses.
+        await contains(".o_erplibre_studio_new_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        expect(".o_erplibre_studio_model_name_status").toHaveCount(0);
+        await contains(".o_erplibre_studio_model_label").edit("Loan tag");
+        expect(".o_erplibre_studio_model_name").toHaveValue("x_loan_tag");
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "checking");
+        await advanceTime(NAME_CHECK_DELAY);
+        await animationFrame();
+        expect(modelChecks.pop()).toEqual({name: "x_loan_tag", kwargs: {line_id: false, label: "Loan tag"}});
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "available");
+    });
+
+    test("development: a name without x_ is checked live and created", async () => {
+        answer = rulePayload(DEVELOPMENT_RULE);
+        await openEditor();
+        await openSpace("models");
+        await contains(".o_erplibre_studio_new_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        expect(".o_erplibre_studio_model_name_rule").toHaveAttribute("data-mode", "development");
+        expect(".o_erplibre_studio_model_name_rule").toHaveText(/Development · code_generator/);
+        expect("#o_erplibre_studio_model_name_help").toHaveText(/x_ is optional on this development database/);
+        await contains(".o_erplibre_studio_model_label").edit("Book");
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.book");
+        await advanceTime(NAME_CHECK_DELAY);
+        await animationFrame();
+        expect(modelChecks.map((check) => check.name)).toEqual(["studio_demo.book"]);
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "available");
+        expect(".o_erplibre_studio_model_name_message").toHaveText("Available");
+        expect(".o_erplibre_studio_model_name_checks li[data-ok='1']").toHaveCount(4);
+        expect(".o_erplibre_studio_model_save").toBeEnabled();
+        respond.create_model = () => rulePayload(DEVELOPMENT_RULE, {revision: 1});
+        await contains(".o_erplibre_studio_model_save").click();
+        expect(lastCall("create_model").args[1].model).toBe("studio_demo.book");
+        expect(".o_erplibre_studio_model_dialog").toHaveCount(0);
+    });
+
+    test("development: a taken name stops Save", async () => {
+        answer = rulePayload(DEVELOPMENT_RULE);
+        respond.check_model_name = (args) => modelCheck(args.args[1], "taken");
+        await openEditor();
+        await openSpace("models");
+        await contains(".o_erplibre_studio_new_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        await contains(".o_erplibre_studio_model_label").edit("Contact");
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.contact");
+        await advanceTime(NAME_CHECK_DELAY);
+        await animationFrame();
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "taken");
+        expect(".o_erplibre_studio_model_name_message").toHaveText("The model studio_demo.contact already exists.");
+        expect(".o_erplibre_studio_model_name_checks li[data-key=unique]").toHaveAttribute("data-ok", "0");
+        expect(".o_erplibre_studio_model_name_checks li[data-key=format]").toHaveAttribute("data-ok", "1");
+        expect(".o_erplibre_studio_model_name").toHaveAttribute("aria-invalid", "true");
+        expect(".o_erplibre_studio_model_save").not.toBeEnabled();
+        // Another name, not checked yet: Save waits no more.
+        respond.check_model_name = (args) => modelCheck(args.args[1]);
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.person");
+        expect(".o_erplibre_studio_model_save").toBeEnabled();
+    });
+
+    test("an answer older than the last check is dropped", async () => {
+        answer = rulePayload(DEVELOPMENT_RULE);
+        const answers = [new Deferred(), new Deferred()];
+        respond.check_model_name = () => answers[modelChecks.length - 1];
+        await openEditor();
+        await openSpace("models");
+        await contains(".o_erplibre_studio_new_model").click();
+        expect.verifySteps(["get_studio_choices 3"]);
+        await contains(".o_erplibre_studio_model_label").edit("Book");
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.book");
+        await advanceTime(NAME_CHECK_DELAY);
+        // Away and back before the first answer: a second check of the same name.
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.boo");
+        await contains(".o_erplibre_studio_model_name").edit("studio_demo.book");
+        await advanceTime(NAME_CHECK_DELAY);
+        expect(modelChecks.map((check) => check.name)).toEqual(["studio_demo.book", "studio_demo.book"]);
+        answers[1].resolve(modelCheck("studio_demo.book"));
+        await animationFrame();
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "available");
+        answers[0].resolve(modelCheck("studio_demo.book", "taken"));
+        await animationFrame();
+        expect(".o_erplibre_studio_model_name_status").toHaveAttribute("data-status", "available");
+        expect(".o_erplibre_studio_model_save").toBeEnabled();
+    });
+
+    test("development: the models space edits the whole name, x_ kept or not", async () => {
+        const project = (model) => ({apps: [LOANS_APP], models: [modelLine({model})], item_count: 2});
+        answer = rulePayload(DEVELOPMENT_RULE, project(MODEL));
+        await openEditor();
+        await openSpace("models");
+        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+        expect(".o_erplibre_studio_model_detail_prefix").toHaveCount(0);
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue(MODEL);
+        expect("#o_erplibre_studio_model_detail_name_note").toHaveText(
+            /x_ is optional on this development database/
+        );
+        respond.update_model = () => rulePayload(DEVELOPMENT_RULE, {...project("studio_demo.loan"), revision: 1});
+        await contains(".o_erplibre_studio_model_detail_name").edit("studio_demo.loan");
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {model: "studio_demo.loan"}]);
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("studio_demo.loan");
+        // A typed x_ stays.
+        respond.update_model = () => rulePayload(DEVELOPMENT_RULE, {...project("x_loan_thing"), revision: 2});
+        await contains(".o_erplibre_studio_model_detail_name").edit("x_loan_thing");
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {model: "x_loan_thing"}]);
+        expect(".o_erplibre_studio_model_detail_name").toHaveValue("x_loan_thing");
     });
 });

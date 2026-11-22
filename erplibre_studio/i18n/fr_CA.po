@@ -1392,6 +1392,7 @@ msgstr "Ne rien changer"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
 msgstr "Vérification…"
@@ -1399,6 +1400,7 @@ msgstr "Vérification…"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 msgid "Checks"
 msgstr "Vérifications"
 
@@ -1479,8 +1481,12 @@ msgstr "Filtre %(label)s"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
-msgid "Fix each name marked below in the inspector of its field, then Apply."
-msgstr "Corrigez chaque nom signalé ci-dessous dans l'inspecteur de son champ, puis appliquez."
+msgid ""
+"Fix each name marked below, a field in its inspector, a model in the Models "
+"space, then Apply."
+msgstr ""
+"Corrigez chaque nom signalé ci-dessous, un champ dans son inspecteur, un "
+"modèle dans l'espace Modèles, puis appliquez."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5211,7 +5217,27 @@ msgstr "Commence par une lettre, 63 caractères au plus."
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
+msgid ""
+"Lower case letters, digits, underscores and dots; x_ is optional on this "
+"development database. It cannot change once applied."
+msgstr ""
+"Lettres minuscules, chiffres, soulignés et points ; x_ est facultatif sur "
+"cette base de développement. Il ne peut plus changer une fois appliqué."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid ""
+"Editable until Apply. x_ is optional on this development database: the "
+"generated module writes the name as is."
+msgstr ""
+"Modifiable jusqu'à l'Apply. x_ est facultatif sur cette base de "
+"développement : le module généré écrit le nom tel quel."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
 msgid ""
 "Starts with x_, then lower case letters, digits and underscores; it cannot "
 "change once applied."

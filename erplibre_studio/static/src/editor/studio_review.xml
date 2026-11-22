@@ -81,7 +81,7 @@
                             <i class="fa fa-exclamation-circle mt-1" aria-hidden="true" />
                             <span>
                                 <span class="fw-bold d-block" t-esc="nameBlockersText" />
-                                Fix each name marked below in the inspector of its field, then Apply.
+                                Fix each name marked below, a field in its inspector, a model in the Models space, then Apply.
                             </span>
                         </div>
                         <p t-if="!groups.length" class="text-muted p-3 mb-0 o_erplibre_studio_review_empty">
@@ -143,8 +143,10 @@
                                                     Technical name to fix
                                                 </span>
                                                 <code class="text-danger-emphasis" t-esc="problem.name" />
-                                                ·
-                                                <t t-esc="problem.message" />
+                                                <t t-if="problem.message !== item.error">
+                                                    ·
+                                                    <t t-esc="problem.message" />
+                                                </t>
                                             </span>
                                         </t>
                                     </span>

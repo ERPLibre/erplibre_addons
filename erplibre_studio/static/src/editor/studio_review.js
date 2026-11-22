@@ -220,7 +220,11 @@ export class StudioReview extends Component {
 
     // ── technical names ─────────────────────────────────────────────────
 
-    /** The new fields whose technical name stops Apply: [{change_id, model, name, message}]. */
+    /**
+     * The new fields and the new models whose technical name stops Apply:
+     * [{change_id | line_id, model, name, message}], a field naming its
+     * change, a model its model line.
+     */
     get nameBlockers() {
         return (this.review && this.review.name_blockers) || [];
     }
@@ -229,9 +233,10 @@ export class StudioReview extends Component {
         return _t("%(count)s technical name(s) block Apply", {count: this.nameBlockers.length});
     }
 
-    /** The technical names of the change ``item`` that stop Apply, or []. */
+    /** The technical names of the change or the model line ``item`` that stop Apply, or []. */
     nameProblems(item) {
-        return item.type === "change" ? this.nameBlockers.filter((blocker) => blocker.change_id === item.id) : [];
+        const key = {change: "change_id", model: "line_id"}[item.type];
+        return key ? this.nameBlockers.filter((blocker) => blocker[key] === item.id) : [];
     }
 
     // ── summary ─────────────────────────────────────────────────────────
