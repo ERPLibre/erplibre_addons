@@ -600,6 +600,35 @@ class TestGenerateModels(StudioCase):
         )[0]
         self.assertTrue(listing.xpath("field[@name='x_company_id']"))
 
+    def test_options_removed_after_apply(self):
+        """Options turned off after Apply leave the module at the next
+        generation: no field, no ribbon, filter or company column in the
+        views, no multi-company rule."""
+        self.project._studio_update_model(
+            self.item, {"archivable": True, "per_company": True}
+        )
+        xml_name = self.item.company_rule_id.xml_name
+        self.project.action_apply()
+        self.generate()
+        _attributes, fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        self.assertIn("x_active", fields)
+        self.assertIn(xml_name, self.read("security", f"{MODULE}.xml"))
+        self.project._studio_update_model(
+            self.item, {"archivable": False, "per_company": False}
+        )
+        self.project.action_apply()
+        self.assertNotIn("x_active", self.env[ITEM]._fields)
+        self.generate()
+        _attributes, fields = self.class_of(self.read("models", f"{ITEM}.py"))
+        self.assertNotIn("x_active", fields)
+        self.assertNotIn("x_company_id", fields)
+        views = self.read("views", "erplibre_studio_views.xml")
+        for text in ("web_ribbon", "x_active", "x_company_id", "inactive"):
+            self.assertNotIn(text, views)
+        security = self.read("security", f"{MODULE}.xml")
+        self.assertNotIn(xml_name, security)
+        self.assertNotIn("x_company_id", security)
+
     # ── checks ─────────────────────────────────────────────────────────
 
     def test_rights_alone_generate(self):
