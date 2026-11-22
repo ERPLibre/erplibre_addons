@@ -30,6 +30,19 @@ export const FIELD_OPTIONS = {
     size: ["char"],
 };
 
+// The geometry field types of base_geoengine (GEO_TYPES of the server), in
+// the order the inspector lists their shapes. The palette offers them as one
+// item, « Geometry », that drops a point; a geometry field shows in a form
+// only.
+export const GEO_TYPES = [
+    "geo_point",
+    "geo_multi_point",
+    "geo_line",
+    "geo_multi_line",
+    "geo_polygon",
+    "geo_multi_polygon",
+];
+
 // The largest maximum size of a new char (MAX_FIELD_SIZE of the server).
 export const MAX_FIELD_SIZE = 10000;
 
@@ -65,8 +78,23 @@ export function fieldTypeLabel(ttype) {
             monetary: _t("Monetary"),
             one2many: _t("One2many"),
             many2many: _t("Many2many"),
+            geo_point: _t("Point"),
+            geo_multi_point: _t("Multi-point"),
+            // « Line » is a chart type, translated in the plural.
+            geo_line: _t("Polyline"),
+            geo_multi_line: _t("Multi-polyline"),
+            geo_polygon: _t("Polygon"),
+            geo_multi_polygon: _t("Multi-polygon"),
         }[ttype] || ttype
     );
+}
+
+/**
+ * The label a new field of ``ttype`` takes when dropped, which proposes its
+ * name: « Geometry » for a geometry field, whose shape changes until Apply.
+ */
+export function newFieldLabel(ttype) {
+    return GEO_TYPES.includes(ttype) ? _t("Geometry") : fieldTypeLabel(ttype);
 }
 
 // The glyph of a field type, in the palette and the plan: a short text, so
@@ -85,6 +113,12 @@ const TYPE_GLYPHS = {
     many2one: "→",
     one2many: "⊞",
     many2many: "⇄",
+    geo_point: "◎",
+    geo_multi_point: "◎",
+    geo_line: "◎",
+    geo_multi_line: "◎",
+    geo_polygon: "◎",
+    geo_multi_polygon: "◎",
 };
 
 /** The glyph of the field type ``ttype``. */

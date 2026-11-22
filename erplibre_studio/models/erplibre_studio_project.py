@@ -701,6 +701,40 @@ class ErplibreStudioProject(models.Model):
     # ── models, menus and rights of the project ─────────────────────────
 
     @api.model
+    def _studio_geo_available(self):
+        """Whether the geometry types of base_geoengine (GEO_TYPES) are
+        field types of this database: ir.model.fields.ttype takes them once
+        base_geoengine is installed. The studio does not depend on it. The
+        selection of the registry answers, not the field classes, which a
+        module imported by another database of the process declares too."""
+        known = self.env["ir.model.fields"]._fields["ttype"].get_values(self.env)
+        return "geo_point" in known
+
+    @api.model
+    def _studio_field_types(self):
+        """The types of a new field in this database: NEW_FIELD_TYPES, and
+        GEO_TYPES where base_geoengine is installed."""
+        types = NEW_FIELD_TYPES
+        if self._studio_geo_available():
+            types += studio_arch.GEO_TYPES
+        return types
+
+    def _studio_geo_view_missing(self, model):
+        """Whether ``model`` has no geoengine view: none in the database and
+        none a view line of the project adds. The form widget of a geometry
+        field reads the raster layers of that view and fails without it."""
+        if any(
+            line.model == model and line.view_type == "geoengine"
+            for line in self.view_line_ids
+        ):
+            return False
+        return (
+            not self.env["ir.ui.view"]
+            .sudo()
+            .search_count([("model", "=", model), ("type", "=", "geoengine")], limit=1)
+        )
+
+    @api.model
     def _studio_mail_available(self):
         """Whether a model can get a chatter: mail is installed. The studio
         does not depend on it."""
@@ -1271,7 +1305,7 @@ class ErplibreStudioProject(models.Model):
         None makes one from the label. ``existing``: the definition the field had, whose relation an
         x2many keeps, and a many2one while it has an inverse one2many."""
         ttype = field.get("ttype")
-        if ttype not in NEW_FIELD_TYPES:
+        if ttype not in self._studio_field_types():
             raise UserError(self.env._("Unknown field type %(type)s.", type=ttype))
         label = (field.get("field_description") or "").strip()
         label = label or self.env._("New field")
@@ -1853,6 +1887,9 @@ class ErplibreStudioProject(models.Model):
             "many2many_view": lambda: self.env._(
                 "A many2many shows in a form, a list or a kanban only."
             ),
+            "geo_view": lambda: self.env._(
+                "A geo field shows as a map in a form only."
+            ),
         }
         if code in messages:
             return messages[code]()
@@ -2095,6 +2132,7 @@ class ErplibreStudioProject(models.Model):
         target, position, _node = self._check_drop(arch, op, view.type)
         field = op.get("field") or {}
         self._refuse(studio_arch.x2many_refusal(view.type, field.get("ttype")))
+        self._refuse(studio_arch.geo_refusal(view.type, field.get("ttype")))
         root_attribute = None
         if view.type == "leaflet_map":
             root_attribute = self._leaflet_new_field(op, target, position)
@@ -2177,6 +2215,11 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 self.env._("The field %(name)s is already in the view.", name=name)
             )
+        self._refuse(
+            studio_arch.geo_refusal(
+                view.type, self._field_info(view.model, name).get("type")
+            )
+        )
         node_attrs = {}
         extra = {}
         if view.type == "timeline" and studio_arch.in_template(node):
@@ -3246,7 +3289,9 @@ class ErplibreStudioProject(models.Model):
         the label while its name is proposed (``name_auto``, missing on a
         field drafted before it, counts as proposed); a rename refused
         keeps the name. Its options (FIELD_OPTIONS) change until Apply
-        creates it; UserError after."""
+        creates it; UserError after. Its type stays, except the shape of a
+        geometry field, another of GEO_TYPES until Apply: the column of
+        PostGIS holds one shape."""
         name = op.get("field_name")
         change = self._field_add_change(view.model, name)
         if not change:
@@ -3255,8 +3300,19 @@ class ErplibreStudioProject(models.Model):
             )
         payload = change._payload()
         definition = dict(payload.get("field") or {}, **(op.get("field") or {}))
-        if definition.get("ttype") != payload["field"].get("ttype"):
-            raise UserError(self.env._("The type of a field cannot change."))
+        old_type = payload["field"].get("ttype")
+        if definition.get("ttype") != old_type:
+            geo = studio_arch.GEO_TYPES
+            if old_type not in geo or definition.get("ttype") not in geo:
+                raise UserError(self.env._("The type of a field cannot change."))
+            if self._studio_field_applied(view.model, name):
+                raise UserError(
+                    self.env._(
+                        "The field %(name)s exists: its shape is set before "
+                        "Apply only.",
+                        name=name,
+                    )
+                )
         if self._studio_options_changed(
             payload["field"], op.get("field") or {}
         ) and self._studio_field_applied(view.model, name):
@@ -5142,6 +5198,10 @@ class ErplibreStudioProject(models.Model):
                 vals[key] = definition[key]
         elif ttype == "monetary":
             vals["currency_field"] = definition["currency_field"]
+        # A geometry field (GEO_TYPES) writes none of the srid, geo_type and
+        # dim columns base_geoengine adds: a manual field is built with the
+        # defaults of its class (srid 3857, 2 dimensions, a GiST index),
+        # whatever those columns hold.
         return vals
 
     def _apply_fields(self, log):

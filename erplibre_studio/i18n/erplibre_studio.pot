@@ -604,6 +604,12 @@ msgid "A filter needs at least one condition."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A geo field shows as a map in a form only."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "A global rule applies to everyone, administrators included."
@@ -1606,6 +1612,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Geometry"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
 msgid "Height (px)"
 msgstr ""
@@ -1729,6 +1741,24 @@ msgid "Models created outside the code carry x_ on a production database."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-point"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-polygon"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-polyline"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "New tab"
@@ -1810,6 +1840,24 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Pie"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Point"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Polygon"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Polyline"
 msgstr ""
 
 #. module: erplibre_studio
@@ -5361,6 +5409,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Shape"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Sheet"
 msgstr ""
@@ -5937,6 +5991,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s exists: its shape is set before Apply only."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s exists: whether it is translatable, indexed and its maximum size are set before Apply only."
 msgstr ""
 
@@ -6122,6 +6182,14 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "The list of %(model)s loses its drag handle"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The map of %(field)s needs a GeoEngine view with a raster layer on %(model)s: add one (Add a view) once the field is applied."
 msgstr ""
 
 #. module: erplibre_studio

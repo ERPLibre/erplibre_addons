@@ -44,6 +44,7 @@ import {
     graphLaneLabel,
     graphLanes,
     namedKeys,
+    newFieldLabel,
     pivotLanes,
     searchColumns,
     searchEndHook,
@@ -956,7 +957,7 @@ export class StudioEditor extends Component {
                 type: "add_field",
                 target,
                 position,
-                field: {ttype: item.ttype, field_description: fieldTypeLabel(item.ttype)},
+                field: {ttype: item.ttype, field_description: newFieldLabel(item.ttype)},
             };
         }
         if (item.kind === "widget") {

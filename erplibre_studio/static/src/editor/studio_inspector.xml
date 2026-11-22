@@ -705,6 +705,31 @@
                         </label>
                         <span t-if="!field.pending" class="d-block text-muted o_erplibre_studio_options_help">Set before Apply only: the column exists.</span>
                     </div>
+                    <t t-if="isGeo(field)">
+                        <label class="form-label mb-1 w-100">
+                            Shape
+                            <select
+                                class="form-select form-select-sm mt-1 o_erplibre_studio_prop_shape"
+                                t-on-change="(ev) => this.setShape(field, ev)"
+                                t-att-disabled="props.busy or !field.pending"
+                            >
+                                <option
+                                    t-foreach="geoShapes"
+                                    t-as="shape"
+                                    t-key="shape.ttype"
+                                    t-att-value="shape.ttype"
+                                    t-att-selected="shape.ttype === field.type"
+                                    t-esc="shape.label"
+                                />
+                            </select>
+                            <span t-if="!field.pending" class="d-block fw-normal text-muted mt-1 o_erplibre_studio_shape_help">Set before Apply only: the column exists.</span>
+                        </label>
+                        <span
+                            t-if="geoNote(field)"
+                            class="d-block small text-muted mb-1 o_erplibre_studio_geo_note"
+                            t-esc="geoNote(field)"
+                        />
+                    </t>
                     <label t-if="field.type === 'selection'" class="form-label mb-1 w-100">
                         Values
                         <textarea

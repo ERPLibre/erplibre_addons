@@ -20,6 +20,7 @@ import {
 } from "./studio_timeline";
 import {
     DATE_TYPES,
+    GEO_TYPES,
     MAX_FIELD_SIZE,
     attributeLabel,
     canRemoveBlock,
@@ -692,6 +693,42 @@ export class StudioInspector extends Component {
 
     get maxFieldSize() {
         return MAX_FIELD_SIZE;
+    }
+
+    // ── a geometry field ────────────────────────────────────────────────
+
+    /** Whether ``field`` is a geometry field (GEO_TYPES of base_geoengine). */
+    isGeo(field) {
+        return GEO_TYPES.includes(field.type);
+    }
+
+    /** The shapes a geometry field takes: [{ttype, label}], GEO_TYPES in order. */
+    get geoShapes() {
+        return GEO_TYPES.map((ttype) => ({ttype, label: fieldTypeLabel(ttype)}));
+    }
+
+    /**
+     * Give the new geometry field ``field`` the shape of the select ``ev``:
+     * another of GEO_TYPES, until Apply creates its column.
+     */
+    setShape(field, ev) {
+        return this.updateFieldFrom(ev, {ttype: ev.target.value}, (input) => {
+            input.value = field.type;
+        });
+    }
+
+    /**
+     * What the map of the geometry field ``field`` needs while the model
+     * has no geoengine view (``geo_view_missing`` of the payload), else "".
+     */
+    geoNote(field) {
+        if (!this.data.geo_view_missing) {
+            return "";
+        }
+        return _t(
+            "The map of %(field)s needs a GeoEngine view with a raster layer on %(model)s: add one (Add a view) once the field is applied.",
+            {field: field.string || "", model: this.data.model_name || this.data.model}
+        );
     }
 
     /** The text the size box of ``field`` shows: empty for no limit (0 or none). */

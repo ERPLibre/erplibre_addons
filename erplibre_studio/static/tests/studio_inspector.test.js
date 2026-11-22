@@ -812,6 +812,65 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_options_help").toHaveText("Set before Apply only: the column exists.");
     });
 
+    test("a geometry field: one palette item, its shape until Apply, a note", async () => {
+        const GEO = ["geo_point", "geo_multi_point", "geo_line", "geo_multi_line", "geo_polygon", "geo_multi_polygon"];
+        // x_area: a new point of the project in the address group.
+        const withArea = ({ttype = "geo_point", pending = true, missing = true} = {}) => {
+            const data = payload({field_types: ["char", ...GEO], geo_view_missing: missing});
+            data.fields.x_area = {
+                string: "Area",
+                type: ttype,
+                project: true,
+                pending,
+                name_auto: true,
+                definition: {ttype, field_description: "Area", help: "", readonly: false},
+            };
+            const address = data.blocks.children[0].children[0];
+            address.children.push(field("street", ["new"], {name: "x_area", path: named("x_area"), label: "Area"}));
+            return data;
+        };
+        answer = withArea();
+        afterOperation = () => withArea();
+        await openEditor();
+        // The six types are one item that drops a point.
+        expect(".o_erplibre_studio_new_field").toHaveCount(2);
+        expect(".o_erplibre_studio_new_field[data-type=geo_point]").toHaveAttribute("title", "Geometry");
+        await contains(".o_erplibre_studio_new_field[data-type=geo_point]").click();
+        expect(operations.pop()).toMatchObject({
+            type: "add_field",
+            field: {ttype: "geo_point", field_description: "Geometry"},
+        });
+
+        await contains(".o_erplibre_studio_field[data-name=x_area]").click();
+        expect(".o_erplibre_studio_inspector_kind").toHaveText("New field · Point");
+        expect(".o_erplibre_studio_field_options").toHaveCount(0);
+        expect(queryAllTexts(".o_erplibre_studio_prop_shape option")).toEqual([
+            "Point",
+            "Multi-point",
+            "Polyline",
+            "Multi-polyline",
+            "Polygon",
+            "Multi-polygon",
+        ]);
+        expect(".o_erplibre_studio_prop_shape").toHaveValue("geo_point");
+        expect(".o_erplibre_studio_geo_note").toHaveText(
+            "The map of Area needs a GeoEngine view with a raster layer on Contact: add one (Add a view) once the field is applied."
+        );
+        afterOperation = () => withArea({ttype: "geo_polygon"});
+        await contains(".o_erplibre_studio_prop_shape").select("geo_polygon");
+        expect(operations.pop()).toEqual({type: "update_field", field_name: "x_area", field: {ttype: "geo_polygon"}});
+        expect(".o_erplibre_studio_prop_shape").toHaveValue("geo_polygon");
+        expect(".o_erplibre_studio_inspector_kind").toHaveText("New field · Polygon");
+
+        // Applied, with a GeoEngine view: the shape is frozen, no note.
+        afterOperation = () => withArea({ttype: "geo_polygon", pending: false, missing: false});
+        await contains(".o_erplibre_studio_prop_help").edit("Where it is");
+        operations.pop();
+        expect(".o_erplibre_studio_prop_shape").not.toBeEnabled();
+        expect(".o_erplibre_studio_shape_help").toHaveText("Set before Apply only: the column exists.");
+        expect(".o_erplibre_studio_geo_note").toHaveCount(0);
+    });
+
     test("the names the server counts block Apply", async () => {
         answer = payload();
         answer.project.counts.name_blockers = 2;

@@ -7,6 +7,7 @@ import {Dialog} from "@web/core/dialog/dialog";
 import {_t} from "@web/core/l10n/translation";
 import {useDebounced} from "@web/core/utils/timing";
 import {NAME_CHECK_DELAY} from "./studio_field_name";
+import {GEO_TYPES} from "./studio_utils";
 
 // The relational field types a drop opens the relation dialog for.
 export const X2MANY_TYPES = ["one2many", "many2many"];
@@ -21,6 +22,10 @@ export const LEAFLET_NEW_TYPES = ["float", "char"];
 export function fieldTypeFits(ttype, viewType) {
     if (viewType === "leaflet_map") {
         return LEAFLET_NEW_TYPES.includes(ttype);
+    }
+    if (GEO_TYPES.includes(ttype)) {
+        // geo_refusal of the server: a map per record outside a form.
+        return viewType === "form";
     }
     return !X2MANY_TYPES.includes(ttype) || X2MANY_VIEW_TYPES[ttype].includes(viewType);
 }

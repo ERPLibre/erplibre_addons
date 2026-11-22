@@ -137,6 +137,13 @@
                                             <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
                                             <t t-esc="item.error" />
                                         </span>
+                                        <span
+                                            t-if="item.warning"
+                                            class="d-block small text-muted o_erplibre_studio_review_item_warning"
+                                        >
+                                            <i class="fa fa-info-circle me-1" aria-hidden="true" />
+                                            <t t-esc="item.warning" />
+                                        </span>
                                         <t t-foreach="nameProblems(item)" t-as="problem" t-key="problem_index">
                                             <span class="d-block small text-danger-emphasis o_erplibre_studio_review_name_problem">
                                                 <span class="badge text-bg-danger me-1 o_erplibre_studio_review_name_badge">

@@ -501,6 +501,14 @@ describe("erplibre_studio editor, kanban", () => {
         });
     });
 
+    test("the geometry types stay out of the palette of a kanban", async () => {
+        answer = kanbanPayload([inCard("name")]);
+        answer.field_types = ["char", "integer", "geo_point", "geo_line", "geo_polygon"];
+        await openEditor("kanban");
+        expect(".o_erplibre_studio_new_field").toHaveCount(2);
+        expect(".o_erplibre_studio_new_field[data-type^=geo]").toHaveCount(0);
+    });
+
     test("no hook inside a t-if chain; the view properties set an attribute", async () => {
         const chain = (path, role, children) =>
             container(path, "t", children, {in_template: true, chain: role, movable: false, label: `t-${role}`});

@@ -564,6 +564,18 @@ X2MANY_VIEW_TYPES = {
     "one2many": ("form",),
     "many2many": ("form", "list", "kanban"),
 }
+# The geometry field types of base_geoengine, a PostGIS column each, in the
+# order the editor lists their shapes. Their widget draws a map that reads
+# the raster layers of a geoengine view of the model: a form shows one, a
+# list or a kanban would draw one map per record.
+GEO_TYPES = (
+    "geo_point",
+    "geo_multi_point",
+    "geo_line",
+    "geo_multi_line",
+    "geo_polygon",
+    "geo_multi_polygon",
+)
 # The longest name of a PostgreSQL table.
 TABLE_NAME_SIZE = 63
 # The longest field name: a column of the table of its model.
@@ -2176,6 +2188,15 @@ def x2many_refusal(view_type, ttype):
             "A many2many shows in a form, a list or a kanban only.",
             "many2many_view",
         )
+    return None
+
+
+def geo_refusal(view_type, ttype):
+    """Why a field of type ``ttype`` cannot go in a ``view_type`` view (an
+    ArchError), or None when it can: a geometry field (GEO_TYPES) shows
+    in a form only."""
+    if ttype in GEO_TYPES and view_type != "form":
+        return ArchError("A geo field shows as a map in a form only.", "geo_view")
     return None
 
 

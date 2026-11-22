@@ -33,8 +33,10 @@ class ErplibreStudioEditor(models.AbstractModel):
         rows and rules (« model »), the access rows and rules of the other
         models (« security »), the apps and groups (« apps »).
         Each item: {key, type, id, category (REVIEW_CATEGORIES), text,
-        error, applied, target}; ``applied`` when the last Apply wrote it
-        as it is, ``error`` why it does not apply (or False), ``target``
+        error, warning, applied, target}; ``applied`` when the last Apply
+        wrote it as it is, ``error`` why it does not apply (or False),
+        ``warning`` what it needs to work once applied, without stopping
+        Apply (or False), ``target``
         where the editor shows it ({space, ...}). ``removal``: the answer
         of ``get_apply_report``. ``blocked``: why Apply refuses the draft
         now, or False. ``name_blockers``: the new fields and the new models
@@ -139,7 +141,9 @@ class _Review:
         title = _("Security of %(model)s", model=self.model_name(model))
         return self.group(f"security:{model}", "security", title, model)
 
-    def add(self, group, kind, record, category, text, error, target, applied):
+    def add(
+        self, group, kind, record, category, text, error, target, applied, warning=False
+    ):
         group["items"].append(
             {
                 "key": f"{kind}:{record.id}",
@@ -148,6 +152,7 @@ class _Review:
                 "category": category,
                 "text": text,
                 "error": error or False,
+                "warning": warning or False,
                 "applied": applied,
                 "target": target,
             }
@@ -232,7 +237,26 @@ class _Review:
                         "path": (not error and paths.get(str(item.id))) or False,
                     },
                     self.is_applied("changes", item),
+                    self.geo_warning(item),
                 )
+
+    def geo_warning(self, change):
+        """What the geometry field ``change`` adds needs to show, or False:
+        its form widget reads the raster layers of a geoengine view of the
+        model, which the model lacks (``_studio_geo_view_missing``)."""
+        if change.change_type != "add_field":
+            return False
+        definition = change._payload().get("field") or {}
+        if definition.get("ttype") not in studio_arch.GEO_TYPES:
+            return False
+        if not self.project._studio_geo_view_missing(change.model):
+            return False
+        return self.env._(
+            "The map of %(field)s needs a GeoEngine view with a raster layer on "
+            "%(model)s: add one (Add a view) once the field is applied.",
+            field=definition.get("field_description") or change.field_name,
+            model=self.model_name(change.model),
+        )
 
     def add_views(self):
         """The views the project adds, each first in the group of its

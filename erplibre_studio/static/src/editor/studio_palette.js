@@ -5,7 +5,7 @@
 import {Component} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {fieldTypeFits} from "./studio_relations";
-import {RIBBON_COLORS, fieldTypeLabel, searchText, typeGlyph, valueLabel} from "./studio_utils";
+import {GEO_TYPES, RIBBON_COLORS, newFieldLabel, searchText, typeGlyph, valueLabel} from "./studio_utils";
 
 // The new field types the palette shows first, in this order; the others
 // show after them once the user asks for them.
@@ -90,7 +90,9 @@ export class StudioPalette extends Component {
 
     /**
      * The new field types the view offers, the common ones first: an
-     * x2many only where it shows. [{ttype, label, glyph}]
+     * x2many only where it shows. The geometry types are one item,
+     * « Geometry », that drops a point; the inspector changes its shape.
+     * [{ttype, label, glyph}]
      */
     get fieldTypes() {
         const rank = (ttype) => {
@@ -99,7 +101,8 @@ export class StudioPalette extends Component {
         };
         return (this.data.field_types || [])
             .filter((ttype) => fieldTypeFits(ttype, this.viewType))
-            .map((ttype, index) => ({ttype, index, label: fieldTypeLabel(ttype), glyph: typeGlyph(ttype)}))
+            .filter((ttype) => !GEO_TYPES.includes(ttype) || ttype === GEO_TYPES[0])
+            .map((ttype, index) => ({ttype, index, label: newFieldLabel(ttype), glyph: typeGlyph(ttype)}))
             .sort((a, b) => rank(a.ttype) - rank(b.ttype) || a.index - b.index);
     }
 

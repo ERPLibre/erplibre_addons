@@ -659,6 +659,12 @@ msgid "A filter needs at least one condition."
 msgstr "Un filtre demande au moins une condition."
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A geo field shows as a map in a form only."
+msgstr "Un champ géographique s'affiche en carte dans un formulaire seulement."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "A global rule applies to everyone, administrators included."
@@ -1714,6 +1720,12 @@ msgstr "Module propriétaire à venir"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Geometry"
+msgstr "Géométrie"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
 msgid "Height (px)"
 msgstr "Hauteur (px)"
@@ -1839,6 +1851,24 @@ msgid "Models created outside the code carry x_ on a production database."
 msgstr "Les modèles créés hors du code portent x_ sur une base de production."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-point"
+msgstr "Multipoint"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-polygon"
+msgstr "Multipolygone"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Multi-polyline"
+msgstr "Multipolyligne"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "New tab"
@@ -1921,6 +1951,24 @@ msgstr "Module propriétaire"
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Pie"
 msgstr "Secteurs"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Point"
+msgstr "Point"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Polygon"
+msgstr "Polygone"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Polyline"
+msgstr "Polyligne"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -5539,6 +5587,12 @@ msgstr "Réglages de la frise"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Shape"
+msgstr "Forme"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Sheet"
 msgstr "Feuille"
@@ -6160,6 +6214,12 @@ msgstr "Le champ %(name)s existe avec un autre type."
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The field %(name)s exists: its shape is set before Apply only."
+msgstr "Le champ %(name)s existe : sa forme se règle avant l'Apply seulement."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s exists: whether it is translatable, indexed and its maximum size are set before Apply only."
 msgstr "Le champ %(name)s existe : traduisible, indexé et taille maximale se règlent avant l'Apply seulement."
 
@@ -6371,6 +6431,14 @@ msgstr "Le libellé du menu ; vide : le libellé du modèle."
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "The list of %(model)s loses its drag handle"
 msgstr "La liste de %(model)s perd sa poignée de glisser-déposer"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The map of %(field)s needs a GeoEngine view with a raster layer on %(model)s: add one (Add a view) once the field is applied."
+msgstr "La carte de %(field)s a besoin d'une vue GeoEngine avec une couche matricielle sur %(model)s : ajoutez-en une (Ajouter une vue) une fois le champ appliqué."
 
 #. module: erplibre_studio
 #. odoo-python

@@ -6,7 +6,6 @@ from odoo.exceptions import UserError
 
 from .. import arch as studio_arch
 from .erplibre_studio_project import (
-    NEW_FIELD_TYPES,
     PENDING_VIEW_OPERATIONS,
     PERMS,
     PREVIEW_KEY,
@@ -734,7 +733,13 @@ class ErplibreStudioEditor(models.AbstractModel):
             "choices": self._choices(fields_info, model),
             "fields": fields_info,
             "palette": self._palette(view.type, arch, fields_info),
-            "field_types": list(NEW_FIELD_TYPES),
+            "field_types": list(Project._studio_field_types()),
+            # The form of a geometry field shows a map that needs a geoengine
+            # view of the model: the inspector says so while there is none.
+            "geo_view_missing": bool(
+                Project._studio_geo_available()
+                and (project or Project)._studio_geo_view_missing(model)
+            ),
             "changes": changes,
             "errors": [e for e in errors.values()],
             "project": self._project_payload(project) if project else False,
