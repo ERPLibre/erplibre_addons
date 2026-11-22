@@ -137,6 +137,28 @@ class TestGenerateViews(StudioCase):
             self.assertNotIn("web_timeline", names)
         self.assertNotIn(MODULE, names)
 
+    def test_activity_dependency(self):
+        """A project that only edits the activity view of the contacts
+        depends on mail, the module of the view and of its view type."""
+        if "activity" not in self.Project._view_types():
+            self.skipTest("mail is not installed")
+        self.assertEqual(self.Project._view_type_module("activity"), "mail")
+        activity = self.env.ref("mail.res_partner_view_activity")
+        project = self.make_project(
+            "studio_test_generate_activity", destination=self.destination
+        )
+        self.op(
+            project,
+            activity,
+            type="add_existing_field",
+            target="//div[@t-name='activity-box']",
+            position="inside",
+            field_name="phone",
+        )
+        names = project._dependencies()
+        self.assertIn("mail", names)
+        self.assertIn("base", names)
+
     def test_groups_dependency(self):
         """A field shown for a group of another installed module: the
         generated module depends on that module."""
