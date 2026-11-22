@@ -767,6 +767,15 @@
                     >
                         Check
                     </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-secondary o_erplibre_studio_rule_domain_visual"
+                        t-att-disabled="props.busy or !form.model or ruleModelPending"
+                        t-att-title="ruleModelPending ? pendingDomainTitle : ''"
+                        t-on-click="() => this.openRuleDomainEditor()"
+                    >
+                        <i class="fa fa-filter me-1" aria-hidden="true" />Edit visually
+                    </button>
                     <t t-set="formCheck" t-value="ruleCheck" />
                     <div
                         t-if="formCheck"

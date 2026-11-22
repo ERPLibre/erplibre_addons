@@ -7,6 +7,7 @@ import {_t} from "@web/core/l10n/translation";
 import {Expression, formatValue, treeFromDomain} from "@web/core/tree_editor/condition_tree";
 import {getOperatorLabel} from "@web/core/tree_editor/tree_editor_operator_editor";
 import {useService} from "@web/core/utils/hooks";
+import {StudioDomainDialog} from "./studio_domain";
 import {StudioAppsPanel, groupValue} from "./studio_groups";
 import {PERMS, accessGroup, permLabel} from "./studio_models";
 import {MODEL} from "./studio_utils";
@@ -778,6 +779,52 @@ export class StudioSecuritySpace extends Component {
 
     get domainPlaceholder() {
         return "[('create_uid', '=', user.id)]";
+    }
+
+    /** Whether the model of the rule form is a model of the project not created yet. */
+    get ruleModelPending() {
+        const form = this.form;
+        return Boolean(
+            form && form.model && (this.project.models || []).some((m) => m.model === form.model && !m.applied)
+        );
+    }
+
+    get pendingDomainTitle() {
+        return _t("Apply the model first: the visual editor reads its fields.");
+    }
+
+    /**
+     * The domain of the rule form in the visual editor (StudioDomainDialog).
+     * Its confirmation checks the domain as « Check » does, then fills the
+     * form with it and with the answer of the check: Save stays the one
+     * change of the draft. A refused domain shows in the dialog.
+     */
+    openRuleDomainEditor() {
+        const form = this.form;
+        if (!form || !form.model || this.ruleModelPending || this.props.busy) {
+            return;
+        }
+        const model = form.model;
+        this.editor.dialog.add(StudioDomainDialog, {
+            resModel: model,
+            domain: form.domain || "[]",
+            allowExpressions: true,
+            title: _t("Domain of the rule"),
+            confirm: async (domain) => {
+                let result;
+                try {
+                    result = await this.orm.call(MODEL, "check_rule_domain", [this.project.id, model, domain]);
+                } catch (error) {
+                    return this.editor.errorMessage(error);
+                }
+                if (!result.ok) {
+                    return result.error;
+                }
+                form.domain = domain;
+                this.es.ruleCheck = {...result, model, domain};
+                return null;
+            },
+        });
     }
 
     // ── groups ──────────────────────────────────────────────────────────

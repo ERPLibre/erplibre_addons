@@ -438,6 +438,56 @@ describe("erplibre_studio editor, security space", () => {
         expect(".o_erplibre_studio_rule_ops_text").toHaveText(/read, write, create them/);
     });
 
+    test("rule form: the visual domain editor checks then fills the form", async () => {
+        await openSecurity();
+        await contains(".o_erplibre_studio_rules_toggle").click();
+        await animationFrame();
+        await contains(".o_erplibre_studio_rule[data-id='5'] .o_erplibre_studio_rule_pick").click();
+        expect(".o_erplibre_studio_check_rule").toHaveCount(1);
+        expect(".o_erplibre_studio_rule_domain_visual").toBeEnabled();
+        await contains(".o_erplibre_studio_rule_domain_visual").click();
+        expect(".o_dialog .o_domain_selector").toHaveCount(1);
+        const CODE = ".o_dialog .o_domain_selector_debug_container textarea";
+        expect(CODE).toHaveValue(RULE.domain);
+
+        // A refused domain: the error in the dialog, the form unchanged.
+        respond.check_rule_domain = () => ({ok: false, error: "Invalid field res.partner.nowhere"});
+        await contains(CODE).edit('[("nowhere", "=", 1)]');
+        await contains(".o_erplibre_studio_domain_confirm").click();
+        expect(".o_erplibre_studio_domain_error").toHaveText("Invalid field res.partner.nowhere");
+        expect(".o_dialog").toHaveCount(1);
+        expect(".o_erplibre_studio_rule_domain").toHaveValue(RULE.domain);
+
+        // A domain that applies fills the form with its check; Save stays to do.
+        const domain = '[("create_uid", "=", user.id)]';
+        respond.check_rule_domain = () => ({ok: true, count: 2});
+        await contains(CODE).edit(domain);
+        await contains(".o_erplibre_studio_domain_confirm").click();
+        expect(lastCall("check_rule_domain").args).toEqual([3, "res.partner", domain]);
+        expect(".o_dialog").toHaveCount(0);
+        expect(".o_erplibre_studio_rule_domain").toHaveValue(domain);
+        expect(".o_erplibre_studio_rule_check").toHaveAttribute("data-ok", "1");
+        expect(lastCall("save_rule")).toBe(undefined);
+    });
+
+    test("rule form: no visual domain editor on a model not created yet", async () => {
+        const project = payload().project;
+        answer = payload({
+            models: [{...project.models[0], applied: false}],
+            rules: [{...RULE, model: VISIT}],
+        });
+        await openSecurity();
+        await contains(".o_erplibre_studio_rules_toggle").click();
+        await animationFrame();
+        await contains(`.o_erplibre_studio_security_model[data-model=${VISIT}]`).click();
+        await contains(".o_erplibre_studio_rule[data-id='5'] .o_erplibre_studio_rule_pick").click();
+        expect(".o_erplibre_studio_rule_domain_visual").not.toBeEnabled();
+        expect(".o_erplibre_studio_rule_domain_visual").toHaveAttribute(
+            "title",
+            "Apply the model first: the visual editor reads its fields."
+        );
+    });
+
     test("a rule whose group left the database: its operations wait, Remove saves it again", async () => {
         answer = payload({rules: [{...RULE, group_lines: [], missing_groups: ["studio_visits.group_gone"]}]});
         await openSecurity();

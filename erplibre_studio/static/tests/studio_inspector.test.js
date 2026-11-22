@@ -997,6 +997,93 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_group_chip").toHaveCount(0);
     });
 
+    test("the domain of a field in the visual editor", async () => {
+        const advanced = () =>
+            payload({
+                settable: {
+                    field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
+                },
+                operations: [...payload().operations, "set_attribute"],
+            });
+        onRpc("erplibre.studio.editor", "get_studio_choices", () => ({
+            groups: [],
+            menus: [],
+            apps: [],
+            models: [],
+            taken_models: [],
+            icons: [],
+        }));
+        answer = advanced();
+        afterOperation = () => advanced();
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=user_id]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        // The text mode stays beside the button.
+        expect(".o_erplibre_studio_prop_domain").toHaveCount(1);
+        expect(".o_erplibre_studio_domain_visual").toBeEnabled();
+        await contains(".o_erplibre_studio_domain_visual").click();
+        expect(".o_dialog .o_domain_selector").toHaveCount(1);
+        expect(".o_dialog .o_erplibre_studio_domain_hint").toHaveCount(1);
+        await contains(".o_dialog .o_domain_selector_debug_container textarea").edit('[("share", "=", False)]');
+        await contains(".o_erplibre_studio_domain_confirm").click();
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: named("user_id"),
+            attribute: "domain",
+            value: '[("share", "=", False)]',
+        });
+        expect(".o_dialog").toHaveCount(0);
+
+        // A refusal shows in the dialog, which stays open. The field stays
+        // selected after the operation.
+        refuse = () => "The domain does not apply: x";
+        await contains(".o_erplibre_studio_domain_visual").click();
+        await contains(".o_dialog .o_domain_selector_debug_container textarea").edit('[("login", "=", "a")]');
+        await contains(".o_erplibre_studio_domain_confirm").click();
+        expect(operations.pop().value).toBe('[("login", "=", "a")]');
+        expect(".o_erplibre_studio_domain_error").toHaveText("The domain does not apply: x");
+        expect(".o_dialog").toHaveCount(1);
+        // An empty domain removes the attribute.
+        refuse = () => false;
+        await contains(".o_dialog .o_domain_selector_debug_container textarea").edit("[]");
+        expect(".o_erplibre_studio_domain_error").toHaveCount(0);
+        await contains(".o_erplibre_studio_domain_confirm").click();
+        expect(operations.pop().value).toBe("");
+        expect(".o_dialog").toHaveCount(0);
+    });
+
+    test("the visual domain editor waits for the comodel of the project", async () => {
+        const data = payload({
+            settable: {
+                field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
+            },
+            operations: [...payload().operations, "set_attribute"],
+        });
+        data.fields.x_sponsor.relation = "x_desk";
+        data.fields.x_sponsor.definition.relation = "x_desk";
+        data.project.models = [{id: 8, model: "x_desk", name: "Desk", applied: false, views: {}}];
+        onRpc("erplibre.studio.editor", "get_studio_choices", () => ({
+            groups: [],
+            menus: [],
+            apps: [],
+            models: [],
+            taken_models: [],
+            icons: [],
+        }));
+        answer = data;
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
+        await contains(".o_erplibre_studio_field[data-name=x_sponsor]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        expect(".o_erplibre_studio_prop_domain").toHaveCount(1);
+        expect(".o_erplibre_studio_domain_visual").not.toBeEnabled();
+        expect(".o_erplibre_studio_domain_visual").toHaveAttribute(
+            "title",
+            "Apply the model first: the visual editor reads its fields."
+        );
+    });
+
     test("raw options under Advanced", async () => {
         const advanced = () =>
             payload({

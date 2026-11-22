@@ -568,6 +568,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "A condition on a record keeps its id: the generated module carries it."
+msgstr "Une condition sur un enregistrement garde son identifiant : le module généré le porte."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
 msgid ""
 "A date or date and time field of the model. Required: without it, the "
@@ -1796,6 +1802,13 @@ msgstr "Réviser le brouillon et l'appliquer, puis modifier le formulaire du mod
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
+msgid "Apply the model first: the visual editor reads its fields."
+msgstr "Appliquez d'abord le modèle : l'éditeur visuel lit ses champs."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "Apply will remove %(count)s member(s) from %(group)s."
 msgstr "Apply retirera %(count)s membre(s) de %(group)s."
@@ -2221,6 +2234,12 @@ msgstr "Comodèle"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_domain.xml:0
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Confirmation"
 msgstr "Confirmation"
@@ -2452,6 +2471,7 @@ msgstr "Empreinte"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_domain.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Discard"
@@ -2500,6 +2520,12 @@ msgstr "Nom affiché"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__domain_force
 msgid "Domain"
 msgstr "Domaine"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
+msgid "Domain of the rule"
+msgstr "Domaine de la règle"
 
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__state__draft
@@ -2674,6 +2700,13 @@ msgstr "Modifier les règles"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Edit this view before Apply creates the model"
 msgstr "Modifier cette vue avant qu'Appliquer crée le modèle"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
+msgid "Edit visually"
+msgstr "Modifier visuellement"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4702,6 +4735,12 @@ msgstr "Enregistrements"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Records %(field)s offers"
+msgstr "Enregistrements que propose %(field)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Records of the database, as you read them"
 msgstr "Enregistrements de la base, tels que vous les lisez"
@@ -5657,6 +5696,12 @@ msgid ""
 msgstr ""
 "Le domaine se lit bien ; Appliquer vérifie ses champs une fois le modèle "
 "créé."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The domain was not saved."
+msgstr "Le domaine n'a pas été enregistré."
 
 #. module: erplibre_studio
 #. odoo-python

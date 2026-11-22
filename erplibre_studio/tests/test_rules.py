@@ -105,6 +105,21 @@ class TestRules(StudioCase):
         self.assertFalse(result["ok"])
         self.assertIn("studio_test_nowhere", result["error"])
 
+    def test_domain_of_the_visual_editor(self):
+        # The DomainSelector writes double quotes, explicit connectors and
+        # the switch of the archived records.
+        domain = '["&", ("create_uid", "=", user.id), ("active", "in", [True, False])]'
+        result = self.Editor.check_rule_domain(self.project.id, "res.partner", domain)
+        self.assertTrue(result["ok"])
+        self.assertIsInstance(result["count"], int)
+        rule = self.rule(domain=domain)
+        self.assertEqual(rule.domain_force, domain)
+        result = self.Editor.check_rule_domain(
+            self.project.id, "res.partner", '[("studio_test_nowhere", "=", 1)]'
+        )
+        self.assertFalse(result["ok"])
+        self.assertIn("studio_test_nowhere", result["error"])
+
     def test_pending_model_rule_checked_at_apply(self):
         self.rule(
             name="Bad rule", model=MODEL, domain="[('x_studio_test_nowhere', '=', 1)]"

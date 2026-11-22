@@ -4,6 +4,7 @@
 
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
+import {StudioDomainDialog} from "./studio_domain";
 import {StudioFieldName} from "./studio_field_name";
 import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
@@ -56,8 +57,10 @@ const ADVANCED_VIEW_TYPES = ["form", "list"];
  * translatable, indexed, maximum size) apart from what this view sets
  * on it (required, hidden, optional, the attributes « set_attribute »
  * writes; in a form or a list, the widget, its options
- * (StudioWidgetOptions), the domain and the groups under « Advanced »; for a new field of a model of the database, the
- * module that holds it once generated); a many2one of the project, the one2many it may create on its
+ * (StudioWidgetOptions), the domain (as text, or in StudioDomainDialog)
+ * and the groups under « Advanced »; for a new field of a model of the
+ * database, the module that holds it once generated); a many2one of the
+ * project, the one2many it may create on its
  * comodel and what it does when its record is deleted; a container shows
  * what it holds. « Changes »: the changes of
  * the draft in this view, each one revealing its block on the canvas or
@@ -584,6 +587,59 @@ export class StudioInspector extends Component {
 
     setAttribute(type, value) {
         return this.editor.setAttribute(type, value);
+    }
+
+    // ── the domain of a relational field ────────────────────────────────
+
+    /**
+     * {model, pending} of the domain of the field ``block``: the comodel
+     * its domain searches, and whether it is a model of the project not
+     * created yet, whose fields the visual editor cannot read.
+     */
+    domainComodel(block) {
+        const field = this.fieldInfo(block.name);
+        const model = field.relation || (field.definition && field.definition.relation) || "";
+        const project = this.data.project || {};
+        const pending = Boolean(model && (project.models || []).some((m) => m.model === model && !m.applied));
+        return {model, pending};
+    }
+
+    get pendingDomainTitle() {
+        return _t("Apply the model first: the visual editor reads its fields.");
+    }
+
+    /**
+     * The domain of ``entry`` on the field ``block`` in the visual editor
+     * (StudioDomainDialog). Its confirmation is one « set_attribute »; a
+     * refusal of the server shows in the dialog. A domain is literal: no
+     * expression (« uid ») is offered.
+     */
+    openDomainEditor(block, entry) {
+        const {model, pending} = this.domainComodel(block);
+        if (!model || pending || this.props.busy) {
+            return;
+        }
+        const field = this.fieldInfo(block.name);
+        this.editor.dialog.add(StudioDomainDialog, {
+            resModel: model,
+            domain: entry.value || "[]",
+            allowExpressions: false,
+            title: _t("Records %(field)s offers", {field: block.label || field.string || block.name}),
+            text: _t("A condition on a record keeps its id: the generated module carries it."),
+            confirm: async (domain) => {
+                let error = null;
+                const data = await this.setNodeAttribute(
+                    block,
+                    entry.attribute,
+                    domain.trim() === "[]" ? "" : domain,
+                    {},
+                    (message) => {
+                        error = message;
+                    }
+                );
+                return error || (data ? null : _t("The domain was not saved."));
+            },
+        });
     }
 
     updateField(values) {

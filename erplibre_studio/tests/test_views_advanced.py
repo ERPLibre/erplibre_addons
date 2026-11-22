@@ -166,6 +166,24 @@ class TestViewsAdvanced(StudioCase):
         change = self.set_attr(name, "domain", "[('code', 'in', ['CA', 'FR'])]")
         self.assertEqual(change._payload()["domain_model"], "res.country")
 
+    def test_domain_of_the_visual_editor(self):
+        # The DomainSelector writes double quotes and explicit connectors:
+        # the arch takes the Python form.
+        self.set_attr("country_id", "domain", '[("code", "=", "FR")]')
+        self.assertEqual(self.node("country_id").get("domain"), "[('code', '=', 'FR')]")
+        self.set_attr(
+            "category_id",
+            "domain",
+            '["&", ("name", "ilike", "a"), ("active", "in", [True, False])]',
+        )
+        self.assertEqual(
+            self.node("category_id").get("domain"),
+            "['&', ('name', 'ilike', 'a'), ('active', 'in', [True, False])]",
+        )
+        # Its expressions are not literals.
+        with self.assertRaisesRegex(UserError, "not a domain"):
+            self.set_attr("country_id", "domain", '[("id", "=", uid)]')
+
     def test_options(self):
         # A dictionary, a JSON text: the arch takes the Python form.
         change = self.set_attr("country_id", "options", {"no_create": True})

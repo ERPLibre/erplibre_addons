@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The domain as conditions, its text below; a refusal of the server
+         shows above the buttons and keeps the dialog open. -->
+    <t t-name="erplibre_studio.DomainDialog">
+        <Dialog title="props.title" size="'lg'" contentClass="'o_erplibre_studio_domain_dialog'">
+            <p t-if="props.text" class="text-muted small o_erplibre_studio_domain_hint" t-esc="props.text" />
+            <DomainSelector
+                resModel="props.resModel"
+                domain="state.domain"
+                readonly="false"
+                isDebugMode="true"
+                allowExpressions="!!props.allowExpressions"
+                update.bind="update"
+            />
+            <div
+                t-if="state.error"
+                role="alert"
+                class="alert alert-danger py-1 small mt-2 mb-0 o_erplibre_studio_domain_error"
+                t-esc="state.error"
+            />
+            <t t-set-slot="footer">
+                <button
+                    class="btn btn-primary o_erplibre_studio_domain_confirm"
+                    t-att-disabled="state.busy"
+                    t-on-click="confirm"
+                >
+                    Confirm
+                </button>
+                <button class="btn btn-secondary o_erplibre_studio_domain_discard" t-on-click="props.close">
+                    Discard
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

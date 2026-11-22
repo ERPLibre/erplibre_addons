@@ -178,9 +178,22 @@
                     busy="!!props.busy"
                 />
             </t>
-            <label t-elif="entry.kind === 'field_domain'" class="form-label mb-0 w-100">
-                <t t-esc="entry.label" />
+            <div t-elif="entry.kind === 'field_domain'" class="w-100">
+                <t t-set="domainTarget" t-value="domainComodel(block)" />
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0" for="o_erplibre_studio_prop_domain" t-esc="entry.label" />
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm p-0 ms-auto o_erplibre_studio_domain_visual"
+                        t-att-disabled="props.busy or !domainTarget.model or domainTarget.pending"
+                        t-att-title="domainTarget.pending ? pendingDomainTitle : ''"
+                        t-on-click="() => this.openDomainEditor(block, entry)"
+                    >
+                        <i class="fa fa-filter me-1" aria-hidden="true" />Edit visually
+                    </button>
+                </div>
                 <textarea
+                    id="o_erplibre_studio_prop_domain"
                     class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_domain"
                     rows="2"
                     placeholder="[('active', '=', True)]"
@@ -189,7 +202,7 @@
                     t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value.trim())"
                 />
                 <span class="d-block text-muted mt-1">The records the field offers. Empty: all of them.</span>
-            </label>
+            </div>
             <t t-elif="entry.kind === 'groups'">
                 <span class="form-label d-block mb-1" t-esc="entry.label" />
                 <div class="d-flex flex-wrap gap-1 mb-1 o_erplibre_studio_group_chips">
