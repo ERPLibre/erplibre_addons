@@ -1685,6 +1685,30 @@ describe("erplibre_studio editor, leaflet map", () => {
             /Map \(Leaflet\)\s*not installed\s*Install the web_view_leaflet_map module.*view\.\s*Markers on a map, provided by web_view_leaflet_map/
         );
     });
+
+    test("the entry of a map that creates its date field says so", async () => {
+        answer = kanbanPayload([inCard("name")]);
+        const base = {view_id: false, xml_id: false, exists: false, pending: false, added: false, changes: 0};
+        answer.view_list = [
+            {...base, type: "kanban", label: "Kanban", view_id: 12, exists: true, editable: true},
+            {
+                ...base,
+                type: "leaflet_map",
+                label: "Map (Leaflet)",
+                editable: false,
+                reason: "Contact has no Map (Leaflet) view to inherit.",
+                reason_code: "no_view",
+                description: "The map also creates the date_localization field it reads.",
+            },
+            {...base, type: "pivot", label: "Pivot", editable: false, reason: "-", reason_code: "no_view"},
+        ];
+        await openEditor("kanban");
+        await contains(".o_erplibre_studio_add_view").click();
+        expect(".o_erplibre_studio_view_menu_add[data-view-type=leaflet_map]").toHaveText(
+            /Map \(Leaflet\).*Adding creates the default view.*The map also creates the date_localization field it reads\./s
+        );
+        expect(".o_erplibre_studio_view_menu_creates").toHaveCount(1);
+    });
 });
 
 describe("erplibre_studio editor, form layout", () => {

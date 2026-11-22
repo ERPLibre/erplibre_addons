@@ -3321,9 +3321,11 @@ class ErplibreStudioProject(models.Model):
         ``op["auto"]``, to the name its label proposes, which it then
         follows again. The changes of the project that name it follow
         (``_studio_rewrite_field_name``). UserError when the field is in the
-        database (the name is a column of its table), when the new name does
-        not apply, or while a change, a rule or an added view still names
-        the old one; nothing changes then. An inverse field the project
+        database (the name is a column of its table), when it is the
+        LEAFLET_DATE_FIELD a map creates (the renderer reads that name),
+        when the new name does not apply, or while a change, a rule or an
+        added view still names the old one; nothing changes then. An inverse
+        field the project
         creates on the model is renamed in the definition of the field that
         creates it (``_studio_rename_inverse``)."""
         self.ensure_one()
@@ -3342,6 +3344,14 @@ class ErplibreStudioProject(models.Model):
                 self.env._(
                     "The technical name of %(name)s cannot change once applied: "
                     "it is a column of the table.",
+                    name=old,
+                )
+            )
+        if old == studio_arch.LEAFLET_DATE_FIELD and change.view_type == "leaflet_map":
+            raise UserError(
+                self.env._(
+                    "The map reads %(name)s by this name: the field it creates "
+                    "keeps it.",
                     name=old,
                 )
             )
@@ -4738,8 +4748,10 @@ class ErplibreStudioProject(models.Model):
     def _studio_add_view(self, model, view_type):
         """Add to the draft the ``view_type`` view of the existing ``model``,
         which has none of that type: a view line with its default arch
-        (``arch.default_view_arch``). Return the line; UserError when the
-        view cannot be added."""
+        (``arch.default_view_arch``). A map of a model without
+        LEAFLET_DATE_FIELD comes with one add_field change on its line that
+        creates it (``_studio_leaflet_date_definition``). Return the line;
+        UserError when the view cannot be added."""
         self.ensure_one()
         self = self._editing()
         Editor = self.env["erplibre.studio.editor"]
@@ -4810,13 +4822,9 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 Editor._view_reason("needs_activity", label, model, view_type)
             )
-        if (
-            view_type == "leaflet_map"
-            and studio_arch.LEAFLET_DATE_FIELD not in Model._fields
-        ):
-            raise UserError(Editor._view_reason("needs_field", label, model, view_type))
-        leaflet = None
+        leaflet = date_definition = None
         if view_type == "leaflet_map":
+            date_definition = self._studio_leaflet_date_definition(model, label)
             leaflet = self._studio_leaflet_fields(model)
         parent = None
         if view_type == "hierarchy":
@@ -4855,8 +4863,49 @@ class ErplibreStudioProject(models.Model):
                 }
             )
         )
+        if date_definition:
+            self._add_change(
+                added_view(line),
+                "add_field",
+                f"/{view_type}",
+                "inside",
+                {
+                    "field_name": studio_arch.LEAFLET_DATE_FIELD,
+                    "field": date_definition,
+                    "node_attrs": {},
+                    # The renderer reads the field by this name.
+                    "name_auto": False,
+                },
+            )
         self._touch()
         return line
+
+    def _studio_leaflet_date_definition(self, model, label):
+        """The definition of the date field LEAFLET_DATE_FIELD a map added to
+        ``model`` creates with its view line: a date with the label of
+        base_geolocalize; None when ``model`` has the field. UserError
+        « needs_field » on a database where a new field needs the x_
+        prefix, and when the name does not apply
+        (``_studio_field_name_problem``)."""
+        name = studio_arch.LEAFLET_DATE_FIELD
+        if name in self.env[model]._fields:
+            return None
+        if self._studio_field_name_rule()["prefix_required"]:
+            raise UserError(
+                self.env["erplibre.studio.editor"]._view_reason(
+                    "needs_field", label, model, "leaflet_map"
+                )
+            )
+        problem = self._studio_field_name_problem(model, name)
+        if problem:
+            raise UserError(problem["message"])
+        # The source label: it goes as is into a generated module.
+        _name, definition = self._clean_field_definition(
+            model,
+            {"ttype": "date", "field_description": "Geolocation Date"},
+            name=name,
+        )
+        return definition
 
     def _studio_added_line(self, line_id):
         line = self.view_line_ids.filtered(lambda v: v.id == int(line_id or 0))
@@ -5381,6 +5430,27 @@ class ErplibreStudioProject(models.Model):
             )
         if line.view_type == "leaflet_map":
             self._studio_check_leaflet_coordinates(line)
+            self._studio_check_leaflet_date(line)
+
+    def _studio_check_leaflet_date(self, line):
+        """Raise UserError when the model of the map of the view line
+        ``line`` has no LEAFLET_DATE_FIELD and the project does not create
+        it: the map reads it with every marker, and the read fails without
+        it. An undo or a removal of the field the map creates leads there."""
+        name = studio_arch.LEAFLET_DATE_FIELD
+        if line.model not in self.env or name in self.env[line.model]._fields:
+            return
+        if self._field_add_change(line.model, name):
+            return
+        raise UserError(
+            self.env._(
+                "The map %(view)s reads a %(field)s field that %(model)s does "
+                "not have: remove the map and add it again to create it.",
+                view=line._studio_view_name(),
+                field=name,
+                model=line.model,
+            )
+        )
 
     def _studio_check_leaflet_coordinates(self, line):
         """Raise UserError when the map of the view line ``line``, with the

@@ -8799,6 +8799,30 @@ msgstr ""
 "%(model)s n'a pas : elle n'afficherait aucun marqueur."
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "The map also creates the %(field)s field it reads."
+msgstr "La carte crée aussi le champ %(field)s qu'elle lit."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The map %(view)s reads a %(field)s field that %(model)s does not have: "
+"remove the map and add it again to create it."
+msgstr ""
+"La carte %(view)s lit un champ %(field)s que %(model)s n'a pas : "
+"retirez la carte et ajoutez-la de nouveau pour le créer."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The map reads %(name)s by this name: the field it creates keeps it."
+msgstr ""
+"La carte lit %(name)s sous ce nom : le champ qu'elle crée le garde."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0

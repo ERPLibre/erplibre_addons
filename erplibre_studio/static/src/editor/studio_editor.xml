@@ -129,6 +129,11 @@
                                         <span class="small text-muted">
                                             Adding creates the default view of this type in the project, then opens it.
                                         </span>
+                                        <span
+                                            t-if="entry.description"
+                                            class="small text-muted o_erplibre_studio_view_menu_creates"
+                                            t-esc="entry.description"
+                                        />
                                     </span>
                                     <span class="ms-auto align-self-center btn btn-sm btn-primary">Add</span>
                                 </button>

@@ -49,8 +49,8 @@ UNSUPPORTED_VIEW_TYPES = ("gantt",)
 # not edit, a type no installed module provides, a type a model not created
 # yet cannot have before Apply, an activity view of a model without
 # activities (mail.activity.mixin), a map of a model without the field
-# web_view_leaflet_map always reads (LEAFLET_DATE_FIELD), a type the model
-# has no view of.
+# web_view_leaflet_map always reads (LEAFLET_DATE_FIELD) on a database where
+# a new field needs the x_ prefix, a type the model has no view of.
 VIEW_REASONS = (
     "needs_module",
     "not_editable",
@@ -500,15 +500,16 @@ class ErplibreStudioEditor(models.AbstractModel):
     @api.model
     def _view_list(self, model, view, project):
         """[{type, label, view_id, xml_id, exists, pending, added, editable,
-        reason, reason_code, changes}]: for each view type of VIEW_TYPES,
-        then of UNSUPPORTED_VIEW_TYPES, the default view of ``model``
+        reason, reason_code, description, changes}]: for each view type of
+        VIEW_TYPES, then of UNSUPPORTED_VIEW_TYPES, the default view of ``model``
         (``view``, the view on screen, for its type) and whether the studio
         edits it, else why not (``reason``, in the language of the user, and
         ``reason_code``, see VIEW_REASONS). ``changes``: how many changes of
         ``project`` it holds. A model of the project not created yet has
         its pending default views (``view_id`` False, ``pending``). A view
         ``project`` adds is ``added``, and ``pending`` until Apply creates
-        it; an entry « no_view » is a type the project can add."""
+        it; an entry « no_view » is a type the project can add, and its
+        ``description`` says what adding it also creates, else False."""
         Project = self.env["erplibre.studio.project"]
         editable_types = Project._view_types()
         known = set(self.env["ir.ui.view"]._fields["type"].get_values(self.env))
@@ -532,6 +533,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "editable": False,
                 "reason": False,
                 "reason_code": False,
+                "description": False,
                 "changes": 0,
             }
             if pending:
@@ -589,7 +591,16 @@ class ErplibreStudioEditor(models.AbstractModel):
                 and model in self.env
                 and studio_arch.LEAFLET_DATE_FIELD not in self.env[model]._fields
             ):
-                code = "needs_field"
+                if Project._studio_field_name_rule()["prefix_required"]:
+                    code = "needs_field"
+                else:
+                    # Add a view creates the field with the map
+                    # (``_studio_add_leaflet_date``).
+                    code = "no_view"
+                    entry["description"] = self.env._(
+                        "The map also creates the %(field)s field it reads.",
+                        field=studio_arch.LEAFLET_DATE_FIELD,
+                    )
             elif not entry["exists"]:
                 code = "no_view"
             else:
