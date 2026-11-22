@@ -613,20 +613,31 @@ class ErplibreStudioProject(models.Model):
     def _view_type_module(self, view_type):
         """The module that adds ``view_type`` to ir.ui.view (web_timeline
         for « timeline »), from the external id of the selection value."""
-        value = (
+        return self._selection_value_module("ir.ui.view", "type", view_type)
+
+    def _field_type_module(self, ttype):
+        """The module that adds the field type ``ttype`` to ir.model.fields
+        (base_geoengine for « geo_point »); base for a type of Odoo."""
+        return self._selection_value_module("ir.model.fields", "ttype", ttype)
+
+    def _selection_value_module(self, model, field_name, value):
+        """The module of the selection value ``value`` of the field
+        ``field_name`` of ``model``, from its external id; False when the
+        selection has no such value."""
+        record = (
             self.env["ir.model.fields.selection"]
             .sudo()
             .search(
                 [
-                    ("field_id.model", "=", "ir.ui.view"),
-                    ("field_id.name", "=", "type"),
-                    ("value", "=", view_type),
+                    ("field_id.model", "=", model),
+                    ("field_id.name", "=", field_name),
+                    ("value", "=", value),
                 ],
                 limit=1,
             )
         )
         return (
-            self._module_of("ir.model.fields.selection", value.id) if value else False
+            self._module_of("ir.model.fields.selection", record.id) if record else False
         )
 
     def _dependencies(self):
@@ -634,6 +645,7 @@ class ErplibreStudioProject(models.Model):
         views, of their view types and of the nodes the changes locate
         (read from the branding of the combined arch), of the models
         extended (by a field or by the inverse of a relational field), of the
+        types of the new fields (base_geoengine for a geometry), of the
         fields added or named by the changes (a filter domain, a group-by,
         a timeline date, the domain of a relational field), of the groups a
         node shows for and of the comodels; those of the models and the
@@ -682,6 +694,8 @@ class ErplibreStudioProject(models.Model):
                 names |= self._attribute_dependencies(data["payload"])
         for model, _name, definition, _change in self._studio_all_definitions():
             names.add(self._module_of("ir.model", IrModel._get_id(model)))
+            # A field class a module declares (fields.GeoPoint).
+            names.add(self._field_type_module(definition.get("ttype")))
             relation = definition.get("relation")
             if relation:
                 names.add(self._module_of("ir.model", IrModel._get_id(relation)))

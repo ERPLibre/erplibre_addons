@@ -1,6 +1,7 @@
 from . import (
     test_generate,
     test_generate_added_views,
+    test_generate_geo,
     test_generate_j4,
     test_generate_models,
     test_generate_views,
