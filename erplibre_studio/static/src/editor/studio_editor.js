@@ -145,6 +145,10 @@ export class StudioEditor extends Component {
         // The view the editor was opened on: where the canvas goes back to
         // when the model on screen leaves the project.
         this.launch = {resModel: params.res_model, viewId: params.view_id || false, viewType: params.view_type || "form"};
+        // The move change the last keyboard move made or merged into, {id,
+        // from}: ``from`` is the path of the block before that change (see
+        // ``moveByKeyboard``); null when there is none.
+        this.keyboardMove = null;
         // Ctrl+Z (Cmd+Z on macOS) removes the last change of the view on
         // screen, as the undo button does; the hotkey service leaves it to
         // the browser inside a text field.
@@ -1422,13 +1426,18 @@ export class StudioEditor extends Component {
     /**
      * Move the block at ``path`` one place up (``direction`` -1) or down
      * (+1): onto the hook ``keyboardHooks`` gives, through the operation a
-     * drop of the block there makes, one change of the draft per move. A
-     * block of a tab page not shown shows first. The block stays selected;
-     * with ``focus``, its button takes the focus back once the canvas
-     * renders again (the move gives it a new element). The live region
-     * says where it went, or that it cannot go further. Answer the path of
-     * the block once moved, or null: an unnamed block gets a new path, the
-     * one the newest move change of the payload carries.
+     * drop of the block there makes. While the last change of the view is
+     * the one the previous keyboard move of this block made, the operation
+     * carries ``merge``: the server folds the move into that change, or
+     * removes it when the block is back where it stood, so a series of
+     * moves is one change of the draft; a drop, an undo or another block
+     * starts a new one. A block of a tab page not shown shows first. The
+     * block stays selected; with ``focus``, its button takes the focus
+     * back once the canvas renders again (the move gives it a new
+     * element). The live region says where it went, or that it cannot go
+     * further. Answer the path of the block once moved, or null: an
+     * unnamed block gets a new path, the one the move change carries, or
+     * the one it had before the series when the change left the draft.
      */
     async moveByKeyboard(path, direction, {focus = true} = {}) {
         if (this.state.busy || !this.project || this.state.preview || this.panel) {
@@ -1452,15 +1461,37 @@ export class StudioEditor extends Component {
             return null;
         }
         const item = {kind: "node", path, name: block.name};
-        const data = await this.operate(this.dropOperation(item, hook.target, hook.position, hook.zone));
+        const operation = this.dropOperation(item, hook.target, hook.position, hook.zone);
+        const previous = this.data.changes || [];
+        const last = previous.at(-1);
+        const series = this.keyboardMove;
+        const merge = Boolean(operation && series && last && last.id === series.id && last.path === path);
+        if (merge) {
+            operation.merge = true;
+        }
+        const data = await this.operate(operation);
         if (!data) {
             return null;
         }
-        const newest = (data.changes || [])
-            .filter((c) => c.type === "move")
-            .reduce((last, c) => (!last || c.id > last.id ? c : last), null);
-        const named = !(newest && newest.path) && block.name && this.fieldBlock(data.blocks, block.name);
-        const newPath = (newest && newest.path) || (named && named.path) || null;
+        const changes = data.changes || [];
+        const known = new Set(previous.map((c) => c.id));
+        const added = changes.some((c) => !known.has(c.id));
+        const merged = merge && !added && changes.find((c) => c.id === last.id);
+        const newest =
+            merged ||
+            changes
+                .filter((c) => c.type === "move")
+                .reduce((latest, c) => (!latest || c.id > latest.id ? c : latest), null);
+        let newPath;
+        if (merge && !added && !merged) {
+            // Back where it stood: the merged change left the draft.
+            newPath = series.from;
+            this.keyboardMove = null;
+        } else {
+            const named = !(newest && newest.path) && block.name && this.fieldBlock(data.blocks, block.name);
+            newPath = (newest && newest.path) || (named && named.path) || null;
+            this.keyboardMove = newest && {id: newest.id, from: merged ? series.from : path};
+        }
         this.state.selected = newPath;
         const place = newPath && this.blockPlace(data, newPath, hook.zone);
         if (place) {

@@ -418,6 +418,9 @@ CHANGE_MARK = "erplibre_studio_changes"
 # The attribute that gives each node, in the archs ``dependent_changes``
 # compares, an identity the changes keep; never written to a view.
 UID_MARK = "data-erplibre-studio-uid"
+# The attribute that gives each element, in the copy ``merged_move``
+# moves, its index in the arch it starts from; never written to a view.
+MOVE_KEY_MARK = "data-erplibre-studio-k"
 # The kinds of ``change_kind``, in the order the editor lists them.
 CHANGE_KINDS = ("new", "renamed", "hidden", "moved", "attribute")
 
@@ -1164,6 +1167,51 @@ def moved_node_xpath(arch, change, view_type):
     node = moved.xpath(f"//*[@{marker}]")[0]
     del node.attrib[marker]
     return node_xpath(moved, node)
+
+
+def merged_move(arch, first, second, view_type):
+    """The one move that puts the node ``first`` moves where ``second``
+    then puts it: ``first`` and ``second`` are move changes (dicts of
+    ``change_spec``), ``first`` located in ``arch``, ``second`` in the arch
+    ``first`` leaves. Return (target, position), ``target`` an XPath of
+    ``arch``: « before » the element that follows the node at the end,
+    else « inside » its parent, at the end. Return None when the node ends
+    where it started: same parent, same next element. The attributes a
+    pivot move sets are not part of the result. Raise ArchError when
+    ``second`` moves another node, and the error of a move that does not
+    apply. ``arch`` is left untouched.
+
+    Every element of a copy of ``arch`` carries its index in document
+    order (MOVE_KEY_MARK); the moves keep the attributes of what they
+    move, so the place of the node at the end names elements of ``arch``
+    by their index."""
+    marked = copy.deepcopy(arch)
+    originals = [node for node in arch.iter() if isinstance(node.tag, str)]
+    for index, node in enumerate(n for n in marked.iter() if isinstance(n.tag, str)):
+        node.set(MOVE_KEY_MARK, str(index))
+
+    def place(node):
+        following = _next_element(node)
+        return (
+            node.getparent().get(MOVE_KEY_MARK),
+            following.get(MOVE_KEY_MARK) if following is not None else None,
+        )
+
+    key = locate(marked, first["payload"]["source"]).get(MOVE_KEY_MARK)
+    start = place(marked.xpath(f"//*[@{MOVE_KEY_MARK}='{key}']")[0])
+    for index, change in enumerate((first, second)):
+        source = change["payload"]["source"]
+        if index and locate(marked, source).get(MOVE_KEY_MARK) != key:
+            raise ArchError(f"The move of {source} moves another node.", "other_node")
+        spec = change_spec(dict(change, payload={"source": source}), view_type)
+        marked = apply_inheritance_specs(marked, spec)
+    end = place(marked.xpath(f"//*[@{MOVE_KEY_MARK}='{key}']")[0])
+    if end == start:
+        return None
+    parent, following = end
+    if following is not None:
+        return node_xpath(arch, originals[int(following)]), "before"
+    return node_xpath(arch, originals[int(parent)]), "inside"
 
 
 # ── values built from the editor forms ──────────────────────────────────

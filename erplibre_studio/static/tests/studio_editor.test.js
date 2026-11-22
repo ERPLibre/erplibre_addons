@@ -97,6 +97,10 @@ let answer;
 let review;
 // A promise the next apply_operation waits for, when set.
 let holdOperation;
+// The move changes the server answers, when set: a move adds one, a move
+// with ``merge`` folds into the last one, or removes it when the columns
+// are back in their first order.
+let moveChanges;
 
 beforeEach(() => {
     serverState.debug = "1";
@@ -104,6 +108,7 @@ beforeEach(() => {
     defineWebModels();
     answer = payload([column("name", "Name"), column("email", "Email")]);
     holdOperation = null;
+    moveChanges = null;
     onRpc("erplibre.studio.editor", "get_editor_data", (args) => {
         expect.step(`get_editor_data ${args.args.slice(0, 4).join(" ")}`);
         if (args.kwargs.pick_project === false) {
@@ -114,7 +119,7 @@ beforeEach(() => {
     onRpc("erplibre.studio.editor", "apply_operation", async (args) => {
         const operation = args.args[4];
         const parts = [operation.type, operation.source || operation.field_name, operation.position];
-        parts.push(operation.target, operation.value);
+        parts.push(operation.target, operation.value, operation.merge && "merge");
         expect.step(["apply_operation", ...parts.filter(Boolean)].join(" "));
         expect(args.kwargs.revision).toBe(answer.project.revision);
         if (holdOperation) {
@@ -139,6 +144,16 @@ beforeEach(() => {
             const index = rest.findIndex((c) => c.path === operation.target);
             rest.splice(operation.position === "before" && index >= 0 ? index : rest.length, 0, moved);
             answer = payload(rest);
+            if (moveChanges) {
+                const back = rest.map((c) => c.name).join() === moveChanges.first;
+                if (!operation.merge) {
+                    const id = moveChanges.items.length + 1;
+                    moveChanges.items.push({id, type: "move", kind: "moved", path: operation.source});
+                } else if (back) {
+                    moveChanges.items.pop();
+                }
+                answer.changes = [...moveChanges.items];
+            }
         } else if (operation.type === "remove") {
             answer = payload(answer.blocks.children.filter((c) => c.path !== operation.target));
         } else if (operation.type === "relabel") {
@@ -352,6 +367,47 @@ describe("erplibre_studio editor", () => {
         await press("ArrowUp");
         expect(pick("name")).toBeFocused();
         expect.verifySteps([]);
+    });
+
+    test("consecutive Alt+Arrow moves of one block ask to merge into one change", async () => {
+        answer = payload([column("name", "Name"), column("email", "Email"), column("ref", "Reference")]);
+        moveChanges = {first: "name,email,ref", items: []};
+        await openEditor();
+        const pick = (name) => `.o_erplibre_studio_field[data-name=${name}] .o_erplibre_studio_pick`;
+        const REF = "//field[@name='ref']";
+        const order = () => queryAll(".o_erplibre_studio_field").map((e) => e.dataset.name);
+        const moveKey = async (key) => {
+            await press(["Alt", key]);
+            await animationFrame();
+            await animationFrame();
+        };
+        // The first move of the series adds a change; the next ones of the
+        // same block carry « merge ».
+        queryOne(pick("name")).focus();
+        await moveKey("ArrowDown");
+        expect.verifySteps([`apply_operation move ${NAME} before ${REF}`]);
+        await moveKey("ArrowDown");
+        expect.verifySteps([`apply_operation move ${NAME} inside /list merge`]);
+        expect(order()).toEqual(["email", "ref", "name"]);
+        expect(".o_erplibre_studio_field[data-name=name]").toHaveClass("o_erplibre_studio_selected");
+        expect(pick("name")).toBeFocused();
+        // Back where it stood: the change leaves, the block stays selected.
+        await moveKey("ArrowUp");
+        expect.verifySteps([`apply_operation move ${NAME} before ${REF} merge`]);
+        await moveKey("ArrowUp");
+        expect.verifySteps([`apply_operation move ${NAME} before ${EMAIL} merge`]);
+        expect(order()).toEqual(["name", "email", "ref"]);
+        expect(".o_erplibre_studio_field[data-name=name]").toHaveClass("o_erplibre_studio_selected");
+        expect(pick("name")).toBeFocused();
+        // The series ended with its change: the next move starts a new one.
+        await moveKey("ArrowDown");
+        expect.verifySteps([`apply_operation move ${NAME} before ${REF}`]);
+        // Another block starts its own series.
+        queryOne(pick("ref")).focus();
+        await moveKey("ArrowUp");
+        expect.verifySteps([`apply_operation move ${REF} before ${NAME}`]);
+        await moveKey("ArrowUp");
+        expect.verifySteps([`apply_operation move ${REF} before ${EMAIL} merge`]);
     });
 
     test("Ctrl+Z removes the last change of the view; a text field keeps its own undo", async () => {

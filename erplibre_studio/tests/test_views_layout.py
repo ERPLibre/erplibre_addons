@@ -229,3 +229,105 @@ class TestViewsLayout(StudioCase):
         self.assertFalse(arch.xpath("//notebook | //separator"))
         self.assertFalse(arch.xpath(NEW_GROUP))
         self.assertEqual(len(self.project.change_ids), 3)
+
+
+KEYBOARD_FORM = """
+<form>
+    <sheet>
+        <group name="g">
+            <field name="name"/>
+            <field name="email"/>
+            <field name="phone"/>
+            <field name="website"/>
+        </group>
+        <group name="h">
+            <field name="ref"/>
+        </group>
+    </sheet>
+</form>
+"""
+
+
+def named(name):
+    return f"//field[@name='{name}']"
+
+
+@tagged("post_install", "-at_install")
+class TestKeyboardMoves(StudioCase):
+    """The moves of a block from the keyboard carry ``merge``: a series of
+    moves of one block is one move change of the draft."""
+
+    def setUp(self):
+        super().setUp()
+        self.view = self.make_view("form", KEYBOARD_FORM)
+        self.project = self.make_project("studio_test_keyboard")
+
+    def move(self, source, target, position="before", merge=True):
+        operation = {"source": source, "target": target, "position": position}
+        if merge:
+            operation["merge"] = True
+        return self.op(self.project, self.view, type="move", **operation)
+
+    def moves(self):
+        return self.project.change_ids.filtered(lambda c: c.change_type == "move")
+
+    def fields_of(self, group):
+        draft = self.draft(self.project, self.view)
+        return [node.get("name") for node in draft.xpath(f"{group}/field")]
+
+    def test_series_is_one_change(self):
+        first = self.move(named("email"), named("website"))
+        self.assertEqual(self.fields_of(GROUP), ["name", "phone", "email", "website"])
+        second = self.move(named("email"), GROUP, "inside")
+        self.assertEqual(second, first)
+        third = self.move(named("email"), "//group[@name='h']")
+        self.assertEqual(third, first)
+        self.assertEqual(self.moves(), first)
+        self.assertEqual(len(self.project.change_ids), 1)
+        self.assertEqual(
+            (first.xpath, first.position), ("//group[@name='h']", "before")
+        )
+        self.assertEqual(first._payload()["source"], named("email"))
+        draft = self.draft(self.project, self.view)
+        self.assertEqual(
+            [node.get("name") for node in draft.xpath("/form/sheet/*")],
+            ["g", "email", "h"],
+        )
+        self.assertEqual(self.fields_of(GROUP), ["name", "phone", "website"])
+        # Undo puts the field back where it stood before the series.
+        self.project.action_undo(self.view)
+        self.assertFalse(self.project.change_ids)
+        self.assertEqual(self.fields_of(GROUP), ["name", "email", "phone", "website"])
+
+    def test_down_then_up_leaves_no_change(self):
+        self.move(named("email"), named("website"))
+        back = self.move(named("email"), named("phone"))
+        self.assertFalse(back)
+        self.assertFalse(self.project.change_ids)
+        self.assertEqual(self.fields_of(GROUP), ["name", "email", "phone", "website"])
+
+    def test_what_does_not_merge(self):
+        # After another kind of change: a new move.
+        self.op(
+            self.project,
+            self.view,
+            type="relabel",
+            target=named("name"),
+            value="Full name",
+        )
+        email = self.move(named("email"), named("website"))
+        self.assertEqual(len(self.project.change_ids), 2)
+        # A move of another node: a new move.
+        phone = self.move(named("phone"), named("name"))
+        self.assertNotEqual(phone, email)
+        self.assertEqual(len(self.moves()), 2)
+        self.assertEqual(self.fields_of(GROUP), ["phone", "name", "email", "website"])
+        # Without merge, a move of the same node: a new move.
+        again = self.move(named("phone"), named("website"), merge=False)
+        self.assertNotEqual(again, phone)
+        self.assertEqual(len(self.moves()), 3)
+        self.assertEqual(self.fields_of(GROUP), ["name", "email", "phone", "website"])
+        # The move that merges is the last change only: undo leaves the
+        # earlier moves as they are.
+        self.project.action_undo(self.view)
+        self.assertEqual(self.fields_of(GROUP), ["phone", "name", "email", "website"])

@@ -2439,7 +2439,46 @@ class ErplibreStudioProject(models.Model):
                 )
             except Exception as exc:  # noqa: BLE001 - reported as the move error
                 raise UserError(self._arch_message(exc)) from exc
+        elif op.get("merge") and not (
+            view.type in studio_arch.TEMPLATED_TYPES and studio_arch.in_template(source)
+        ):
+            merged = self._merged_move(view, target, position, source_path)
+            if merged is not None:
+                return merged
         return self._add_change(view, "move", target, position, payload)
+
+    def _merged_move(self, view, target, position, source_path):
+        """Fold the move of the node at ``source_path`` to ``target`` /
+        ``position`` into the last change of ``view`` when that change is a
+        move of the same node without pivot attributes: the change then
+        holds the one move from where the node stood before it
+        (``studio_arch.merged_move``), its payload unchanged, since its
+        source still names the node in the arch without it. Only the last
+        change: a later change may locate a node by a position the move
+        shifts. Return the change, an empty recordset when the node is
+        back where it stood (the change leaves the draft), or None when
+        nothing merges."""
+        last = self._view_changes(view)[-1:]
+        if last.change_type != "move" or last._payload().get("attrs"):
+            return None
+        before, errors = self._draft_arch_without(view, last)
+        if errors:
+            return None
+        move = {
+            "type": "move",
+            "xpath": target,
+            "position": position,
+            "payload": {"source": source_path},
+        }
+        try:
+            place = studio_arch.merged_move(before, last._as_dict(), move, view.type)
+        except Exception:  # noqa: BLE001 - a move that does not merge is added
+            return None
+        if place is None:
+            last.unlink()
+            return last.browse()
+        last.write({"xpath": place[0], "position": place[1]})
+        return last
 
     def _op_hide(self, view, arch, op):
         """Hide a node: by its hide attribute, or, in a search or a pivot

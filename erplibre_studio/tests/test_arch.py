@@ -557,3 +557,114 @@ class TestArch(BaseCase):
             (block["tag"], block["kind"], block["movable"]), ("chatter", "other", False)
         )
         self.assertNotIn("drop", block)
+
+    def test_merged_move(self):
+        root = etree.fromstring("""
+            <form>
+                <sheet>
+                    <group name="a">
+                        <field name="f1"/>
+                        <field name="f2"/>
+                        <field name="f3"/>
+                        <field name="f4"/>
+                    </group>
+                    <group name="b">
+                        <field name="f5"/>
+                    </group>
+                </sheet>
+            </form>
+            """)
+        before = etree.tostring(root)
+
+        def move(source, xpath, position="before"):
+            return {
+                "key": 1,
+                "type": "move",
+                "xpath": xpath,
+                "position": position,
+                "payload": {"source": source},
+            }
+
+        def field(name):
+            return f"//field[@name='{name}']"
+
+        def merged(first, second):
+            return studio_arch.merged_move(root, first, second, "form")
+
+        def names(arch, parent):
+            return [node.get("name") for node in arch.xpath(f"{parent}/*")]
+
+        # Down twice inside a group: one move before the next field.
+        place = merged(move(field("f1"), field("f3")), move(field("f1"), field("f4")))
+        self.assertEqual(place, (field("f4"), "before"))
+        moved = studio_arch._apply_one(root, move(field("f1"), *place), "form")
+        self.assertEqual(names(moved, "//group[@name='a']"), ["f2", "f3", "f1", "f4"])
+        # Down to the end of the group: inside it.
+        place = merged(
+            move(field("f2"), field("f4")),
+            move(field("f2"), "//group[@name='a']", "inside"),
+        )
+        self.assertEqual(place, ("//group[@name='a']", "inside"))
+        # Down past the end of the group: before the next group.
+        place = merged(
+            move(field("f3"), "//group[@name='a']", "inside"),
+            move(field("f3"), "//group[@name='b']"),
+        )
+        self.assertEqual(place, ("//group[@name='b']", "before"))
+        # Past the last group: inside the sheet, at the end.
+        place = merged(
+            move(field("f5"), "//group[@name='b']"),
+            move(field("f5"), "/form/sheet[1]", "inside"),
+        )
+        self.assertEqual(place, ("/form/sheet[1]", "inside"))
+        # Down then up: back where it stood.
+        self.assertIsNone(
+            merged(move(field("f1"), field("f3")), move(field("f1"), field("f2")))
+        )
+        # A move of another node does not merge.
+        with self.assertRaises(studio_arch.ArchError) as caught:
+            merged(move(field("f1"), field("f3")), move(field("f2"), field("f4")))
+        self.assertEqual(caught.exception.code, "other_node")
+        self.assertEqual(etree.tostring(root), before)
+
+    def test_merged_move_by_position(self):
+        # Unnamed nodes: the target is a position in the arch before both
+        # moves, not in the arch the first one leaves.
+        root = etree.fromstring("""
+            <form>
+                <group name="a">
+                    <separator string="s1"/>
+                    <separator string="s2"/>
+                    <separator string="s3"/>
+                    <separator string="s4"/>
+                </group>
+            </form>
+            """)
+        group = "//group[@name='a']"
+        first = {
+            "type": "move",
+            "xpath": f"{group}/separator[3]",
+            "position": "before",
+            "payload": {"source": f"{group}/separator[1]"},
+        }
+        second = dict(
+            first,
+            xpath=f"{group}/separator[4]",
+            payload={"source": f"{group}/separator[2]"},
+        )
+        place = studio_arch.merged_move(root, first, second, "form")
+        self.assertEqual(place, (f"{group}/separator[4]", "before"))
+        change = dict(first, xpath=place[0], position=place[1])
+        moved = studio_arch._apply_one(root, change, "form")
+        self.assertEqual(
+            [node.get("string") for node in moved.xpath(f"{group}/separator")],
+            ["s2", "s3", "s1", "s4"],
+        )
+        # The first move alone, then a second one that ends it where it
+        # started: back.
+        back = dict(
+            first,
+            xpath=f"{group}/separator[1]",
+            payload={"source": f"{group}/separator[2]"},
+        )
+        self.assertIsNone(studio_arch.merged_move(root, first, back, "form"))
