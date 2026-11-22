@@ -205,3 +205,80 @@ class TestGenerateAddedCalendar(StudioCase):
             f"{self.module}.{xml_name}",
         )
         self.assertIn('name="color">user_id<', etree.tostring(studio).decode())
+
+
+@tagged("post_install", "-at_install")
+class TestGenerateAddedHierarchy(StudioCase):
+    """Generation of a project that adds a hierarchy view to the contacts,
+    which have none, and gives it a children field, when web_hierarchy is
+    installed."""
+
+    module = "studio_test_generate_hierarchy"
+
+    def setUp(self):
+        super().setUp()
+        if not self.hierarchy_available():
+            self.skipTest("web_hierarchy is not installed")
+        if self.env["ir.ui.view"].default_view("res.partner", "hierarchy"):
+            self.skipTest("res.partner has a hierarchy view in this database")
+        self.destination = tempfile.mkdtemp(prefix="erplibre_studio_test_")
+        self.addCleanup(shutil.rmtree, self.destination, True)
+        choices = [(self.destination, self.destination)]
+        patcher = patch.object(
+            type(self.Project), "_destination_choices", lambda self_: choices
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.project = self.make_project(self.module, destination=self.destination)
+        self.Editor.add_view(self.project.id, "res.partner", "hierarchy")
+        view = self.Editor._resolve_view(
+            "res.partner", False, "hierarchy", self.project
+        )
+        self.op(
+            self.project,
+            view,
+            type="set_attribute",
+            target="/hierarchy",
+            attribute="child_field",
+            value="child_ids",
+        )
+
+    def read(self, *parts):
+        with open(
+            os.path.join(self.destination, self.module, *parts), encoding="utf-8"
+        ) as fh:
+            return fh.read()
+
+    def test_generate(self):
+        with self.server_actions():
+            self.project.action_apply()
+            self.project.action_generate()
+        self.assertIn("web_hierarchy", self.project._dependencies())
+        manifest = self.read("__manifest__.py")
+        self.assertIn("web_hierarchy", manifest)
+        views = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        records = [r.get("id") for r in views.findall("record")]
+        xml_name = "res_partner_view_hierarchy"
+        studio_name = f"{self.module}_{xml_name}_studio"
+        self.assertEqual(records, [xml_name, studio_name])
+        primary = views.find(f"record[@id='{xml_name}']")
+        self.assertEqual(primary.find("field[@name='type']").text, "hierarchy")
+        hierarchy = primary.find("field[@name='arch']/hierarchy")
+        self.assertEqual(hierarchy.get("parent_field"), "parent_id")
+        self.assertEqual(
+            [f.get("name") for f in hierarchy.findall("field")], ["parent_id"]
+        )
+        self.assertEqual(
+            len(hierarchy.xpath("templates/t[@t-name='hierarchy-box']")), 1
+        )
+        studio = views.find(f"record[@id='{studio_name}']")
+        self.assertEqual(
+            studio.find("field[@name='inherit_id']").get("ref"),
+            f"{self.module}.{xml_name}",
+        )
+        text = etree.tostring(studio).decode()
+        # The children field, and the field loaded for web_hierarchy.
+        self.assertIn('name="child_field">child_ids<', text)
+        self.assertIn('<field name="child_ids"/>', text)
