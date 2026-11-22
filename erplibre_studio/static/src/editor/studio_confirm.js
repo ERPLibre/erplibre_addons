@@ -11,6 +11,7 @@ import {_t} from "@web/core/l10n/translation";
 export const REPORT_SECTIONS = [
     "models",
     "fields",
+    "effects",
     "tables",
     "groups",
     "categories",
@@ -29,6 +30,7 @@ export function reportTitle(section) {
         {
             models: _t("Models and their records"),
             fields: _t("Fields and their values"),
+            effects: _t("What changes for the records"),
             tables: _t("Relation tables"),
             groups: _t("Groups and their members"),
             categories: _t("Categories of groups"),
@@ -43,6 +45,21 @@ export function reportTitle(section) {
     );
 }
 
+/**
+ * The line of ``item`` ({model, kind, count, field}), an effect on the
+ * records of the removal of the field of a model option (effect_text of
+ * the server).
+ */
+function effectText(item) {
+    if (item.kind === "archived") {
+        return _t("%(count)s archived record(s) of %(model)s become visible", item);
+    }
+    if (item.kind === "company") {
+        return _t("%(count)s record(s) of %(model)s are no longer limited to their company", item);
+    }
+    return _t("The list of %(model)s loses its drag handle", item);
+}
+
 /** The line of ``item`` in the section ``section`` of a removal report. */
 export function reportItemText(section, item) {
     switch (section) {
@@ -50,6 +67,8 @@ export function reportItemText(section, item) {
             return _t("%(name)s (%(model)s): %(count)s record(s)", item);
         case "fields":
             return _t("%(label)s (%(model)s.%(name)s): %(filled)s value(s)", item);
+        case "effects":
+            return effectText(item);
         case "groups":
             return _t("%(name)s: %(users)s member(s)", item);
         case "members":
@@ -74,8 +93,8 @@ export function reportItemText(section, item) {
 /**
  * The non-empty sections of the removal report ``report``
  * (``_studio_removal_report`` of the server): [{key, title, items}], each
- * item {text, warn}; ``warn`` marks what holds data: records, values or
- * members.
+ * item {text, warn}; ``warn`` marks what holds data: records, values,
+ * members, or records an effect reaches.
  */
 export function reportSections(report) {
     return REPORT_SECTIONS.map((key) => ({

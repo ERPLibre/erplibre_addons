@@ -458,18 +458,38 @@ export class StudioModelsSpace extends Component {
         }
     }
 
-    /** Whether the option ``key`` of the model line of ``entry`` is applied: its field exists, it stays. */
-    optionLocked(entry, key) {
+    /** Whether the option ``key`` of the model line of ``entry`` is applied: its field exists in the database. */
+    optionApplied(entry, key) {
         return Boolean(entry.line.options_applied && entry.line.options_applied[key]);
     }
 
-    get lockedTitle() {
-        return _t("Once applied, this option cannot be removed.");
+    /** Whether the next Apply removes the field of the option ``key``, off while its field exists. */
+    optionRemoval(entry, key) {
+        return Boolean(entry.line.option_removals && entry.line.option_removals[key]);
     }
 
-    async toggleOption(entry, key, ev) {
+    get appliedTitle() {
+        return _t("Its field exists in the database; turning it off removes the field at the next Apply.");
+    }
+
+    get removalTitle() {
+        return _t("Turned off: the next Apply removes its field, after its confirmation.");
+    }
+
+    /**
+     * Write the option ``option`` ({key, label}) of the model line of
+     * ``entry`` as its checkbox says. An applied option turns off through
+     * the confirmation of the editor (confirmOptionRemoval): the checkbox
+     * shows the option on until the payload says otherwise.
+     */
+    async toggleOption(entry, option, ev) {
         const checked = ev.target.checked;
-        if (!(await this.editor.updateModel(entry.line, {[key]: checked}))) {
+        if (!checked && this.optionApplied(entry, option.key)) {
+            ev.target.checked = true;
+            await this.editor.confirmOptionRemoval(entry.line, option.key, option.label);
+            return;
+        }
+        if (!(await this.editor.updateModel(entry.line, {[option.key]: checked}))) {
             ev.target.checked = !checked;
         }
     }

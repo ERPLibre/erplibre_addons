@@ -368,22 +368,28 @@
                         t-att-id="'o_erplibre_studio_model_option_' + option.key"
                         t-attf-class="form-check-input o_erplibre_studio_model_{{option.key}}"
                         t-att-checked="entry.line[option.key]"
-                        t-att-disabled="optionLocked(entry, option.key) or props.busy"
-                        t-att-title="optionLocked(entry, option.key) ? lockedTitle : ''"
-                        t-on-change="(ev) => this.toggleOption(entry, option.key, ev)"
+                        t-att-disabled="props.busy"
+                        t-on-change="(ev) => this.toggleOption(entry, option, ev)"
                     />
                     <label
-                        class="form-check-label small d-flex flex-wrap gap-2"
+                        class="form-check-label small d-flex flex-wrap align-items-center gap-2"
                         t-att-for="'o_erplibre_studio_model_option_' + option.key"
                     >
                         <span t-esc="option.label" />
                         <code t-esc="option.field" />
+                        <!-- One badge at most: the field leaves at the next
+                             Apply, or it exists while the option is on. -->
+                        <span
+                            t-if="optionRemoval(entry, option.key)"
+                            class="badge text-bg-warning o_erplibre_studio_model_option_removal"
+                            t-att-title="removalTitle"
+                        >Removed at the next Apply</span>
+                        <span
+                            t-elif="entry.line[option.key] and optionApplied(entry, option.key)"
+                            class="badge text-bg-light border o_erplibre_studio_model_option_locked"
+                            t-att-title="appliedTitle"
+                        >Applied</span>
                     </label>
-                    <div
-                        t-if="optionLocked(entry, option.key)"
-                        class="form-text mt-0 o_erplibre_studio_model_option_locked"
-                        t-esc="lockedTitle"
-                    />
                     <div
                         t-if="option.key === 'per_company' and entry.line.per_company"
                         class="form-text mt-0 d-flex flex-wrap align-items-baseline gap-2 o_erplibre_studio_model_company_rule"

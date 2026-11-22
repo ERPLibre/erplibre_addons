@@ -17,8 +17,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "%(count)s archived record(s) of %(model)s become visible"
 msgstr ""
 "%(count)s enregistrement(s) archivé(s) de %(model)s redeviennent visibles"
@@ -84,8 +86,10 @@ msgid "%(count)s member(s)"
 msgstr "%(count)s membre(s)"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid ""
 "%(count)s record(s) of %(model)s are no longer limited to their company"
 msgstr ""
@@ -1262,8 +1266,10 @@ msgid "App of the project"
 msgstr "App du projet"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_app__applied
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__applied
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__applied
@@ -1673,12 +1679,6 @@ msgstr "Pas un nom réservé"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Not a reserved word of the ORM"
 msgstr "Pas un mot réservé de l'ORM"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
-msgid "Once applied, this option cannot be removed."
-msgstr "Une fois appliquée, cette option ne peut plus être retirée."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3282,6 +3282,16 @@ msgstr "Modèle de l'élément"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid ""
+"Its field exists in the database; turning it off removes the field at the "
+"next Apply."
+msgstr ""
+"Son champ existe dans la base ; la désactiver retire le champ au prochain "
+"Apply."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__kanban
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__kanban
@@ -4794,6 +4804,12 @@ msgstr "Retirer cette vue du brouillon"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+msgid "Removed at the next Apply"
+msgstr "Retirée au prochain Apply"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
 msgid "Render of the preview"
@@ -5882,6 +5898,16 @@ msgid "The implied groups that left the database since they were chosen."
 msgstr "Les groupes impliqués qui ont quitté la base depuis leur choix."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"The installed generated module defines the field of this option: it leaves "
+"the database once the module is generated again and upgraded."
+msgstr ""
+"Le module généré installé définit le champ de cette option : il quitte la "
+"base une fois le module généré de nouveau et mis à jour."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
@@ -5914,8 +5940,10 @@ msgid "The label of the menu; empty: the label."
 msgstr "Le libellé du menu ; vide : le libellé du modèle."
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "The list of %(model)s loses its drag handle"
 msgstr "La liste de %(model)s perd sa poignée de glisser-déposer"
 
@@ -6819,6 +6847,33 @@ msgid "Translatable"
 msgstr "Traduisible"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Turn off"
+msgstr "Désactiver"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Turn off %(option)s"
+msgstr "Désactiver %(option)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
+msgid "Turned off: the next Apply removes its field, after its confirmation."
+msgstr ""
+"Désactivée : le prochain Apply retire son champ, après sa confirmation."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"Turning this option off removes at the next Apply, after its confirmation:"
+msgstr ""
+"Désactiver cette option retire au prochain Apply, après sa confirmation :"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Two Apply would create the same column."
@@ -7161,8 +7216,10 @@ msgid "What Revert removes changed since it was shown: review it again."
 msgstr "Ce que Défaire retire a changé depuis son affichage : relisez-le."
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "What changes for the records"
 msgstr "Ce qui change pour les enregistrements"
 

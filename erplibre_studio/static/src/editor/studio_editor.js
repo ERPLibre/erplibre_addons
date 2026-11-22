@@ -687,11 +687,15 @@ export class StudioEditor extends Component {
         });
     }
 
-    /** The answer of the report ``method`` (get_apply_report, get_revert_report), or null. */
-    async readReport(method) {
+    /**
+     * The answer of the report ``method`` (get_apply_report,
+     * get_revert_report, get_option_removal_report) of the project, with
+     * ``args`` after its id, or null.
+     */
+    async readReport(method, args = []) {
         this.state.busy = true;
         try {
-            return await this.orm.call(MODEL, method, [this.project.id]);
+            return await this.orm.call(MODEL, method, [this.project.id, ...args]);
         } catch (error) {
             this.notification.add(this.errorMessage(error), {type: "danger"});
             return null;
@@ -1788,6 +1792,45 @@ export class StudioEditor extends Component {
             this.state.modelsSpace.model = values.model;
         }
         return Boolean(data);
+    }
+
+    /**
+     * Turn the option ``key`` (labelled ``label``) of the model line
+     * ``line`` off, once its field exists in the database: a dialog shows
+     * what the next Apply removes with it (get_option_removal_report) and
+     * its effects on the records; « Turn off » writes the option off. A
+     * refusal of the server replaces the button. Without an answer of the
+     * server, the option stays on.
+     */
+    async confirmOptionRemoval(line, key, label) {
+        if (this.state.busy || !this.project) {
+            return;
+        }
+        const args = [line.id, key];
+        const answer = await this.readReport("get_option_removal_report", args);
+        if (!answer) {
+            return;
+        }
+        const intro = answer.waiting
+            ? _t(
+                  "The installed generated module defines the field of this option: it leaves the database once the module is generated again and upgraded."
+              )
+            : _t("Turning this option off removes at the next Apply, after its confirmation:");
+        this.dialog.add(StudioConfirmDialog, {
+            title: _t("Turn off %(option)s", {option: label}),
+            intro,
+            report: answer.report,
+            refused: answer.refused || false,
+            confirmLabel: _t("Turn off"),
+            confirm: async () => this.updateModel(line, {[key]: false}),
+            // This report has no digest (update_model checks none): the
+            // dialog compares false with false and flags only a change of
+            // the refusal.
+            reload: async () => {
+                const again = await this.readReport("get_option_removal_report", args);
+                return again && {...again, digest: false};
+            },
+        });
     }
 
     /** Show the model ``model`` in the models space. */

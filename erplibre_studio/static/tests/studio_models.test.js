@@ -251,13 +251,17 @@ beforeEach(() => {
         expect.step(`get_studio_choices ${args.args[0]}`);
         return choices;
     });
-    onRpc("erplibre.studio.editor", "get_review", () => ({
-        revision: 0,
-        state: "draft",
-        groups: [],
-        removal: {report: {}, digest: "n0thing", confirm: false},
-        blocked: false,
-    }));
+    onRpc("erplibre.studio.editor", "get_review", (args) =>
+        respond.get_review
+            ? respond.get_review(args)
+            : {
+                  revision: 0,
+                  state: "draft",
+                  groups: [],
+                  removal: {report: {}, digest: "n0thing", confirm: false},
+                  blocked: false,
+              }
+    );
     onRpc("erplibre.studio.editor", "get_access_existing", (args) => {
         expect.step(`get_access_existing ${args.args[1]}`);
         return respond.get_access_existing ? respond.get_access_existing(args) : [];
@@ -272,6 +276,7 @@ beforeEach(() => {
         "save_rule",
         "remove_rule",
         "check_rule_domain",
+        "get_option_removal_report",
     ]) {
         editorRpc(method);
     }
@@ -746,8 +751,9 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_model_order").toHaveValue("x_name desc, id asc");
     });
 
-    test("the models space: an applied option is locked", async () => {
-        answer = payload({
+    /** The project of an applied model line whose options ``line`` completes. */
+    function appliedProject(line = {}) {
+        return {
             apps: [LOANS_APP],
             models: [
                 modelLine({
@@ -756,30 +762,183 @@ describe("erplibre_studio models", () => {
                     order: "",
                     archivable: true,
                     manual_order: false,
-                    options_applied: {archivable: true, manual_order: false},
+                    per_company: false,
+                    company_rule: false,
+                    options_applied: {archivable: true, manual_order: false, per_company: false},
+                    option_removals: {archivable: false, manual_order: false, per_company: false},
                     sort_fields: [["x_name", "Name"]],
+                    ...line,
                 }),
             ],
             item_count: 1,
             touched_models: [],
-        });
+        };
+    }
+
+    /** Open the models space on the model of the project. */
+    async function openAppliedModel() {
         respond.get_editor_data = (args) =>
             payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
         await openEditor();
         await openSpace("models");
         await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+    }
+
+    test("the models space: an applied option turns off after a confirmation", async () => {
+        answer = payload(appliedProject());
+        await openAppliedModel();
         expect(".o_erplibre_studio_model_archivable").toBeChecked();
-        expect(".o_erplibre_studio_model_archivable").not.toBeEnabled();
-        expect(".o_erplibre_studio_model_archivable").toHaveAttribute(
-            "title",
-            "Once applied, this option cannot be removed."
-        );
+        expect(".o_erplibre_studio_model_archivable").toBeEnabled();
         expect(".o_erplibre_studio_model_option_locked").toHaveCount(1);
+        expect(".o_erplibre_studio_model_option_locked").toHaveText("Applied");
+        expect(".o_erplibre_studio_model_option_locked").toHaveAttribute(
+            "title",
+            "Its field exists in the database; turning it off removes the field at the next Apply."
+        );
+        expect(".o_erplibre_studio_model_option_removal").toHaveCount(0);
         expect(".o_erplibre_studio_model_manual_order").toBeEnabled();
+
+        // Unchecked: the report of the server, the option still on.
+        respond.get_option_removal_report = () => ({
+            report: {
+                fields: [{label: "Active", model: MODEL, name: "x_active", filled: 3}],
+                effects: [{kind: "archived", model: MODEL, count: 1, field: "x_active"}],
+            },
+            refused: false,
+            waiting: false,
+        });
+        await contains(".o_erplibre_studio_model_archivable").click();
+        expect(lastCall("get_option_removal_report").args).toEqual([3, 7, "archivable"]);
+        expect(lastCall("update_model")).toBe(undefined);
+        expect(".o_erplibre_studio_model_archivable").toBeChecked();
+        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(1);
+        expect(".o_erplibre_studio_confirm_dialog .modal-title").toHaveText("Turn off Archivable");
+        expect(".o_erplibre_studio_confirm_section[data-section=fields] .o_erplibre_studio_confirm_item").toHaveText(
+            `Active (${MODEL}.x_active): 3 value(s)`
+        );
+        expect(".o_erplibre_studio_confirm_section[data-section=effects] h6").toHaveText(
+            /What changes for the records/
+        );
+        expect(".o_erplibre_studio_confirm_section[data-section=effects] .o_erplibre_studio_confirm_item").toHaveText(
+            `1 archived record(s) of ${MODEL} become visible`
+        );
+        expect(".o_erplibre_studio_confirm_section[data-section=effects] .o_erplibre_studio_confirm_item").toHaveClass(
+            "text-danger"
+        );
+        expect(".o_erplibre_studio_confirm_button").toHaveText("Turn off");
+
+        // Cancel sends nothing.
+        await contains(".o_erplibre_studio_confirm_cancel").click();
+        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
+        expect(lastCall("update_model")).toBe(undefined);
+        expect(".o_erplibre_studio_model_archivable").toBeChecked();
+
+        // « Turn off » writes the option off; the field leaves at the next Apply.
+        respond.update_model = () =>
+            payload({
+                ...appliedProject({
+                    archivable: false,
+                    option_removals: {archivable: true, manual_order: false, per_company: false},
+                }),
+                revision: 1,
+            });
+        await contains(".o_erplibre_studio_model_archivable").click();
+        await contains(".o_erplibre_studio_confirm_button").click();
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {archivable: false}]);
+        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
+        expect(".o_erplibre_studio_model_archivable").not.toBeChecked();
+        expect(".o_erplibre_studio_model_option_removal").toHaveText("Removed at the next Apply");
+        expect(".o_erplibre_studio_model_option_locked").toHaveCount(0);
+
         await contains(".o_erplibre_studio_model_advanced_toggle").click();
         expect(".o_erplibre_studio_model_advanced_note").toHaveText(
             "Set by Odoo for a model created outside code: they do not change."
         );
+    });
+
+    test("the models space: an option to remove turns back on without a dialog", async () => {
+        answer = payload(
+            appliedProject({
+                archivable: false,
+                manual_order: false,
+                options_applied: {archivable: false, manual_order: true, per_company: false},
+                option_removals: {archivable: false, manual_order: true, per_company: false},
+            })
+        );
+        await openAppliedModel();
+        expect(".o_erplibre_studio_model_manual_order").not.toBeChecked();
+        expect(".o_erplibre_studio_model_option_removal").toHaveCount(1);
+        expect(".o_erplibre_studio_model_option_removal").toHaveAttribute(
+            "title",
+            "Turned off: the next Apply removes its field, after its confirmation."
+        );
+        expect(".o_erplibre_studio_model_option_locked").toHaveCount(0);
+
+        respond.update_model = () =>
+            payload({
+                ...appliedProject({
+                    archivable: false,
+                    manual_order: true,
+                    options_applied: {archivable: false, manual_order: true, per_company: false},
+                }),
+                revision: 1,
+            });
+        await contains(".o_erplibre_studio_model_manual_order").click();
+        expect(lastCall("get_option_removal_report")).toBe(undefined);
+        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
+        expect(lastCall("update_model").args.slice(1, 3)).toEqual([7, {manual_order: true}]);
+        expect(".o_erplibre_studio_model_manual_order").toBeChecked();
+        expect(".o_erplibre_studio_model_option_removal").toHaveCount(0);
+        expect(".o_erplibre_studio_model_option_locked").toHaveText("Applied");
+    });
+
+    test("the models space: a report the server cannot read keeps the option on", async () => {
+        answer = payload(appliedProject());
+        await openAppliedModel();
+        respond.get_option_removal_report = () => {
+            throw makeServerError({message: "Unknown model option archivable."});
+        };
+        await contains(".o_erplibre_studio_model_archivable").click();
+        expect(".o_erplibre_studio_confirm_dialog").toHaveCount(0);
+        expect(".o_notification").toHaveText(/Unknown model option/);
+        expect(".o_erplibre_studio_model_archivable").toBeChecked();
+        expect(lastCall("update_model")).toBe(undefined);
+    });
+
+    test("the models space: the review lists the effects of an option removed", async () => {
+        answer = payload(
+            appliedProject({
+                archivable: false,
+                option_removals: {archivable: true, manual_order: false, per_company: false},
+            })
+        );
+        respond.get_review = () => ({
+            revision: 0,
+            state: "draft",
+            groups: [],
+            removal: {
+                report: {
+                    fields: [{label: "Active", model: MODEL, name: "x_active", filled: 3}],
+                    effects: [
+                        {kind: "archived", model: MODEL, count: 1, field: "x_active"},
+                        {kind: "handle", model: MODEL, count: 0, field: "x_sequence"},
+                    ],
+                },
+                digest: "0pt10n",
+                confirm: true,
+            },
+            blocked: false,
+        });
+        await openAppliedModel();
+        await contains(".o_erplibre_studio_apply_bar").click();
+        const effects = ".o_erplibre_studio_review_removal [data-section=effects] .o_erplibre_studio_confirm_item";
+        expect([...document.querySelectorAll(effects)].map((el) => el.textContent.trim())).toEqual([
+            `1 archived record(s) of ${MODEL} become visible`,
+            `The list of ${MODEL} loses its drag handle`,
+        ]);
+        // The handle reaches no record: it is not a warning.
+        expect(`${effects}.text-danger`).toHaveCount(1);
+        expect(".o_erplibre_studio_apply").not.toBeEnabled();
     });
 
     test("the models space: per company and its rule", async () => {
@@ -853,34 +1012,38 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_model_company_rule_open").toHaveCount(0);
     });
 
-    test("the models space: per company applied is locked", async () => {
-        answer = payload({
-            apps: [LOANS_APP],
-            models: [
-                modelLine({
-                    applied: true,
-                    views: APPLIED_VIEWS,
-                    order: "",
-                    archivable: false,
-                    manual_order: false,
-                    per_company: true,
-                    company_rule: false,
-                    options_applied: {archivable: false, manual_order: false, per_company: true},
-                    sort_fields: [["x_name", "Name"]],
-                }),
-            ],
-            item_count: 1,
-            touched_models: [],
-        });
-        respond.get_editor_data = (args) =>
-            payload(answer.project, {model: args.args[0], viewId: args.args[1], viewType: args.args[2]});
-        await openEditor();
-        await openSpace("models");
-        await contains(`.o_erplibre_studio_models_item[data-model=${MODEL}]`).click();
+    test("the models space: a refused removal of per company has no Turn off", async () => {
+        answer = payload(
+            appliedProject({
+                archivable: false,
+                per_company: true,
+                options_applied: {archivable: false, manual_order: false, per_company: true},
+            })
+        );
+        await openAppliedModel();
         expect(".o_erplibre_studio_model_per_company").toBeChecked();
-        expect(".o_erplibre_studio_model_per_company").not.toBeEnabled();
+        expect(".o_erplibre_studio_model_per_company").toBeEnabled();
         expect(".o_erplibre_studio_model_option_locked").toHaveCount(1);
         expect(".o_erplibre_studio_model_archivable").toBeEnabled();
+
+        respond.get_option_removal_report = () => ({
+            report: {
+                fields: [{label: "Company", model: MODEL, name: "x_company_id", filled: 2}],
+                effects: [{kind: "company", model: MODEL, count: 2, field: "x_company_id"}],
+            },
+            refused: "The view Loan item: by company names x_company_id: remove it from the view first.",
+            waiting: false,
+        });
+        await contains(".o_erplibre_studio_model_per_company").click();
+        expect(lastCall("get_option_removal_report").args).toEqual([3, 7, "per_company"]);
+        expect(".o_erplibre_studio_confirm_refused").toHaveText(/remove it from the view first/);
+        expect(".o_erplibre_studio_confirm_section[data-section=effects] .o_erplibre_studio_confirm_item").toHaveText(
+            `2 record(s) of ${MODEL} are no longer limited to their company`
+        );
+        expect(".o_erplibre_studio_confirm_button").toHaveCount(0);
+        await contains(".o_erplibre_studio_confirm_cancel").click();
+        expect(lastCall("update_model")).toBe(undefined);
+        expect(".o_erplibre_studio_model_per_company").toBeChecked();
     });
 
     test("the access grid: a toggle and a new row send set_access", async () => {
