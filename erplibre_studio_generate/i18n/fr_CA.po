@@ -60,6 +60,13 @@ msgstr ""
 "n'en ont pas : %(views)s"
 
 #. module: erplibre_studio_generate
+#: model:ir.model.fields,help:erplibre_studio_generate.field_ir_model__erplibre_studio_unprefixed
+msgid ""
+"A model of an ERPLibre studio project whose name has no x_: ERPLibre studio "
+"generate protects it from a module of the same name installed later."
+msgstr "Un modèle d'un projet ERPLibre studio dont le nom n'a pas de x_ : ERPLibre studio generate le protège d'un module du même nom installé plus tard."
+
+#. module: erplibre_studio_generate
 #: model:ir.model.fields.selection,name:erplibre_studio_generate.selection__erplibre_studio_project__license__agpl-3
 msgid "AGPL-3"
 msgstr "AGPL-3"
@@ -117,10 +124,8 @@ msgstr "Écrivain du générateur de code"
 #. module: erplibre_studio_generate
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/ir_module_module.py:0
-msgid ""
-"Delete the fields %(fields)s first: their names have no x_, which Odoo loads "
-"only with ERPLibre studio generate."
-msgstr "Supprimez d'abord les champs %(fields)s : leurs noms n'ont pas de x_, ce qu'Odoo ne charge qu'avec ERPLibre studio generate."
+msgid "Delete them first: %(reasons)s."
+msgstr "Supprimez-les d'abord : %(reasons)s."
 
 #. module: erplibre_studio_generate
 #: model:ir.model.fields,field_description:erplibre_studio_generate.field_erplibre_studio_project__description
@@ -231,6 +236,11 @@ msgid "License"
 msgstr "Licence"
 
 #. module: erplibre_studio_generate
+#: model:ir.model,name:erplibre_studio_generate.model_ir_model
+msgid "Models"
+msgstr "Modèles"
+
+#. module: erplibre_studio_generate
 #: model:ir.model,name:erplibre_studio_generate.model_ir_module_module
 msgid "Module"
 msgstr "Module"
@@ -245,9 +255,8 @@ msgstr "Régénérer"
 #: code:addons/erplibre_studio_generate/models/ir_module_module.py:0
 msgid ""
 "Revert the studio projects %(projects)s first, or install their generated "
-"modules: the fields %(fields)s have names without x_, which Odoo loads only "
-"with ERPLibre studio generate."
-msgstr "Défaites d'abord les projets studio %(projects)s, ou installez leurs modules générés : les champs %(fields)s ont des noms sans x_, qu'Odoo ne charge qu'avec ERPLibre studio generate."
+"modules: %(reasons)s."
+msgstr "Défaites d'abord les projets studio %(projects)s, ou installez leurs modules générés : %(reasons)s."
 
 #. module: erplibre_studio_generate
 #: model:ir.model.fields,field_description:erplibre_studio_generate.field_erplibre_studio_project__state
@@ -255,6 +264,7 @@ msgid "State"
 msgstr "État"
 
 #. module: erplibre_studio_generate
+#: model:ir.model.fields,field_description:erplibre_studio_generate.field_ir_model__erplibre_studio_unprefixed
 #: model:ir.model.fields,field_description:erplibre_studio_generate.field_ir_model_fields__erplibre_studio_unprefixed
 msgid "Studio name without x_"
 msgstr "Nom studio sans x_"
@@ -300,6 +310,22 @@ msgstr ""
 "Les libellés et les infobulles des nouveaux champs et modèles ne peuvent "
 "contenir ni guillemets, ni barres obliques inverses, ni sauts de ligne : %"
 "(value)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid ""
+"The model %(name)s cannot be written in the generated module: revert the "
+"project, rename it in the draft, then Apply again."
+msgstr "Le modèle %(name)s ne peut pas être écrit dans le module généré : défaites le projet, renommez-le dans le brouillon, puis appliquez de nouveau."
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/ir_model.py:0
+msgid ""
+"The model name %(name)s needs the prefix x_ on this database, or does not "
+"fit the rule of the models without x_."
+msgstr "Le nom de modèle %(name)s exige le préfixe x_ sur cette base, ou ne respecte pas la règle des modèles sans x_."
 
 #. module: erplibre_studio_generate
 #. odoo-python
@@ -442,6 +468,22 @@ msgstr "règle d'enregistrement %(name)s pour %(groups)s : `%(domain)s`"
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "table %(table)s"
 msgstr "table %(table)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/ir_module_module.py:0
+msgid ""
+"the fields %(fields)s have names without x_, which Odoo loads only with "
+"ERPLibre studio generate"
+msgstr "les champs %(fields)s ont des noms sans x_, qu'Odoo ne charge qu'avec ERPLibre studio generate"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/ir_module_module.py:0
+msgid ""
+"the models %(models)s have names without x_; ERPLibre studio generate "
+"protects them from a module of the same name installed later"
+msgstr "les modèles %(models)s ont des noms sans x_ ; ERPLibre studio generate les protège d'un module du même nom installé plus tard"
 
 #. module: erplibre_studio_generate
 #. odoo-python

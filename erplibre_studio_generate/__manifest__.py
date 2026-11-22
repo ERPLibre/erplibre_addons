@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre studio generate",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
@@ -42,6 +42,13 @@ update, the registries set up before this module is loaded log such a
 field as « Failed to load field » (ERROR) and skip it; its column and
 values stay. A module installed later that defines a field of the same
 name takes its column over.
+A new model may go without ``x_`` as well (``studio_demo.book``): its row
+carries a mark that lets it pass the core rule of ``ir.model``. Odoo keeps
+loading such a model without this module; this module protects it from a
+module installed later that defines a model of the same name, which then
+takes its table over, refuses a name a module on the addons path defines,
+and refuses to be uninstalled until the project is reverted or its
+generated module installed.
 The destinations are the directories of the ``addons_path`` of the
 server that it can write into. Writing to the disk needs the
 Settings group, the developer mode and

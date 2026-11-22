@@ -57,3 +57,12 @@
     once this module is loaded. A server start without `-i` or `-u` logs
     none of it. An update of base adds the constraint on the names back:
     this module drops it again at the end of the loading.
+12. A new model may go without `x_` under the same rule
+    (`studio_demo.book`): Apply marks its row, which lets it pass the
+    rule of Odoo, and the generated module defines it under the same
+    name. Odoo keeps loading such a model without this module. The
+    editor refuses a name a module on the addons path defines, installed
+    or not, and a name whose table, its dots as `_`, another model uses.
+    A module installed later that defines a model of the same name takes
+    its table over. This module refuses to be uninstalled while such a
+    model exists, as with the fields.

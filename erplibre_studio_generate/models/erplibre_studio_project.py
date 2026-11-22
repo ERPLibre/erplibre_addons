@@ -2,9 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import base64
+import functools
 import hashlib
 import logging
 import os
+import re
 import shutil
 import time
 from contextlib import contextmanager
@@ -55,6 +57,12 @@ GENERATED_IMPORTS = frozenset({"api", "fields", "models"})
 # string of the generated module: refused in the texts that reach it.
 _UNSAFE_TEXT = ("'", '"', "\\", "\n", "\r")
 
+# The ``_name`` of a model class in a Python source, indented in the body
+# of its class.
+_SOURCE_MODEL_NAME = re.compile(r"^\s+_name\s*=\s*['\"]([a-z0-9_.]+)['\"]", re.M)
+# The directories of a module that hold no model class.
+_SKIPPED_DIRS = frozenset({"static", "node_modules", "__pycache__"})
+
 
 def _series():
     return release.major_version
@@ -69,6 +77,65 @@ def _odoo_addons_dirs():
         os.path.join(package, "addons"),
         os.path.join(os.path.dirname(package), "addons"),
     }
+
+
+def _addons_signature():
+    """((directory, mtime), ...) of the addons path of the server: a module
+    directory added or removed changes the time of its parent."""
+    signature = []
+    for path in odoo.addons.__path__:
+        try:
+            signature.append((path, os.stat(path).st_mtime_ns))
+        except OSError:
+            signature.append((path, None))
+    return tuple(signature)
+
+
+@functools.lru_cache(maxsize=4)
+def _module_model_names(signature):
+    """{model name: frozenset of modules} of the model classes the Python
+    sources of the modules of ``signature`` declare, installed or not; a
+    module found twice counts in its first directory, as Odoo loads it. A
+    ``_name`` computed at run time or written outside a ``.py`` file is
+    not seen."""
+    found = {}
+    seen = set()
+    for path, _mtime in signature:
+        try:
+            entries = sorted(os.listdir(path))
+        except OSError:
+            continue
+        for module in entries:
+            directory = os.path.join(path, module)
+            if module in seen or not os.path.isfile(
+                os.path.join(directory, "__manifest__.py")
+            ):
+                continue
+            seen.add(module)
+            for root, dirs, files in os.walk(directory):
+                dirs[:] = [
+                    d for d in dirs if d not in _SKIPPED_DIRS and not d.startswith(".")
+                ]
+                for name in files:
+                    if not name.endswith(".py"):
+                        continue
+                    try:
+                        with open(
+                            os.path.join(root, name), encoding="utf-8", errors="replace"
+                        ) as fh:
+                            text = fh.read()
+                    except OSError:
+                        continue
+                    for model in _SOURCE_MODEL_NAME.findall(text):
+                        found.setdefault(model, set()).add(module)
+    return {model: frozenset(modules) for model, modules in found.items()}
+
+
+def module_model_names():
+    """{model name: frozenset of modules} of the models the modules on the
+    addons path define, read from their sources (``_module_model_names``).
+    Cached per process until a directory of the addons path changes."""
+    return _module_model_names(_addons_signature())
 
 
 def addons_path_dirs():
@@ -305,6 +372,45 @@ class ErplibreStudioProject(models.Model):
         in the body of the class replaces the import for the fields that
         follow it, and the module no longer loads."""
         return super()._studio_reserved_field_names(model) | GENERATED_IMPORTS
+
+    def _model_vals(self, line, label):
+        """The row of a model without ``x_`` carries the mark that lets it
+        pass the core rule (``ir.model._check_model_name``) and protects it
+        at loading (``ir.model._add_manual_models``)."""
+        vals = super()._model_vals(line, label)
+        vals["erplibre_studio_unprefixed"] = not line.model.startswith("x_")
+        return vals
+
+    def _studio_reserved_model_names(self):
+        """Those of ERPLibre studio, and the models a module on the addons
+        path defines (``module_model_names``), installed or not, the
+        generated module of the project aside: installed later, that
+        module would take a custom model of the same name over."""
+        names = super()._studio_reserved_model_names()
+        own = self.module_name if len(self) == 1 else None
+        for model, modules in module_model_names().items():
+            if modules - {own}:
+                names.add(model)
+        return names
+
+    def _check_generation_model_names(self):
+        """Raise UserError on a new model without ``x_`` whose name cannot be
+        a model of the generated module: its format, a table that is a
+        Python keyword (the file ``models/<table>.py`` is imported by
+        name), a namespace of Odoo (``studio_arch.model_name_refusal``)."""
+        self.ensure_one()
+        for line in self.new_model_ids:
+            if line.model.startswith("x_"):
+                continue
+            if studio_arch.model_name_refusal(line.model, prefix_required=False):
+                raise UserError(
+                    self.env._(
+                        "The model %(name)s cannot be written in the generated "
+                        "module: revert the project, rename it in the draft, "
+                        "then Apply again.",
+                        name=line.model,
+                    )
+                )
 
     def _check_generation_field_names(self):
         """Raise UserError on a new field without ``x_`` whose name cannot be
@@ -827,6 +933,7 @@ class ErplibreStudioProject(models.Model):
             raise UserError(self.env._("The project has no change to generate."))
         self._check_generation_texts()
         self._check_generation_field_names()
+        self._check_generation_model_names()
         if self.state == "draft":
             raise UserError(self.env._("Apply the draft before generating the module."))
         # The groups and the rules go into every database that installs the
