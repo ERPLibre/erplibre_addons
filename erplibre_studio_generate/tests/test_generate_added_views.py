@@ -140,3 +140,68 @@ class TestGenerateAddedGraph(StudioCase):
             f"{self.module}.{xml_name}",
         )
         self.assertIn("partner_latitude", etree.tostring(studio).decode())
+
+
+@tagged("post_install", "-at_install")
+class TestGenerateAddedCalendar(StudioCase):
+    """Generation of a project that adds a calendar view to the contacts,
+    which have none, and colors its events."""
+
+    module = "studio_test_generate_calendar"
+
+    def setUp(self):
+        super().setUp()
+        if self.env["ir.ui.view"].default_view("res.partner", "calendar"):
+            self.skipTest("res.partner has a calendar view in this database")
+        self.destination = tempfile.mkdtemp(prefix="erplibre_studio_test_")
+        self.addCleanup(shutil.rmtree, self.destination, True)
+        choices = [(self.destination, self.destination)]
+        patcher = patch.object(
+            type(self.Project), "_destination_choices", lambda self_: choices
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.project = self.make_project(self.module, destination=self.destination)
+        self.Editor.add_view(self.project.id, "res.partner", "calendar")
+        view = self.Editor._resolve_view("res.partner", False, "calendar", self.project)
+        self.op(
+            self.project,
+            view,
+            type="set_attribute",
+            target="/calendar",
+            attribute="color",
+            value="user_id",
+        )
+
+    def read(self, *parts):
+        with open(
+            os.path.join(self.destination, self.module, *parts), encoding="utf-8"
+        ) as fh:
+            return fh.read()
+
+    def test_generate(self):
+        date, _readonly = self.project._studio_calendar_date("res.partner")
+        with self.server_actions():
+            self.project.action_apply()
+            self.project.action_generate()
+        self.assertIn("base", self.project._dependencies())
+        views = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        records = [r.get("id") for r in views.findall("record")]
+        xml_name = "res_partner_view_calendar"
+        studio_name = f"{self.module}_{xml_name}_studio"
+        self.assertEqual(records, [xml_name, studio_name])
+        primary = views.find(f"record[@id='{xml_name}']")
+        self.assertEqual(primary.find("field[@name='type']").text, "calendar")
+        calendar = primary.find("field[@name='arch']/calendar")
+        self.assertEqual(
+            (calendar.get("date_start"), calendar.get("mode")), (date, "month")
+        )
+        self.assertEqual([f.get("name") for f in calendar.findall("field")], ["name"])
+        studio = views.find(f"record[@id='{studio_name}']")
+        self.assertEqual(
+            studio.find("field[@name='inherit_id']").get("ref"),
+            f"{self.module}.{xml_name}",
+        )
+        self.assertIn('name="color">user_id<', etree.tostring(studio).decode())
