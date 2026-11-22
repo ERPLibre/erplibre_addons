@@ -29,6 +29,8 @@ import {
     columnLabel,
     endHook,
     findBlock,
+    graphLaneLabel,
+    graphLanes,
     isTrue,
     pivotLanes,
     searchColumns,
@@ -286,7 +288,7 @@ StudioBlock.components = {StudioBlock};
 /**
  * The canvas of the editor: the arch tree of a form or a list, the template
  * of a kanban card or of a timeline item, the columns of a search view, the
- * axes of a pivot. It renders from its props: a component renders again
+ * axes of a pivot or of a graph. It renders from its props: a component renders again
  * when its props change, not when the editor reads its own state, so what
  * the canvas shows of that state reaches it as a prop. A drop, a selection
  * or the filter form goes through the editor ``editor``, which holds the
@@ -515,6 +517,58 @@ export class StudioCanvas extends Component {
 
     get pivotLaneList() {
         return ["row", "col", "measure"].map((key) => ({key, label: columnLabel(key)}));
+    }
+
+    // ── graph ───────────────────────────────────────────────────────────
+
+    get graphLanes() {
+        return graphLanes(this.data);
+    }
+
+    get graphLaneList() {
+        return ["row", "measure"].map((key) => ({key, label: graphLaneLabel(key)}));
+    }
+
+    /** The chart type of the graph: its « type », a bar chart without one. */
+    get graphType() {
+        return (this.root.attrs || {}).type || "bar";
+    }
+
+    /** The chart types of a graph: [{value, label, pressed}]. */
+    get graphTypes() {
+        const current = this.graphType;
+        return ((this.data.choices || {}).graph_type || []).map(([value, label]) => ({
+            value,
+            label: valueLabel("graph_type", value) || label,
+            pressed: value === current,
+        }));
+    }
+
+    setGraphType(value) {
+        if (value !== this.graphType) {
+            return this.editor.setNodeAttribute(this.root, "type", value);
+        }
+    }
+
+    /**
+     * The caption of the group-by at ``index`` of a graph: the first one
+     * makes the X axis, or the slices of a pie; the next ones split it
+     * into series.
+     */
+    graphRowCaption(index) {
+        if (index) {
+            return _t("Series");
+        }
+        return this.graphType === "pie" ? _t("Slices") : _t("X axis");
+    }
+
+    /**
+     * The caption of the measure at ``index`` among ``count`` measures of
+     * a graph, or "": the graph draws the last one, the others are offered
+     * in its Measures menu.
+     */
+    graphMeasureCaption(index, count) {
+        return count > 1 && index === count - 1 ? _t("Drawn") : "";
     }
 
     // ── the filter form of a search view ────────────────────────────────

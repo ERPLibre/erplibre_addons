@@ -181,7 +181,7 @@ export class StudioInspector extends Component {
             .map(([attribute, kind]) => ({
                 attribute,
                 kind,
-                label: attributeLabel(attribute),
+                label: attributeLabel(attribute, kind),
                 value: (block.attrs || {})[attribute] || "",
                 required: required.includes(attribute),
             }));

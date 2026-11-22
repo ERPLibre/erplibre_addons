@@ -169,8 +169,16 @@ export function canSelectBlock(block) {
     return block.kind !== "template";
 }
 
-/** The label of a settable view attribute (``settable`` of the payload). */
-export function attributeLabel(attribute) {
+/**
+ * The label of a settable view attribute (``settable`` of the payload).
+ * ``kind``, the kind of its value, names the attributes whose name means
+ * another thing elsewhere: the « type » of a graph is its chart type.
+ */
+export function attributeLabel(attribute, kind) {
+    const ofKind = {graph_type: _t("Chart type")}[kind];
+    if (ofKind) {
+        return ofKind;
+    }
     return (
         {
             default_group_by: _t("Default grouping"),
@@ -196,6 +204,9 @@ export function attributeLabel(attribute) {
             mode: _t("Default scale"),
             stack: _t("Stack the items"),
             event_open_popup: _t("Open the records in a dialog"),
+            stacked: _t("Stacked"),
+            order: _t("Sort"),
+            cumulated: _t("Cumulative"),
         }[attribute] || attribute
     );
 }
@@ -207,6 +218,9 @@ export function valueLabel(kind, value) {
         axis: {row: _t("Row"), col: _t("Column"), measure: _t("Measure")},
         interval: {day: _t("Day"), week: _t("Week"), month: _t("Month"), quarter: _t("Quarter"), year: _t("Year")},
         timeline_mode: {day: _t("Day"), week: _t("Week"), month: _t("Month"), fit: _t("Fit")},
+        graph_axis: {row: _t("Group by"), measure: _t("Measure")},
+        graph_type: {bar: _t("Bar"), line: _t("Line"), pie: _t("Pie")},
+        graph_order: {asc: _t("Ascending"), desc: _t("Descending")},
     }[kind];
     return (labels && labels[value]) || null;
 }
@@ -317,6 +331,33 @@ export function pivotAxes(info) {
         axes.push("measure");
     }
     return axes;
+}
+
+// The axes of a graph: its group-bys, the first one the X axis and the
+// next ones its series, and its measures, of which it draws the last one.
+// A field of type « col » is a group-by too: the layout of the server puts
+// it under « row ».
+export const GRAPH_AXES = ["row", "measure"];
+
+/** The field blocks of a graph view by axis: {row, measure, others}. */
+export function graphLanes(data) {
+    const lanes = pivotLanes(data);
+    return {row: lanes.row, measure: lanes.measure, others: lanes.others};
+}
+
+/** The title of the axis ``key`` of a graph view (GRAPH_AXES). */
+export function graphLaneLabel(key) {
+    return {row: _t("Group by"), measure: _t("Measures")}[key] || key;
+}
+
+/** The axes of a graph a field described by ``info`` can go on. */
+export function graphAxes(info) {
+    return pivotAxes(info).filter((axis) => GRAPH_AXES.includes(axis));
+}
+
+/** The axes a field described by ``info`` can go on in a ``viewType`` view. */
+export function axesOf(viewType, info) {
+    return viewType === "graph" ? graphAxes(info) : pivotAxes(info);
 }
 
 /**

@@ -79,6 +79,38 @@ class TestStudioUi(HttpCase):
         tax = search.xpath("//filter[@string='Tour has a tax ID']")
         self.assertEqual(tax[0].get("domain"), "[('vat', '!=', False)]")
 
+    def test_graph_tour(self):
+        """A graph view added to the draft of the contacts: a field dropped
+        on its group-bys, the line chart chosen in the canvas, the preview
+        renders the graph before Apply."""
+        if self.env["ir.ui.view"].default_view("res.partner", "graph"):
+            self.skipTest("res.partner has a graph view in this database")
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1",
+            "erplibre_studio_graph_editor",
+            login="admin",
+            timeout=240,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_graph")]
+        )
+        line = project.view_line_ids
+        self.assertEqual(line.view_type, "graph")
+        self.assertFalse(line.applied)
+        view = self.env["erplibre.studio.editor"]._resolve_view(
+            "res.partner", False, "graph", project
+        )
+        arch, errors = project._draft_arch(view)
+        self.assertFalse(errors)
+        self.assertEqual(arch.get("type"), "line")
+        country = arch.xpath("//field[@name='country_id']")
+        self.assertEqual(country[0].get("type"), "row")
+        # The field goes after the group-by of the added view: it splits
+        # the X axis into series.
+        self.assertEqual(arch.xpath("//field")[-1].get("name"), "country_id")
+
     def timeline_setup(self):
         """A timeline view of the contacts, a contact of a company to show
         in it, and an action that opens the view: (view, action). Skips the

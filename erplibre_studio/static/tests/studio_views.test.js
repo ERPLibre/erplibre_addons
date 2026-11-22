@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {press, queryOne} from "@odoo/hoot-dom";
+import {press, queryAllTexts, queryOne} from "@odoo/hoot-dom";
 import {animationFrame, mockTimeZone} from "@odoo/hoot-mock";
 import {
     contains,
@@ -16,7 +16,14 @@ import {
 } from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
-import {conditionValue, pivotAxes, pivotLanes, searchColumns} from "@erplibre_studio/editor/studio_editor";
+import {
+    conditionValue,
+    graphAxes,
+    graphLanes,
+    pivotAxes,
+    pivotLanes,
+    searchColumns,
+} from "@erplibre_studio/editor/studio_editor";
 
 const CARD = "//t[@t-name='card']";
 const named = (tag, name) => `//${tag}[@name='${name}']`;
@@ -47,6 +54,7 @@ const OPERATIONS = {
     ],
     search: ["add_existing_field", "add_filter", "add_group_by", "add_separator", "move", "remove", "hide", "relabel"],
     pivot: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
+    graph: ["add_existing_field", "move", "remove", "hide", "relabel", "set_attribute"],
     timeline: ["add_existing_field", "move", "remove", "hide", "set_attribute"],
 };
 
@@ -71,6 +79,9 @@ const CHOICES = {
     interval: ["day", "week", "month", "quarter", "year"].map((i) => [i, i]),
     timeline_mode: ["day", "week", "month", "fit"].map((m) => [m, m]),
     axis: ["row", "col", "measure"].map((a) => [a, a]),
+    graph_axis: ["row", "measure"].map((a) => [a, a]),
+    graph_type: ["bar", "line", "pie"].map((t) => [t, t]),
+    graph_order: ["asc", "desc"].map((o) => [o, o]),
 };
 
 function field(path, name, extra = {}) {
@@ -95,7 +106,7 @@ function payload(viewType, blocks, extra = {}) {
         blocks,
         layout: {root: blocks.path},
         operations: OPERATIONS[viewType],
-        hide_mode: ["search", "pivot"].includes(viewType) ? "remove" : "invisible",
+        hide_mode: ["search", "pivot", "graph"].includes(viewType) ? "remove" : "invisible",
         settable: {},
         required_attributes: {},
         choices: CHOICES,
@@ -225,6 +236,33 @@ function pivotPayload(axes) {
     });
     data.palette = data.palette
         .map((item) => ({...item, axes: pivotAxes(FIELDS[item.name])}))
+        .filter((item) => item.axes.length);
+    return data;
+}
+
+/** A graph of ``axes`` [[name, axis]], its root of ``rootAttrs``. */
+function graphPayload(axes, rootAttrs = {}) {
+    const children = [];
+    const layout = {root: "/graph", axes: {row: [], measure: []}, others: []};
+    for (const [name, axis] of axes) {
+        children.push(field(named("field", name), name, {axis, interval: null, attrs: {type: axis}}));
+        layout.axes[axis].push(named("field", name));
+    }
+    const data = payload("graph", container("/graph", "graph", children, {movable: false, attrs: rootAttrs}), {
+        layout,
+        settable: {
+            graph: {
+                type: "graph_type",
+                stacked: "bool",
+                order: "graph_order",
+                disable_linking: "bool",
+                cumulated: "bool",
+            },
+            field: {type: "graph_axis", interval: "interval"},
+        },
+    });
+    data.palette = data.palette
+        .map((item) => ({...item, axes: graphAxes(FIELDS[item.name])}))
         .filter((item) => item.axes.length);
     return data;
 }
@@ -606,6 +644,117 @@ describe("erplibre_studio editor, pivot", () => {
             axis: "row",
             interval: "month",
         });
+    });
+});
+
+describe("erplibre_studio editor, graph", () => {
+    test("the axes, their captions, a drop on each axis and the chart type", async () => {
+        answer = graphPayload([
+            ["country_id", "row"],
+            ["active", "row"],
+            ["color", "measure"],
+        ]);
+        await openEditor("graph");
+        expect(".o_erplibre_studio_axis").toHaveCount(2);
+        expect(queryAllTexts(".o_erplibre_studio_axis > .fw-bold")).toEqual(["Group by", "Measures"]);
+        expect("[data-axis=row] .o_erplibre_studio_field[data-name=country_id]").toHaveCount(1);
+        expect("[data-axis=measure] .o_erplibre_studio_field[data-name=color]").toHaveCount(1);
+        // The first group-by makes the X axis, the next one the series; a
+        // single measure needs no caption.
+        expect(queryAllTexts("[data-axis=row] .o_erplibre_studio_axis_caption")).toEqual(["X axis", "Series"]);
+        expect("[data-axis=measure] .o_erplibre_studio_axis_caption").toHaveCount(0);
+        expect(".o_erplibre_studio_existing_field[data-name=partner_latitude] .o_erplibre_studio_axis_badge").toHaveText(
+            "Measure"
+        );
+        expect(".o_erplibre_studio_existing_field[data-name=create_date] .o_erplibre_studio_axis_badge").toHaveText(
+            "Group by"
+        );
+
+        // A number that does not group goes on the measures only.
+        const dragging = await contains(".o_erplibre_studio_existing_field[data-name=partner_latitude]").drag();
+        expect("[data-axis=row]").toHaveClass("o_erplibre_studio_axis_refused");
+        expect("[data-axis=measure]").not.toHaveClass("o_erplibre_studio_axis_refused");
+        await dragging.drop(hook(named("field", "color"), "after", "measure"));
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: named("field", "color"),
+            position: "after",
+            field_name: "partner_latitude",
+            axis: "measure",
+        });
+
+        // A date groups by the interval of the palette.
+        await contains(".o_erplibre_studio_existing_field[data-name=create_date]").dragAndDrop(
+            hook(named("field", "active"), "after", "row")
+        );
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: named("field", "active"),
+            position: "after",
+            field_name: "create_date",
+            axis: "row",
+            interval: "month",
+        });
+
+        // Without « type », the graph is a bar chart.
+        const type = (value) => `.o_erplibre_studio_graph_types .o_erplibre_studio_graph_type[data-value=${value}]`;
+        expect(queryAllTexts(".o_erplibre_studio_graph_type")).toEqual(["Bar", "Line", "Pie"]);
+        expect(type("bar")).toHaveAttribute("aria-pressed", "true");
+        await contains(type("bar")).click();
+        expect.verifySteps([]);
+        respond = () =>
+            graphPayload(
+                [
+                    ["country_id", "row"],
+                    ["active", "row"],
+                    ["color", "measure"],
+                ],
+                {type: "line"}
+            );
+        await contains(type("line")).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({type: "set_attribute", target: "/graph", attribute: "type", value: "line"});
+        expect(type("line")).toHaveAttribute("aria-pressed", "true");
+
+        // The properties of the view name the chart type and its values.
+        await contains(".o_erplibre_studio_canvas").click();
+        const settable = (attribute) => `.o_erplibre_studio_settable[data-attribute=${attribute}]`;
+        expect(`${settable("type")} label`).toHaveText(/^Chart type/);
+        expect(queryAllTexts(`${settable("type")} option`)).toEqual(["Default", "Bar", "Line", "Pie"]);
+        expect(`${settable("type")} select`).toHaveValue("line");
+        expect(`${settable("stacked")} label`).toHaveText(/^Stacked/);
+        expect(`${settable("cumulated")} label`).toHaveText(/^Cumulative/);
+        expect(queryAllTexts(`${settable("order")} option`)).toEqual(["Default", "Ascending", "Descending"]);
+    });
+
+    test("a pie names its slices, several measures name the one drawn", async () => {
+        answer = graphPayload(
+            [
+                ["country_id", "row"],
+                ["color", "measure"],
+                ["partner_latitude", "measure"],
+            ],
+            {type: "pie"}
+        );
+        await openEditor("graph");
+        expect(queryAllTexts("[data-axis=row] .o_erplibre_studio_axis_caption")).toEqual(["Slices"]);
+        expect(queryAllTexts("[data-axis=measure] .o_erplibre_studio_axis_caption")).toEqual(["Drawn"]);
+        expect(
+            "[data-axis=measure] .o_erplibre_studio_axis_caption + .o_erplibre_studio_field[data-name=partner_latitude]"
+        ).toHaveCount(1);
+        expect(".o_erplibre_studio_axis_empty").toHaveCount(0);
+    });
+
+    test("a graph without measure counts the records", async () => {
+        answer = graphPayload([["create_date", "row"]]);
+        await openEditor("graph");
+        expect("[data-axis=measure] .o_erplibre_studio_axis_empty").toHaveText("None: the chart counts the records.");
+        // The palette adds on the first axis that takes the field.
+        await contains(".o_erplibre_studio_existing_field[data-name=country_id] .o_erplibre_studio_pick").click();
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toMatchObject({field_name: "country_id", axis: "row"});
     });
 });
 
@@ -1114,6 +1263,20 @@ test("helpers of the view types", () => {
     expect(pivotAxes(FIELDS.color)).toEqual(["row", "col", "measure"]);
     expect(pivotAxes(FIELDS.partner_latitude)).toEqual(["measure"]);
     expect(pivotAxes(FIELDS.comment)).toEqual([]);
+    const graph = graphLanes(
+        graphPayload([
+            ["country_id", "row"],
+            ["color", "measure"],
+        ])
+    );
+    expect(graph.row.map((b) => b.name)).toEqual(["country_id"]);
+    expect(graph.measure.map((b) => b.name)).toEqual(["color"]);
+    expect(graph.others).toEqual([]);
+    expect("col" in graph).toBe(false);
+    expect(graphAxes(FIELDS.color)).toEqual(["row", "measure"]);
+    expect(graphAxes(FIELDS.partner_latitude)).toEqual(["measure"]);
+    expect(graphAxes(FIELDS.create_date)).toEqual(["row"]);
+    expect(graphAxes(FIELDS.comment)).toEqual([]);
     mockTimeZone(+2);
     expect(conditionValue("datetime", "2026-01-01T08:00")).toBe("2026-01-01 06:00:00");
     expect(conditionValue("date", "2026-01-01")).toBe("2026-01-01");

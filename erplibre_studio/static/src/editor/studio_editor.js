@@ -32,6 +32,7 @@ import {
     MODEL,
     RIBBON_COLORS,
     allBlocks,
+    axesOf,
     blockTrail,
     canDragBlock,
     canRemoveBlock,
@@ -40,8 +41,9 @@ import {
     conditionValue,
     fieldTypeLabel,
     findBlock,
+    graphLaneLabel,
+    graphLanes,
     namedKeys,
-    pivotAxes,
     pivotLanes,
     searchColumns,
     searchEndHook,
@@ -58,6 +60,8 @@ export {
     fieldTypeLabel,
     fieldWidgets,
     findBlock,
+    graphAxes,
+    graphLanes,
     isTrue,
     namedKeys,
     pivotAxes,
@@ -496,6 +500,7 @@ export class StudioEditor extends Component {
                 kanban: _t("The records as cards, in columns by grouping."),
                 search: _t("The filters, groupings and fields of the search."),
                 pivot: _t("Cross analysis: rows, columns and measures."),
+                graph: _t("A bar, line or pie chart of the records, grouped and measured."),
                 timeline: _t("A chronological band, provided by web_timeline (OCA)."),
             }[viewType] || ""
         );
@@ -846,7 +851,7 @@ export class StudioEditor extends Component {
 
     /**
      * Whether the dragged ``item`` can land in ``zone``: a column of a
-     * search view, an axis of a pivot, the loaded fields of a timeline,
+     * search view, an axis of a pivot or a graph, the loaded fields of a timeline,
      * the tabs of a notebook (« pages », a tab only), or the arch tree (no
      * zone). A tab lands in the arch tree only where the server accepts
      * a new notebook for it: on a hook (``target``, ``position``) whose
@@ -886,8 +891,8 @@ export class StudioEditor extends Component {
             }
             return true;
         }
-        if (viewType === "pivot") {
-            const axes = item.kind === "existing" ? item.axes || [] : pivotAxes(this.fieldInfo(item.name));
+        if (["pivot", "graph"].includes(viewType)) {
+            const axes = item.kind === "existing" ? item.axes || [] : axesOf(viewType, this.fieldInfo(item.name));
             return axes.includes(zone);
         }
         if (zone === "loaded") {
@@ -933,7 +938,7 @@ export class StudioEditor extends Component {
                 return null;
             }
             const operation = {type: "move", source: item.path, target, position};
-            if (viewType === "pivot" && zone) {
+            if (["pivot", "graph"].includes(viewType) && zone) {
                 operation.axis = zone;
             }
             return operation;
@@ -967,7 +972,7 @@ export class StudioEditor extends Component {
             return operation;
         }
         const operation = {type: "add_existing_field", target, position, field_name: item.name};
-        if (viewType === "pivot") {
+        if (["pivot", "graph"].includes(viewType)) {
             operation.axis = zone;
             if (isDate && zone !== "measure") {
                 operation.interval = this.state.palette.interval;
@@ -1397,7 +1402,7 @@ export class StudioEditor extends Component {
     /**
      * Where the block at ``path`` of the payload ``data`` stands, for the
      * live region: {index, count, container}, its place from 1 among the
-     * blocks of its column (``zone``, a search view or a pivot view) or of
+     * blocks of its column (``zone``, a search, a pivot or a graph view) or of
      * its container, and the label of that column or container. Null when
      * no block has that path.
      */
@@ -1415,6 +1420,9 @@ export class StudioEditor extends Component {
         } else if (zone && this.viewType === "pivot") {
             blocks = pivotLanes(data)[zone] || [];
             container = columnLabel(zone);
+        } else if (zone && this.viewType === "graph") {
+            blocks = graphLanes(data)[zone] || [];
+            container = graphLaneLabel(zone);
         } else {
             const parent = trail[trail.length - 2];
             blocks = (parent && parent.children) || [block];
@@ -2087,6 +2095,7 @@ export class StudioEditor extends Component {
             search: _t("Search"),
             kanban: _t("Kanban"),
             pivot: _t("Pivot"),
+            graph: _t("Graph"),
             timeline: _t("Timeline"),
         };
         return labels[viewType] || viewType;

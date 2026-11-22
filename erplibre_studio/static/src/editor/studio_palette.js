@@ -157,7 +157,7 @@ export class StudioPalette extends Component {
 
     /** Whether the palette offers the interval of a date grouping. */
     get offersInterval() {
-        return ["search", "pivot"].includes(this.viewType);
+        return ["search", "pivot", "graph"].includes(this.viewType);
     }
 
     get intervals() {
@@ -167,8 +167,9 @@ export class StudioPalette extends Component {
         ]);
     }
 
+    /** The label of the axis ``axis`` a field can go on, by view type. */
     axisLabel(axis) {
-        return valueLabel("axis", axis) || axis;
+        return valueLabel(this.viewType === "graph" ? "graph_axis" : "axis", axis) || axis;
     }
 
     startDrag(ev, item) {

@@ -515,6 +515,12 @@ msgid ""
 msgstr "Un mot-clé Python, un espace de noms d'Odoo (ir, res, base, web, bus, report) ou un modèle qui ne prend aucun droit d'accès. Le préfixe x_ évite ce cas."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "A bar, line or pie chart of the records, grouped and measured."
+msgstr "Un graphique à barres, à lignes ou en secteurs des enregistrements, regroupés et mesurés."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A change cannot add <%(tag)s>."
@@ -1429,6 +1435,12 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Ascending"
+msgstr "Croissant"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Available"
@@ -1442,9 +1454,22 @@ msgstr "Revenir au nom proposé (%(name)s)"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Bar"
+msgstr "Barres"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
 msgid "Change nothing"
 msgstr "Ne rien changer"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Chart type"
+msgstr "Type de graphique"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1490,6 +1515,24 @@ msgstr "Conteneur %(tag)s « %(label)s »"
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr "Ordre de création"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Cumulative"
+msgstr "Cumulatif"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Descending"
+msgstr "Décroissant"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Drawn"
+msgstr "Tracée"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1648,6 +1691,12 @@ msgid "Layout"
 msgstr "Mise en page"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Line"
+msgstr "Lignes"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Lower case letters, digits and _"
@@ -1740,6 +1789,12 @@ msgid "No video"
 msgstr "Sans vidéo"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "None: the chart counts the records."
+msgstr "Aucune : le graphique compte les enregistrements."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Not a reserved name"
@@ -1768,6 +1823,12 @@ msgstr "Options · un champ chacune"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Owner module"
 msgstr "Module propriétaire"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Pie"
+msgstr "Secteurs"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -3021,8 +3082,10 @@ msgstr ""
 "perdus ; sans Apply, le brouillon est vidé."
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__graph
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__graph
 msgid "Graph"
@@ -5255,6 +5318,12 @@ msgid "Sequence"
 msgstr "Séquence"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Series"
+msgstr "Séries"
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__set_attribute
 msgid "Set an attribute"
 msgstr "Définir un attribut"
@@ -5348,6 +5417,12 @@ msgstr "Simulation, rien n'est écrit"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Slices"
+msgstr "Parts"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid ""
 "Some of these changes are applied: Apply then removes them from the "
@@ -5359,8 +5434,20 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Sort"
+msgstr "Tri"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Stack the items"
 msgstr "Empiler les éléments"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Stacked"
+msgstr "Empilé"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7468,6 +7555,12 @@ msgstr "Sans x_ permis : base de développement (code_generator)"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__perm_write
 msgid "Write"
 msgstr "Modifier"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "X axis"
+msgstr "Axe X"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__xml_name

@@ -6,7 +6,7 @@
          tree of blocks of a form or a list. -->
     <t t-name="erplibre_studio.Canvas">
         <t
-            t-if="['kanban', 'search', 'pivot', 'timeline'].includes(viewType)"
+            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
@@ -32,7 +32,8 @@
 
     <!-- A list of blocks with a hook before each one and one at the end,
          for « blocks » in « zone »; « end » is the {target, position} of
-         the last hook. -->
+         the last hook. « laneCaption », when set, gives the muted text
+         above the block of an index. -->
     <t t-name="erplibre_studio.Lane">
         <div class="o_erplibre_studio_lane d-flex flex-column" t-att-data-zone="zone">
             <t t-foreach="blocks" t-as="child" t-key="child.path">
@@ -40,6 +41,8 @@
                     <t t-set="target" t-value="child.path" />
                     <t t-set="position" t-value="'before'" />
                 </t>
+                <t t-set="caption" t-value="laneCaption ? laneCaption(child_index) : ''" />
+                <div t-if="caption" class="small text-muted o_erplibre_studio_axis_caption" t-esc="caption" />
                 <StudioBlock block="child" editor="editor" viewType="viewType" />
             </t>
             <t t-call="erplibre_studio.Hook">
@@ -457,6 +460,68 @@
                         <t t-set="zone" t-value="lane.key" />
                         <t t-set="blocks" t-value="lanes[lane.key]" />
                         <t t-set="end" t-value="endHook(lanes[lane.key], root.path)" />
+                    </t>
+                </div>
+            </div>
+            <div t-if="lanes.others.length" class="o_erplibre_studio_pivot_others mt-2">
+                <div class="small text-muted mb-1">Fields on no axis</div>
+                <div class="d-flex flex-wrap gap-1">
+                    <t t-foreach="lanes.others" t-as="child" t-key="child.path">
+                        <StudioBlock block="child" editor="editor" viewType="viewType" />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- The canvas of a graph view: its chart type, then one lane per axis,
+         the group-bys (the X axis, then the series) and the measures. -->
+    <t t-name="erplibre_studio.Canvas.graph">
+        <div class="o_erplibre_studio_graph">
+            <div
+                class="btn-group btn-group-sm mb-2 o_erplibre_studio_graph_types"
+                role="group"
+                aria-label="Chart type"
+            >
+                <button
+                    t-foreach="graphTypes"
+                    t-as="type"
+                    t-key="type.value"
+                    type="button"
+                    class="btn o_erplibre_studio_graph_type"
+                    t-att-class="type.pressed ? 'btn-primary' : 'btn-outline-secondary'"
+                    t-att-data-value="type.value"
+                    t-att-aria-pressed="type.pressed ? 'true' : 'false'"
+                    t-att-disabled="props.busy or !project"
+                    t-on-click.stop="() => this.setGraphType(type.value)"
+                    t-esc="type.label"
+                />
+            </div>
+            <t t-set="lanes" t-value="graphLanes" />
+            <div class="o_erplibre_studio_columns d-flex gap-2">
+                <div
+                    t-foreach="graphLaneList"
+                    t-as="lane"
+                    t-key="lane.key"
+                    class="o_erplibre_studio_column o_erplibre_studio_axis flex-grow-1 border rounded p-2"
+                    t-att-data-axis="lane.key"
+                    t-att-class="{'o_erplibre_studio_axis_refused': props.dragging and !editor.accepts(props.dragging, lane.key)}"
+                >
+                    <div class="fw-bold small mb-1" t-esc="lane.label" />
+                    <div
+                        t-if="lane.key === 'measure' and !lanes.measure.length"
+                        class="small text-muted o_erplibre_studio_axis_empty"
+                    >
+                        None: the chart counts the records.
+                    </div>
+                    <t t-call="erplibre_studio.Lane">
+                        <t t-set="zone" t-value="lane.key" />
+                        <t t-set="blocks" t-value="lanes[lane.key]" />
+                        <t t-set="end" t-value="endHook(lanes[lane.key], root.path)" />
+                        <t
+                            t-set="laneCaption"
+                            t-value="lane.key === 'row' ? ((index) => this.graphRowCaption(index)) : ((index) => this.graphMeasureCaption(index, lanes.measure.length))"
+                        />
                     </t>
                 </div>
             </div>

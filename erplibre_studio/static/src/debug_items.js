@@ -9,7 +9,7 @@ import {user} from "@web/core/user";
 // The view types the editor opens on. A page shows a timeline view only
 // when web_timeline is installed, and the server refuses the type
 // otherwise: the list needs no detection of its own.
-export const STUDIO_VIEW_TYPES = ["form", "list", "kanban", "pivot", "timeline"];
+export const STUDIO_VIEW_TYPES = ["form", "list", "kanban", "pivot", "graph", "timeline"];
 
 /** The client action of the studio editor on a view. */
 export function customizeAction({resModel, viewType, viewId, actionId}) {
