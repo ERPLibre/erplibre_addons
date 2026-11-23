@@ -212,6 +212,24 @@ msgid "%(label)s hidden"
 msgstr "%(label)s masqué"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s removed from the view"
+msgstr "%(label)s retiré de la vue"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s removed from the view, show the line"
+msgstr "%(label)s retiré de la vue, afficher la ligne"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(label)s restored."
+msgstr "%(label)s rétabli."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s already has a %(type)s view."
@@ -1928,6 +1946,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Fold the line %(label)s"
+msgstr "Replier la ligne %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Frozen at Apply: its name is a column of the table in the database."
 msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de données."
@@ -2258,6 +2282,12 @@ msgid "Remove this element from the draft"
 msgstr "Retirer cet élément du brouillon"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Removed from this view"
+msgstr "Retiré de cette vue"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Reserved model name (%(name)s)"
@@ -2268,6 +2298,19 @@ msgstr "Nom de modèle réservé (%(name)s)"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Reserved name of the ORM (%(name)s)"
 msgstr "Mot réservé de l'ORM (%(name)s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Restore"
+msgstr "Rétablir"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Restore puts this element back where it was."
+msgstr "Rétablir remet cet élément à sa place."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6662,6 +6705,12 @@ msgid "The field %(name)s is not a field of %(model)s."
 msgstr "Le champ %(name)s n'est pas un champ de %(model)s."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "The field stays in the database; Restore puts it back where it was."
+msgstr "Le champ reste en base ; Rétablir le remet à sa place."
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_change__field_name
 msgid "The field the change adds or moves, when it names one."
 msgstr "Le champ que le changement ajoute ou déplace, quand il en nomme un."
@@ -8956,6 +9005,13 @@ msgstr "règle d'enregistrement %(name)s sur %(model)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "removed"
+msgstr "retiré"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "renamed"
 msgstr "renommé"
@@ -8977,6 +9033,12 @@ msgstr "règle du projet %(project)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
 msgid "rules"
 msgstr "règles"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "show"
+msgstr "afficher"
 
 #. module: erplibre_studio
 #. odoo-javascript

@@ -303,6 +303,29 @@ class TestEditorPayload(StudioCase):
         self.assertFalse(entry["path"])
         self.assertFalse(any(b["changed"] for b in self.blocks(data["blocks"])))
 
+    def test_a_form_or_list_removal_stays_on_the_canvas(self):
+        """« Remove from the view » keeps the node of a form or a list in
+        the arch, hidden: its change is of kind « hidden » and carries the
+        path of the block the editor draws as a removed line, which the
+        palette does not offer again."""
+        for view, view_type, attribute in (
+            (self.form, "form", "invisible"),
+            (self.list, "list", "column_invisible"),
+        ):
+            with self.subTest(view_type=view_type):
+                self.project.change_ids.unlink()
+                self.op(
+                    self.project, view, type="remove", target="//field[@name='vat']"
+                )
+                data = self.data(view_type)
+                (change,) = data["changes"]
+                self.assertEqual((change["type"], change["kind"]), ("hide", "hidden"))
+                vat = self.block_of(data, "vat")
+                self.assertEqual(change["path"], vat["path"])
+                self.assertEqual(vat["change_kinds"], ["hidden"])
+                self.assertEqual(vat["attrs"].get(attribute), "True")
+                self.assertNotIn("vat", [item["name"] for item in data["palette"]])
+
     def test_apply_changes_tracks_the_nodes(self):
         """``apply_changes(track=True)`` gives the same arch as without,
         once the marks are stripped."""

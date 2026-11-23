@@ -324,11 +324,12 @@ describe("the calm canvas of a form", () => {
 
     test("hidden elements: the draft's as a muted line, the base arch's as the form draws them", async () => {
         await openEditor();
-        // The field the draft hides: one muted line, still a block that selects.
+        // The field the draft removes: one muted line, still a block that selects.
         expect(line("fax")).toHaveClass(["o_erplibre_studio_muted_line", "o_erplibre_studio_changed_hidden"]);
-        expect(`${line("fax")} > .o_erplibre_studio_pick`).toHaveText("Fax hidden");
+        expect(`${line("fax")} > .o_erplibre_studio_pick`).toHaveText("Fax removed — show");
         expect(`${line("fax")} ${DOT}[data-dot=ring]`).toHaveAttribute("aria-label", "hidden");
         expect(`${line("fax")} .o_erplibre_studio_line_value`).toHaveCount(0);
+        expect(`${line("fax")} .o_erplibre_studio_ghost_value`).toHaveCount(0);
         await contains(line("fax")).click();
         expect(line("fax")).toHaveClass("o_erplibre_studio_selected");
         // The field the arch always hides is not drawn…

@@ -175,13 +175,29 @@ export function blockTrail(root, path) {
     return [];
 }
 
+// The view types whose blocks the draft removes show as a removed line
+// (``isGhost``).
+export const GHOST_VIEW_TYPES = ["form", "list"];
+
+/**
+ * Whether ``block`` is an element the draft removes from a view of
+ * ``viewType`` (GHOST_VIEW_TYPES): « Remove from the view » keeps the node
+ * in the arch of a form or a list, hidden by a change of kind « hidden »,
+ * so that the other views that locate it keep finding it. The canvas
+ * draws it as one removed line that Restore brings back; it neither moves
+ * nor leaves again, and the drops around it target the real node.
+ */
+export function isGhost(block, viewType) {
+    return Boolean(block) && GHOST_VIEW_TYPES.includes(viewType) && (block.change_kinds || []).includes("hidden");
+}
+
 /**
  * Whether ``block`` can be dragged in a view of ``viewType``: what the
  * server lets move, and in a form or a list only the fields and the other
- * leaves.
+ * leaves, an element the draft removes left out (``isGhost``).
  */
 export function canDragBlock(block, viewType) {
-    if (block.movable === false) {
+    if (block.movable === false || isGhost(block, viewType)) {
         return false;
     }
     if (["field", "widget", "filter", "group_by", "separator"].includes(block.kind)) {
@@ -194,9 +210,11 @@ export function canDragBlock(block, viewType) {
  * Whether ``block`` can leave a view of ``viewType`` whose root block is
  * ``root``: not the view itself, nor a QWeb template, and in a kanban or a
  * timeline only a node of its templates (a native node is hidden instead).
+ * An element the draft already removes (``isGhost``) comes back with
+ * Restore instead.
  */
 export function canRemoveBlock(block, root, viewType) {
-    if (!block || (root && block.path === root.path) || block.kind === "template") {
+    if (!block || (root && block.path === root.path) || block.kind === "template" || isGhost(block, viewType)) {
         return false;
     }
     return !TEMPLATED_TYPES.includes(viewType) || block.in_template !== false;

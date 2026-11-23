@@ -30,6 +30,7 @@ import {
     fieldTypeLabel,
     fieldWidgets,
     findBlock,
+    isGhost,
     isTrue,
     selectionToText,
     textToSelection,
@@ -227,6 +228,37 @@ export class StudioInspector extends Component {
     /** Whether ``block`` can leave the view (a native node is hidden). */
     canRemove(block) {
         return canRemoveBlock(block, this.root, this.viewType);
+    }
+
+    // ── an element the draft removes ────────────────────────────────────
+
+    /** Whether ``block`` is an element the draft removes (``isGhost``). */
+    isGhost(block) {
+        return isGhost(block, this.viewType);
+    }
+
+    /**
+     * The texts of the properties of ``block``, an element the draft
+     * removes: its heading, what it is, the note on Restore and, for the
+     * Detailed level, the node as the arch holds it.
+     */
+    ghostInfo(block) {
+        const attribute = this.hideAttribute === "remove" ? "invisible" : this.hideAttribute;
+        const name = block.name ? ` name="${block.name}"` : "";
+        return {
+            heading: outlineLabel(block),
+            kind: _t("Removed from this view"),
+            note:
+                block.kind === "field"
+                    ? _t("The field stays in the database; Restore puts it back where it was.")
+                    : _t("Restore puts this element back where it was."),
+            node: `<${block.tag}${name} ${attribute}="True"/>`,
+        };
+    }
+
+    /** Undo the change that removes ``block`` (StudioEditor.restoreBlock). */
+    restoreBlock(block) {
+        return this.editor.restoreBlock(block);
     }
 
     /**

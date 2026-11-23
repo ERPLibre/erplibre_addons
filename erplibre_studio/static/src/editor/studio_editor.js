@@ -46,6 +46,7 @@ import {
     findBlock,
     graphLaneLabel,
     graphLanes,
+    isGhost,
     namedKeys,
     newFieldLabel,
     pivotLanes,
@@ -68,6 +69,7 @@ export {
     graphAxes,
     graphLanes,
     isBaseInvisible,
+    isGhost,
     isTrue,
     namedKeys,
     pivotAxes,
@@ -1160,8 +1162,9 @@ export class StudioEditor extends Component {
      * Add the palette ``item`` without a drag (a click, Enter or Space on
      * it). A selected container that takes drops (a group, a tab page)
      * gets it at its end, on its own « inside » hook. Another selected
-     * block gets it right after it: the hook before its next sibling,
-     * else the hook at the end of its container. With nothing selected,
+     * block gets it right after it: the hook before its next sibling that
+     * the draft does not remove, else the hook at the end of its
+     * container. With nothing selected,
      * or when none of those hooks takes the item (a row of groups shows
      * no hook of its own), it goes on the last hook of the canvas that
      * takes it. A tab goes at the end of the tabs of the notebook that
@@ -1216,7 +1219,10 @@ export class StudioEditor extends Component {
         if (trail.length > 1) {
             const parent = trail[trail.length - 2];
             const siblings = parent.children || [];
-            const next = siblings[siblings.indexOf(selected) + 1];
+            // An element the draft removes takes no place (``isGhost``).
+            const next = siblings
+                .slice(siblings.indexOf(selected) + 1)
+                .find((b) => !isGhost(b, this.viewType));
             if (next) {
                 wanted.push({target: next.path, position: "before"});
             }
@@ -1530,7 +1536,9 @@ export class StudioEditor extends Component {
      * (``accepts``) and change its place: the hooks inside the block, the
      * tab hooks of a notebook, and the hooks of its own column that leave
      * it where it is (right before or after it, at the end of its
-     * container when it is the last child) are left out. A search view
+     * container when it is the last child) are left out. An element the
+     * draft removes (``isGhost``) takes no place: the hook before it is
+     * left out, and the place of the block reads past it. A search view
      * keeps a block in its column: a filter in the column of the fields
      * stays a filter. Only the hooks on screen count: a tab page not
      * shown holds none, so a block enters it only once it shows.
@@ -1544,7 +1552,11 @@ export class StudioEditor extends Component {
         const item = {kind: "node", path: block.path, name: block.name};
         const trail = blockTrail(this.root, block.path);
         const parent = trail[trail.length - 2];
-        const siblings = (parent && parent.children) || [];
+        // An element the draft removes takes no place: a move past it
+        // alone would change nothing the view shows.
+        const ghost = (b) => isGhost(b, this.viewType);
+        const siblings = ((parent && parent.children) || []).filter((b) => b === block || !ghost(b));
+        const ghostPaths = new Set(allBlocks(this.root).filter(ghost).map((b) => b.path));
         const index = siblings.indexOf(block);
         const still = new Set([`before:${block.path}`, `after:${block.path}`]);
         if (index >= 0 && index + 1 < siblings.length) {
@@ -1563,7 +1575,7 @@ export class StudioEditor extends Component {
         for (const hookEl of canvas.querySelectorAll(".o_erplibre_studio_hook")) {
             const {target, position} = hookEl.dataset;
             const hookZone = hookEl.dataset.zone || "";
-            if (el.contains(hookEl) || hookZone === "pages" || target === block.path) {
+            if (el.contains(hookEl) || hookZone === "pages" || target === block.path || ghostPaths.has(target)) {
                 continue;
             }
             if (hookZone === zone ? still.has(`${position}:${target}`) : this.viewType === "search") {
@@ -2234,9 +2246,10 @@ export class StudioEditor extends Component {
      * ``get_change_removal`` says what leaves with it: a refusal shows as
      * a notification; a change that leaves alone and that no Apply wrote
      * goes at once, as Ctrl+Z does; otherwise a dialog lists what leaves
-     * and removes it once confirmed.
+     * and removes it once confirmed. ``onRemoved`` runs with the payload
+     * once the change left, directly or after the dialog.
      */
-    async removeChange(changeId) {
+    async removeChange(changeId, {onRemoved = null} = {}) {
         if (this.state.busy || !this.project) {
             return;
         }
@@ -2254,13 +2267,73 @@ export class StudioEditor extends Component {
             this.notification.add(removal.refused, {type: "danger"});
             return;
         }
+        const remove = async (expected) => {
+            const data = await this.doRemoveChange(changeId, expected);
+            if (data && onRemoved) {
+                onRemoved(data);
+            }
+            return data;
+        };
         if (!removal.items.length && !removal.applied) {
-            await this.doRemoveChange(changeId, [changeId]);
+            await remove([changeId]);
             return;
         }
         this.dialog.add(StudioChangeRemovalDialog, {
             removal,
-            confirm: () => this.doRemoveChange(changeId, [removal.change.id, ...removal.items.map((i) => i.id)]),
+            confirm: () => remove([removal.change.id, ...removal.items.map((i) => i.id)]),
+        });
+    }
+
+    /**
+     * The id of the change of the draft that removes ``block`` from the
+     * view (``isGhost``): the one of kind « hidden » among its changes,
+     * else its only change; false when none is known.
+     */
+    removalChange(block) {
+        const keys = (block && block.changes) || [];
+        const change = (this.data.changes || []).find((c) => keys.includes(c.id) && c.kind === "hidden");
+        if (change) {
+            return change.id;
+        }
+        return keys.length === 1 && Number.isInteger(keys[0]) ? keys[0] : false;
+    }
+
+    /**
+     * Restore ``block``, an element the draft removes (``isGhost``): undo
+     * the change that removes it (``removeChange``, which asks first when
+     * other changes leave with it). Once it left, the block is back where
+     * it was: it takes the selection, the live region says it, and its
+     * button takes the focus.
+     */
+    async restoreBlock(block) {
+        const changeId = this.removalChange(block);
+        if (!changeId) {
+            return;
+        }
+        const label = outlineLabel(block);
+        await this.removeChange(changeId, {
+            onRemoved: async (data) => {
+                const found =
+                    (block.name && this.fieldBlock(data.blocks, block.name)) ||
+                    findBlock(data.blocks, (b) => b.path === block.path);
+                this.announce(_t("%(label)s restored.", {label}));
+                if (!found) {
+                    return;
+                }
+                this.state.selected = found.path;
+                // The removed line and the restored block share their
+                // path: the focus waits for the block to replace the line.
+                for (let frame = 0; frame < 5; frame++) {
+                    await new Promise((resolve) => browser.requestAnimationFrame(resolve));
+                    const el = this.blockElement(found.path);
+                    if (el && !el.classList.contains("o_erplibre_studio_ghost")) {
+                        el.querySelector(
+                            ":scope > .o_erplibre_studio_pick, :scope > .o_erplibre_studio_container_title > .o_erplibre_studio_pick"
+                        )?.focus();
+                        return;
+                    }
+                }
+            },
         });
     }
 

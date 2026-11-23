@@ -9,6 +9,7 @@ import {
     allBlocks,
     canDragBlock,
     changeKindLabel,
+    isGhost,
     searchText,
     typeGlyph,
 } from "./studio_utils";
@@ -70,12 +71,22 @@ export function blockGlyph(block, fields = {}) {
     return KIND_GLYPHS[block.kind] || "◦";
 }
 
-/** How many fields ``block`` holds, at any depth; a notebook counts its pages. */
-export function outlineCount(block) {
+/**
+ * How many fields ``block`` holds, at any depth; a notebook counts its
+ * pages. In a view of ``viewType``, an element the draft removes
+ * (``isGhost``) does not count, nor what it holds.
+ */
+export function outlineCount(block, viewType = null) {
+    const ghost = (b) => isGhost(b, viewType);
     if (block.tag === "notebook") {
-        return (block.children || []).filter((child) => child.tag === "page").length;
+        return (block.children || []).filter((child) => child.tag === "page" && !ghost(child)).length;
     }
-    return allBlocks(block).filter((b) => b !== block && b.kind === "field").length;
+    const count = (parent) =>
+        (parent.children || []).reduce(
+            (total, child) => (ghost(child) ? total : total + (child.kind === "field" ? 1 : 0) + count(child)),
+            0
+        );
+    return count(block);
 }
 
 /**
@@ -231,15 +242,27 @@ export class StudioOutline extends Component {
     }
 
     count(block) {
-        return outlineCount(block);
+        return outlineCount(block, this.props.viewType);
+    }
+
+    /** Whether ``block`` is an element the draft removes (``isGhost``): a struck row with a ring. */
+    isGhost(block) {
+        return isGhost(block, this.props.viewType);
     }
 
     glyph(block) {
         return blockGlyph(block, this.props.data.fields || {});
     }
 
-    /** The label of the change of ``block`` the row shows: the first tag, else the first kind. */
+    /**
+     * The label of the change of ``block`` the row shows: « removed » for
+     * an element the draft removes, else the first tag, else the first
+     * kind.
+     */
     changeLabel(block) {
+        if (this.isGhost(block)) {
+            return _t("removed");
+        }
         const kinds = block.change_kinds || [];
         const kind = CHANGE_TAGS.find((k) => kinds.includes(k)) || kinds[0];
         return kind ? changeKindLabel(kind) : "";

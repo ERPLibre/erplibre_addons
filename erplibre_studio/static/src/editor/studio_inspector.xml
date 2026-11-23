@@ -579,6 +579,39 @@
                 <t t-call="erplibre_studio.Inspector.Settable" />
             </fieldset>
         </div>
+        <!-- An element the draft removes (isGhost): what it is, the note on
+             Restore, Restore; the Detailed level adds the node as the arch
+             holds it. -->
+        <div
+            t-elif="block and isGhost(block)"
+            class="o_erplibre_studio_properties o_erplibre_studio_ghost_props small d-flex flex-column gap-3"
+            t-att-data-name="block.name"
+            t-att-data-kind="block.kind"
+        >
+            <t t-set="ghost" t-value="ghostInfo(block)" />
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <span class="o_erplibre_studio_gutter" aria-hidden="true">
+                    <span class="o_erplibre_studio_margin_dot" data-dot="ring" />
+                </span>
+                <div class="o_erplibre_studio_inspector_name">
+                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title">
+                        <s t-esc="ghost.heading" />
+                    </div>
+                    <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="ghost.kind" />
+                </div>
+            </div>
+            <code t-if="detailed" class="text-break o_erplibre_studio_tech o_erplibre_studio_ghost_node" t-esc="ghost.node" />
+            <p class="text-muted mb-0 o_erplibre_studio_ghost_note" t-esc="ghost.note" />
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-primary align-self-start o_erplibre_studio_ghost_restore"
+                t-att-disabled="props.busy or !props.hasProject"
+                t-on-click="() => this.restoreBlock(block)"
+            >
+                <i class="fa fa-undo" aria-hidden="true" />
+                Restore
+            </button>
+        </div>
         <div
             t-elif="block"
             class="o_erplibre_studio_properties small d-flex flex-column gap-3"

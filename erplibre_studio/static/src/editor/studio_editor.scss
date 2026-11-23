@@ -74,6 +74,12 @@
             color: $text-muted;
         }
 
+        // An element the draft removes: its label struck.
+        &.o_erplibre_studio_outline_removed .o_erplibre_studio_outline_label {
+            color: $text-muted;
+            text-decoration: line-through;
+        }
+
         .o_erplibre_studio_outline_pick {
             font-size: $font-size-sm;
             border: 0;
@@ -716,6 +722,89 @@
 
         > .o_erplibre_studio_gutter {
             padding-top: 0.35rem;
+        }
+    }
+
+    // An element the draft removes from a form or a list: one muted line,
+    // « label removed — show »; open, a muted row whose label and value
+    // are struck, then Restore and the fold button. A form line keeps the
+    // columns of the lines around it; a list column stays narrow. The two
+    // classes outweigh the grid of the muted line.
+    .o_erplibre_studio_node.o_erplibre_studio_ghost {
+        display: grid;
+        grid-template-columns: 14px minmax(0, 1fr) auto;
+        column-gap: 0.5rem;
+        align-items: start;
+        min-height: 1.5rem;
+        padding: 0.0625rem 0.375rem 0.0625rem 0;
+        color: $text-muted;
+        font-size: $font-size-sm;
+        cursor: pointer;
+
+        > .o_erplibre_studio_gutter,
+        > .o_erplibre_studio_pick,
+        > .o_erplibre_studio_ghost_value {
+            padding-top: 0.25rem;
+        }
+
+        // Its button reads as one sentence: inline, not a flex row.
+        > .o_erplibre_studio_ghost_pick {
+            display: inline-block;
+            white-space: pre-wrap;
+        }
+
+        .o_erplibre_studio_ghost_label {
+            color: $text-muted;
+            font-weight: $font-weight-normal;
+        }
+
+        .o_erplibre_studio_ghost_show {
+            color: $primary;
+            font-weight: $font-weight-bold;
+            text-decoration: underline;
+        }
+
+        .o_erplibre_studio_ghost_value {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+        }
+
+        .o_erplibre_studio_ghost_actions {
+            grid-column: -2 / -1;
+            justify-self: end;
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.125rem;
+        }
+
+        .o_erplibre_studio_ghost_restore,
+        .o_erplibre_studio_ghost_fold {
+            padding: 0.125rem 0.375rem;
+            font-weight: $font-weight-bold;
+            text-decoration: none;
+        }
+
+        &.o_erplibre_studio_ghost_open {
+            min-height: 1.875rem;
+            border-radius: 0.375rem;
+            background-color: $gray-100;
+            box-shadow: inset 0 0 0 1px $border-color;
+        }
+
+        &.o_erplibre_studio_ghost_open[data-layout="line"] {
+            grid-template-columns: 14px minmax(0, 9rem) minmax(0, 1fr) auto;
+        }
+
+        &[data-layout="column"] {
+            grid-template-columns: 14px minmax(0, 1fr);
+            max-width: 9rem;
+
+            .o_erplibre_studio_ghost_actions {
+                grid-column: 2;
+                justify-self: start;
+            }
         }
     }
 

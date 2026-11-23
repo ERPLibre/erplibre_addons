@@ -195,8 +195,72 @@
     </t>
 
     <t t-name="erplibre_studio.Block">
+        <!-- An element the draft removes from a form or a list (isGhost):
+             one muted line whose button opens it, « label removed — show »;
+             open, its label struck, the value of a form line struck,
+             Restore and, at the Simple level, the fold button. The same
+             button stays the tab stop in both states. A list draws it as a
+             narrow column header. -->
         <div
-            t-if="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
+            t-if="isGhost"
+            class="o_erplibre_studio_ghost o_erplibre_studio_node o_erplibre_studio_changed_hidden"
+            t-att-class="{
+                'o_erplibre_studio_field': block.kind === 'field',
+                'o_erplibre_studio_muted_line': !detailed,
+                'o_erplibre_studio_ghost_open': ghostOpen,
+                'o_erplibre_studio_selected': isSelected,
+            }"
+            t-att-data-path="block.path"
+            t-att-data-name="block.name"
+            t-att-data-kind="block.kind"
+            t-att-data-tag="block.tag"
+            t-att-data-layout="layout"
+            draggable="false"
+            t-on-click.stop="() => this.onGhostClick()"
+        >
+            <t t-call="erplibre_studio.Block.gutter" />
+            <button
+                type="button"
+                class="o_erplibre_studio_pick o_erplibre_studio_ghost_pick"
+                t-att-aria-pressed="isSelected ? 'true' : 'false'"
+                t-att-aria-expanded="detailed ? undefined : (ghostOpen ? 'true' : 'false')"
+                t-att-aria-label="ghostText.pick"
+                t-att-aria-keyshortcuts="pickShortcuts"
+            >
+                <s class="o_erplibre_studio_label o_erplibre_studio_ghost_label" t-esc="titleLabel" />
+                <t t-if="!ghostOpen">
+                    <span class="o_erplibre_studio_ghost_removed" t-esc="' ' + ghostText.removed + ' — '" />
+                    <span class="o_erplibre_studio_ghost_show" t-esc="ghostText.show" />
+                </t>
+            </button>
+            <t t-if="ghostOpen">
+                <s t-if="ghostValue" class="o_erplibre_studio_ghost_value" t-esc="ghostValue" />
+                <span class="o_erplibre_studio_ghost_actions">
+                    <t t-call="erplibre_studio.Block.marks" />
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm o_erplibre_studio_ghost_restore"
+                        t-att-disabled="editorState.busy"
+                        t-on-click.stop="() => this.restoreGhost()"
+                    >
+                        Restore
+                    </button>
+                    <button
+                        t-if="!detailed"
+                        type="button"
+                        class="btn btn-link btn-sm o_erplibre_studio_ghost_fold"
+                        aria-expanded="true"
+                        t-att-aria-label="ghostText.fold"
+                        t-att-title="ghostText.fold"
+                        t-on-click.stop="(ev) => this.foldGhost(ev)"
+                    >
+                        <i class="fa fa-chevron-up" aria-hidden="true" />
+                    </button>
+                </span>
+            </t>
+        </div>
+        <div
+            t-elif="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
             class="o_erplibre_studio_field o_erplibre_studio_node"
             t-att-class="{
                 'o_erplibre_studio_line': !mutedLine and layout === 'line',
