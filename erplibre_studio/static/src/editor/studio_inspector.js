@@ -50,6 +50,10 @@ const RELATION_TYPES = ["many2one", "one2many", "many2many"];
 const ADVANCED_KINDS = ["widget", "field_options", "field_domain", "groups"];
 // The view types whose fields show the attributes of ADVANCED_KINDS apart.
 const ADVANCED_VIEW_TYPES = ["form", "list"];
+// The field of dms_field that a form shows as a documents tree, and its
+// comodel: the « mode » of that field only is settable (x2many_mode).
+const DMS_FIELD = "dms_directory_ids";
+const DMS_COMODEL = "dms.directory";
 // The kinds of the root attributes of a view with lanes that fold under
 // « Advanced » (foldedEntries): the numbers of the markers of a map.
 const FOLDED_KINDS = ["pixels", "offset"];
@@ -195,6 +199,7 @@ export class StudioInspector extends Component {
         return Object.entries(attrs)
             .filter(([attribute]) => attribute !== "interval" || DATE_TYPES.includes(field.type))
             .filter(([, kind]) => kind !== "field_domain" || RELATION_TYPES.includes(field.type))
+            .filter(([, kind]) => kind !== "x2many_mode" || this.isDmsField(block, field))
             .map(([attribute, kind]) => ({
                 attribute,
                 kind,
@@ -202,6 +207,24 @@ export class StudioInspector extends Component {
                 value: (block.attrs || {})[attribute] || "",
                 required: required.includes(attribute),
             }));
+    }
+
+    /**
+     * Whether the field block ``block`` (``field``: its entry of the
+     * payload) holds the DMS directories of a record, shown as a list or
+     * as the documents tree of dms_field.
+     */
+    isDmsField(block, field) {
+        return block.kind === "field" && block.name === DMS_FIELD && field.relation === DMS_COMODEL;
+    }
+
+    /**
+     * Open the embedded DMS templates of dms_field (``dms_template_action``
+     * of the layout): without one for the model, its documents tree stays
+     * empty.
+     */
+    openDmsTemplates() {
+        return this.editor.action.doAction(this.layout.dms_template_action);
     }
 
     /** Whether ``block`` shows the attributes of ADVANCED_KINDS apart. */

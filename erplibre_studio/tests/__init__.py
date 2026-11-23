@@ -31,6 +31,7 @@ from . import (
     test_views_activity,
     test_views_advanced,
     test_views_calendar,
+    test_views_dms,
     test_views_geo,
     test_views_geoengine,
     test_views_graph,

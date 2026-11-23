@@ -323,7 +323,9 @@ FIELD_ADVANCED_ATTRIBUTES = {
     "groups": "groups",
 }
 SETTABLE_ATTRIBUTES = {
-    "form": {"field": FIELD_ADVANCED_ATTRIBUTES},
+    # « mode » of a form field shows the DMS directories of a record as the
+    # documents tree of dms_field (DMS_FIELD only, see X2MANY_MODES).
+    "form": {"field": {**FIELD_ADVANCED_ATTRIBUTES, "mode": "x2many_mode"}},
     "list": {"field": FIELD_ADVANCED_ATTRIBUTES},
     "kanban": {
         "kanban": {
@@ -516,6 +518,18 @@ LEAFLET_OFFSET = (-512, 512)
 # The field web_view_leaflet_map always reads: a model without it shows no
 # marker, the read failing as a whole.
 LEAFLET_DATE_FIELD = "date_localization"
+
+# The field of dms.field.mixin (dms_field) that holds the DMS directories
+# of a record, its comodel, and the view type dms_field adds: a form shows
+# that field as a documents tree with mode="dms_list". dms_field renders
+# the tree from the record of the form, so the studio offers no primary
+# view of that type.
+DMS_FIELD = "dms_directory_ids"
+DMS_COMODEL = "dms.directory"
+DMS_VIEW_TYPE = "dms_list"
+# The values of « mode » the studio writes on an x2many of a form: none,
+# the default list, or the documents tree of DMS_FIELD.
+X2MANY_MODES = ("", DMS_VIEW_TYPE)
 
 # The widgets « add_widget » puts in a kanban card, with the attributes
 # each one takes.

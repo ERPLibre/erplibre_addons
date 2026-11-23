@@ -755,6 +755,24 @@ class ErplibreStudioProject(models.Model):
             and "is_mail_thread" in self.env["ir.model"]._fields
         )
 
+    @api.model
+    def _studio_dms_available(self):
+        """Whether dms_field is installed: ir.ui.view knows the view type
+        it adds (DMS_VIEW_TYPE). The studio does not depend on it."""
+        known = self.env["ir.ui.view"]._fields["type"].get_values(self.env)
+        return studio_arch.DMS_VIEW_TYPE in known
+
+    @api.model
+    def _studio_dms_field(self, name, info):
+        """Whether the field ``name`` (``info``: its fields_get entry) holds
+        the DMS directories of a record (DMS_FIELD of dms.field.mixin), which
+        a form shows as a documents tree."""
+        return bool(
+            name == studio_arch.DMS_FIELD
+            and info.get("relation") == studio_arch.DMS_COMODEL
+            and self._studio_dms_available()
+        )
+
     def _studio_new_models(self):
         """The names of the models the project creates."""
         return set(self.new_model_ids.mapped("model"))
@@ -2266,6 +2284,8 @@ class ErplibreStudioProject(models.Model):
             )
         elif view.type == "kanban" and op.get("widget"):
             node_attrs["widget"] = self._clean_widget(op["widget"])
+        if op.get("special") == studio_arch.DMS_VIEW_TYPE:
+            node_attrs = self._dms_tree_attrs(view, node, position, name)
         return self._add_change(
             view,
             "add_existing_field",
@@ -2273,6 +2293,25 @@ class ErplibreStudioProject(models.Model):
             position,
             {"field_name": name, "node_attrs": node_attrs, **extra},
         )
+
+    def _dms_tree_attrs(self, view, node, position, name):
+        """The attributes of the field ``name`` dropped at ``position`` of
+        ``node`` as a documents tree: the DMS directories of the record
+        (``_studio_dms_field``), right in a tab or in the sheet of a form,
+        where the tree takes the whole width without a label. UserError
+        elsewhere."""
+        if not self._studio_dms_field(name, self._field_info(view.model, name)):
+            raise UserError(
+                self.env._(
+                    "Only the DMS directories of a record show as a documents tree."
+                )
+            )
+        parent = node if position == "inside" else node.getparent()
+        if view.type != "form" or parent is None or parent.tag not in ("page", "sheet"):
+            raise UserError(
+                self.env._("The documents tree goes in a tab or the sheet of a form.")
+            )
+        return {"mode": studio_arch.DMS_VIEW_TYPE, "nolabel": "1"}
 
     def _item_field(self, model, arch, name):
         """The payload keys of a field dropped into a timeline item: how it
@@ -2725,6 +2764,8 @@ class ErplibreStudioProject(models.Model):
             return self._groups_value(value), []
         if kind == "calendar_filter":
             return self._calendar_filter_value(view.model, node, value)
+        if kind == "x2many_mode":
+            return self._x2many_mode_value(view.model, node, value), []
         if kind == "parent_field" and value in (None, "", False):
             # Without the attribute, web_hierarchy reads parent_id.
             self._check_child_follows(view.model, node, "parent_id")
@@ -2758,6 +2799,23 @@ class ErplibreStudioProject(models.Model):
         if not check:
             raise UserError(self.env._("Invalid value %(value)s.", value=value))
         return check(view.model, node, kind, value.strip())
+
+    def _x2many_mode_value(self, model, node, value):
+        """The « mode » ``value`` of the field ``node`` of a form, one of
+        X2MANY_MODES: the field holds the DMS directories of a record
+        (``_studio_dms_field``), shown as a list ("") or as a documents
+        tree. UserError on any other field or value."""
+        name = node.get("name")
+        if not self._studio_dms_field(name, self._field_info(model, name)):
+            raise UserError(
+                self.env._(
+                    "Only the DMS directories of a record show as a documents tree."
+                )
+            )
+        value = value or ""
+        if value not in studio_arch.X2MANY_MODES:
+            raise UserError(self.env._("Invalid value %(value)s.", value=value))
+        return value
 
     def _group_field_value(self, model, node, kind, value):
         self._check_groupable(model, value)

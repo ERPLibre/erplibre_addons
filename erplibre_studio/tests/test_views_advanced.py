@@ -89,7 +89,9 @@ class TestViewsAdvanced(StudioCase):
                 "res.partner", view.id, view.type, self.project.id
             )
             self.assertIn("set_attribute", data["operations"])
-            # The options come right under the widget in the inspector.
+            # The options come right under the widget in the inspector; a
+            # form also shows the DMS directories as a documents tree.
+            extra = [("mode", "x2many_mode")] if view.type == "form" else []
             self.assertEqual(
                 list(data["settable"]["field"].items()),
                 [
@@ -97,6 +99,7 @@ class TestViewsAdvanced(StudioCase):
                     ("options", "field_options"),
                     ("domain", "field_domain"),
                     ("groups", "groups"),
+                    *extra,
                 ],
             )
 

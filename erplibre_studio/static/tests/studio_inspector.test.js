@@ -11,6 +11,7 @@ import {
     makeServerError,
     mountWithCleanup,
     onRpc,
+    patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
@@ -869,6 +870,90 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_prop_shape").not.toBeEnabled();
         expect(".o_erplibre_studio_shape_help").toHaveText("Set before Apply only: the column exists.");
         expect(".o_erplibre_studio_geo_note").toHaveCount(0);
+    });
+
+    test("the documents tree of dms_field: palette item, Display, template note", async () => {
+        const DMS = "dms_directory_ids";
+        // The DMS directories of the contacts, in the Notes tab once
+        // dropped (``dropped``); ``template``: dms_template of the layout.
+        const withDms = ({dropped = false, mode = "dms_list", template = false} = {}) => {
+            const data = payload({
+                operations: [...payload().operations, "set_attribute"],
+                settable: {field: {widget: "widget", mode: "x2many_mode"}},
+                layout: {
+                    root: "/form",
+                    dms_template: template,
+                    dms_template_action: "dms_field.action_dms_field_template",
+                },
+                palette: dropped
+                    ? []
+                    : [{name: DMS, string: "Documents (DMS)", type: "one2many", special: "dms_list"}],
+            });
+            data.fields[DMS] = {string: "DMS Directories", type: "one2many", relation: "dms.directory"};
+            if (dropped) {
+                const notes = data.blocks.children[0].children[1].children[0];
+                notes.children.push({
+                    ...field("comment"),
+                    name: DMS,
+                    path: named(DMS),
+                    label: "DMS Directories",
+                    attrs: mode ? {mode, nolabel: "1"} : {nolabel: "1"},
+                });
+            }
+            return data;
+        };
+        answer = withDms();
+        afterOperation = () => withDms({dropped: true});
+        await openEditor();
+
+        await contains(".o_erplibre_studio_palette [data-tab=existing]").click();
+        const item = `.o_erplibre_studio_existing_field[data-name=${DMS}]`;
+        expect(item).toHaveText(/Documents \(DMS\)/);
+        await contains(item).click();
+        const drop = operations.pop();
+        expect(drop).toMatchObject({type: "add_existing_field", field_name: DMS, special: "dms_list"});
+        // Right in a tab or in the sheet, never in a group.
+        const parents = {
+            [named("comment")]: NOTES,
+            [named("user_id")]: SALES,
+            [named("x_sponsor")]: SALES,
+            [ADDRESS]: SHEET,
+            [NOTEBOOK]: SHEET,
+        };
+        const container = drop.position === "inside" ? drop.target : parents[drop.target];
+        expect([NOTES, SALES, SHEET]).toInclude(container);
+
+        // The drop selects the field: List or Documents tree, and the
+        // missing template.
+        expect(`.o_erplibre_studio_field[data-name=${DMS}]`).toHaveClass("o_erplibre_studio_selected");
+        const display = ".o_erplibre_studio_settable[data-attribute=mode]";
+        expect(`${display} label`).toHaveText(/^Display/);
+        expect(queryAllTexts(".o_erplibre_studio_prop_x2many_mode option")).toEqual(["List", "Documents tree"]);
+        expect(".o_erplibre_studio_prop_x2many_mode").toHaveValue("dms_list");
+        expect(".o_erplibre_studio_dms_template_note").toHaveText(
+            "No embedded DMS template for this model: the tree stays empty until one exists. Open the DMS templates"
+        );
+        afterOperation = () => withDms({dropped: true, mode: ""});
+        await contains(".o_erplibre_studio_prop_x2many_mode").select("");
+        expect(operations.pop()).toEqual({type: "set_attribute", target: named(DMS), attribute: "mode", value: ""});
+        expect(".o_erplibre_studio_prop_x2many_mode").toHaveValue("");
+
+        patchWithCleanup(getService("action"), {
+            async doAction(action) {
+                expect.step(`doAction ${action}`);
+            },
+        });
+        await contains(".o_erplibre_studio_dms_template_open").click();
+        expect.verifySteps(["doAction dms_field.action_dms_field_template"]);
+
+        // With a template, no note; another field has no Display.
+        afterOperation = () => withDms({dropped: true, template: true});
+        await contains(".o_erplibre_studio_prop_x2many_mode").select("dms_list");
+        operations.pop();
+        expect(".o_erplibre_studio_prop_x2many_mode").toHaveValue("dms_list");
+        expect(".o_erplibre_studio_dms_template_note").toHaveCount(0);
+        await contains(".o_erplibre_studio_field[data-name=comment]").click();
+        expect(".o_erplibre_studio_prop_x2many_mode").toHaveCount(0);
     });
 
     test("the names the server counts block Apply", async () => {

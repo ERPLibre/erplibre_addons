@@ -87,9 +87,9 @@
                         t-att-data-name="item.name"
                         t-att-title="item.type"
                         draggable="true"
-                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes})"
+                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                         t-on-dragend="() => this.endDrag()"
-                        t-on-click="() => this.add({kind: 'existing', name: item.name, axes: item.axes})"
+                        t-on-click="() => this.add({kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                     >
                         <button
                             type="button"

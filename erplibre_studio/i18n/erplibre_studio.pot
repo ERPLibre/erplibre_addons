@@ -1657,6 +1657,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Display"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Documents (DMS)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Documents tree"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Drawn"
 msgstr ""
@@ -1949,6 +1967,12 @@ msgid "New tab"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "No embedded DMS template for this model: the tree stays empty until one exists."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "No field %(name)s on %(model)s nor in the other projects."
@@ -2006,6 +2030,18 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Not listed by this widget:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Only the DMS directories of a record show as a documents tree."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Open the DMS templates"
 msgstr ""
 
 #. module: erplibre_studio
@@ -3875,6 +3911,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__list
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__list
@@ -6151,6 +6188,12 @@ msgstr ""
 msgid ""
 "The default order of %(model)s names %(name)s, which the model will not "
 "have: choose another order."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The documents tree goes in a tab or the sheet of a form."
 msgstr ""
 
 #. module: erplibre_studio

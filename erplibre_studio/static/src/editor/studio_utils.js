@@ -209,7 +209,7 @@ export function canSelectBlock(block) {
  * another thing elsewhere: the « type » of a graph is its chart type.
  */
 export function attributeLabel(attribute, kind) {
-    const ofKind = {graph_type: _t("Chart type")}[kind];
+    const ofKind = {graph_type: _t("Chart type"), x2many_mode: _t("Display")}[kind];
     if (ofKind) {
         return ofKind;
     }

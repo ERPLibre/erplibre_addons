@@ -256,6 +256,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         else:
             shown = studio_arch.shown_field_names(arch, view_type)
         palette = []
+        Project = self.env["erplibre.studio.project"]
         for name, info in fields_info.items():
             if name in shown or name == "id" or name.startswith("__"):
                 continue
@@ -264,6 +265,10 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "string": info.get("string") or name,
                 "type": info.get("type"),
             }
+            if view_type == "form" and Project._studio_dms_field(name, info):
+                # Dropped as the documents tree of dms_field (« special »).
+                item["string"] = self.env._("Documents (DMS)")
+                item["special"] = studio_arch.DMS_VIEW_TYPE
             if view_type == "search" and not info.get("searchable"):
                 continue
             if view_type == "calendar" and info.get("type") in (
@@ -295,6 +300,25 @@ class ErplibreStudioEditor(models.AbstractModel):
                 item["axes"] = axes
             palette.append(item)
         return sorted(palette, key=lambda f: (f["string"] or "").lower())
+
+    @api.model
+    def _dms_layout(self, model, fields_info):
+        """The keys a form adds to its layout when ``model`` holds the DMS
+        directories of its records (``_studio_dms_field``): whether a
+        dms.field.template of dms_field configures them (``dms_template``;
+        without one the documents tree stays empty) and the external id of
+        the action that lists the templates (``dms_template_action``)."""
+        name = studio_arch.DMS_FIELD
+        Project = self.env["erplibre.studio.project"]
+        Template = self.env.get("dms.field.template")
+        if Template is None or not Project._studio_dms_field(
+            name, fields_info.get(name) or {}
+        ):
+            return {}
+        return {
+            "dms_template": bool(Template.sudo().search_count([("model", "=", model)])),
+            "dms_template_action": "dms_field.action_dms_field_template",
+        }
 
     @api.model
     def _leaflet_fits(self, info):
@@ -748,7 +772,10 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "added": self._added_payload(project, view),
             },
             "blocks": blocks,
-            "layout": self._layout(view.type, arch, fields_info),
+            "layout": {
+                **self._layout(view.type, arch, fields_info),
+                **(self._dms_layout(model, fields_info) if view.type == "form" else {}),
+            },
             "operations": [
                 op
                 for op in studio_arch.VIEW_OPERATIONS[view.type]

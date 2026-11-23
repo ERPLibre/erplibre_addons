@@ -1668,6 +1668,24 @@ msgstr "Décroissant"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Display"
+msgstr "Affichage"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Documents (DMS)"
+msgstr "Documents (GED)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Documents tree"
+msgstr "Arborescence de documents"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Drawn"
 msgstr "Tracée"
@@ -1927,6 +1945,12 @@ msgid "New tab"
 msgstr "Nouvel onglet"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "No embedded DMS template for this model: the tree stays empty until one exists."
+msgstr "Aucun gabarit GED intégré pour ce modèle : l'arborescence reste vide tant qu'il n'en existe pas."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "No field %(name)s on %(model)s nor in the other projects."
@@ -1985,6 +2009,18 @@ msgstr "Pas un mot réservé de l'ORM"
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Not listed by this widget:"
 msgstr "Non listées par ce widget :"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Only the DMS directories of a record show as a documents tree."
+msgstr "Seuls les répertoires GED d'un enregistrement s'affichent en arborescence de documents."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Open the DMS templates"
+msgstr "Ouvrir les gabarits GED"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3881,6 +3917,7 @@ msgstr "Niveau %(level)s"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__list
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__list
@@ -6188,6 +6225,12 @@ msgid ""
 msgstr ""
 "L'ordre par défaut de %(model)s nomme %(name)s, que le modèle n'aura pas : "
 "choisissez un autre ordre."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The documents tree goes in a tab or the sheet of a form."
+msgstr "L'arborescence de documents va dans un onglet ou dans la feuille d'un formulaire."
 
 #. module: erplibre_studio
 #. odoo-javascript

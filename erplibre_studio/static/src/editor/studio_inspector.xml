@@ -289,6 +289,32 @@
                     t-esc="entry.label"
                 />
             </div>
+            <t t-elif="entry.kind === 'x2many_mode'">
+                <label class="form-label mb-0 w-100">
+                    <t t-esc="entry.label" />
+                    <select
+                        class="form-select form-select-sm o_erplibre_studio_attribute o_erplibre_studio_prop_x2many_mode"
+                        t-att-disabled="props.busy"
+                        t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+                    >
+                        <option value="" t-att-selected="!entry.value">List</option>
+                        <option value="dms_list" t-att-selected="entry.value === 'dms_list'">Documents tree</option>
+                    </select>
+                </label>
+                <div
+                    t-if="layout.dms_template === false"
+                    class="text-muted mt-1 o_erplibre_studio_dms_template_note"
+                >
+                    No embedded DMS template for this model: the tree stays empty until one exists.
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm p-0 align-baseline o_erplibre_studio_dms_template_open"
+                        t-on-click="() => this.openDmsTemplates()"
+                    >
+                        Open the DMS templates
+                    </button>
+                </div>
+            </t>
             <label t-elif="entry.kind === 'order'" class="form-label mb-0 w-100">
                 <t t-esc="entry.label" />
                 <input

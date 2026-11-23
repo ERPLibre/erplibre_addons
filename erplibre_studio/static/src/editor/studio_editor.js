@@ -926,7 +926,21 @@ export class StudioEditor extends Component {
         if (zone === "loaded") {
             return item.kind === "existing";
         }
+        if (item.special === "dms_list") {
+            return viewType === "form" && !zone && this.dmsTreeHook(target, position);
+        }
         return true;
+    }
+
+    /**
+     * Whether the documents tree of dms_field can go at the hook
+     * (``target``, ``position``): right in a tab or in the sheet of a
+     * form, as the server's ``_dms_tree_attrs`` requires.
+     */
+    dmsTreeHook(target, position) {
+        const trail = blockTrail(this.root, target);
+        const container = position === "inside" ? trail.at(-1) : trail.at(-2);
+        return Boolean(container) && ["page", "sheet"].includes(container.tag);
     }
 
     /**
@@ -1000,6 +1014,10 @@ export class StudioEditor extends Component {
             return operation;
         }
         const operation = {type: "add_existing_field", target, position, field_name: item.name};
+        if (item.special) {
+            // The field shows as a documents tree (« dms_list »).
+            operation.special = item.special;
+        }
         if (["pivot", "graph"].includes(viewType)) {
             operation.axis = zone;
             if (isDate && zone !== "measure") {
