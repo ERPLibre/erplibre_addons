@@ -15,27 +15,50 @@
     <!-- A drop hook: « target », « position », and « zone » when the hook
          belongs to a column, an axis or the loaded fields. The component
          that renders it (StudioCanvas, StudioBlock) names « activeHook »,
-         the hook the dragged item is over. -->
+         the hook a drop goes to: that one holds the label « Drop here »
+         with the glyph and the name of the dragged item. -->
     <t t-name="erplibre_studio.Hook">
+        <t t-set="hookActive" t-value="activeHook === editor.hookKey(target, position, zone)" />
         <div
             class="o_erplibre_studio_hook"
-            t-att-class="{'o_erplibre_studio_hook_active': activeHook === editor.hookKey(target, position, zone)}"
+            t-att-class="{'o_erplibre_studio_hook_active': hookActive}"
             t-att-data-target="target"
             t-att-data-position="position"
             t-att-data-zone="zone or ''"
             t-on-dragenter="(ev) => editor.overHook(ev, target, position, zone)"
             t-on-dragover="(ev) => editor.overHook(ev, target, position, zone)"
-            t-on-dragleave="() => editor.leaveHook(target, position, zone)"
+            t-on-dragleave="(ev) => editor.leaveHook(target, position, zone, ev)"
             t-on-drop="(ev) => editor.dropOnHook(ev, target, position, zone)"
-        />
+        >
+            <t t-if="hookActive">
+                <t t-set="dropItem" t-value="editor.dropItem" />
+                <span t-if="dropItem" class="o_erplibre_studio_drop_label" aria-hidden="true">
+                    <span class="o_erplibre_studio_drop_here">Drop here</span>
+                    <span class="o_erplibre_studio_drop_item">
+                        <span class="o_erplibre_studio_drop_glyph" t-esc="dropItem.glyph" />
+                        <t t-esc="dropItem.label" />
+                    </span>
+                </span>
+            </t>
+        </div>
     </t>
 
     <!-- A list of blocks with a hook before each one and one at the end,
          for « blocks » in « zone »; « end » is the {target, position} of
          the last hook. « laneCaption », when set, gives the muted text
-         above the block of an index. -->
+         above the block of an index. The lane is the drop scope of its
+         hooks (StudioCanvas.overScope). -->
     <t t-name="erplibre_studio.Lane">
-        <div class="o_erplibre_studio_lane d-flex flex-column" t-att-data-zone="zone">
+        <t t-set="laneScope" t-value="'lane:' + (zone or '')" />
+        <div
+            class="o_erplibre_studio_lane d-flex flex-column"
+            t-att-class="{'o_erplibre_studio_drop_scope': dropScope === laneScope}"
+            t-att-data-zone="zone"
+            t-att-data-drop-scope="laneScope"
+            t-on-dragenter="(ev) => editor.overScope(ev, laneScope)"
+            t-on-dragover="(ev) => editor.overScope(ev, laneScope)"
+            t-on-drop="(ev) => editor.dropOnScope(ev)"
+        >
             <t t-foreach="blocks" t-as="child" t-key="child.path">
                 <t t-call="erplibre_studio.Hook">
                     <t t-set="target" t-value="child.path" />
@@ -385,7 +408,14 @@
                         <t t-set="dot" t-value="notebookDot" />
                     </t>
                 </span>
-                <ul class="nav nav-tabs">
+                <ul
+                    class="nav nav-tabs"
+                    t-att-class="{'o_erplibre_studio_drop_scope': dropScope === pagesScope}"
+                    t-att-data-drop-scope="pagesScope"
+                    t-on-dragenter="(ev) => editor.overScope(ev, pagesScope)"
+                    t-on-dragover="(ev) => editor.overScope(ev, pagesScope)"
+                    t-on-drop="(ev) => editor.dropOnScope(ev)"
+                >
                     <li class="nav-item" t-foreach="pages" t-as="page" t-key="page.path">
                         <a
                             href="#"
@@ -473,7 +503,15 @@
                     <t t-call="erplibre_studio.Block.marks" />
                 </t>
             </div>
-            <div t-if="!mutedLine" class="o_erplibre_studio_children">
+            <div
+                t-if="!mutedLine"
+                class="o_erplibre_studio_children"
+                t-att-class="{'o_erplibre_studio_drop_scope': showHooks and dropScope === block.path}"
+                t-att-data-drop-scope="showHooks ? block.path : false"
+                t-on-dragenter="(ev) => showHooks and editor.overScope(ev, block.path)"
+                t-on-dragover="(ev) => showHooks and editor.overScope(ev, block.path)"
+                t-on-drop="(ev) => showHooks and editor.dropOnScope(ev)"
+            >
                 <t t-foreach="drawnChildren" t-as="child" t-key="child.path">
                     <t t-if="hookBefore(child)" t-call="erplibre_studio.Hook">
                         <t t-set="target" t-value="child.path" />
@@ -630,7 +668,15 @@
     </t>
 
     <t t-name="erplibre_studio.Canvas.loaded">
-        <div class="o_erplibre_studio_loaded mt-3" t-att-data-zone="'loaded'">
+        <div
+            class="o_erplibre_studio_loaded mt-3"
+            t-att-class="{'o_erplibre_studio_drop_scope': dropScope === 'loaded'}"
+            t-att-data-zone="'loaded'"
+            t-att-data-drop-scope="'loaded'"
+            t-on-dragenter="(ev) => editor.overScope(ev, 'loaded')"
+            t-on-dragover="(ev) => editor.overScope(ev, 'loaded')"
+            t-on-drop="(ev) => editor.dropOnScope(ev)"
+        >
             <div class="small text-muted mb-1">Fields loaded for the templates</div>
             <div t-if="viewType === 'geoengine'" class="small text-muted mb-1 o_erplibre_studio_geo_loaded_hint">
                 The geo fields go here: the vector layers draw them.

@@ -915,7 +915,9 @@
                 }
             }
 
+            // A hook keeps its box when the columns overflow the row.
             > .o_erplibre_studio_hook {
+                flex: none;
                 width: 6px;
                 height: auto;
                 min-height: 3rem;
@@ -1029,6 +1031,7 @@
         gap: 0.25rem;
 
         > .o_erplibre_studio_hook {
+            flex: none;
             width: 6px;
             height: auto;
             min-height: 1.75rem;
@@ -1101,18 +1104,72 @@
         font-size: $font-size-sm;
     }
 
+    // A drop hook: a transparent box at rest, that the drop events reach.
+    // A drag draws the hooks of the scope under the pointer only, and
+    // opens the one a drop goes to (below, under the dragging body).
     .o_erplibre_studio_hook {
+        position: relative;
         height: 6px;
         margin: 1px 0;
         border-radius: 3px;
         transition: height 0.1s;
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
     }
 
-    .o_erplibre_studio_hook_active {
-        background-color: $primary !important;
+    // The label of the hook a drop goes to: « Drop here », then the glyph
+    // and the name of the dragged item. The pointer goes through it to
+    // the hook.
+    .o_erplibre_studio_drop_label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        pointer-events: none;
+        white-space: nowrap;
+        font-size: $font-size-sm;
+        font-weight: 600;
+        line-height: 1.25rem;
+        z-index: 3;
     }
 
-    // The hook of a new tab: a small « + » tab at the end of the tabs.
+    .o_erplibre_studio_drop_here {
+        padding: 0 0.5rem;
+        border: 1px solid rgba($primary, 0.35);
+        border-radius: 999px;
+        background-color: mix($primary, $white, 10%);
+        color: $primary;
+    }
+
+    .o_erplibre_studio_drop_item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0 0.5rem 0 0.25rem;
+        border: 1px solid $primary;
+        border-radius: 0.375rem;
+        background-color: $o-view-background-color;
+        color: $body-color;
+        box-shadow: 0 4px 12px rgba($black, 0.15);
+    }
+
+    .o_erplibre_studio_drop_glyph {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.125rem;
+        height: 1.125rem;
+        padding: 0 0.125rem;
+        border-radius: 0.25rem;
+        background-color: mix($primary, $white, 10%);
+        color: $primary;
+        font-size: 0.625rem;
+        font-weight: 700;
+    }
+
+    // The hook of a new tab: a small « + » tab at the end of the tabs,
+    // drawn while a tab is dragged only.
     .o_erplibre_studio_page_hook {
         display: flex;
         align-items: stretch;
@@ -1125,14 +1182,10 @@
             height: auto;
             min-height: 1.75rem;
             margin: 0 0 0 2px;
-            border: 1px dashed $border-color;
+            border: 1px dashed transparent;
             border-bottom: 0;
             border-radius: 0.25rem 0.25rem 0 0;
             color: $text-muted;
-
-            &::before {
-                content: "+";
-            }
         }
     }
 
@@ -1254,8 +1307,10 @@
     }
 }
 
-// While a field is dragged, the drop hooks open up, and the lanes of a
-// timeline or of a calendar show which ones take it.
+// While an item is dragged, the hooks of the drop scope under the pointer
+// show as a line and the hook a drop goes to opens with its label; the
+// other hooks keep their transparent box. The lanes of a timeline, of a
+// calendar or of a map show which ones take the item.
 body.o_erplibre_studio_dragging .o_erplibre_studio {
     .o_erplibre_studio_timeline_lane_drop,
     .o_erplibre_studio_calendar_lane_drop {
@@ -1274,10 +1329,50 @@ body.o_erplibre_studio_dragging .o_erplibre_studio {
         border-color: $border-color !important;
     }
 
-    .o_erplibre_studio_hook {
-        height: 1.25rem;
-        border: 1px dashed $primary;
-        background-color: rgba($primary, 0.06);
+    // The hooks of the scope: a 2px line across a column, down a row.
+    .o_erplibre_studio_drop_scope > .o_erplibre_studio_hook,
+    .o_erplibre_studio_loaded.o_erplibre_studio_drop_scope .o_erplibre_studio_hook {
+        background: linear-gradient($primary, $primary) center / 100% 2px no-repeat;
+    }
+
+    .o_erplibre_studio_button_row > .o_erplibre_studio_drop_scope > .o_erplibre_studio_hook,
+    [data-tag="list"] > .o_erplibre_studio_drop_scope > .o_erplibre_studio_hook,
+    .o_erplibre_studio_loaded.o_erplibre_studio_drop_scope .o_erplibre_studio_hook {
+        background-size: 2px 100%;
+    }
+
+    // The hook a drop goes to, in a column: about 2rem high, its line
+    // across, its label on the line.
+    .o_erplibre_studio_hook_active {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 2rem;
+        padding: 0 0.375rem;
+        background: linear-gradient($primary, $primary) center / 100% 3px no-repeat !important;
+    }
+
+    // In a row (a list, the buttons of a header, the loaded fields), the
+    // hook keeps its width and its label floats over the line.
+    .o_erplibre_studio_button_row > .o_erplibre_studio_children > .o_erplibre_studio_hook_active,
+    [data-tag="list"] > .o_erplibre_studio_children > .o_erplibre_studio_hook_active,
+    .o_erplibre_studio_loaded .o_erplibre_studio_hook_active {
+        width: 1rem;
+        padding: 0;
+        background-size: 3px 100% !important;
+
+        > .o_erplibre_studio_drop_label {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+
+    .o_erplibre_studio_page_hook .o_erplibre_studio_hook_active {
+        width: auto;
+        border-color: $primary;
+        background: mix($primary, $white, 10%) !important;
     }
 
     // The chrome of the blocks shows while a block is dragged: the
@@ -1299,12 +1394,14 @@ body.o_erplibre_studio_dragging .o_erplibre_studio {
         opacity: 1;
     }
 
-    .o_erplibre_studio_button_row > .o_erplibre_studio_children > .o_erplibre_studio_hook,
-    [data-tag="list"] > .o_erplibre_studio_children > .o_erplibre_studio_hook,
-    .o_erplibre_studio_loaded .o_erplibre_studio_hook {
-        width: 1.25rem;
-        height: auto;
-        min-height: 1.5rem;
+}
+
+// The « + » tab of a notebook, while a tab is dragged.
+body.o_erplibre_studio_dragging_page .o_erplibre_studio .o_erplibre_studio_page_hook .o_erplibre_studio_hook {
+    border-color: $border-color;
+
+    &:not(.o_erplibre_studio_hook_active)::before {
+        content: "+";
     }
 }
 

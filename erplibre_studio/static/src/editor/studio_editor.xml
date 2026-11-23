@@ -513,6 +513,8 @@
                         t-att-class="{'o_erplibre_studio_busy': state.busy}"
                         t-on-click="onCanvasClick"
                         t-on-keydown="onCanvasKey"
+                        t-on-dragover="() => editor.overCanvas()"
+                        t-on-dragleave="(ev) => editor.leaveCanvas(ev)"
                     >
                         <t t-if="panel" t-call="erplibre_studio.Panel.{{panel}}" />
                         <t t-elif="state.preview" t-call="erplibre_studio.ViewPreview" />
@@ -570,6 +572,7 @@
                                 busy="state.busy"
                                 dragging="state.dragging"
                                 hook="state.hook"
+                                dropScope="state.dropScope"
                                 template="state.template"
                                 filterForm="state.filterForm"
                                 lane="state.timelineLane"

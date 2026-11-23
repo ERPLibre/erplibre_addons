@@ -48,10 +48,10 @@ import {
 /**
  * One node of the edited arch: a container with its children and the drop
  * hooks between them, a field, or another element. It reads the selection,
- * the hook under the dragged item and the page shown of a notebook from
- * the state of the editor, through a ``useState`` of its own: a block
- * renders again when what it reads of that state changes, without the
- * props of the blocks above it changing.
+ * the hook a drop goes to, the drop scope that holds it and the page
+ * shown of a notebook from the state of the editor, through a
+ * ``useState`` of its own: a block renders again when what it reads of
+ * that state changes, without the props of the blocks above it changing.
  *
  * A field, a container title or another element holds its name in a
  * ``<button class="o_erplibre_studio_pick">`` inside the draggable div:
@@ -562,9 +562,23 @@ export class StudioBlock extends Component {
         }
     }
 
-    /** The hook the dragged item is over, as ``hookKey`` names it. */
+    /** The hook a drop goes to, as ``hookKey`` names it. */
     get activeHook() {
         return this.editorState.hook;
+    }
+
+    /**
+     * The key of the drop scope under the pointer during a drag: the
+     * children of the container whose path it is, or the tabs of a
+     * notebook (``pagesScope``).
+     */
+    get dropScope() {
+        return this.editorState.dropScope;
+    }
+
+    /** The key of the drop scope of the tabs of a notebook. */
+    get pagesScope() {
+        return `pages:${this.block.path}`;
     }
 }
 StudioBlock.components = {StudioBlock};
@@ -590,9 +604,11 @@ export class StudioCanvas extends Component {
         viewType: String,
         project: {type: [Object, {value: null}], optional: true},
         busy: {type: Boolean, optional: true},
-        // The item being dragged and the hook it is over.
+        // The item being dragged, the hook a drop goes to, and the key of
+        // the drop scope that holds that hook (a lane, the loaded fields).
         dragging: {type: [Object, {value: null}], optional: true},
         hook: {type: [String, {value: null}], optional: true},
+        dropScope: {type: [String, {value: null}], optional: true},
         // The kanban template on screen, by name.
         template: {type: [String, {value: null}], optional: true},
         // The new filter of a search view being written.
@@ -631,6 +647,10 @@ export class StudioCanvas extends Component {
 
     get activeHook() {
         return this.props.hook;
+    }
+
+    get dropScope() {
+        return this.props.dropScope;
     }
 
     fieldInfo(name) {

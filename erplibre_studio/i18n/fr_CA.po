@@ -562,6 +562,12 @@ msgid "%(type)s to %(model)s"
 msgstr "%(type)s vers %(model)s"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(type)s · new field"
+msgstr "%(type)s · nouveau champ"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(value)s is not a value of the field %(name)s."
@@ -1846,6 +1852,12 @@ msgstr "Arborescence de documents"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Drawn"
 msgstr "Tracée"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Drop here"
+msgstr "Déposer ici"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -3632,6 +3644,7 @@ msgstr "Graphique"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
@@ -5765,6 +5778,7 @@ msgstr "Revoir le brouillon, puis l'écrire dans la base"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Ribbon"
@@ -5956,6 +5970,7 @@ msgstr "Envoyer vers une feuille de calcul"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
@@ -6256,6 +6271,7 @@ msgstr "Résumé : droits et règles se règlent dans Sécurité."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 msgid "Tab"

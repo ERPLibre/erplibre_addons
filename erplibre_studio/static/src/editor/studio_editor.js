@@ -20,7 +20,7 @@ import {parseGroupValue} from "./studio_groups";
 import {PERMS, StudioModelDialog, accessGroup, accessRows} from "./studio_models";
 import {StudioSecuritySpace, pickModel, securityModels} from "./studio_security";
 import {INSPECTOR_TABS, StudioInspector} from "./studio_inspector";
-import {StudioOutline, outlineLabel} from "./studio_outline";
+import {StudioOutline, blockGlyph, outlineLabel} from "./studio_outline";
 import {StudioPalette} from "./studio_palette";
 import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
@@ -52,6 +52,7 @@ import {
     pivotLanes,
     searchColumns,
     searchEndHook,
+    typeGlyph,
 } from "./studio_utils";
 
 // The helpers live in studio_utils.js; this module re-exports them, where
@@ -85,7 +86,15 @@ export {StudioBlock} from "./studio_canvas";
 export {outlineRows} from "./studio_outline";
 export {INSPECTOR_TABS} from "./studio_inspector";
 
-// The spaces of the rail, in its order: the view on screen, the models of
+// The class of the body while a tab is dragged: the « + » tab of a
+// notebook shows then only.
+const DRAGGING_PAGE_CLASS = "o_erplibre_studio_dragging_page";
+// An element of the canvas that holds drop hooks: the children of a
+// container, a lane, the loaded fields, the tabs of a notebook. Its
+// ``data-drop-scope`` is its key.
+const DROP_SCOPE_SELECTOR = "[data-drop-scope]";
+
+// The spaces of the rail, in its order:the view on screen, the models of
 // the project, its security (access rights, rules, apps and groups), the
 // review of its changes.
 export const SPACES = ["view", "models", "security", "review"];
@@ -203,7 +212,13 @@ export class StudioEditor extends Component {
             projectId: (back ? back.projectId : params.project_id) || false,
             selected: null,
             dragging: null,
+            // The hook a drop goes to (``hookKey``), its {target,
+            // position, zone}, and the key of the drop scope that holds it
+            // (``data-drop-scope``): the container, the lane or the loaded
+            // fields under the pointer.
             hook: null,
+            dropTarget: null,
+            dropScope: null,
             preview: false,
             pages: {},
             newProject: {name: "", module_name: ""},
@@ -941,12 +956,108 @@ export class StudioEditor extends Component {
             ev.dataTransfer.setData("text/plain", item.path || item.ttype || item.name || item.kind || "");
         }
         document.body.classList.add(DRAGGING_CLASS);
+        document.body.classList.toggle(DRAGGING_PAGE_CLASS, item.kind === "page");
     }
 
     endDrag() {
-        this.state.dragging = null;
-        this.state.hook = null;
-        document.body.classList.remove(DRAGGING_CLASS);
+        Object.assign(this.state, {dragging: null, hook: null, dropTarget: null, dropScope: null});
+        document.body.classList.remove(DRAGGING_CLASS, DRAGGING_PAGE_CLASS);
+    }
+
+    /**
+     * Show ``hook`` ({target, position, zone}) of the drop scope ``scope``
+     * as the place of the drop, or none for null. The state changes only
+     * when the hook or the scope does: a dragover fires every few
+     * milliseconds, and each change renders the blocks again.
+     */
+    setDropHook(scope, hook) {
+        const key = hook ? this.hookKey(hook.target, hook.position, hook.zone) : null;
+        if (this.state.hook !== key || this.state.dropScope !== (hook ? scope : null)) {
+            Object.assign(this.state, {hook: key, dropTarget: hook, dropScope: hook ? scope : null});
+        }
+    }
+
+    /**
+     * The hook of the drop scope ``element`` nearest to the point (``x``,
+     * ``y``) that takes ``item``: {target, position, zone}, or null. The
+     * hooks of a scope are those whose nearest scope is ``element``, not
+     * those of a scope inside it. The distance runs to the centre of the
+     * hook: the hooks of a column share their abscissa, those of a row (a
+     * list, the loaded fields) their ordinate, so the other coordinate
+     * decides.
+     */
+    nearestHook(element, item, x, y) {
+        let best = null;
+        for (const hook of element.querySelectorAll(".o_erplibre_studio_hook")) {
+            if (hook.closest(DROP_SCOPE_SELECTOR) !== element) {
+                continue;
+            }
+            const {target, position} = hook.dataset;
+            const zone = hook.dataset.zone || undefined;
+            if (!this.accepts(item, zone, target, position)) {
+                continue;
+            }
+            const rect = hook.getBoundingClientRect();
+            const distance = Math.hypot(x - (rect.left + rect.width / 2), y - (rect.top + rect.height / 2));
+            if (!best || distance < best.distance) {
+                best = {distance, hook: {target, position, zone}};
+            }
+        }
+        return best && best.hook;
+    }
+
+    /**
+     * A dragover (or a dragenter) on the drop scope of key ``scope``: the
+     * hook nearest to the pointer that takes the dragged item becomes the
+     * place of the drop, and the event stops there, so the innermost scope
+     * wins. A scope without such a hook lets the event pass to the scope
+     * around it; the canvas clears the place when no scope takes it
+     * (``overCanvas``). Firefox gives the pointer on dragover, not on drag.
+     */
+    overScope(ev, scope) {
+        const item = this.state.dragging;
+        const hook = item && ev.currentTarget ? this.nearestHook(ev.currentTarget, item, ev.clientX, ev.clientY) : null;
+        if (!hook) {
+            return;
+        }
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (ev.dataTransfer) {
+            ev.dataTransfer.dropEffect = "move";
+        }
+        this.setDropHook(scope, hook);
+    }
+
+    /** A drop on a drop scope: on the hook it shows, through ``dropOnHook``. */
+    async dropOnScope(ev) {
+        const hook = this.state.dropTarget;
+        if (!hook) {
+            return;
+        }
+        ev.stopPropagation();
+        await this.dropOnHook(ev, hook.target, hook.position, hook.zone);
+    }
+
+    /**
+     * A dragover on the canvas that no drop scope nor hook took: no place
+     * of drop shows.
+     */
+    overCanvas() {
+        if (this.state.dragging) {
+            this.setDropHook(null, null);
+        }
+    }
+
+    /**
+     * A dragleave of the canvas: the place of drop goes once the pointer
+     * is on an element outside it. A browser that names no element
+     * (``relatedTarget`` null) keeps it until the next dragover.
+     */
+    leaveCanvas(ev) {
+        const to = ev.relatedTarget;
+        if (this.state.dragging && to && ev.currentTarget && !ev.currentTarget.contains(to)) {
+            this.setDropHook(null, null);
+        }
     }
 
     hookKey(target, position, zone) {
@@ -1039,21 +1150,79 @@ export class StudioEditor extends Component {
         return Boolean(container) && NOTEBOOK_PARENTS.includes(container.tag);
     }
 
+    /**
+     * A dragover (or a dragenter) right on a hook, or on a lane of a
+     * timeline, of a calendar or of a map: the event stops there, before
+     * the drop scope around it. A hook that takes the dragged item is the
+     * place of the drop; one that refuses it shows none, and the browser
+     * drops nothing on it.
+     */
     overHook(ev, target, position, zone) {
+        ev.stopPropagation();
         if (!this.accepts(this.state.dragging, zone, target, position)) {
+            if (this.state.dragging) {
+                this.setDropHook(null, null);
+            }
             return;
         }
         ev.preventDefault();
         if (ev.dataTransfer) {
             ev.dataTransfer.dropEffect = "move";
         }
-        this.state.hook = this.hookKey(target, position, zone);
+        const scope = ev.currentTarget && ev.currentTarget.closest(DROP_SCOPE_SELECTOR);
+        this.setDropHook(scope ? scope.dataset.dropScope : null, {target, position, zone});
     }
 
-    leaveHook(target, position, zone) {
-        if (this.state.hook === this.hookKey(target, position, zone)) {
-            this.state.hook = null;
+    /**
+     * A dragleave of a hook or of a lane: it stops being the place of the
+     * drop, unless the pointer stays in its drop scope, whose dragover
+     * places the drop again.
+     */
+    leaveHook(target, position, zone, ev = null) {
+        if (this.state.hook !== this.hookKey(target, position, zone)) {
+            return;
         }
+        const scope = ev && ev.currentTarget && ev.currentTarget.closest(DROP_SCOPE_SELECTOR);
+        if (scope && ev.relatedTarget && scope.contains(ev.relatedTarget)) {
+            return;
+        }
+        this.setDropHook(null, null);
+    }
+
+    /**
+     * What the label of the place of the drop shows of the dragged item:
+     * {glyph, label}, the glyph and the name the palette or the plan
+     * gives it; null without a drag.
+     */
+    get dropItem() {
+        const item = this.state.dragging;
+        if (!item) {
+            return null;
+        }
+        if (item.kind === "new") {
+            return {
+                glyph: typeGlyph(item.ttype),
+                label: _t("%(type)s · new field", {type: newFieldLabel(item.ttype)}),
+            };
+        }
+        if (item.kind === "existing") {
+            const field = this.fieldInfo(item.name);
+            return {glyph: typeGlyph(field.type), label: field.string || item.name};
+        }
+        if (item.kind === "node") {
+            const block = findBlock(this.root, (b) => b.path === item.path);
+            if (block) {
+                return {glyph: blockGlyph(block, this.data.fields), label: outlineLabel(block)};
+            }
+            return {glyph: "•", label: item.name || ""};
+        }
+        const layout = {
+            group: {glyph: "▦", label: _t("Group")},
+            page: {glyph: "▤", label: _t("Tab")},
+            separator: {glyph: "—", label: _t("Separator")},
+            widget: {glyph: "★", label: _t("Ribbon")},
+        };
+        return layout[item.kind] || {glyph: "•", label: ""};
     }
 
     /** The operation a drop of ``item`` on a hook makes, or null. */
@@ -1111,8 +1280,16 @@ export class StudioEditor extends Component {
         return operation;
     }
 
+    /**
+     * A drop on the hook (``target``, ``position``, ``zone``), or the add
+     * of ``addFromPalette``; the event stops there, before the drop scope
+     * around the hook.
+     */
     async dropOnHook(ev, target, position, zone) {
         ev.preventDefault();
+        if (ev.stopPropagation) {
+            ev.stopPropagation();
+        }
         const item = this.state.dragging;
         this.endDrag();
         if (!item || this.state.busy || !this.accepts(item, zone, target, position)) {
