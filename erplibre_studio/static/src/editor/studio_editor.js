@@ -29,6 +29,7 @@ import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relati
 import {
     DATE_TYPES,
     DRAGGING_CLASS,
+    GEO_TYPES,
     MODEL,
     RIBBON_COLORS,
     allBlocks,
@@ -88,8 +89,16 @@ export const LEFT_TABS = ["palette", "plan"];
 // a type the model has no view of, which the project can add; a timeline
 // once web_timeline is installed; a type a model not created yet gets
 // once applied; an activity view once the model has activities; a map
-// once the model has the field web_view_leaflet_map reads.
-export const ADDABLE_REASONS = ["no_view", "needs_module", "apply_first", "needs_activity", "needs_field"];
+// once the model has the field web_view_leaflet_map reads; a GeoEngine
+// view once the model has a geo field.
+export const ADDABLE_REASONS = [
+    "no_view",
+    "needs_module",
+    "apply_first",
+    "needs_activity",
+    "needs_field",
+    "needs_geo_field",
+];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
 // The classes of the element a StudioBlock renders, one per kind of block
@@ -508,6 +517,7 @@ export class StudioEditor extends Component {
                 hierarchy: _t("An organization chart: each record under its parent, provided by web_hierarchy."),
                 activity: _t("The records with their planned activities, one column per activity type (mail)."),
                 leaflet_map: _t("Markers on a map, provided by web_view_leaflet_map (OCA)."),
+                geoengine: _t("A map of geo fields with layers, provided by base_geoengine (OCA)."),
             }[viewType] || ""
         );
     }
@@ -903,6 +913,11 @@ export class StudioEditor extends Component {
         if (["pivot", "graph"].includes(viewType)) {
             const axes = item.kind === "existing" ? item.axes || [] : axesOf(viewType, this.fieldInfo(item.name));
             return axes.includes(zone);
+        }
+        if (viewType === "geoengine" && item.kind === "existing" && GEO_TYPES.includes(this.fieldInfo(item.name).type)) {
+            // geo_refusal of the server: a geo field is loaded beside the
+            // info box, never in it.
+            return zone === "loaded";
         }
         if (zone === "loaded") {
             return item.kind === "existing";
@@ -2156,6 +2171,7 @@ export class StudioEditor extends Component {
             hierarchy: _t("Hierarchy"),
             activity: _t("Activity"),
             leaflet_map: _t("Map (Leaflet)"),
+            geoengine: _t("GeoEngine"),
         };
         return labels[viewType] || viewType;
     }
@@ -2776,7 +2792,8 @@ export class StudioEditor extends Component {
 
     /**
      * The preview of the view on screen: the real view with the draft, or
-     * for a model not created yet, its model preview.
+     * for a model not created yet, its model preview. A GeoEngine view the
+     * project adds has no map before Apply: a notice says so.
      */
     async togglePreview() {
         if (this.state.busy) {
@@ -2786,6 +2803,12 @@ export class StudioEditor extends Component {
             // The preview shows the view: back to its space, preview on.
             this.closePanel();
             Object.assign(this.state, {space: "view", selected: null, preview: false});
+        }
+        const added = this.addedView;
+        if (this.viewType === "geoengine" && added && !added.applied && !this.state.preview) {
+            // base_geoengine reads the layers of the view from the database.
+            this.notification.add(this.geoMapNotice, {type: "info"});
+            return;
         }
         if (this.data.view && this.data.view.pending) {
             if (this.state.panel === "preview") {
@@ -2830,6 +2853,11 @@ export class StudioEditor extends Component {
             props.searchViewId = false;
         }
         return props;
+    }
+
+    /** Why a GeoEngine view the project adds shows no map before Apply. */
+    get geoMapNotice() {
+        return _t("The map shows once Apply creates the view and its layers.");
     }
 
     get draftPreviewTitle() {

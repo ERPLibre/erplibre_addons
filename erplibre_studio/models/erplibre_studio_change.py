@@ -37,6 +37,7 @@ VIEW_TYPES = [
     ("hierarchy", "Hierarchy"),
     ("activity", "Activity"),
     ("leaflet_map", "Leaflet Map"),
+    ("geoengine", "GeoEngine"),
 ]
 
 

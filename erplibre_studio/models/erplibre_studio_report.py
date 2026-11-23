@@ -10,7 +10,11 @@ from odoo.exceptions import UserError
 from odoo.tools import SQL, sql
 
 from .. import arch as studio_arch
-from .erplibre_studio_project import CREATED_FIELDS, MODULE_OWNING_STATES
+from .erplibre_studio_project import (
+    CREATED_FIELDS,
+    GEO_LAYER_KINDS,
+    MODULE_OWNING_STATES,
+)
 
 # {option: kind of effect} of the removal of the field of an option
 # (``_studio_option_effects``): archived records that become visible,
@@ -370,6 +374,7 @@ class ErplibreStudioProject(models.Model):
         records = {kind: self[name] for kind, name in CREATED_FIELDS.items()}
         records["views"] = self.studio_view_ids
         records["fields"] = self.field_ids
+        records.update(self._studio_geo_layer_records())
         return records
 
     def _studio_revert_refusal(self, checks=True):
@@ -423,8 +428,17 @@ class ErplibreStudioProject(models.Model):
             kept["menus"].add(names["menu"])
             for view_type in studio_arch.MODEL_VIEW_TYPES:
                 kept["primary_views"].add(names[view_type])
+        for kind in GEO_LAYER_KINDS:
+            kept[kind] = set()
         for line in self.view_line_ids:
             kept["primary_views"].add(line._studio_xml_name())
+            for layer in line.layer_ids:
+                kind = next(
+                    k
+                    for k, res_model in GEO_LAYER_KINDS.items()
+                    if res_model == layer._studio_layer_model()
+                )
+                kept[kind].add(layer._studio_xml_name())
         for app in self.app_ids:
             if app._studio_menu_models():
                 kept["menus"].add(app.xml_name)

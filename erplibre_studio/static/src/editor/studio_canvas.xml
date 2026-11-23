@@ -6,7 +6,7 @@
          tree of blocks of a form or a list. -->
     <t t-name="erplibre_studio.Canvas">
         <t
-            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity', 'leaflet_map'].includes(viewType)"
+            t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity', 'leaflet_map', 'geoengine'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
@@ -309,14 +309,47 @@
         <t t-call="erplibre_studio.Canvas.kanban" />
     </t>
 
+    <!-- The canvas of a GeoEngine view (base_geoengine): its « info_box »
+         template, the popup of a record, edited as a kanban card; the
+         fields it loads, where its geo fields go; then its layers, read
+         only. base_geoengine reads the layers from the database: the map
+         shows in the Preview once Apply created the view. -->
+    <t t-name="erplibre_studio.Canvas.geoengine">
+        <div class="small text-muted mb-1 o_erplibre_studio_geoengine_caption">The popup of a record on the map</div>
+        <t t-call="erplibre_studio.Canvas.kanban" />
+        <section class="o_erplibre_studio_geo_layers mt-3" aria-label="Layers">
+            <div class="small text-muted mb-1">Layers</div>
+            <ul class="list-unstyled small mb-1">
+                <li
+                    t-foreach="geoLayers"
+                    t-as="layer"
+                    t-key="layer.id"
+                    class="o_erplibre_studio_geo_layer"
+                    t-att-data-kind="layer.kind"
+                >
+                    <span class="fw-bold" t-esc="layer.name" />
+                    ·
+                    <span class="text-muted" t-esc="layer.description" />
+                </li>
+                <li t-if="!geoLayers.length" class="text-muted">No layer</li>
+            </ul>
+            <div t-if="geoMapPending" class="small text-muted o_erplibre_studio_geo_pending">
+                The map shows once Apply creates the view and its layers.
+            </div>
+        </section>
+    </t>
+
     <t t-name="erplibre_studio.Canvas.loaded">
         <div class="o_erplibre_studio_loaded mt-3" t-att-data-zone="'loaded'">
             <div class="small text-muted mb-1">Fields loaded for the templates</div>
+            <div t-if="viewType === 'geoengine'" class="small text-muted mb-1 o_erplibre_studio_geo_loaded_hint">
+                The geo fields go here: the vector layers draw them.
+            </div>
             <div class="d-flex flex-wrap align-items-center gap-1">
                 <t t-foreach="loadedBlocks" t-as="child" t-key="child.path">
                     <StudioBlock block="child" editor="editor" viewType="viewType" />
                 </t>
-                <t t-if="viewType === 'timeline'" t-call="erplibre_studio.Hook">
+                <t t-if="['timeline', 'geoengine'].includes(viewType)" t-call="erplibre_studio.Hook">
                     <t t-set="target" t-value="root.path" />
                     <t t-set="position" t-value="'inside'" />
                     <t t-set="zone" t-value="'loaded'" />

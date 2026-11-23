@@ -32,6 +32,7 @@ from . import (
     test_views_advanced,
     test_views_calendar,
     test_views_geo,
+    test_views_geoengine,
     test_views_graph,
     test_views_hierarchy,
     test_views_kanban,

@@ -7,9 +7,10 @@ import {registry} from "@web/core/registry";
 import {user} from "@web/core/user";
 
 // The view types the editor opens on. A page shows a timeline, a hierarchy,
-// an activity view or a map only when web_timeline, web_hierarchy, mail or
-// web_view_leaflet_map is installed, and the server refuses the type
-// otherwise: the list needs no detection of its own.
+// an activity view, a map or a GeoEngine view only when web_timeline,
+// web_hierarchy, mail, web_view_leaflet_map or base_geoengine is installed,
+// and the server refuses the type otherwise: the list needs no detection of
+// its own.
 export const STUDIO_VIEW_TYPES = [
     "form",
     "list",
@@ -21,6 +22,7 @@ export const STUDIO_VIEW_TYPES = [
     "hierarchy",
     "activity",
     "leaflet_map",
+    "geoengine",
 ];
 
 /** The client action of the studio editor on a view. */

@@ -50,6 +50,13 @@ list, kanban, search and pivot views, and timeline views once
   same change. The marker size and the popup anchor are under Advanced.
   The map reads a `date_localization` field on every record: **Add a
   view** offers a map only to a model that has one, such as the contacts.
+- **GeoEngine** (once *base_geoengine* is installed): **Add a view** gives
+  a model with a geo field applied a map with an OpenStreetMap background
+  and a vector layer on its first geo field. Its `info_box` template, the
+  popup of a record, is edited as a kanban card; a geo field goes among
+  the fields the view loads, never in the popup. **Apply** writes the
+  layers to base_geoengine with the view; the map shows in the Preview
+  once applied.
 - Each change is recorded in a **studio project**, as a draft. **Preview**
   shows the real view with the draft applied, to the editor of the
   project only.

@@ -137,6 +137,14 @@ export class StudioInspector extends Component {
         return isTrue(value);
     }
 
+    /**
+     * Whether the attribute text ``value`` is true read as a number, as
+     * base_geoengine reads « editable » (« 1 » is, « True » is not).
+     */
+    numberTrue(value) {
+        return Boolean(Number(value));
+    }
+
     get selectedBlock() {
         return this.props.selected && findBlock(this.data.blocks, (b) => b.path === this.props.selected);
     }

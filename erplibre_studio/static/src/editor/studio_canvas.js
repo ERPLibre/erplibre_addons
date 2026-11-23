@@ -383,6 +383,33 @@ export class StudioCanvas extends Component {
         return ((this.root && this.root.children) || []).filter((b) => b.kind === "field");
     }
 
+    /**
+     * The layers of a GeoEngine view the project adds, as the canvas lists
+     * them: [{id, kind, name, description}].
+     */
+    get geoLayers() {
+        const added = (this.data.view && this.data.view.added) || {};
+        const representations = {basic: _t("drawn as is"), colored: _t("colored by value")};
+        return (added.layers || []).map((layer) => {
+            let description = _t("Background");
+            if (layer.kind === "vector") {
+                const field = this.fieldInfo(layer.geo_field).string || layer.geo_field;
+                description = _t("%(field)s (%(name)s), %(representation)s", {
+                    field,
+                    name: layer.geo_field,
+                    representation: representations[layer.geo_repr] || layer.geo_repr,
+                });
+            }
+            return {id: layer.id, kind: layer.kind, name: layer.name, description};
+        });
+    }
+
+    /** Whether the map of the GeoEngine view waits for Apply. */
+    get geoMapPending() {
+        const added = this.data.view && this.data.view.added;
+        return Boolean(added && !added.applied);
+    }
+
     get timelineTemplate() {
         const path = this.layout.template;
         return path ? findBlock(this.root, (b) => b.path === path) : null;

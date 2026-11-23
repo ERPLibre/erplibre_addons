@@ -1719,6 +1719,180 @@ describe("erplibre_studio editor, leaflet map", () => {
     });
 });
 
+describe("erplibre_studio editor, geoengine", () => {
+    const BOX = "//t[@t-name='info_box']";
+    const GEO_FIELDS = {
+        ...FIELDS,
+        x_site: {string: "Site", type: "geo_point", store: true},
+        x_spot: {string: "Spot", type: "geo_point", store: true},
+    };
+
+    /**
+     * A GeoEngine view the project adds to the contacts, before Apply: it
+     * loads the name and the geo field x_site, its « info_box » shows the
+     * fields ``names``; two layers.
+     */
+    function geoPayload(names = ["name"], rootAttrs = {}) {
+        const box = {
+            path: BOX,
+            tag: "t",
+            kind: "template",
+            label: "info_box",
+            attrs: {"t-name": "info_box"},
+            movable: false,
+            drop: true,
+            in_template: true,
+            chain: null,
+            template: "info_box",
+            children: names.map((name) => inCard(name)),
+        };
+        const loaded = ["name", "x_site"].map((name, index) => ({
+            path: `/geoengine/field[${index + 1}]`,
+            tag: "field",
+            kind: "field",
+            name,
+            label: GEO_FIELDS[name].string,
+            attrs: {},
+            movable: false,
+            in_template: false,
+            chain: null,
+        }));
+        const blocks = container(
+            "/geoengine",
+            "geoengine",
+            [
+                ...loaded,
+                container("/geoengine/templates", "templates", [box], {
+                    drop: false,
+                    movable: false,
+                    in_template: false,
+                }),
+            ],
+            {movable: false, attrs: rootAttrs}
+        );
+        return payload("geoengine", blocks, {
+            view: {
+                id: false,
+                name: "res.partner.geoengine.studio",
+                xml_id: "studio_contacts.res_partner_view_geoengine",
+                added: {
+                    line_id: 7,
+                    applied: false,
+                    name: "res.partner.geoengine.studio",
+                    xml_id: "studio_contacts.res_partner_view_geoengine",
+                    layers: [
+                        {
+                            id: 1,
+                            kind: "raster",
+                            name: "OpenStreetMap",
+                            geo_field: false,
+                            geo_repr: "basic",
+                            active_on_startup: false,
+                        },
+                        {
+                            id: 2,
+                            kind: "vector",
+                            name: "Site",
+                            geo_field: "x_site",
+                            geo_repr: "basic",
+                            active_on_startup: true,
+                        },
+                    ],
+                },
+            },
+            operations: ["add_existing_field", "move", "remove", "hide", "set_attribute"],
+            layout: {
+                root: "/geoengine",
+                card: BOX,
+                templates: {info_box: BOX},
+                loaded_fields: ["name", "x_site"],
+                widgets: {},
+            },
+            settable: {geoengine: {editable: "bool_number"}},
+            fields: GEO_FIELDS,
+            palette: ["email", "phone", "x_spot"].map((name) => ({
+                name,
+                string: GEO_FIELDS[name].string,
+                type: GEO_FIELDS[name].type,
+            })),
+        });
+    }
+
+    test("the info box, the loaded fields and the layers; a geo field goes among the loaded ones", async () => {
+        answer = geoPayload();
+        await openEditor("geoengine");
+        expect(".o_erplibre_studio_geoengine_caption").toHaveText("The popup of a record on the map");
+        expect(".o_erplibre_studio_card .o_erplibre_studio_field").toHaveCount(1);
+        expect(".o_erplibre_studio_loaded .o_erplibre_studio_field").toHaveCount(2);
+        expect(".o_erplibre_studio_loaded .o_erplibre_studio_field[data-name=x_site]").toHaveCount(1);
+        expect(queryAllTexts(".o_erplibre_studio_geo_layer")).toEqual([
+            "OpenStreetMap · Background",
+            "Site · Site (x_site), drawn as is",
+        ]);
+        expect(".o_erplibre_studio_geo_layers .badge").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_pending").toHaveText(
+            "The map shows once Apply creates the view and its layers."
+        );
+
+        // The view takes no new field: the existing ones show unfolded.
+        expect(".o_erplibre_studio_palette [data-tab=new]").toHaveCount(0);
+        // A geo field never goes in the info box.
+        const dragging = await contains(".o_erplibre_studio_existing_field[data-name=x_spot]").drag();
+        await dragging.moveTo(hook(BOX, "inside"));
+        expect(hook(BOX, "inside")).not.toHaveClass("o_erplibre_studio_hook_active");
+        await dragging.moveTo(hook("/geoengine", "inside", "loaded"));
+        expect(hook("/geoengine", "inside", "loaded")).toHaveClass("o_erplibre_studio_hook_active");
+        await dragging.drop(hook(BOX, "inside"));
+        expect.verifySteps([]);
+
+        respond = () => geoPayload();
+        await contains(".o_erplibre_studio_existing_field[data-name=x_spot]").dragAndDrop(
+            hook("/geoengine", "inside", "loaded")
+        );
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: "/geoengine",
+            position: "inside",
+            field_name: "x_spot",
+        });
+
+        // Another field goes in the info box.
+        respond = () => geoPayload(["name", "email"]);
+        await contains(".o_erplibre_studio_existing_field[data-name=email]").dragAndDrop(hook(BOX, "inside"));
+        expect.verifySteps(["apply_operation add_existing_field"]);
+        expect(operations.pop()).toEqual({
+            type: "add_existing_field",
+            target: BOX,
+            position: "inside",
+            field_name: "email",
+        });
+    });
+
+    test("Draw on the map is a toggle that writes 1; the preview waits for Apply", async () => {
+        answer = geoPayload();
+        await openEditor("geoengine");
+        const toggle = ".o_erplibre_studio_settable[data-attribute=editable] input[type=checkbox]";
+        expect(toggle).toHaveCount(1);
+        expect(toggle).not.toBeChecked();
+        expect(".o_erplibre_studio_settable[data-attribute=editable] label").toHaveText("Draw on the map");
+        respond = () => geoPayload(["name"], {editable: "1"});
+        await contains(toggle).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(operations.pop()).toEqual({
+            type: "set_attribute",
+            target: "/geoengine",
+            attribute: "editable",
+            value: "1",
+        });
+        expect(toggle).toBeChecked();
+
+        await contains(".o_erplibre_studio_preview_toggle").click();
+        expect(".o_notification").toHaveText(/The map shows once Apply creates the view and its layers/);
+        expect(".o_erplibre_studio_view_preview").toHaveCount(0);
+    });
+});
+
 describe("erplibre_studio editor, form layout", () => {
     const FORM_OPERATIONS = [
         "add_field",

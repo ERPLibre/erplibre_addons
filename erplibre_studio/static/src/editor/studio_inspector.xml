@@ -273,6 +273,22 @@
                     t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value.trim())"
                 />
             </label>
+            <div t-elif="entry.kind === 'bool_number'" class="form-check form-switch mb-0">
+                <input
+                    type="checkbox"
+                    role="switch"
+                    class="form-check-input o_erplibre_studio_attribute_toggle"
+                    t-att-id="'o_erplibre_studio_attr_' + entry.attribute"
+                    t-att-checked="numberTrue(entry.value)"
+                    t-att-disabled="props.busy"
+                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.checked ? '1' : '')"
+                />
+                <label
+                    class="form-check-label"
+                    t-att-for="'o_erplibre_studio_attr_' + entry.attribute"
+                    t-esc="entry.label"
+                />
+            </div>
             <label t-elif="entry.kind === 'order'" class="form-label mb-0 w-100">
                 <t t-esc="entry.label" />
                 <input

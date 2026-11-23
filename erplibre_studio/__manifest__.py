@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre studio",
-    "version": "18.0.1.2.0",
+    "version": "18.0.1.3.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",
@@ -19,9 +19,10 @@ project**, applied to the database, and can become a module.
 * **Views**: form, list, kanban, search, pivot, graph and calendar
   views, timeline views once *web_timeline* is installed, hierarchy views
   once *web_hierarchy* is, activity views of the models with activities
-  once *mail* is, maps once *web_view_leaflet_map* is. **Customize this
-  view**, in the debug menu or the *Developer panel*, opens the editor on
-  the view of the page. Fields move by drag and drop; the palette adds
+  once *mail* is, maps once *web_view_leaflet_map* is, GeoEngine maps
+  with their layers once *base_geoengine* is. **Customize this view**, in
+  the debug menu or the *Developer panel*, opens the editor on the view of
+  the page. Fields move by drag and drop; the palette adds
   existing fields and new ``x_`` fields, the side panel edits their
   properties. **Add a view** gives a model a view of a type it lacks.
 * **New models**: ``x_`` models with their views, action, menu and access

@@ -75,11 +75,23 @@ CREATED_FIELDS = {
     "groups": "created_group_ids",
     "categories": "created_category_ids",
 }
+# What Apply writes for the layers of the GeoEngine views the project adds,
+# by kind of REMOVAL_ORDER: the model of base_geoengine, which exists once it
+# is installed. The layers are found by their external ids under the module
+# (``_studio_geo_layer_records``), the studio does not depend on it. A layer
+# goes before its view, which it names with « ondelete restrict », and
+# before the geo field it draws.
+GEO_LAYER_KINDS = {
+    "raster_layers": "geoengine.raster.layer",
+    "vector_layers": "geoengine.vector.layer",
+}
 REMOVAL_ORDER = (
     "menus",
     "actions",
     "rules",
     "access",
+    "raster_layers",
+    "vector_layers",
     "views",
     "primary_views",
     "fields",
@@ -1890,6 +1902,10 @@ class ErplibreStudioProject(models.Model):
             "geo_view": lambda: self.env._(
                 "A geo field shows as a map in a form only."
             ),
+            "geo_info_box": lambda: self.env._(
+                "A geo field goes among the fields a GeoEngine view loads, "
+                "not in its info box."
+            ),
         }
         if code in messages:
             return messages[code]()
@@ -2198,6 +2214,15 @@ class ErplibreStudioProject(models.Model):
         return self._loaded_fields(arch)
 
     @api.model
+    def _in_template_drop(self, node, position):
+        """Whether a node dropped at ``position`` of ``node`` lands in a
+        template of a QWeb view, or among the fields it loads beside."""
+        parent = node if position == "inside" else node.getparent()
+        if parent is None:
+            return False
+        return parent.tag == "templates" or studio_arch.in_template(parent)
+
+    @api.model
     def _loaded_fields(self, arch):
         """The names of the fields a QWeb view loads outside its templates."""
         return {
@@ -2217,7 +2242,9 @@ class ErplibreStudioProject(models.Model):
             )
         self._refuse(
             studio_arch.geo_refusal(
-                view.type, self._field_info(view.model, name).get("type")
+                view.type,
+                self._field_info(view.model, name).get("type"),
+                templated=self._in_template_drop(node, position),
             )
         )
         node_attrs = {}
@@ -2685,6 +2712,13 @@ class ErplibreStudioProject(models.Model):
             if isinstance(value, str):
                 value = studio_arch.constant_true(value)
             return ("True" if value else "False"), []
+        if kind == "bool_number":
+            # « 1 » or no attribute: the view reads a number (number_true).
+            if isinstance(value, str):
+                value = studio_arch.number_true(value) or studio_arch.constant_true(
+                    value
+                )
+            return ("1" if value else ""), []
         if kind == "colors":
             return self._colors_value(view.model, value)
         if kind == "groups":
@@ -3187,6 +3221,8 @@ class ErplibreStudioProject(models.Model):
                 return "True"
             if text in ("0", "False", "false"):
                 return "False"
+        if kind == "bool_number":
+            return "1" if studio_arch.number_true(text) else ""
         if kind == "groups":
             return ",".join(item.strip() for item in text.split(",") if item.strip())
         if kind == "field_options":
@@ -4806,7 +4842,9 @@ class ErplibreStudioProject(models.Model):
         which has none of that type: a view line with its default arch
         (``arch.default_view_arch``). A map of a model without
         LEAFLET_DATE_FIELD comes with one add_field change on its line that
-        creates it (``_studio_leaflet_date_definition``). Return the line;
+        creates it (``_studio_leaflet_date_definition``). A GeoEngine view
+        needs a geo field of the model in the database, and comes with its
+        default layers (``_studio_default_geo_layers``). Return the line;
         UserError when the view cannot be added."""
         self.ensure_one()
         self = self._editing()
@@ -4874,14 +4912,17 @@ class ErplibreStudioProject(models.Model):
                         model=model,
                     )
                 )
-        if view_type == "activity" and not self._studio_has_activities(model):
-            raise UserError(
-                Editor._view_reason("needs_activity", label, model, view_type)
-            )
+        need = Editor._view_need(view_type, model)
+        if need:
+            raise UserError(Editor._view_reason(need, label, model, view_type))
         leaflet = date_definition = None
         if view_type == "leaflet_map":
             date_definition = self._studio_leaflet_date_definition(model, label)
             leaflet = self._studio_leaflet_fields(model)
+        # The view loads the geo field of its vector layer: the first one.
+        geo_fields = (
+            self._studio_geo_fields(model)[:1] if view_type == "geoengine" else ()
+        )
         parent = None
         if view_type == "hierarchy":
             parent = self._studio_parent_field(model)
@@ -4903,6 +4944,7 @@ class ErplibreStudioProject(models.Model):
             readonly_date=readonly_date,
             parent_field=parent,
             leaflet=leaflet,
+            geo_fields=geo_fields,
         )
         sequence = max(self.view_line_ids.mapped("sequence") or [0]) + 10
         line = (
@@ -4933,8 +4975,56 @@ class ErplibreStudioProject(models.Model):
                     "name_auto": False,
                 },
             )
+        self._studio_default_geo_layers(line, geo_fields)
         self._touch()
         return line
+
+    @api.model
+    def _studio_geo_fields(self, model):
+        """The stored geo fields (GEO_TYPES) ``model`` has in the registry,
+        in the order of its fields: a GeoEngine view draws a field Apply
+        created."""
+        if model not in self.env:
+            return ()
+        return tuple(
+            name
+            for name, field in self.env[model]._fields.items()
+            if field.type in studio_arch.GEO_TYPES and field.store
+        )
+
+    def _studio_default_geo_layers(self, line, geo_fields):
+        """The layers of the new GeoEngine view ``line``: an OpenStreetMap
+        background, and the first field of ``geo_fields`` drawn as it is,
+        shown when the map opens. None without a geo field."""
+        if not geo_fields:
+            return
+        geo_field = geo_fields[0]
+        field = self.env[line.model]._fields[geo_field]
+        # The source labels: they go as they are into a generated module.
+        self.env["erplibre.studio.geo.layer"].with_context(
+            **{NO_TOUCH_KEY: True}
+        ).create(
+            [
+                {
+                    "project_id": self.id,
+                    "view_line_id": line.id,
+                    "kind": "raster",
+                    "sequence": 10,
+                    "name": "OpenStreetMap",
+                    "raster_type": "osm",
+                },
+                {
+                    "project_id": self.id,
+                    "view_line_id": line.id,
+                    "kind": "vector",
+                    "sequence": 10,
+                    "name": field.string or geo_field,
+                    "geo_field": geo_field,
+                    "geo_repr": "basic",
+                    "active_on_startup": True,
+                },
+            ]
+        )
 
     def _studio_leaflet_date_definition(self, model, label):
         """The definition of the date field LEAFLET_DATE_FIELD a map added to
@@ -5017,9 +5107,11 @@ class ErplibreStudioProject(models.Model):
             }
         )
         Data = self.env["ir.model.data"].sudo()
-        records = [self.studio_view_ids, self.field_ids] + [
-            self[name] for name in CREATED_FIELDS.values()
-        ]
+        records = (
+            [self.studio_view_ids, self.field_ids]
+            + [self[name] for name in CREATED_FIELDS.values()]
+            + list(self._studio_geo_layer_records().values())
+        )
         for record in records:
             if record:
                 Data.search(
@@ -6024,6 +6116,85 @@ class ErplibreStudioProject(models.Model):
             kept |= view
         return kept
 
+    def _studio_geo_layer_records(self):
+        """{kind of GEO_LAYER_KINDS: records} of the layers under external
+        ids of the module of the project, for the layer models of the
+        database (none without base_geoengine)."""
+        Data = self.env["ir.model.data"].sudo()
+        records = {}
+        for kind, res_model in GEO_LAYER_KINDS.items():
+            if res_model not in self.env:
+                continue
+            Model = self.env[res_model].sudo()
+            if len(self) != 1 or not self.module_name:
+                records[kind] = Model
+                continue
+            data = Data.search(
+                [("module", "=", self.module_name), ("model", "=", res_model)]
+            )
+            records[kind] = Model.browse(data.mapped("res_id")).exists()
+        return records
+
+    def _apply_geo_layers(self, log):
+        """Write the layers of the GeoEngine views the view lines add to
+        base_geoengine, bound to the view Apply created for their line.
+        A vector layer names its geo field by its ir.model.fields, which
+        Apply created before. Return {kind of GEO_LAYER_KINDS: the layers
+        kept}; UserError when a layer draws a field the model lacks."""
+        kept = {
+            kind: self.env[res_model].sudo()
+            for kind, res_model in GEO_LAYER_KINDS.items()
+            if res_model in self.env
+        }
+        if not kept:
+            return kept
+        Fields = self.env["ir.model.fields"].sudo()
+        kinds = {res_model: kind for kind, res_model in GEO_LAYER_KINDS.items()}
+        for line in self.view_line_ids.filtered("layer_ids"):
+            view = self._studio_record("ir.ui.view", line._studio_xml_name())
+            if not view:
+                continue
+            for layer in line.layer_ids:
+                vals = {
+                    "name": layer.name,
+                    "sequence": layer.sequence,
+                    "view_id": view.id,
+                }
+                if layer.kind == "raster":
+                    vals["raster_type"] = layer.raster_type or "osm"
+                else:
+                    geo_field = Fields._get(line.model, layer.geo_field)
+                    if not geo_field:
+                        raise UserError(
+                            self.env._(
+                                "The layer %(layer)s draws the field %(field)s, "
+                                "which %(model)s does not have.",
+                                layer=layer.name,
+                                field=layer.geo_field,
+                                model=line.model,
+                            )
+                        )
+                    vals.update(
+                        {
+                            "geo_field_id": geo_field.id,
+                            "geo_repr": layer.geo_repr or "basic",
+                            "attribute_field_id": Fields._get(
+                                line.model, layer.attribute_field or ""
+                            ).id,
+                            "classification": layer.classification or False,
+                            "begin_color": layer.begin_color or False,
+                            "end_color": layer.end_color or False,
+                            "nb_class": layer.nb_class or 1,
+                            "active_on_startup": layer.active_on_startup,
+                        }
+                    )
+                res_model = layer._studio_layer_model()
+                record, _differs = self._studio_save(
+                    res_model, layer._studio_xml_name(), vals, log
+                )
+                kept[kinds[res_model]] |= record
+        return kept
+
     def _apply_actions(self, log):
         """Create or update the window action of each model line, with the
         context of its options (``_studio_action_context``) and the views
@@ -6775,9 +6946,14 @@ class ErplibreStudioProject(models.Model):
         name their model by its name and would stay behind. The default
         values for everyone of the fields of the options of the models the
         studio creates (``_apply_model_options``), removed with ``models``
-        or among ``fields``, are the studio's own: left out. A read, in
-        sudo."""
+        or among ``fields``, are the studio's own: left out, and so are the
+        layers the project wrote (``_studio_geo_layer_records``), removed
+        before the fields they draw. A read, in sudo."""
         Fields = self.env["ir.model.fields"].sudo()
+        own_layers = {
+            records._name: records
+            for records in self._studio_geo_layer_records().values()
+        }
         fields = (fields or Fields) | Fields.search([("model_id", "in", models.ids)])
         targets = {"ir.model": models.ids, "ir.model.fields": fields.ids}
         options = [option[0] for option in studio_arch.MODEL_OPTIONS.values()]
@@ -6823,6 +6999,7 @@ class ErplibreStudioProject(models.Model):
                 )
                 if name == "ir.default":
                     rows = rows.filtered(lambda row: not own_default(row))
+                rows -= own_layers.get(name, rows.browse())
                 if rows:
                     found.append(rows)
         if models:
@@ -6992,6 +7169,7 @@ class ErplibreStudioProject(models.Model):
             before = {kind: project[name] for kind, name in CREATED_FIELDS.items()}
             before["views"] = project.studio_view_ids
             before["fields"] = project.field_ids
+            before.update(project._studio_geo_layer_records())
             # The fields of the options turned off are not fields of the
             # project: they leave on their own, after everything that names
             # them was rewritten without them.
@@ -7009,6 +7187,7 @@ class ErplibreStudioProject(models.Model):
                 log, owned
             )
             kept["primary_views"] |= project._apply_added_views(log)
+            kept.update(project._apply_geo_layers(log))
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
             project._studio_bind_pending_changes()
             kept["views"] = project._apply_views(log)
@@ -7088,6 +7267,7 @@ class ErplibreStudioProject(models.Model):
             records = {kind: project[name] for kind, name in CREATED_FIELDS.items()}
             records["views"] = project.studio_view_ids
             records["fields"] = project.field_ids
+            records.update(project._studio_geo_layer_records())
             removed += project._studio_remove_created(records, log)
             vals = {name: [(5, 0, 0)] for name in CREATED_FIELDS.values()}
             vals.update(

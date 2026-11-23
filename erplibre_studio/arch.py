@@ -39,6 +39,7 @@ VIEW_TYPES = (
     "hierarchy",
     "activity",
     "leaflet_map",
+    "geoengine",
 )
 # {view type: module}: the module that adds the type to ir.ui.view.type, which
 # the editor names when the type is missing from the database.
@@ -47,11 +48,12 @@ OPTIONAL_VIEW_MODULES = {
     "hierarchy": "web_hierarchy",
     "activity": "mail",
     "leaflet_map": "web_view_leaflet_map",
+    "geoengine": "base_geoengine",
 }
 POSITIONS = ("before", "after", "inside")
 
 # The QWeb views: their fields show from a template under <templates>.
-TEMPLATED_TYPES = ("kanban", "timeline", "hierarchy", "activity")
+TEMPLATED_TYPES = ("kanban", "timeline", "hierarchy", "activity", "geoengine")
 # The template elements a node can be dropped into.
 TEMPLATE_DROPS = ("t", "main", "aside", "footer", "header", "div", "section")
 # The QWeb directives that replace or ignore the body of their element: the
@@ -93,6 +95,7 @@ CONTAINERS = {
     "hierarchy": ("hierarchy", "templates") + TEMPLATE_DROPS,
     "activity": ("activity", "templates") + TEMPLATE_DROPS,
     "leaflet_map": ("leaflet_map",),
+    "geoengine": ("geoengine", "templates") + TEMPLATE_DROPS,
 }
 DROP_CONTAINERS = {
     "form": ("sheet", "group", "page", "div"),
@@ -112,6 +115,9 @@ DROP_CONTAINERS = {
     # A map reads its fields from its root attributes only: a <field> child
     # is what a new field of a lane adds, which the map ignores.
     "leaflet_map": ("leaflet_map",),
+    # A GeoEngine view loads its geo fields beside its « info_box »
+    # template: the vector layers draw them from the records it reads.
+    "geoengine": ("geoengine",) + TEMPLATE_DROPS,
 }
 
 # How a view type hides a node: an attribute, or the node removed from the
@@ -130,6 +136,7 @@ HIDE_MODES = {
     "pivot": "remove",
     "graph": "remove",
     "leaflet_map": "remove",
+    "geoengine": "invisible",
 }
 
 # The node attributes the editor shows; ``settable`` ones are added.
@@ -293,6 +300,15 @@ VIEW_OPERATIONS = {
         "remove",
         "set_attribute",
     ),
+    # A GeoEngine view takes existing fields: in its « info_box », or
+    # loaded beside it for its vector layers.
+    "geoengine": (
+        "add_existing_field",
+        "move",
+        "remove",
+        "hide",
+        "set_attribute",
+    ),
 }
 
 # The attributes « set_attribute » may write: view type -> tag ->
@@ -407,6 +423,11 @@ SETTABLE_ATTRIBUTES = {
             "marker_popup_anchor_x": "offset",
             "marker_popup_anchor_y": "offset",
         },
+    },
+    # base_geoengine reads « editable » as a number (« Boolean(Number(...)) »):
+    # « True » would read as false, so the kind writes « 1 » or nothing.
+    "geoengine": {
+        "geoengine": {"editable": "bool_number"},
     },
 }
 # The settable attributes a view needs: they can change, not go away.
@@ -576,6 +597,8 @@ GEO_TYPES = (
     "geo_polygon",
     "geo_multi_polygon",
 )
+# The template a GeoEngine view shows in the popup of a record.
+GEO_INFO_BOX = "info_box"
 # The longest name of a PostgreSQL table.
 TABLE_NAME_SIZE = 63
 # The longest field name: a column of the table of its model.
@@ -2057,6 +2080,7 @@ def default_view_arch(
     readonly_date=False,
     parent_field=None,
     leaflet=None,
+    geo_fields=(),
 ):
     """The arch text of the ``view_type`` view (``VIEW_TYPES``) a project
     adds to an existing model, labelled ``label``: the record name
@@ -2072,9 +2096,13 @@ def default_view_arch(
     « activity-box » template, a <div> as mail writes it, shows the record
     name on a line of its own; a map whose root attributes are those of
     ``leaflet`` ({attribute of LEAFLET_FIELD_ATTRIBUTES: field}), without
-    children. A calendar on a ``readonly_date`` neither creates nor
-    moves its events (« create » and « edit » False). The arch depends on these values
-    only: the changes of the editor on the view locate their nodes in it."""
+    children; a GeoEngine view that loads display_name (its panel of
+    records lists it), the record name and the geo fields ``geo_fields``
+    its vector layers draw from its records, its « info_box » showing the
+    record name (``_geoengine_children``). A calendar on a
+    ``readonly_date`` neither creates nor moves its events (« create » and
+    « edit » False). The arch depends on these values only: the changes of
+    the editor on the view locate their nodes in it."""
     root = etree.Element(view_type, {"string": label})
     # A map is its root attributes; any other type takes none of them.
     _set_attributes(root, _leaflet_attributes(view_type, leaflet))
@@ -2158,11 +2186,27 @@ def default_view_arch(
                 "field",
                 {"name": date_field, "interval": "month", "type": "row"},
             )
+    elif view_type == "geoengine":
+        _geoengine_children(root, name_field, geo_fields)
     elif view_type not in ("pivot", "leaflet_map"):
         raise ArchError(
             f"Unknown view type {view_type}.", "unknown_view_type", type=view_type
         )
     return etree.tostring(root, encoding="unicode", pretty_print=True)
+
+
+def _geoengine_children(root, name_field, geo_fields):
+    """Append to the GeoEngine ``root`` the fields it loads, display_name,
+    ``name_field`` and the geo fields ``geo_fields``, each once, then its
+    « info_box » template showing ``name_field``. ArchError without a geo
+    field: a vector layer draws one."""
+    if not geo_fields:
+        raise ArchError("A GeoEngine view needs a geo field.", "geo_fields")
+    for name in dict.fromkeys(["display_name", name_field, *geo_fields]):
+        etree.SubElement(root, "field", {"name": name})
+    templates = etree.SubElement(root, "templates")
+    box = etree.SubElement(templates, "t", {"t-name": GEO_INFO_BOX})
+    etree.SubElement(box, "field", {"name": name_field, "class": "fw-bold"})
 
 
 def _leaflet_attributes(view_type, leaflet):
@@ -2191,13 +2235,36 @@ def x2many_refusal(view_type, ttype):
     return None
 
 
-def geo_refusal(view_type, ttype):
+def geo_refusal(view_type, ttype, templated=False):
     """Why a field of type ``ttype`` cannot go in a ``view_type`` view (an
     ArchError), or None when it can: a geometry field (GEO_TYPES) shows
-    in a form only."""
-    if ttype in GEO_TYPES and view_type != "form":
+    as a map in a form; a GeoEngine view loads it outside its templates
+    (``templated`` False), where its vector layers read it. In the
+    « info_box » its widget would draw an edit map in the popup."""
+    if ttype not in GEO_TYPES:
+        return None
+    if view_type == "geoengine":
+        if templated:
+            return ArchError(
+                "A geo field goes among the fields a GeoEngine view loads, "
+                "not in its info box.",
+                "geo_info_box",
+            )
+        return None
+    if view_type != "form":
         return ArchError("A geo field shows as a map in a form only.", "geo_view")
     return None
+
+
+def number_true(text):
+    """Whether the attribute text ``text`` is true read as a number, as
+    base_geoengine reads « editable »: « 1 » is, « 0 », « True » and an
+    empty text are not."""
+    try:
+        value = float((text or "").strip())
+    except ValueError:
+        return False
+    return bool(value) and not math.isnan(value)
 
 
 def x2many_node(view_type, ttype, display_field):

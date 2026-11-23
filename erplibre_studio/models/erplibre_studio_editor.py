@@ -49,7 +49,18 @@ UNSUPPORTED_VIEW_TYPES = ("gantt",)
 # yet cannot have before Apply, an activity view of a model without
 # activities (mail.activity.mixin), a map of a model without the field
 # web_view_leaflet_map always reads (LEAFLET_DATE_FIELD) on a database where
-# a new field needs the x_ prefix, a type the model has no view of.
+# a new field needs the x_ prefix, a GeoEngine view of a model without a
+# geo field in the database, a type the model has no view of.
+# {view type: name of its template the canvas edits as a card}: a
+# hierarchy draws each node with its « hierarchy-box », an activity view the
+# record cell of each row with its « activity-box », a GeoEngine view the
+# popup of a record with its « info_box ». A kanban takes « card », or
+# « kanban-box » as former versions name it.
+CARD_TEMPLATES = {
+    "hierarchy": "hierarchy-box",
+    "activity": "activity-box",
+    "geoengine": studio_arch.GEO_INFO_BOX,
+}
 VIEW_REASONS = (
     "needs_module",
     "not_editable",
@@ -57,6 +68,7 @@ VIEW_REASONS = (
     "apply_first",
     "needs_activity",
     "needs_field",
+    "needs_geo_field",
     "no_view",
 )
 # How many members ``get_group_members`` and ``get_group_losses`` name at
@@ -263,6 +275,13 @@ class ErplibreStudioEditor(models.AbstractModel):
             if view_type == "leaflet_map" and not self._leaflet_fits(info):
                 # A map shows a field through a lane only.
                 continue
+            if (
+                view_type == "geoengine"
+                and info.get("type") in studio_arch.GEO_TYPES
+                and name in studio_arch.arch_field_names(arch)
+            ):
+                # A geo field goes among the loaded fields only, once.
+                continue
             if view_type in studio_arch.AXIS_VIEW_TYPES:
                 axes = [
                     axis
@@ -364,16 +383,12 @@ class ErplibreStudioEditor(models.AbstractModel):
         path = lambda node: studio_arch.node_xpath(arch, node)  # noqa: E731
         root = f"/{arch.tag}"
         loaded = [c.get("name") for c in studio_arch.elements(arch) if c.tag == "field"]
-        if view_type in ("kanban", "hierarchy", "activity"):
-            # A hierarchy draws each node with its « hierarchy-box » card,
-            # an activity view the record cell of each row with its
-            # « activity-box », both compiled as a kanban card is; no widget
-            # of WIDGETS goes in them.
+        if view_type == "kanban" or view_type in CARD_TEMPLATES:
+            # Each card template (CARD_TEMPLATES) compiles as a kanban card
+            # does; no widget of WIDGETS goes in them.
             templates = studio_arch.templates_of(arch)
-            if view_type == "hierarchy":
-                card = templates.get("hierarchy-box")
-            elif view_type == "activity":
-                card = templates.get("activity-box")
+            if view_type in CARD_TEMPLATES:
+                card = templates.get(CARD_TEMPLATES[view_type])
             else:
                 card = templates.get("card")
                 if card is None:
@@ -491,6 +506,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "gantt": self.env._("Gantt"),
             "activity": self.env._("Activity"),
             "leaflet_map": self.env._("Map (Leaflet)"),
+            "geoengine": self.env._("GeoEngine"),
         }
         field = self.env["ir.ui.view"]._fields["type"]
         labels.update(dict(field._description_selection(self.env)))
@@ -578,12 +594,8 @@ class ErplibreStudioEditor(models.AbstractModel):
                     code = "not_installed"
             elif pending and view_type not in studio_arch.MODEL_VIEW_TYPES:
                 code = "apply_first"
-            elif (
-                view_type == "activity"
-                and not entry["exists"]
-                and not Project._studio_has_activities(model)
-            ):
-                code = "needs_activity"
+            elif not entry["exists"] and (need := self._view_need(view_type, model)):
+                code = need
             elif (
                 view_type == "leaflet_map"
                 and not entry["exists"]
@@ -609,6 +621,19 @@ class ErplibreStudioEditor(models.AbstractModel):
             entry["reason"] = self._view_reason(code, label, model, view_type)
             result.append(entry)
         return result
+
+    @api.model
+    def _view_need(self, view_type, model):
+        """The ``reason_code`` of a ``view_type`` view ``model`` lacks what
+        it reads for: « needs_activity » for an activity view of a model
+        without activities, « needs_geo_field » for a GeoEngine view of a
+        model without a geo field in the registry; False otherwise."""
+        Project = self.env["erplibre.studio.project"]
+        if view_type == "activity" and not Project._studio_has_activities(model):
+            return "needs_activity"
+        if view_type == "geoengine" and not Project._studio_geo_fields(model):
+            return "needs_geo_field"
+        return False
 
     @api.model
     def _view_reason(self, code, label, model, view_type=None):
@@ -643,6 +668,12 @@ class ErplibreStudioEditor(models.AbstractModel):
             return self.env._(
                 "The map of web_view_leaflet_map reads a date_localization "
                 "field, which %(model)s does not have: it would show no marker.",
+                model=model,
+            )
+        if code == "needs_geo_field":
+            return self.env._(
+                "A GeoEngine view needs a geo field on %(model)s: add one to its "
+                "form and Apply first.",
                 model=model,
             )
         if code == "no_view":
@@ -761,9 +792,10 @@ class ErplibreStudioEditor(models.AbstractModel):
 
     @api.model
     def _added_payload(self, project, view):
-        """{line_id, applied, name, xml_id} of the view line of ``project``
-        behind ``view`` (see ``_studio_view_line_of``), or False when
-        ``view`` is not a view the project adds."""
+        """{line_id, applied, name, xml_id, layers} of the view line of
+        ``project`` behind ``view`` (see ``_studio_view_line_of``), or False
+        when ``view`` is not a view the project adds. ``layers``: the layers
+        of a GeoEngine view (``erplibre.studio.geo.layer._payload``)."""
         line = project._studio_view_line_of(view) if project else False
         if not line:
             return False
@@ -772,6 +804,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "applied": line.applied,
             "name": line._studio_view_name(),
             "xml_id": f"{project.module_name}.{line._studio_xml_name()}",
+            "layers": line.layer_ids._payload(),
         }
 
     @api.model

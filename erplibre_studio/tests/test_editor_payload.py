@@ -67,13 +67,17 @@ class TestEditorPayload(StudioCase):
                 self.assertEqual(entry["editable"], not entry["reason_code"])
                 self.assertEqual(bool(entry["reason"]), bool(entry["reason_code"]))
                 if entry["type"] in editable and not entry["exists"]:
-                    # An activity view needs a model with activities.
-                    expected = (
-                        "no_view"
-                        if entry["type"] != "activity"
-                        or self.Project._studio_has_activities("res.partner")
-                        else "needs_activity"
-                    )
+                    # An activity view needs a model with activities, a
+                    # GeoEngine view a model with a geo field.
+                    expected = "no_view"
+                    if entry["type"] == "activity" and not (
+                        self.Project._studio_has_activities("res.partner")
+                    ):
+                        expected = "needs_activity"
+                    if entry["type"] == "geoengine" and not (
+                        self.Project._studio_geo_fields("res.partner")
+                    ):
+                        expected = "needs_geo_field"
                     self.assertEqual(entry["reason_code"], expected)
                 if entry["type"] in UNSUPPORTED_VIEW_TYPES:
                     self.assertFalse(entry["editable"])
@@ -96,6 +100,9 @@ class TestEditorPayload(StudioCase):
         if not self.activity_available():
             self.assertEqual(entries["activity"]["reason_code"], "needs_module")
             self.assertIn("mail", entries["activity"]["reason"])
+        if "geoengine" not in editable:
+            self.assertEqual(entries["geoengine"]["reason_code"], "needs_module")
+            self.assertIn("base_geoengine", entries["geoengine"]["reason"])
 
     def test_view_list_names_a_type_without_a_view(self):
         """A studio type the model has no view of is listed, not editable."""
@@ -110,11 +117,12 @@ class TestEditorPayload(StudioCase):
         for view_type in missing:
             with self.subTest(view_type=view_type):
                 entry = entries[view_type]
-                # The tags have no activities and no date_localization: no
-                # activity view and no map to add.
+                # The tags have no activities, no date_localization and no
+                # geo field: no activity view and no map to add.
                 code = {
                     "activity": "needs_activity",
                     "leaflet_map": "needs_field",
+                    "geoengine": "needs_geo_field",
                 }.get(view_type, "no_view")
                 self.assertEqual(
                     (entry["exists"], entry["editable"], entry["reason_code"]),

@@ -33,6 +33,12 @@ class ErplibreStudioView(models.Model):
     view_id = fields.Many2one(
         "ir.ui.view", compute="_compute_applied", string="View in the database"
     )
+    layer_ids = fields.One2many(
+        "erplibre.studio.geo.layer",
+        "view_line_id",
+        string="Layers",
+        help="The layers of a GeoEngine view, written to base_geoengine by Apply.",
+    )
 
     _sql_constraints = [
         (
@@ -75,22 +81,35 @@ class ErplibreStudioView(models.Model):
             line.applied = bool(record)
 
     def _snapshot(self):
-        return [
-            {
+        """The view lines as the snapshot of the project keeps them; the
+        key « layers » shows only for a line with layers, so that the
+        snapshot of a line without them keeps the form it had before."""
+        items = []
+        for line in self.sorted(lambda v: (v.sequence, v.model, v.view_type)):
+            item = {
                 "model": line.model,
                 "view_type": line.view_type,
                 "arch": line.arch or "",
                 "sequence": line.sequence,
             }
-            for line in self.sorted(lambda v: (v.sequence, v.model, v.view_type))
-        ]
+            if line.layer_ids:
+                item["layers"] = line.layer_ids._snapshot()
+            items.append(item)
+        return items
 
     @api.model
     def _studio_line_vals(self, item, project):
-        """The values of a line from ``item``, one entry of ``_snapshot``."""
-        return {
+        """The values of a line from ``item``, one entry of ``_snapshot``,
+        its layers included."""
+        vals = {
             key: item.get(key) for key in ("model", "view_type", "arch", "sequence")
         }
+        layers = item.get("layers") or []
+        if layers:
+            vals["layer_ids"] = [
+                (0, 0, dict(layer, project_id=project.id)) for layer in layers
+            ]
+        return vals
 
     # ── constraints ─────────────────────────────────────────────────────
 
