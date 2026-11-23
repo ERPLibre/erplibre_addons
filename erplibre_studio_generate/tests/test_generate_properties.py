@@ -172,6 +172,55 @@ class TestGenerateProperties(PropertiesGenerationCase):
         # The applied field reads the same definition.
         self.assertEqual(self.env["res.partner"]._fields[name].definition, definition)
 
+    def test_depends_on_the_modules_of_its_definition(self):
+        """A properties field that reads an existing definition field
+        through an existing many2one depends on the module of each: the
+        registry of a fresh database fails to load the field without
+        them. Two modules named for the test own them."""
+        Fields = self.env["ir.model.fields"]
+        IrModel = self.env["ir.model"]
+        definitions = Fields.create(
+            {
+                "name": "x_studio_test_definitions",
+                "model_id": IrModel._get_id("res.country"),
+                "ttype": "properties_definition",
+                "state": "manual",
+                "field_description": "Studio test definitions",
+            }
+        )
+        container = Fields.create(
+            {
+                "name": "x_studio_test_land_id",
+                "model_id": IrModel._get_id("res.partner"),
+                "ttype": "many2one",
+                "relation": "res.country",
+                "state": "manual",
+                "field_description": "Studio test land",
+            }
+        )
+        owners = {
+            definitions: "studio_test_definition_owner",
+            container: "studio_test_container_owner",
+        }
+        for field, module in owners.items():
+            self.env["ir.model.data"].create(
+                {
+                    "module": module,
+                    "name": f"field_{field.model.replace('.', '_')}__{field.name}",
+                    "model": "ir.model.fields",
+                    "res_id": field.id,
+                }
+            )
+        self.assertNotIn("studio_test_definition_owner", self.project._dependencies())
+        self.add(
+            definition_record=container.name,
+            definition_new=False,
+            definition_record_field=definitions.name,
+        )
+        dependencies = self.project._dependencies()
+        self.assertIn("studio_test_definition_owner", dependencies)
+        self.assertIn("studio_test_container_owner", dependencies)
+
     def test_container_comes_before_the_field(self):
         container = "commercial_partner_id"
         companion = "x_studio_definitions"

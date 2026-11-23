@@ -646,8 +646,10 @@ class ErplibreStudioProject(models.Model):
         (read from the branding of the combined arch), of the models
         extended (by a field or by the inverse of a relational field), of the
         types of the new fields (base_geoengine for a geometry), of the
-        fields added or named by the changes (a filter domain, a group-by,
-        a timeline date, the domain of a relational field), of the groups a
+        container and the definition field a properties field reads
+        (``_properties_dependencies``), of the fields added or named by the
+        changes (a filter domain, a group-by, a timeline date, the domain of
+        a relational field), of the groups a
         node shows for and of the comodels; those of the models and the
         view types of the views the project adds; mail for a chatter; those of
         the parent menus, of the groups, of the groups the groups of the
@@ -693,12 +695,7 @@ class ErplibreStudioProject(models.Model):
                         names.add(self._module_of("ir.model.fields", field.id))
                 names |= self._attribute_dependencies(data["payload"])
         for model, _name, definition, _change in self._studio_all_definitions():
-            names.add(self._module_of("ir.model", IrModel._get_id(model)))
-            # A field class a module declares (fields.GeoPoint).
-            names.add(self._field_type_module(definition.get("ttype")))
-            relation = definition.get("relation")
-            if relation:
-                names.add(self._module_of("ir.model", IrModel._get_id(relation)))
+            names |= self._definition_dependencies(model, definition)
         for added in self.view_line_ids:
             # The model of a view the project adds, and its view type.
             names.add(self._module_of("ir.model", IrModel._get_id(added.model)))
@@ -707,6 +704,46 @@ class ErplibreStudioProject(models.Model):
         names.discard(False)
         names.discard(self.module_name)
         return sorted(names)
+
+    def _definition_dependencies(self, model, definition):
+        """The modules a new field of ``model`` of ``definition`` needs: the
+        module of its model, of its field class (fields.GeoPoint), of its
+        comodel, and for a properties field those of the fields it reads
+        its definition through (``_properties_dependencies``). A set that
+        may hold False."""
+        IrModel = self.env["ir.model"].sudo()
+        names = {
+            self._module_of("ir.model", IrModel._get_id(model)),
+            self._field_type_module(definition.get("ttype")),
+        }
+        relation = definition.get("relation")
+        if relation:
+            names.add(self._module_of("ir.model", IrModel._get_id(relation)))
+        if definition.get("ttype") == "properties":
+            names |= self._properties_dependencies(model, definition)
+        return names
+
+    def _properties_dependencies(self, model, definition):
+        """The modules a properties field of ``model`` reads its definition
+        through (``definition``: its definition_record and
+        definition_record_field): the module of the many2one of ``model``
+        that holds the container, and the module of the definition field
+        of the comodel, unless the project creates that field
+        (``definition_new``). Either may come from a module other than
+        the one of its model; the registry fails to load without it. A set
+        that may hold False."""
+        Fields = self.env["ir.model.fields"].sudo()
+        found = [Fields._get(model, definition.get("definition_record"))]
+        if not definition.get("definition_new"):
+            found.append(
+                Fields._get(
+                    definition.get("relation"),
+                    definition.get("definition_record_field"),
+                )
+            )
+        return {
+            self._module_of("ir.model.fields", field.id) for field in found if field
+        }
 
     def _attribute_dependencies(self, payload):
         """The modules a « set_attribute » of ``payload`` names: those of the
