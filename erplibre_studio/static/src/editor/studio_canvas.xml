@@ -65,14 +65,21 @@
          belongs to a column, an axis or the loaded fields. The component
          that renders it (StudioCanvas, StudioBlock) names « activeHook »,
          the hook a drop goes to: that one holds the label « Drop here »
-         with the glyph and the name of the dragged item. A hook of a
-         form container whose caller sets « insertable » holds its « + »
-         (erplibre_studio.Insert). -->
+         with the glyph and the name of the dragged item; « nearHooks »
+         names the hooks next to it, which draw as a line during the
+         drag. A hook of a form container whose caller sets « insertable »
+         holds its « + » (erplibre_studio.Insert). The hook where the
+         palette adds while the focus is on a block (« focusSlotKey »)
+         draws a quiet slot after it. -->
     <t t-name="erplibre_studio.Hook">
-        <t t-set="hookActive" t-value="activeHook === editor.hookKey(target, position, zone)" />
+        <t t-set="hookKeyOf" t-value="editor.hookKey(target, position, zone)" />
+        <t t-set="hookActive" t-value="activeHook === hookKeyOf" />
         <div
             class="o_erplibre_studio_hook"
-            t-att-class="{'o_erplibre_studio_hook_active': hookActive}"
+            t-att-class="{
+                'o_erplibre_studio_hook_active': hookActive,
+                'o_erplibre_studio_hook_near': !hookActive and nearHooks.includes(hookKeyOf),
+            }"
             t-att-data-target="target"
             t-att-data-position="position"
             t-att-data-zone="zone or ''"
@@ -92,6 +99,14 @@
                     </span>
                 </span>
             </t>
+        </div>
+        <div
+            t-if="focusSlotKey and focusSlotKey === hookKeyOf"
+            class="o_erplibre_studio_focus_slot"
+            t-att-data-hook="hookKeyOf"
+        >
+            <i class="fa fa-plus" aria-hidden="true" />
+            <span t-esc="focusSlotText" />
         </div>
     </t>
 
@@ -201,7 +216,8 @@
 
     <!-- The button that selects the block a StudioBlock renders, around
          the body of the t-call (« 0 »): the tab stop of the block, with the
-         classes « pickClass » besides its own. Enter or Space clicks it,
+         classes « pickClass » besides its own, and « pickAria » for its
+         accessible name when set, else pickLabel. Enter or Space clicks it,
          and the click bubbles to the div of the block. The CSS lets no
          pointer event reach it, so a drag starts on the div.
          « aria-keyshortcuts » names the keys the editor reads on it;
@@ -212,7 +228,7 @@
             class="o_erplibre_studio_pick"
             t-att-class="pickClass or ''"
             t-att-aria-pressed="isSelected ? 'true' : 'false'"
-            t-att-aria-label="pickLabel"
+            t-att-aria-label="pickAria or pickLabel"
             t-att-aria-keyshortcuts="pickShortcuts"
         >
             <t t-out="0" />
@@ -220,12 +236,15 @@
     </t>
 
     <!-- A block at the Simple level as one muted line (mutedLine): its
-         ring dot, then « label hidden ». -->
+         ring dot, then its label in muted text. The canvas writes no
+         status on it: « label hidden » is the accessible name of its
+         button only. -->
     <t t-name="erplibre_studio.Block.muted">
         <t t-call="erplibre_studio.Block.gutter" />
         <t t-call="erplibre_studio.Block.pick">
             <t t-set="pickClass" t-value="'o_erplibre_studio_muted_text'" />
-            <t t-esc="mutedText" />
+            <t t-set="pickAria" t-value="mutedText" />
+            <t t-esc="titleLabel" />
         </t>
     </t>
 
@@ -592,9 +611,10 @@
                 t-on-drop="(ev) => showHooks and editor.dropOnScope(ev)"
             >
                 <!-- Its hooks hold a « + » in a form (canInsert); the
-                     one after the selected block is a tab stop. -->
+                     one after the selected block, or the only one of a
+                     block that draws no child, is a tab stop. -->
                 <t t-set="insertable" t-value="canInsert" />
-                <t t-set="insertTabKey" t-value="insertable ? afterSelectedKey : null" />
+                <t t-set="insertTabKey" t-value="insertable ? tabStopKey : null" />
                 <t t-foreach="drawnChildren" t-as="child" t-key="child.path">
                     <t t-if="hookBefore(child)" t-call="erplibre_studio.Hook">
                         <t t-set="target" t-value="child.path" />
@@ -606,7 +626,10 @@
                     <t t-set="target" t-value="block.path" />
                     <t t-set="position" t-value="'inside'" />
                 </t>
-                <p t-if="isEmptyPage" class="o_erplibre_studio_empty_hint">
+                <p
+                    t-if="isEmptyPage and focusSlotKey !== editor.hookKey(block.path, 'inside')"
+                    class="o_erplibre_studio_empty_hint"
+                >
                     <t t-if="insertable">Empty tab. The + above inserts a first field.</t>
                     <t t-else="">Empty tab. Drag a field here from the palette or the form.</t>
                 </p>

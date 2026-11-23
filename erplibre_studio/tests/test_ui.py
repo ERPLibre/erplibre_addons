@@ -33,6 +33,10 @@ class TestStudioUi(HttpCase):
         self.assertEqual(project.user_id, self.env.ref("base.user_admin"))
         self.assertFalse(project.change_ids)
         self.assertEqual(project.draft_revision, 2)
+        # The tour chose Detailed, read it back on a new opening, then
+        # chose Simple: the settings row of the user holds the last one.
+        settings = self.env.ref("base.user_admin").res_users_settings_ids[:1]
+        self.assertEqual(settings.erplibre_studio_display_level, "simple")
 
     def arch_of(self, xmlid):
         """The arch get_view gives for the contact view ``xmlid``."""

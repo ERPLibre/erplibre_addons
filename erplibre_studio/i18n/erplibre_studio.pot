@@ -2005,6 +2005,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Empty tab · palette additions land here"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Empty tab. Drag a field here from the palette or the form."
 msgstr ""
@@ -2215,6 +2221,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Insertion point"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Insertion point · palette additions land here"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2470,6 +2482,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Not listed by this widget:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "One value per line."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6539,6 +6557,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Technical name to fix"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Technical values"
 msgstr ""
 
 #. module: erplibre_studio

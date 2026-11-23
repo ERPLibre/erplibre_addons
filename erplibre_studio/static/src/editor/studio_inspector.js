@@ -7,6 +7,7 @@ import {_t} from "@web/core/l10n/translation";
 import {StudioDomainDialog} from "./studio_domain";
 import {StudioFieldName, fieldNameKey} from "./studio_field_name";
 import {StudioGeoLayers} from "./studio_geo_layers";
+import {slug} from "./studio_models";
 import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {
@@ -62,6 +63,54 @@ const DMS_COMODEL = "dms.directory";
 // The kinds of the root attributes of a view with lanes that fold under
 // « Advanced » (foldedEntries): the numbers of the markers of a map.
 const FOLDED_KINDS = ["pixels", "offset"];
+
+/** The labels of the selection ``selection`` ([[value, label]]), one per line. */
+export function selectionLabelsText(selection) {
+    return (selection || []).map(([, label]) => label).join("\n");
+}
+
+/**
+ * The selection ([[value, label]]) of the labels ``text``, one per line,
+ * that keeps the values of ``previous``: a line whose label ``previous``
+ * holds keeps its value, else the line keeps the value at its place in
+ * ``previous`` when no other line kept it (a renamed label). Any other
+ * line gets the slug of its label as its value (« value_<n> » when the
+ * slug is empty), with a suffix while another line holds it.
+ */
+export function labelsToSelection(text, previous = []) {
+    const labels = (text || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+    const free = new Map(previous.map(([value, label]) => [value, label]));
+    const values = labels.map((label) => {
+        const entry = [...free].find(([, old]) => old === label);
+        if (entry) {
+            free.delete(entry[0]);
+        }
+        return entry ? entry[0] : null;
+    });
+    labels.forEach((label, index) => {
+        const at = previous[index] && previous[index][0];
+        if (values[index] === null && at !== undefined && free.has(at)) {
+            values[index] = at;
+            free.delete(at);
+        }
+    });
+    const taken = new Set([...values.filter((value) => value !== null), ...free.keys()]);
+    return labels.map((label, index) => {
+        let value = values[index];
+        if (value === null) {
+            const base = slug(label) || `value_${index + 1}`;
+            value = base;
+            for (let count = 2; taken.has(value); count++) {
+                value = `${base}_${count}`;
+            }
+            taken.add(value);
+        }
+        return [value, label];
+    });
+}
 
 /**
  * The inspector of the view space, in two tabs. « Properties »: the
@@ -513,8 +562,19 @@ export class StudioInspector extends Component {
         return this.allows("hide") && this.hideAttribute !== "remove";
     }
 
+    /** The selection of ``field``: [[value, label]]. */
+    selectionOf(field) {
+        return (field.definition && field.definition.selection) || field.selection || [];
+    }
+
+    /** The « value:Label » lines of the selection of ``field`` (Detailed, More options). */
     selectionText(field) {
-        return selectionToText((field.definition && field.definition.selection) || field.selection);
+        return selectionToText(this.selectionOf(field));
+    }
+
+    /** The labels of the selection of ``field``, one per line (Simple). */
+    selectionLabels(field) {
+        return selectionLabelsText(this.selectionOf(field));
     }
 
     /**
@@ -989,6 +1049,14 @@ export class StudioInspector extends Component {
             return;
         }
         await this.updateField({selection: textToSelection(text)});
+    }
+
+    /** The labels of the selection of ``field`` edited at the Simple level: its values stay (``labelsToSelection``). */
+    async updateSelectionLabels(field, text) {
+        if (this.editor.state.busy) {
+            return;
+        }
+        await this.updateField({selection: labelsToSelection(text, this.selectionOf(field))});
     }
 
     loadComodels() {

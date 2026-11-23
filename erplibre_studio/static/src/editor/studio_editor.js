@@ -226,6 +226,9 @@ export class StudioEditor extends Component {
             hook: null,
             dropTarget: null,
             dropScope: null,
+            // The keys of the hooks next to that one in its scope
+            // (``nearKeys``): a drag draws them as a line too.
+            hookNear: [],
             preview: false,
             pages: {},
             newProject: {name: "", module_name: ""},
@@ -309,6 +312,8 @@ export class StudioEditor extends Component {
             focus: {on: false, path: null, last: null},
         });
         this.previewCount = 0;
+        // How many times the user chose a level (``setLevel``).
+        this.levelStamp = 0;
         // The menus of the top bar, closed by their items once chosen.
         this.menus = {
             project: useDropdownState(),
@@ -380,8 +385,17 @@ export class StudioEditor extends Component {
         return this.state.level === "detailed";
     }
 
-    /** The level of the payload ``data`` when it carries one; else the level stays. */
-    takeLevel(data) {
+    /**
+     * The level of the payload ``data`` when it carries one; else the level
+     * stays. ``stamp`` is the ``levelStamp`` read when the request of that
+     * payload started: once the user chose a level since, the payload may
+     * carry the level from before, read before that choice was saved, and
+     * the level on screen stays.
+     */
+    takeLevel(data, stamp) {
+        if (stamp !== this.levelStamp) {
+            return;
+        }
         if (data && DISPLAY_LEVELS.includes(data.display_level)) {
             this.state.level = data.display_level;
         }
@@ -390,13 +404,16 @@ export class StudioEditor extends Component {
     /**
      * Show the editor at ``level`` at once, and remember it for the account
      * of the user. The call neither replaces the payload nor makes the
-     * editor busy; a refusal puts the former level back.
+     * editor busy; a refusal puts the former level back. ``levelStamp``
+     * counts these choices, so that a payload asked for before one of them
+     * leaves the level alone (``takeLevel``).
      */
     async setLevel(level) {
         const before = this.state.level;
         if (level === before || !DISPLAY_LEVELS.includes(level)) {
             return;
         }
+        this.levelStamp++;
         this.state.level = level;
         try {
             await this.orm.call(MODEL, "set_display_level", [level]);
@@ -433,6 +450,7 @@ export class StudioEditor extends Component {
      */
     async call(method, args, kwargs = {}, onError = null) {
         this.state.busy = true;
+        const stamp = this.levelStamp;
         let data;
         try {
             data = await this.orm.call(MODEL, method, args, kwargs);
@@ -448,20 +466,28 @@ export class StudioEditor extends Component {
             this.state.busy = false;
         }
         this.state.data = data;
-        this.takeLevel(data);
+        this.takeLevel(data, stamp);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
+        this.keepCanvasState(data);
+        await this.refreshModelPreview();
+        return data;
+    }
+
+    /**
+     * Drop what the payload ``data`` of the draft no longer holds: the
+     * insertion list whose hook is gone, the filter form whose target was
+     * in a draft that is gone, the focus on a block that left
+     * (``checkFocus``).
+     */
+    keepCanvasState(data) {
         if (this.state.insert && !this.insertPlace(this.state.insert.target, this.state.insert.position)) {
-            // The hook of the insertion list is gone with the draft it was in.
             this.state.insert = null;
         }
         if (!this.formIsCurrent(this.state.filterForm, data.project)) {
-            // Its target was located in a draft that is gone.
             this.state.filterForm = null;
         }
         this.checkFocus();
-        await this.refreshModelPreview();
-        return data;
     }
 
     async load() {
@@ -470,6 +496,7 @@ export class StudioEditor extends Component {
             this.state.error = _t("Open the studio from the debug menu of a view.");
             return;
         }
+        const stamp = this.levelStamp;
         try {
             const data = await this.orm.call(MODEL, "get_editor_data", [
                 this.params.resModel,
@@ -478,7 +505,7 @@ export class StudioEditor extends Component {
                 this.state.projectId,
             ]);
             this.state.data = data;
-            this.takeLevel(data);
+            this.takeLevel(data, stamp);
             this.params.viewId = data.view.id;
             this.launch.viewId = this.launch.viewId || data.view.id;
             this.state.projectId = (data.project && data.project.id) || false;
@@ -522,6 +549,7 @@ export class StudioEditor extends Component {
         }
         const projectId = this.project ? this.project.id : false;
         this.state.busy = true;
+        const stamp = this.levelStamp;
         try {
             const data = await this.orm.call(MODEL, "get_editor_data", [resModel, viewId, viewType, projectId], {
                 pick_project: Boolean(projectId),
@@ -529,7 +557,7 @@ export class StudioEditor extends Component {
             Object.assign(this.params, {resModel, viewType, viewId: data.view.id});
             this.resetCanvas();
             this.state.data = data;
-            this.takeLevel(data);
+            this.takeLevel(data, stamp);
             const keep = this.state.projectId === "new" ? "new" : false;
             this.state.projectId = (data.project && data.project.id) || keep;
             return true;
@@ -666,6 +694,7 @@ export class StudioEditor extends Component {
      */
     async viewCall(method, args, kwargs) {
         this.state.busy = true;
+        const stamp = this.levelStamp;
         let data;
         try {
             data = await this.orm.call(MODEL, method, args, kwargs);
@@ -682,7 +711,7 @@ export class StudioEditor extends Component {
         Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
         this.resetCanvas();
         this.state.data = data;
-        this.takeLevel(data);
+        this.takeLevel(data, stamp);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
         return data;
@@ -785,6 +814,7 @@ export class StudioEditor extends Component {
         }
         const before = this.project;
         this.state.busy = true;
+        const stamp = this.levelStamp;
         let data = null;
         const kwargs = {revision: this.project.revision, fallback: this.launchArgs};
         if (digest) {
@@ -826,12 +856,10 @@ export class StudioEditor extends Component {
             Object.assign(this.state, {space, selected: null, preview: false});
         }
         this.state.data = data;
-        this.takeLevel(data);
+        this.takeLevel(data, stamp);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
-        if (!this.formIsCurrent(this.state.filterForm, data.project)) {
-            this.state.filterForm = null;
-        }
+        this.keepCanvasState(data);
         if (action !== "action_apply") {
             this.state.selected = null;
         }
@@ -989,44 +1017,76 @@ export class StudioEditor extends Component {
     }
 
     endDrag() {
-        Object.assign(this.state, {dragging: null, hook: null, dropTarget: null, dropScope: null});
+        Object.assign(this.state, {dragging: null, hook: null, dropTarget: null, dropScope: null, hookNear: []});
         document.body.classList.remove(DRAGGING_CLASS, DRAGGING_PAGE_CLASS);
     }
 
     /**
      * Show ``hook`` ({target, position, zone}) of the drop scope ``scope``
-     * as the place of the drop, or none for null. The state changes only
-     * when the hook or the scope does: a dragover fires every few
-     * milliseconds, and each change renders the blocks again.
+     * as the place of the drop, or none for null. ``element``, the drop
+     * scope on screen, gives the hooks next to it (``hookNear``), which
+     * draw as a line too. The state changes only when the hook or the
+     * scope does: a dragover fires every few milliseconds, and each change
+     * renders the blocks again.
      */
-    setDropHook(scope, hook) {
+    setDropHook(scope, hook, element = null) {
         const key = hook ? this.hookKey(hook.target, hook.position, hook.zone) : null;
         if (this.state.hook !== key || this.state.dropScope !== (hook ? scope : null)) {
-            Object.assign(this.state, {hook: key, dropTarget: hook, dropScope: hook ? scope : null});
+            Object.assign(this.state, {
+                hook: key,
+                dropTarget: hook,
+                dropScope: hook ? scope : null,
+                hookNear: hook && element ? this.nearKeys(element, key) : [],
+            });
         }
     }
 
     /**
+     * The hooks of the drop scope ``element`` that take ``item``, in the
+     * order of the page: [{target, position, zone, el}]. The hooks of a
+     * scope are those whose nearest scope is ``element``, not those of a
+     * scope inside it.
+     */
+    scopeHooks(element, item) {
+        const hooks = [];
+        for (const el of element.querySelectorAll(".o_erplibre_studio_hook")) {
+            if (el.closest(DROP_SCOPE_SELECTOR) !== element) {
+                continue;
+            }
+            const {target, position} = el.dataset;
+            const zone = el.dataset.zone || undefined;
+            if (this.accepts(item, zone, target, position)) {
+                hooks.push({target, position, zone, el});
+            }
+        }
+        return hooks;
+    }
+
+    /**
+     * The keys of the hooks of the drop scope ``element`` right before and
+     * right after the hook of key ``key``, among those that take the
+     * dragged item: a drag draws these two and the hook a drop goes to,
+     * not every hook of the scope.
+     */
+    nearKeys(element, key) {
+        const keys = this.scopeHooks(element, this.state.dragging).map((h) =>
+            this.hookKey(h.target, h.position, h.zone)
+        );
+        const index = keys.indexOf(key);
+        return index < 0 ? [] : [keys[index - 1], keys[index + 1]].filter(Boolean);
+    }
+
+    /**
      * The hook of the drop scope ``element`` nearest to the point (``x``,
-     * ``y``) that takes ``item``: {target, position, zone}, or null. The
-     * hooks of a scope are those whose nearest scope is ``element``, not
-     * those of a scope inside it. The distance runs to the centre of the
-     * hook: the hooks of a column share their abscissa, those of a row (a
-     * list, the loaded fields) their ordinate, so the other coordinate
-     * decides.
+     * ``y``) that takes ``item``: {target, position, zone}, or null
+     * (``scopeHooks``). The distance runs to the centre of the hook: the
+     * hooks of a column share their abscissa, those of a row (a list, the
+     * loaded fields) their ordinate, so the other coordinate decides.
      */
     nearestHook(element, item, x, y) {
         let best = null;
-        for (const hook of element.querySelectorAll(".o_erplibre_studio_hook")) {
-            if (hook.closest(DROP_SCOPE_SELECTOR) !== element) {
-                continue;
-            }
-            const {target, position} = hook.dataset;
-            const zone = hook.dataset.zone || undefined;
-            if (!this.accepts(item, zone, target, position)) {
-                continue;
-            }
-            const rect = hook.getBoundingClientRect();
+        for (const {target, position, zone, el} of this.scopeHooks(element, item)) {
+            const rect = el.getBoundingClientRect();
             const distance = Math.hypot(x - (rect.left + rect.width / 2), y - (rect.top + rect.height / 2));
             if (!best || distance < best.distance) {
                 best = {distance, hook: {target, position, zone}};
@@ -1054,7 +1114,7 @@ export class StudioEditor extends Component {
         if (ev.dataTransfer) {
             ev.dataTransfer.dropEffect = "move";
         }
-        this.setDropHook(scope, hook);
+        this.setDropHook(scope, hook, ev.currentTarget);
     }
 
     /** A drop on a drop scope: on the hook it shows, through ``dropOnHook``. */
@@ -1199,7 +1259,7 @@ export class StudioEditor extends Component {
             ev.dataTransfer.dropEffect = "move";
         }
         const scope = ev.currentTarget && ev.currentTarget.closest(DROP_SCOPE_SELECTOR);
-        this.setDropHook(scope ? scope.dataset.dropScope : null, {target, position, zone});
+        this.setDropHook(scope ? scope.dataset.dropScope : null, {target, position, zone}, scope);
     }
 
     /**
@@ -1692,9 +1752,15 @@ export class StudioEditor extends Component {
             return null;
         }
         const container = position === "inside" ? trail.at(-1) : trail.at(-2);
-        if (!container) {
-            return null;
-        }
+        return container ? this.placeIn(container, target, position) : null;
+    }
+
+    /**
+     * ``insertPlace`` of the hook (``target``, ``position``) of the block
+     * ``container``, which holds it: the hooks a block draws read their
+     * place there, without a walk from the root of the tree.
+     */
+    placeIn(container, target, position) {
         const children = container.children || [];
         const shown = (child) => !isGhost(child, this.viewType) && this.isDrawnChild(child);
         const index = position === "inside" ? children.length : children.findIndex((c) => c.path === target);
@@ -1754,10 +1820,12 @@ export class StudioEditor extends Component {
 
     /**
      * Open the insertion list at ``hook`` ({target, position, zone}): the
-     * selection goes, the inspector shows the insertion point. Answer
-     * whether it opened.
+     * selection goes, the inspector shows the insertion point. ``from``:
+     * the path of the row of the plan that opened it, which takes the
+     * focus back once it closes (``closeInsert``); null for a « + » of the
+     * canvas. Answer whether it opened.
      */
-    openInsert(hook) {
+    openInsert(hook, {from = null} = {}) {
         const place = this.insertPlace(hook.target, hook.position);
         if (!place || !this.canInsert || this.state.busy) {
             return false;
@@ -1770,6 +1838,7 @@ export class StudioEditor extends Component {
                 key: this.hookKey(hook.target, hook.position, hook.zone),
                 where: place.where,
                 container: place.container,
+                from,
             },
             selected: null,
             colors: null,
@@ -1789,15 +1858,29 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * Close the insertion list; with ``focus``, its « + » takes the focus
-     * once it renders.
+     * Close the insertion list; with ``focus``, what opened it takes the
+     * focus once it renders: the row of the plan (``openInsert``), else
+     * its « + ».
      */
     closeInsert({focus = false} = {}) {
         const insert = this.state.insert;
         this.state.insert = null;
-        if (focus && insert) {
+        if (!focus || !insert) {
+            return;
+        }
+        if (insert.from) {
+            this.focusPlanRow(insert.from);
+        } else {
             this.focusInsertButton(insert.key);
         }
+    }
+
+    /** Focus the row of the plan of the block at ``path`` once the plan draws it. */
+    focusPlanRow(path) {
+        return this.focusWhenDrawn(() => {
+            const tree = document.querySelector(".o_erplibre_studio_outline_tree");
+            return tree && [...tree.children].find((el) => el.dataset.path === path);
+        });
     }
 
     /**
@@ -1945,16 +2028,17 @@ export class StudioEditor extends Component {
     /**
      * Open the insertion list at ``hook`` from the plan: the container of
      * the hook shows (its tab, its row unfolded), then the list opens on
-     * the canvas and its input takes the focus.
+     * the canvas and its input takes the focus. ``from``: the path of the
+     * row that opened it, which takes the focus back once it closes.
      */
-    insertFromPlan(hook) {
+    insertFromPlan(hook, {from = null} = {}) {
         const place = this.insertPlace(hook.target, hook.position);
         if (!place) {
             return;
         }
         this.reveal(place.containerPath);
         delete this.state.outline.collapsed[place.containerPath];
-        this.openInsert(hook);
+        this.openInsert(hook, {from});
     }
 
     /** Add a tab at the end of the notebook at ``path`` (« Add a tab » of the plan). */
@@ -2012,6 +2096,32 @@ export class StudioEditor extends Component {
         }
         const block = blockTrail(entry.block, path).at(-1);
         return block && block.kind !== "container" ? block : null;
+    }
+
+    /**
+     * The key (``hookKey``) of the hook where the palette adds while the
+     * focus is on a block of a form, as ``addFromPalette`` places it: right
+     * after the selected leaf of the block (``focusSelectedLeaf``), else
+     * at the end of the block (``focusEndHook``). Null when the focus is
+     * off.
+     */
+    get focusSlotKey() {
+        const entry = this.focusEntry;
+        if (!entry) {
+            return null;
+        }
+        const leaf = this.focusSelectedLeaf;
+        const hook = (leaf && this.hookAfter(leaf.path)) || focusEndHook(entry);
+        return this.hookKey(hook.target, hook.position);
+    }
+
+    /** The text of the slot at ``focusSlotKey``: « Empty tab » for a tab without children. */
+    get focusSlotText() {
+        const entry = this.focusEntry;
+        const empty = entry && entry.block.tag === "page" && !(entry.block.children || []).length;
+        return empty
+            ? _t("Empty tab · palette additions land here")
+            : _t("Insertion point · palette additions land here");
     }
 
     /**
@@ -2156,10 +2266,16 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * Escape while the focus is on: it unselects what is selected, else
-     * turns the focus off. Answer whether it did one of them.
+     * Escape on the canvas or the plan: an open insertion list closes
+     * first, and what opened it takes the focus back; then, while the
+     * focus is on, it unselects what is selected, else turns the focus
+     * off. Answer whether it did one of them.
      */
     escapeFocus() {
+        if (this.state.insert) {
+            this.closeInsert({focus: true});
+            return true;
+        }
         if (!this.focusEntry) {
             return false;
         }

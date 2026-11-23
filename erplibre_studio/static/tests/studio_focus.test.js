@@ -457,6 +457,65 @@ describe("erplibre_studio focus on a block", () => {
         expect(`${OPEN} .o_erplibre_studio_pick:first`).toBeFocused();
     });
 
+    test("the slot of the palette: after the selected field of the block in focus, else at its end", async () => {
+        const SLOT = ".o_erplibre_studio_focus_slot";
+        await openEditor();
+        expect(SLOT).toHaveCount(0);
+        await contains(`.o_erplibre_studio_page_tab[data-path="${TRADE}"]`).click();
+        await clickFocus(SALE);
+        expect(SLOT).toHaveCount(1);
+        expect(`${OPEN} ${SLOT}`).toHaveCount(1);
+        expect(SLOT).toHaveAttribute("data-hook", `:inside:${SALE}`);
+        expect(SLOT).toHaveText("Insertion point · palette additions land here");
+        await contains(fieldEl("seller")).click();
+        expect(SLOT).toHaveAttribute("data-hook", `:before:${named("x_sponsor")}`);
+        // Not during a drag.
+        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragstart");
+        await animationFrame();
+        expect(SLOT).toHaveCount(0);
+        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragend");
+        await animationFrame();
+        expect(SLOT).toHaveCount(1);
+        // Out of the focus, none.
+        await contains(".o_erplibre_studio_focus_leave").click();
+        expect(SLOT).toHaveCount(0);
+    });
+
+    test("the slot of an empty tab in focus says so, without the hint of the full form", async () => {
+        const blocks = formBlocks();
+        const notebook = blocks.children[0].children.find((b) => b.tag === "notebook");
+        notebook.children.find((b) => b.path === NOTES).children = [];
+        answer = payload({blocks});
+        await openEditor();
+        await contains(`.o_erplibre_studio_page_tab[data-path="${NOTES}"]`).click();
+        expect(".o_erplibre_studio_empty_hint").toHaveCount(1);
+        await clickFocus(NOTES);
+        expect(".o_erplibre_studio_focus_slot").toHaveText("Empty tab · palette additions land here");
+        expect(".o_erplibre_studio_empty_hint").toHaveCount(0);
+    });
+
+    test("Undo that removes the block in focus turns the focus off", async () => {
+        const EXTRA = "//group[@name='extra']";
+        const blocks = formBlocks();
+        blocks.children[0].children.push(container(EXTRA, "group", "extra", [field("barcode")], {attrs: {string: "Extra"}}));
+        answer = payload({blocks});
+        onRpc("erplibre.studio.editor", "project_action", (args) => {
+            expect.step(args.args[1]);
+            answer = payload();
+            return answer;
+        });
+        await openEditor();
+        await clickFocus(EXTRA);
+        expect(OPEN).toHaveAttribute("data-focus-path", EXTRA);
+        await contains(".o_erplibre_studio_undo").click();
+        expect.verifySteps(["action_undo"]);
+        expect(BAR).toHaveCount(0);
+        expect(".o_erplibre_studio_status_focus").toHaveCount(0);
+        // The full form again, with its « Focus » buttons.
+        expect(FOCUS_BTN).not.toHaveCount(0);
+        expect(".o_erplibre_studio_full_bar").toHaveCount(0);
+    });
+
     test("no focus in a list view", async () => {
         answer = payload({
             view_type: "list",

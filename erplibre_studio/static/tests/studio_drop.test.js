@@ -144,6 +144,7 @@ async function openEditor(viewType = "form") {
 const scopeOf = (path) => `.o_erplibre_studio_container[data-path="${path}"] > .o_erplibre_studio_children`;
 const ACTIVE = ".o_erplibre_studio_hook_active";
 const SCOPE = ".o_erplibre_studio_drop_scope";
+const NEAR = ".o_erplibre_studio_hook_near";
 
 /** The own hooks of the scope ``scope``, in their order. */
 function hooksOf(scope) {
@@ -162,6 +163,17 @@ async function overNear(scope, index) {
     await animationFrame();
 }
 
+/**
+ * What the blocks look like: the border of a field, the outline of a
+ * group, the drag handle of a field. A drag changes none of it.
+ */
+function blockLook() {
+    const field = getComputedStyle(queryOne(".o_erplibre_studio_field[data-name=birthday]"));
+    const group = getComputedStyle(queryOne(`.o_erplibre_studio_container[data-path="${RIGHT}"]`));
+    const handle = getComputedStyle(queryOne(".o_erplibre_studio_field[data-name=birthday] .o_erplibre_studio_handle"));
+    return [field.borderTopColor, group.outlineStyle, handle.opacity];
+}
+
 async function startDrag(selector) {
     await manuallyDispatchProgrammaticEvent(queryOne(selector), "dragstart");
     await animationFrame();
@@ -176,6 +188,7 @@ describe("erplibre_studio drop zones", () => {
         expect(ACTIVE).toHaveCount(0);
         expect(SCOPE).toHaveCount(0);
         expect(".o_erplibre_studio_drop_label").toHaveCount(0);
+        const look = blockLook();
 
         await startDrag(".o_erplibre_studio_new_field[data-type=date]");
         expect(document.body).toHaveClass("o_erplibre_studio_dragging");
@@ -192,11 +205,21 @@ describe("erplibre_studio drop zones", () => {
         expect(`${ACTIVE} .o_erplibre_studio_drop_glyph`).toHaveText("D");
         expect(`${ACTIVE} .o_erplibre_studio_drop_item`).toHaveText(/Date · new field/);
         expect(".o_erplibre_studio_drop_label").toHaveCount(1);
+        // Only the hooks right before and after it draw a line, not every
+        // hook of the group.
+        expect(NEAR).toHaveCount(2);
+        // The form keeps its calm look: no border, outline nor handle shows.
+        expect(blockLook()).toEqual(look);
+        expect(hooksOf(scopeOf(RIGHT))[0]).toHaveClass("o_erplibre_studio_hook_near");
+        expect(hooksOf(scopeOf(RIGHT))[2]).toHaveClass("o_erplibre_studio_hook_near");
+        expect(hooksOf(scopeOf(RIGHT))[3]).not.toHaveClass("o_erplibre_studio_hook_near");
 
         // Nearer the end of the group: the slot moves there.
         await overNear(scopeOf(RIGHT), 3);
         expect(hooksOf(scopeOf(RIGHT))[3]).toHaveClass("o_erplibre_studio_hook_active");
         expect(ACTIVE).toHaveCount(1);
+        expect(NEAR).toHaveCount(1);
+        expect(hooksOf(scopeOf(RIGHT))[2]).toHaveClass("o_erplibre_studio_hook_near");
 
         // Over the other group: its scope shows, the first one no longer.
         await overNear(scopeOf(LEFT), 0);
@@ -211,6 +234,7 @@ describe("erplibre_studio drop zones", () => {
         expect(document.body).not.toHaveClass("o_erplibre_studio_dragging");
         expect(ACTIVE).toHaveCount(0);
         expect(SCOPE).toHaveCount(0);
+        expect(NEAR).toHaveCount(0);
     });
 
     test("a node dragged from the canvas: its label, then dragend clears", async () => {

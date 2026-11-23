@@ -2034,6 +2034,12 @@ msgstr "Ailleurs dans le formulaire · %(count)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Empty tab · palette additions land here"
+msgstr "Onglet vide · les ajouts de la palette arrivent ici"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Empty tab. Drag a field here from the palette or the form."
 msgstr "Onglet vide. Glissez-y un champ depuis la palette ou le formulaire."
@@ -2246,6 +2252,12 @@ msgstr "Inséré %(where)s dans %(container)s."
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Insertion point"
 msgstr "Point d’insertion"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Insertion point · palette additions land here"
+msgstr "Point d’insertion · les ajouts de la palette arrivent ici"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2465,6 +2477,12 @@ msgstr "Pas un mot réservé de l'ORM"
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.xml:0
 msgid "Not listed by this widget:"
 msgstr "Non listées par ce widget :"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "One value per line."
+msgstr "Une valeur par ligne."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6587,6 +6605,12 @@ msgstr "Nom technique"
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Technical name to fix"
 msgstr "Nom technique à corriger"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Technical values"
+msgstr "Valeurs techniques"
 
 #. module: erplibre_studio
 #. odoo-javascript

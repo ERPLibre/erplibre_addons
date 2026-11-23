@@ -8,6 +8,8 @@ const NAME_BEFORE = `.o_erplibre_studio_hook[data-target="//field[@name='complet
 
 // From the developer panel of the contact list: a new project, a column
 // moved by drag and drop, its preview, then undone. Nothing is applied.
+// The Detailed level then chosen comes back once the editor opens again,
+// read from the server; the tour leaves it at Simple.
 registry.category("web_tour.tours").add("erplibre_studio_editor", {
     steps: () => [
         {trigger: ".o_list_view .o_data_row"},
@@ -29,6 +31,18 @@ registry.category("web_tour.tours").add("erplibre_studio_editor", {
         {trigger: ".o_erplibre_studio_preview_toggle", run: "click"},
         {trigger: ".o_erplibre_studio_undo", run: "click"},
         {trigger: ".o_erplibre_studio_no_change"},
+        {trigger: ".o_erplibre_studio[data-level=simple]:not(:has(.o_erplibre_studio_tech))"},
+        {trigger: ".o_erplibre_studio_level_option[data-level=detailed]", run: "click"},
+        {trigger: ".o_erplibre_studio[data-level=detailed] .o_erplibre_studio_canvas .o_erplibre_studio_tech"},
+        {trigger: ".o_erplibre_studio_close", run: "click"},
+        {trigger: ".o_list_view .o_data_row"},
+        {trigger: ".o_debug_manager .dropdown-toggle", run: "click"},
+        {trigger: ".dropdown-menu .dropdown-item:contains(Developer panel)", run: "click"},
+        {trigger: ".o_erplibre_dev_drawer .o_erplibre_studio_customize", run: "click"},
+        {trigger: "body:not(.o_erplibre_dev_open)"},
+        {trigger: ".o_erplibre_studio[data-level=detailed] .o_erplibre_studio_canvas .o_erplibre_studio_tech"},
+        {trigger: ".o_erplibre_studio_level_option[data-level=simple]", run: "click"},
+        {trigger: ".o_erplibre_studio[data-level=simple]:not(:has(.o_erplibre_studio_tech))"},
         {trigger: ".o_erplibre_studio_close", run: "click"},
         {trigger: ".o_list_view .o_data_row"},
     ],

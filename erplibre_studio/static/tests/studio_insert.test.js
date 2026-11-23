@@ -324,6 +324,54 @@ describe("erplibre_studio insert without dragging", () => {
         expect(LIST).toHaveCount(0);
     });
 
+    test("Escape on the Close button of the list closes it too", async () => {
+        await openEditor();
+        await clickHidden(plusOf(INFO, "inside"));
+        queryOne(".o_erplibre_studio_insert_close").focus();
+        await press("Escape");
+        await animationFrame();
+        await animationFrame();
+        expect(LIST).toHaveCount(0);
+        expect(plusOf(INFO, "inside")).toBeFocused();
+    });
+
+    test("a list opened from the plan gives the focus back to its row", async () => {
+        await openEditor();
+        await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        const emailRow = `.o_erplibre_studio_outline_row[data-path="${named("email")}"]`;
+        await contains(`${emailRow} .o_erplibre_studio_outline_pick`).click();
+        queryOne(emailRow).focus();
+        await press("Insert");
+        await animationFrame();
+        expect(INPUT).toBeFocused();
+        await press("Escape");
+        await animationFrame();
+        await animationFrame();
+        expect(LIST).toHaveCount(0);
+        expect(emailRow).toBeFocused();
+        // Its Close button too.
+        await press("Insert");
+        await animationFrame();
+        expect(INPUT).toBeFocused();
+        await contains(".o_erplibre_studio_insert_close").click();
+        await animationFrame();
+        await animationFrame();
+        expect(emailRow).toBeFocused();
+    });
+
+    test("the « + » of an empty tab is a tab stop", async () => {
+        const blocks = formBlocks();
+        const notebook = blocks.children[0].children.find((b) => b.tag === "notebook");
+        notebook.children[0].children = [];
+        answer = payload({blocks});
+        await openEditor();
+        expect(".o_erplibre_studio_empty_hint").toHaveText("Empty tab. The + above inserts a first field.");
+        expect(plusOf(NOTES, "inside")).toHaveAttribute("tabindex", "0");
+        expect(plusOf(NOTES, "inside")).toHaveAttribute("aria-label", "Insert here, in Notes");
+        // The group, which holds fields, keeps none at rest.
+        expect(`.o_erplibre_studio_container[data-path="${INFO}"] ${PLUS}[tabindex="0"]`).toHaveCount(0);
+    });
+
     test("the plan: the « + » of the selected row and of a container open the list on the canvas", async () => {
         await openEditor();
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();

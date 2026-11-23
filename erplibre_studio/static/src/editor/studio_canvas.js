@@ -225,6 +225,20 @@ export class StudioBlock extends Component {
         return hook ? this.editor.hookKey(hook.target, hook.position) : null;
     }
 
+    /**
+     * The key of the hook of the block whose « + » is a tab stop: the one
+     * after the selected child (``afterSelectedKey``), else the hook
+     * « inside » of a block that draws no child, its only hook, so that
+     * Tab reaches the « + » of an empty tab or group.
+     */
+    get tabStopKey() {
+        const key = this.afterSelectedKey;
+        if (key || this.drawnChildren.length) {
+            return key;
+        }
+        return this.editor.hookKey(this.block.path, "inside");
+    }
+
     get parentTag() {
         return (this.props.parent && this.props.parent.tag) || "";
     }
@@ -601,6 +615,29 @@ export class StudioBlock extends Component {
         return this.editorState.hook;
     }
 
+    /** The keys of the hooks next to the hook a drop goes to (``nearKeys``). */
+    get nearHooks() {
+        return this.editorState.hookNear || [];
+    }
+
+    /**
+     * The key of the hook after which the slot of the palette shows, while
+     * the focus is on a block of a form (``StudioEditor.focusSlotKey``);
+     * null otherwise.
+     */
+    get focusSlotKey() {
+        const {focus, dragging} = this.editorState;
+        if (!focus.on || !focus.path || dragging || this.props.viewType !== "form") {
+            return null;
+        }
+        return this.editor.focusSlotKey;
+    }
+
+    /** The text of that slot (``StudioEditor.focusSlotText``). */
+    get focusSlotText() {
+        return this.editor.focusSlotText;
+    }
+
     /**
      * The key of the drop scope under the pointer during a drag: the
      * children of the container whose path it is, or the tabs of a
@@ -674,6 +711,8 @@ export class StudioCanvas extends Component {
         dragging: {type: [Object, {value: null}], optional: true},
         hook: {type: [String, {value: null}], optional: true},
         dropScope: {type: [String, {value: null}], optional: true},
+        // The keys of the hooks next to the hook a drop goes to.
+        hookNear: {type: Array, optional: true},
         // The kanban template on screen, by name.
         template: {type: [String, {value: null}], optional: true},
         // The new filter of a search view being written.
@@ -715,6 +754,15 @@ export class StudioCanvas extends Component {
 
     get activeHook() {
         return this.props.hook;
+    }
+
+    get nearHooks() {
+        return this.props.hookNear || [];
+    }
+
+    // The lanes of a canvas draw no slot of the palette.
+    get focusSlotKey() {
+        return null;
     }
 
     get dropScope() {

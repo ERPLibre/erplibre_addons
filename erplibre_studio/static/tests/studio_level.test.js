@@ -3,7 +3,7 @@
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
 import {queryAll, queryOne} from "@odoo/hoot-dom";
-import {animationFrame} from "@odoo/hoot-mock";
+import {Deferred, animationFrame} from "@odoo/hoot-mock";
 import {
     contains,
     defineWebModels,
@@ -142,16 +142,23 @@ let editorCalls;
 let levels;
 // The message set_display_level refuses with, or null to accept.
 let refuseLevel;
+// A Deferred get_editor_data waits for before it answers, or null.
+let gate;
 
 beforeEach(() => {
     defineWebModels();
     answer = payload();
     levels = [];
     refuseLevel = null;
+    gate = null;
     editorCalls = 0;
-    onRpc("erplibre.studio.editor", "get_editor_data", () => {
+    onRpc("erplibre.studio.editor", "get_editor_data", async () => {
         editorCalls++;
-        return answer;
+        const data = answer;
+        if (gate) {
+            await gate;
+        }
+        return data;
     });
     onRpc("erplibre.studio.editor", "set_display_level", (args) => {
         levels.push(args.args[0]);
@@ -337,6 +344,27 @@ describe("the display level of the editor", () => {
         await contains(".o_erplibre_studio_view_tab[data-view-type=list]").click();
         expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id, .o_erplibre_studio_crumbs code").toHaveCount(1);
         expect(".o_erplibre_studio_inherited").toHaveCount(0);
+    });
+
+    test("a payload asked for before a level change keeps the level the user chose", async () => {
+        await openEditor();
+        // The server read « simple » before the click on Detailed was saved.
+        answer = payload({display_level: "simple"});
+        gate = new Deferred();
+        await contains(".o_erplibre_studio_view_tab[data-view-type=list]").click();
+        await contains(DETAILED).click();
+        expect(levels).toEqual(["detailed"]);
+        gate.resolve();
+        await animationFrame();
+        await animationFrame();
+        expect(editorCalls).toBe(2);
+        expect(".o_erplibre_studio").toHaveAttribute("data-level", "detailed");
+        expect(DETAILED).toHaveAttribute("aria-pressed", "true");
+        // A payload asked for after the change gives the level again.
+        gate = null;
+        answer = payload({display_level: "simple"});
+        await contains(".o_erplibre_studio_view_tab[data-view-type=form]").click();
+        expect(".o_erplibre_studio").toHaveAttribute("data-level", "simple");
     });
 
     test("a refused level comes back and the user is told", async () => {

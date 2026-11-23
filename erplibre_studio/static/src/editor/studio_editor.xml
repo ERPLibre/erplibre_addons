@@ -633,6 +633,7 @@
                                 dragging="state.dragging"
                                 hook="state.hook"
                                 dropScope="state.dropScope"
+                                hookNear="state.hookNear"
                                 template="state.template"
                                 filterForm="state.filterForm"
                                 lane="state.timelineLane"

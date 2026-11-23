@@ -487,7 +487,7 @@ export class StudioOutline extends Component {
             this.editor.closeInsert();
             return;
         }
-        this.editor.insertFromPlan(add.hook);
+        this.editor.insertFromPlan(add.hook, {from: block.path});
     }
 
     /**
@@ -503,7 +503,7 @@ export class StudioOutline extends Component {
             editor.hookAfter(row.block.path) ||
             (editor.insertsIn(row.block) ? {target: row.block.path, position: "inside"} : null);
         if (hook) {
-            editor.insertFromPlan(hook);
+            editor.insertFromPlan(hook, {from: row.block.path});
         }
     }
 

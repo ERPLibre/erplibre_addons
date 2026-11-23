@@ -16,6 +16,7 @@ import {
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
 import {choiceValue, parseOptions, widgetOptionSpecs} from "@erplibre_studio/editor/studio_widget_options";
+import {labelsToSelection} from "@erplibre_studio/editor/studio_inspector";
 
 const SHEET = "/form/sheet";
 const ADDRESS = "//group[@name='address']";
@@ -402,6 +403,63 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_inspector_kind").toHaveText("New field · Selection");
         expect(".o_erplibre_studio_field_props .o_erplibre_studio_prop_selection").toHaveValue("gold:Gold");
         expect(".o_erplibre_studio_name_help").toHaveText(/in the database/);
+    });
+
+    test("a selection at the Simple level: its labels only, its values kept or made from the label", async () => {
+        answer = payload({display_level: "simple"});
+        afterOperation = () => payload({display_level: "simple"});
+        await openEditor();
+        await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        const LABELS = ".o_erplibre_studio_field_props .o_erplibre_studio_prop_selection_labels";
+        expect(LABELS).toHaveValue("Gold");
+        expect(".o_erplibre_studio_prop_selection").toHaveCount(0);
+        expect(".o_erplibre_studio_field_props").toHaveText(/One value per line\./);
+        expect(".o_erplibre_studio_field_props").not.toHaveText(/value:Label/);
+        // A renamed line keeps its value; a new one takes the slug of its label.
+        await contains(LABELS).edit("Golden\nSilver\nSilver", {confirm: "blur"});
+        expect(operations.pop()).toEqual({
+            type: "update_field",
+            field_name: "x_level",
+            field: {
+                selection: [
+                    ["gold", "Golden"],
+                    ["silver", "Silver"],
+                    ["silver_2", "Silver"],
+                ],
+            },
+        });
+        // More options: the values a record stores, with their labels.
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
+        expect(".o_erplibre_studio_field_advanced .o_erplibre_studio_prop_selection").toHaveValue("gold:Gold");
+        expect(".o_erplibre_studio_field_advanced").toHaveText(/Technical values[\s\S]*One « value:Label » line per value\./);
+    });
+
+    test("labelsToSelection: a label kept keeps its value wherever it moves", () => {
+        const previous = [
+            ["gold", "Gold"],
+            ["silver", "Silver"],
+            ["bronze", "Bronze"],
+        ];
+        // A line removed in the middle: the others keep their values.
+        expect(labelsToSelection("Gold\nBronze", previous)).toEqual([
+            ["gold", "Gold"],
+            ["bronze", "Bronze"],
+        ]);
+        // A label renamed in place keeps the value of its line.
+        expect(labelsToSelection("Gold\nPlatinum\nBronze", previous)).toEqual([
+            ["gold", "Gold"],
+            ["silver", "Platinum"],
+            ["bronze", "Bronze"],
+        ]);
+        // Reordered: each label keeps its value; a new label at a place
+        // whose value another line kept gets its own.
+        expect(labelsToSelection("Bronze\nGold\nCopper", previous)).toEqual([
+            ["bronze", "Bronze"],
+            ["gold", "Gold"],
+            ["copper", "Copper"],
+        ]);
+        // A label without letter nor digit, and blank lines.
+        expect(labelsToSelection("\n€\n", [])).toEqual([["value_1", "€"]]);
     });
 
     test("a new field of an existing model names its future owner module", async () => {

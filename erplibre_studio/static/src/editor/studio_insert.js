@@ -17,7 +17,7 @@ let nextListId = 1;
  * The list a « + » of the margin of a form opens at its hook (rule 5:
  * insert without dragging). ``insert`` is the place it inserts at, as
  * ``StudioEditor.openInsert`` sets it: {target, position, zone, key,
- * where, container}.
+ * where, container, from}.
  *
  * A search input (a combobox) keeps the focus; the options of its listbox
  * come in groups: the existing fields the form does not show yet (those of
@@ -26,8 +26,9 @@ let nextListId = 1;
  * « text » as… » once a text is typed: the new field takes it as its
  * label), and the layout elements the hook takes. Up and Down move the
  * active option across the groups (Home and End, while the search is
- * empty, to the first and the last), Enter inserts it, Escape closes the
- * list and gives the focus back to its « + »; the pointer moves the active
+ * empty, to the first and the last), Enter inserts it; Escape anywhere
+ * in the list closes it and gives the focus back to its « + », or to the
+ * row of the plan that opened it; the pointer moves the active
  * option and a click inserts it. The insertion runs through
  * ``StudioEditor.insertAt``, as a drop on the hook does.
  *
@@ -250,9 +251,6 @@ export class StudioInsertList extends Component {
                     this.pick(options[active]);
                 }
                 break;
-            case "Escape":
-                this.close();
-                break;
             default:
                 return;
         }
@@ -261,6 +259,19 @@ export class StudioInsertList extends Component {
         if (["ArrowDown", "ArrowUp", "Home", "End"].includes(ev.key)) {
             this.scrollToActive();
         }
+    }
+
+    /**
+     * Escape on any element of the list (its input, its Close button)
+     * closes it, before the canvas or the plan around it reads the key.
+     */
+    onRootKeydown(ev) {
+        if (ev.key !== "Escape" || ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) {
+            return;
+        }
+        ev.preventDefault();
+        ev.stopPropagation();
+        this.close();
     }
 
     /** Bring the active option on screen once it renders. */
@@ -286,7 +297,7 @@ export class StudioInsertList extends Component {
         this.editor.insertAt(option.item);
     }
 
-    /** Close the list; the focus goes back to its « + ». */
+    /** Close the list; the focus goes back to what opened it (``closeInsert``). */
     close() {
         this.editor.closeInsert({focus: true});
     }

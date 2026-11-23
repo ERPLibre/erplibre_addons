@@ -851,17 +851,25 @@
                             t-esc="geoNote(field)"
                         />
                     </t>
-                    <label t-if="field.type === 'selection'" class="form-label mb-1 w-100">
-                        Values
-                        <textarea
-                            class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_selection"
-                            rows="4"
-                            t-att-value="selectionText(field)"
-                            t-on-change="(ev) => this.updateSelection(ev.target.value)"
-                            t-att-disabled="props.busy"
-                        />
-                        <span class="d-block fw-normal text-muted mt-1">One « value:Label » line per value.</span>
-                    </label>
+                    <!-- The values of a selection: their labels at the
+                         Simple level, « value:Label » at the Detailed one
+                         and under « More options ». -->
+                    <t t-if="field.type === 'selection'">
+                        <t t-if="detailed">
+                            <t t-call="erplibre_studio.Inspector.SelectionKeys" />
+                        </t>
+                        <label t-else="" class="form-label mb-1 w-100">
+                            Values
+                            <textarea
+                                class="form-control form-control-sm mt-1 o_erplibre_studio_prop_selection_labels"
+                                rows="4"
+                                t-att-value="selectionLabels(field)"
+                                t-on-change="(ev) => this.updateSelectionLabels(field, ev.target.value)"
+                                t-att-disabled="props.busy"
+                            />
+                            <span class="d-block fw-normal text-muted mt-1">One value per line.</span>
+                        </label>
+                    </t>
                     <label t-if="field.type === 'many2one'" class="form-label mb-1 w-100">
                         Comodel
                         <input
@@ -997,6 +1005,9 @@
                 <fieldset t-if="isAdvancedOpen" class="o_erplibre_studio_fieldset o_erplibre_studio_field_advanced pt-1">
                     <legend class="visually-hidden">More options</legend>
                     <t t-call="erplibre_studio.Inspector.FieldName" />
+                    <t t-if="view.definition and field.type === 'selection'" t-call="erplibre_studio.Inspector.SelectionKeys">
+                        <t t-set="keysApart" t-value="true" />
+                    </t>
                     <t t-foreach="advancedEntries(block)" t-as="entry" t-key="entry.attribute">
                         <t t-call="erplibre_studio.Inspector.SettableEntry" />
                     </t>
@@ -1025,6 +1036,25 @@
                 Remove from the view
             </button>
         </div>
+    </t>
+
+    <!-- The values of the selection field « field », one « value:Label »
+         line each: the technical value a record stores, then its label.
+         « keysApart » when the labels show above it (Simple, More
+         options): its title says the values are the technical ones. -->
+    <t t-name="erplibre_studio.Inspector.SelectionKeys">
+        <label class="form-label mb-1 w-100">
+            <t t-if="keysApart">Technical values</t>
+            <t t-else="">Values</t>
+            <textarea
+                class="form-control form-control-sm font-monospace mt-1 o_erplibre_studio_prop_selection"
+                rows="4"
+                t-att-value="selectionText(field)"
+                t-on-change="(ev) => this.updateSelection(ev.target.value)"
+                t-att-disabled="props.busy"
+            />
+            <span class="d-block fw-normal text-muted mt-1">One « value:Label » line per value.</span>
+        </label>
     </t>
 
     <!-- The technical name of the field block « block » (« field »: its

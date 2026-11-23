@@ -340,7 +340,9 @@ describe("the calm canvas of a form", () => {
             `.o_erplibre_studio_outline_row[data-path="${named("code")}"] .o_erplibre_studio_outline_pick`
         ).click();
         expect(line("code")).toHaveClass(["o_erplibre_studio_muted_line", "o_erplibre_studio_selected"]);
-        expect(`${line("code")} > .o_erplibre_studio_pick`).toHaveText("Internal code hidden");
+        // Its label only on the canvas; « hidden » is the name of its button.
+        expect(`${line("code")} > .o_erplibre_studio_pick`).toHaveText("Internal code");
+        expect(`${line("code")} > .o_erplibre_studio_pick`).toHaveAttribute("aria-label", "Internal code hidden");
         // A click elsewhere: it leaves the canvas again.
         await contains(line("street")).click();
         expect(line("code")).toHaveCount(0);

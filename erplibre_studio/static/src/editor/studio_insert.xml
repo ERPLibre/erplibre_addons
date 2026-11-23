@@ -17,6 +17,7 @@
             t-att-aria-label="title"
             t-on-click.stop="stay"
             t-on-dragstart.stop="stay"
+            t-on-keydown="onRootKeydown"
         >
             <div class="o_erplibre_studio_insert_head">
                 <span class="o_erplibre_studio_insert_title" t-esc="title" />
@@ -102,11 +103,12 @@
          hidden until the hook is hovered, the « + » has the keyboard
          focus or its list is open, which renders under it. The caller
          sets « target », « position », « zone » and « insertTabKey », the
-         key of the hook whose « + » is a tab stop. -->
+         key of the hook whose « + » is a tab stop; « block », the
+         container that holds the hook, gives its place (placeIn). -->
     <t t-name="erplibre_studio.Insert">
         <t t-set="insertKey" t-value="editor.hookKey(target, position, zone)" />
         <t t-set="insertOpen" t-value="editorState.insert and editorState.insert.key === insertKey" />
-        <t t-set="insertPlace" t-value="editor.insertPlace(target, position)" />
+        <t t-set="insertPlace" t-value="editor.placeIn(block, target, position)" />
         <span class="o_erplibre_studio_insert_line" aria-hidden="true" />
         <button
             type="button"
