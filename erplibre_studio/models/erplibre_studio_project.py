@@ -3774,6 +3774,7 @@ class ErplibreStudioProject(models.Model):
         that the rename does not rewrite."""
         self.ensure_one()
         names = {old}
+        self._studio_check_layer_fields(model, names)
         found = False
         for change in self.change_ids.filtered(lambda c: c.model == model):
             if self._studio_change_names(change, names):
@@ -3848,6 +3849,7 @@ class ErplibreStudioProject(models.Model):
         )
         removed = added | changes.filtered(lambda c: c.id in keys)
         self._studio_check_inverse_removal(removed)
+        self._studio_check_layer_removal(removed)
         self._studio_inverse_dependents(removed).unlink()
 
     def _remove_added_page(self, view, arch, page):
@@ -3980,6 +3982,7 @@ class ErplibreStudioProject(models.Model):
         project = self._editing()
         removed = project._studio_change_removal(changes.with_env(project.env))
         project._studio_check_inverse_removal(removed)
+        project._studio_check_layer_removal(removed)
         ids = removed.ids
         removed.unlink()
         project._touch()
@@ -3994,6 +3997,7 @@ class ErplibreStudioProject(models.Model):
             changes = project._view_changes(view) if view else project.change_ids
             last = changes.sorted(lambda c: (c.sequence, c.id))[-1:]
             project._studio_check_inverse_removal(last)
+            project._studio_check_layer_removal(last)
             project._studio_inverse_dependents(last).unlink()
             project._touch()
         return True
@@ -5295,7 +5299,7 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 self.env._(
                     "A colored range needs the field whose values color it: a "
-                    "number, a date, a text or a selection of %(model)s.",
+                    "number, a date or a selection of %(model)s.",
                     model=model,
                 )
             )
@@ -5426,6 +5430,69 @@ class ErplibreStudioProject(models.Model):
                 op.update(target=f"/{arch.tag}/templates", position="before")
             self._apply_operation(view, op)
             loaded.add(name)
+
+    def _studio_layer_reading(self, model, names):
+        """(layer, name): the first vector layer of a view line of the
+        project on ``model`` that draws or colors by one of the fields
+        ``names``, and that field; (empty recordset, False) when none
+        does."""
+        self.ensure_one()
+        names = {name for name in names if name}
+        for line in self.view_line_ids.filtered(lambda v: v.model == model):
+            for layer in line.layer_ids.filtered(lambda item: item.kind == "vector"):
+                for name in (layer.geo_field, layer.attribute_field):
+                    if name and name in names:
+                        return layer, name
+        return self.env["erplibre.studio.geo.layer"], False
+
+    def _studio_check_layer_fields(self, model, names):
+        """Raise UserError when a vector layer of the project on ``model``
+        reads one of the fields ``names``: once its view no longer loads
+        the field, the records reach the renderer without it and the layer
+        draws nothing."""
+        layer, name = self._studio_layer_reading(model, names)
+        if layer:
+            raise UserError(
+                self.env._(
+                    "The layer %(layer)s of %(view)s reads %(field)s: remove "
+                    "the layer, or have it read another field, first.",
+                    layer=layer.name,
+                    view=layer.view_line_id._studio_view_name(),
+                    field=name,
+                )
+            )
+
+    def _studio_check_layer_removal(self, changes):
+        """``_studio_check_layer_fields`` for ``changes`` that leave the
+        draft: the field an add_field creates, the field an
+        add_existing_field loads in a GeoEngine view."""
+        for change in changes:
+            if change.change_type == "add_field" or (
+                change.change_type == "add_existing_field"
+                and change.view_type == "geoengine"
+            ):
+                self._studio_check_layer_fields(change.model, {change.field_name})
+
+    def _studio_check_geo_layers(self, line):
+        """Raise UserError when a vector layer of the GeoEngine view line
+        ``line`` reads a field that the draft of its view does not load: the
+        map would draw nothing for it."""
+        view = line.view_id if line.applied and line.view_id else added_view(line)
+        arch, _errors = self._draft_arch(view)
+        loaded = self._loaded_fields(arch)
+        for layer in line.layer_ids.filtered(lambda item: item.kind == "vector"):
+            for name in (layer.geo_field, layer.attribute_field):
+                if name and name not in loaded:
+                    raise UserError(
+                        self.env._(
+                            "The layer %(layer)s of %(view)s reads %(field)s, "
+                            "which the view does not load: save the layer "
+                            "again to load it.",
+                            layer=layer.name,
+                            view=line._studio_view_name(),
+                            field=name,
+                        )
+                    )
 
     def _studio_remove_geo_layer(self, layer):
         """Take ``layer`` out of its view; the next Apply removes the layer
@@ -6011,6 +6078,8 @@ class ErplibreStudioProject(models.Model):
         if line.view_type == "leaflet_map":
             self._studio_check_leaflet_coordinates(line)
             self._studio_check_leaflet_date(line)
+        if line.view_type == "geoengine":
+            self._studio_check_geo_layers(line)
 
     def _studio_check_leaflet_date(self, line):
         """Raise UserError when the model of the map of the view line
@@ -7629,12 +7698,14 @@ class ErplibreStudioProject(models.Model):
             waiting += waiting_options
             removed = {kind: before[kind] - kept[kind] for kind in before}
             removed["fields"] |= option_fields
+            removed_models = set(removed["models"].exists().mapped("model"))
             project._studio_remove_created(
                 removed,
                 log,
                 kept,
                 own_changes=project.change_ids,
             )
+            project._studio_drop_spreadsheets(removed_models)
             vals = {
                 name: [(6, 0, kept[kind].exists().ids)]
                 for kind, name in CREATED_FIELDS.items()
@@ -7752,11 +7823,15 @@ class ErplibreStudioProject(models.Model):
         )
         return vals
 
-    def _studio_reset_after_uninstall(self):
+    def _studio_reset_after_uninstall(self, removed_models=()):
         """Back to a draft with its lines, once the generated module left the
         database with what the project applied; the changes of the default
-        views of its models went with these views."""
+        views of its models went with these views. The spreadsheets of the
+        project go as Revert takes them: deleted when they read one of
+        ``removed_models``, the models the uninstall removed, untracked
+        otherwise (``_studio_revert_spreadsheets``)."""
         for project in self:
+            project._studio_revert_spreadsheets(set(removed_models))
             project._internal().write(project._studio_uninstall_reset_vals())
             project.new_model_ids.invalidate_recordset(["applied", "ir_model_id"])
             project.view_line_ids.invalidate_recordset(["applied", "view_id"])

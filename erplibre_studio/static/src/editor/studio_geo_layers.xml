@@ -25,7 +25,7 @@
             <div t-if="isBackground" class="text-muted o_erplibre_studio_geo_background_note">
                 The map draws the geo fields over OpenStreetMap: the background stays as it is.
             </div>
-            <div t-elif="!state.form" class="text-muted">This layer is no longer in the view.</div>
+            <div t-elif="!state.form" class="text-muted o_erplibre_studio_geo_layer_gone">This layer is no longer in the view.</div>
             <fieldset t-else="" class="o_erplibre_studio_fieldset o_erplibre_studio_geo_layer_form">
                 <legend class="o_erplibre_studio_section_title">Layer</legend>
                 <label class="form-label mb-1 w-100">

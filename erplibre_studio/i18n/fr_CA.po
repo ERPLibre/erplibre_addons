@@ -6849,6 +6849,22 @@ msgstr "La couche %(layer)s dessine le champ %(field)s, que %(model)s n'a pas."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The layer %(layer)s of %(view)s reads %(field)s, which the view does not "
+"load: save the layer again to load it."
+msgstr "La couche %(layer)s de %(view)s lit %(field)s, que la vue ne charge pas : enregistrez de nouveau la couche pour le charger."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The layer %(layer)s of %(view)s reads %(field)s: remove the layer, or have "
+"it read another field, first."
+msgstr "La couche %(layer)s de %(view)s lit %(field)s : retirez d'abord la couche, ou faites-lui lire un autre champ."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_geo_layer.py:0
 msgid "The layer %(name)s draws no geo field."
 msgstr "La couche %(name)s ne dessine aucun champ géographique."
@@ -6862,6 +6878,14 @@ msgstr "La couche s'affiche à l'ouverture de la carte."
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_view__layer_ids
 msgid "The layers of a GeoEngine view, written to base_geoengine by Apply."
 msgstr "Les couches d'une vue GeoEngine, écrites dans base_geoengine par l'Apply."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid ""
+"The layers of a map the project does not add are not edited here: they stay "
+"as they are."
+msgstr "Les couches d'une carte que le projet n'ajoute pas ne se modifient pas ici : elles restent telles quelles."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7967,6 +7991,12 @@ msgstr "Deux règles d'un projet ont le même identifiant externe."
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__change_type
 msgid "Type"
 msgstr "Type"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "Type a technical name."
+msgstr "Saisissez un nom technique."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9659,9 +9689,9 @@ msgstr "Une plage colorée compte de %(low)s à %(high)s classes."
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
-"A colored range needs the field whose values color it: a number, a date, a "
-"text or a selection of %(model)s."
-msgstr "Une plage colorée demande le champ dont les valeurs la colorent : un nombre, une date, un texte ou une sélection de %(model)s."
+"A colored range needs the field whose values color it: a number, a date or "
+"a selection of %(model)s."
+msgstr "Une plage colorée demande le champ dont les valeurs la colorent : un nombre, une date ou une sélection de %(model)s."
 
 #. module: erplibre_studio
 #. odoo-python

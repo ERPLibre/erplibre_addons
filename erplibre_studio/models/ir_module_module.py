@@ -175,7 +175,8 @@ class IrModuleModule(models.Model):
         menus, access rights, rules, groups with their members, categories
         and relation tables; then what the database deletes with these
         models that no module of ``names`` owns (``_studio_foreign_on``),
-        its owner named."""
+        its owner named; the spreadsheets of the project that read these
+        models."""
         self.ensure_one()
         self.env.flush_all()
         Data = self.env["ir.model.data"].sudo()
@@ -258,12 +259,19 @@ class IrModuleModule(models.Model):
             .search([("module", "=", self.id)])
             .mapped("name")
         )
+        # The spreadsheets sent from the project that read a model the
+        # uninstall removes go with it (``_studio_reset_after_uninstall``).
+        report["spreadsheets"] = [
+            item
+            for project in Project.sudo().search([("module_name", "=", self.name)])
+            for item in project._studio_spreadsheet_report(removed, deleted_only=True)
+        ]
         return report
 
     def module_uninstall(self):
         """Once a module a project generated is uninstalled, the project is
         back to a draft with its lines: its records left the database with
-        the module. What Odoo leaves behind the models of a generated module
+        the module, the spreadsheets that read its models too. What Odoo leaves behind the models of a generated module
         goes too: their filters, the external ids of their inheritance
         (``_studio_drop_model_leftovers``), and the reflection of the
         constraints of the module that left the database with the columns
@@ -281,7 +289,7 @@ class IrModuleModule(models.Model):
             Project.sudo()._studio_drop_model_leftovers(lost)
             studio._studio_drop_constraint_rows()
             projects = Project.sudo().search([("module_name", "in", names)])
-            projects._studio_reset_after_uninstall()
+            projects._studio_reset_after_uninstall(lost)
         return res
 
     def _studio_drop_constraint_rows(self):

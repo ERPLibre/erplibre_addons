@@ -1,7 +1,10 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from unittest.mock import patch
+
 from lxml import etree
+from odoo.addons.base.models.ir_module import Module
 from odoo.exceptions import UserError
 from odoo.tests import new_test_user, tagged
 
@@ -272,6 +275,58 @@ class TestStudioSpreadsheet(SpreadsheetMixin, StudioCase):
         self.assertEqual(
             self.project._studio_revert_report()["report"]["spreadsheets"], []
         )
+
+    def sheets_of_a_model(self):
+        """A model of the project applied, a sheet sent from its list and
+        one from the contacts: (model line, its sheet, the contacts')."""
+        line = self.make_model(self.project, "Studio test sheet", model=SHEET_MODEL)
+        self.project.action_apply()
+        own = self.send(self.project, line._studio_views()["list"], SHEET_MODEL)
+        partner = self.send(self.project, self.list)
+        return (
+            line,
+            self.Sheet.browse(own["action"]["params"]["spreadsheet_id"]),
+            self.Sheet.browse(partner["action"]["params"]["spreadsheet_id"]),
+        )
+
+    def test_apply_deletes_the_sheets_of_a_removed_model(self):
+        line, own_sheet, partner_sheet = self.sheets_of_a_model()
+        self.assertFalse(self.project._studio_apply_report()["report"]["spreadsheets"])
+        line.unlink()
+        answer = self.project._studio_apply_report()
+        self.assertEqual(
+            answer["report"]["spreadsheets"],
+            [{"name": own_sheet.name, "model": SHEET_MODEL, "deleted": True}],
+        )
+        # An empty model goes without a question; its sheet does not.
+        self.assertTrue(answer["confirm"])
+        self.project.action_apply()
+        self.assertNotIn(SHEET_MODEL, self.env)
+        self.assertFalse(own_sheet.exists())
+        self.assertTrue(partner_sheet.exists())
+        self.assertEqual(self.project.spreadsheet_ids.mapped("model"), ["res.partner"])
+        report = self.project._studio_revert_report()["report"]
+        self.assertEqual(
+            [item["model"] for item in report["spreadsheets"]], ["res.partner"]
+        )
+
+    def test_uninstall_deletes_the_sheets_of_its_models(self):
+        _line, own_sheet, partner_sheet = self.sheets_of_a_model()
+        module = self.env["ir.module.module"].create(
+            {"name": MODULE, "state": "installed"}
+        )
+        report = module._studio_uninstall_report({MODULE})
+        self.assertEqual(
+            report["spreadsheets"],
+            [{"name": own_sheet.name, "model": SHEET_MODEL, "deleted": True}],
+        )
+        wizard = self.env["base.module.uninstall"].create({"module_id": module.id})
+        self.assertIn("Spreadsheets", str(wizard.studio_report))
+        with patch.object(Module, "module_uninstall", lambda self: True):
+            module.module_uninstall()
+        self.assertFalse(own_sheet.exists())
+        self.assertTrue(partner_sheet.exists())
+        self.assertFalse(self.project.spreadsheet_ids)
 
     def test_revert_report_html_lists_the_sheets(self):
         self.send(self.project, self.list)

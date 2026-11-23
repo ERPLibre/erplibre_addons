@@ -413,6 +413,14 @@ export class StudioCanvas extends Component {
         });
     }
 
+    /**
+     * Whether the GeoEngine view is one the project adds: the layers of
+     * another view are records of base_geoengine the payload does not hold.
+     */
+    get geoLayersAdded() {
+        return Boolean(this.data.view && this.data.view.added);
+    }
+
     /** Whether the project can edit the layers: one holds the view. */
     get geoLayersEditable() {
         return Boolean(this.props.project && this.data.view && this.data.view.added);

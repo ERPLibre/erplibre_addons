@@ -270,7 +270,7 @@
                     t-att-placeholder="numberDefault(entry.attribute)"
                     t-att-value="entry.value"
                     t-att-disabled="props.busy"
-                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value.trim())"
+                    t-on-change="(ev) => this.setAttributeFrom(ev, block, entry, ev.target.value.trim())"
                 />
             </label>
             <div t-elif="entry.kind === 'bool_number'" class="form-check form-switch mb-0">
@@ -281,7 +281,7 @@
                     t-att-id="'o_erplibre_studio_attr_' + entry.attribute"
                     t-att-checked="numberTrue(entry.value)"
                     t-att-disabled="props.busy"
-                    t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.checked ? '1' : '')"
+                    t-on-change="(ev) => this.setAttributeFrom(ev, block, entry, ev.target.checked ? '1' : '')"
                 />
                 <label
                     class="form-check-label"
@@ -295,7 +295,7 @@
                     <select
                         class="form-select form-select-sm o_erplibre_studio_attribute o_erplibre_studio_prop_x2many_mode"
                         t-att-disabled="props.busy"
-                        t-on-change="(ev) => this.setNodeAttribute(block, entry.attribute, ev.target.value)"
+                        t-on-change="(ev) => this.setAttributeFrom(ev, block, entry, ev.target.value)"
                     >
                         <option value="" t-att-selected="!entry.value">List</option>
                         <option value="dms_list" t-att-selected="entry.value === 'dms_list'">Documents tree</option>

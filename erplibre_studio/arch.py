@@ -628,17 +628,19 @@ GEO_TYPES = (
 )
 # The template a GeoEngine view shows in the popup of a record.
 GEO_INFO_BOX = "info_box"
-# The field types whose values color a colored range of a GeoEngine layer
-# (SUPPORTED_ATT of base_geoengine), and among them the numbers an interval
-# or a quantile classification needs (NUMBER_ATT): geoengine.vector.layer
-# refuses another attribute with a ValidationError.
+# The field types whose values color a colored range of a GeoEngine layer,
+# and among them the numbers an interval or a quantile classification needs
+# (NUMBER_ATT): geoengine.vector.layer refuses another attribute with a
+# ValidationError. base_geoengine also takes a char or a text (SUPPORTED_ATT)
+# but writes each value of a « unique » range into the HTML of the legend
+# unescaped: a value any user types would run as script for whoever opens
+# the map. A selection shows its key, which only the definition of the
+# field sets.
 GEO_ATTRIBUTE_TYPES = (
     "float",
     "integer",
     "date",
     "datetime",
-    "char",
-    "text",
     "selection",
 )
 GEO_NUMBER_TYPES = ("float", "integer")

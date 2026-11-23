@@ -320,7 +320,10 @@
         <t t-call="erplibre_studio.Canvas.kanban" />
         <section class="o_erplibre_studio_geo_layers mt-3" aria-label="Layers">
             <div class="small text-muted mb-1">Layers</div>
-            <ul class="list-unstyled small d-flex flex-column gap-1 mb-1">
+            <div t-if="!geoLayersAdded" class="small text-muted o_erplibre_studio_geo_layers_elsewhere">
+                The layers of a map the project does not add are not edited here: they stay as they are.
+            </div>
+            <ul t-else="" class="list-unstyled small d-flex flex-column gap-1 mb-1">
                 <li
                     t-foreach="geoLayers"
                     t-as="layer"

@@ -258,7 +258,8 @@ class ErplibreStudioProject(models.Model):
         ``_studio_option_effects``), views: [{name, kind}], changes_removed,
         menus, actions, access: [{name, group}], rules: [{name, model}],
         groups: [{name, users}], categories, tables, spreadsheets (filled
-        by Revert alone, ``_studio_revert_report``)}. A read, in sudo."""
+        by the report of Revert and of Apply, ``_studio_revert_report``,
+        ``_studio_apply_report``)}. A read, in sudo."""
         self.ensure_one()
         self.env.flush_all()
         records = {
@@ -515,11 +516,15 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_apply_report(self):
         """{report, digest, confirm}: what the next Apply removes from the
-        database; ``confirm`` when it holds records, values, group members
-        or records an option removed changes, which Apply then asks to
+        database, the spreadsheets of the models it removes among them;
+        ``confirm`` when it holds records, values, group members, records an
+        option removed changes or spreadsheets, which Apply then asks to
         confirm by the digest."""
         self.ensure_one()
         report = self._studio_removal_report(self._studio_apply_removals())
+        report["spreadsheets"] = self._studio_spreadsheet_report(
+            {item["model"] for item in report["models"]}, deleted_only=True
+        )
         report["members"] = [
             {
                 "name": dropped.full_name,
@@ -535,6 +540,7 @@ class ErplibreStudioProject(models.Model):
             or any(item["users"] for item in report["groups"])
             or any(item["users"] for item in report["members"])
             or any(item["count"] for item in report["effects"])
+            or bool(report["spreadsheets"])
         )
         return {"report": report, "digest": report_digest(report), "confirm": confirm}
 

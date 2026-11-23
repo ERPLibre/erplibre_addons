@@ -635,6 +635,26 @@ export class StudioInspector extends Component {
         return this.editor.setNodeAttribute(block, attribute, value, extra, onError);
     }
 
+    /**
+     * Set the attribute of ``entry`` on ``block`` to ``value``, read from the
+     * input of ``ev``. When the change is not made (the server refuses the
+     * value, the editor is busy), the input shows ``entry.value`` again:
+     * Owl does not patch an attribute whose value did not change, and the
+     * input would keep the value the view does not hold.
+     */
+    async setAttributeFrom(ev, block, entry, value) {
+        const input = ev.target;
+        const data = await this.setNodeAttribute(block, entry.attribute, value);
+        if (!data) {
+            if (input.type === "checkbox") {
+                input.checked = this.numberTrue(entry.value);
+            } else {
+                input.value = entry.value || "";
+            }
+        }
+        return data;
+    }
+
     setAttribute(type, value) {
         return this.editor.setAttribute(type, value);
     }

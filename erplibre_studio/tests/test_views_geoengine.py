@@ -275,7 +275,10 @@ class TestGeoengineLayers(GeoengineCase):
             name: numeric for name, _label, numeric in added["attribute_fields"]
         }
         self.assertIs(attributes["color"], True)
-        self.assertIs(attributes["name"], False)
+        self.assertIs(attributes["type"], False)
+        # A text would reach the legend of the map as HTML: not offered.
+        self.assertNotIn("name", attributes)
+        self.assertNotIn("comment", attributes)
         self.assertNotIn(SITE, attributes)
         raster, vector = added["layers"]
         self.assertEqual((raster["kind"], vector["kind"]), ("raster", "vector"))
@@ -319,7 +322,7 @@ class TestGeoengineLayers(GeoengineCase):
                 name="Zones",
                 geo_field=ZONE,
                 geo_repr="colored",
-                attribute_field="name",
+                attribute_field="type",
                 classification="interval",
                 nb_class=3,
             )
@@ -343,16 +346,75 @@ class TestGeoengineLayers(GeoengineCase):
             self.remove(self.vector(line, SITE))
         self.assertEqual(len(line.layer_ids), 2)
         self.assertFalse(self.project.change_ids)
-        # A text colors a range by unique value.
+        # A text is refused: base_geoengine writes its values into the
+        # legend unescaped.
+        with self.assertRaisesRegex(UserError, "needs the field whose values"):
+            self.save(
+                name="Zones",
+                geo_field=ZONE,
+                geo_repr="colored",
+                attribute_field="name",
+                classification="unique",
+                nb_class=1,
+            )
+        self.assertFalse(self.project.change_ids)
+        # A selection colors a range by unique value.
         self.save(
             name="Zones",
             geo_field=ZONE,
             geo_repr="colored",
-            attribute_field="name",
+            attribute_field="type",
             classification="unique",
             nb_class=1,
         )
-        self.assertEqual(self.vector(line, ZONE).attribute_field, "name")
+        self.assertEqual(self.vector(line, ZONE).attribute_field, "type")
+
+    def test_a_layer_keeps_the_fields_it_reads(self):
+        line, _data = self.add_map()
+        self.save(
+            name="Zones",
+            geo_field=ZONE,
+            geo_repr="colored",
+            attribute_field="color",
+            classification="interval",
+            nb_class=5,
+        )
+        zone, color = self.project.change_ids.sorted("sequence")
+        self.assertEqual((zone.field_name, color.field_name), (ZONE, "color"))
+        # Undo, the removal from the canvas and the removal of a change
+        # are refused while the layer reads the field.
+        with self.assertRaisesRegex(UserError, "Zones of .* reads color"):
+            self.project.action_undo()
+        with self.assertRaisesRegex(UserError, "reads color"):
+            self.op(
+                self.project,
+                self.resolve(),
+                type="remove",
+                target="/geoengine/field[@name='color']",
+            )
+        with self.assertRaisesRegex(UserError, f"reads {ZONE}"):
+            self.project._studio_remove_changes(zone)
+        self.assertEqual(len(self.project.change_ids), 2)
+        # A change gone by another way: Apply refuses the layer.
+        color.unlink()
+        with self.assertRaisesRegex(UserError, "which the view does not load"):
+            self.project.action_apply()
+        # Saved again, the layer loads its field; removed, it frees both.
+        self.save(
+            id=self.vector(line, ZONE).id,
+            name="Zones",
+            geo_field=ZONE,
+            geo_repr="colored",
+            attribute_field="color",
+            classification="interval",
+            nb_class=5,
+        )
+        self.assertEqual(len(self.project.change_ids), 2)
+        self.remove(self.vector(line, ZONE))
+        self.project.action_undo()
+        self.project.action_undo()
+        self.assertFalse(self.project.change_ids)
+        self.project.action_apply()
 
     def test_basic_drops_the_range(self):
         line, _data = self.add_map()

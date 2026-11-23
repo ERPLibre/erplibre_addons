@@ -1652,6 +1652,12 @@ describe("erplibre_studio editor, leaflet map", () => {
             "placeholder",
             "-32"
         );
+        respond = () =>
+            leafletPayload({
+                field_latitude: "partner_latitude",
+                field_longitude: "partner_latitude",
+                marker_icon_size_x: "48",
+            });
         await contains(width).edit("48");
         expect.verifySteps(["apply_operation set_attribute"]);
         expect(operations.pop()).toEqual({
@@ -1660,6 +1666,14 @@ describe("erplibre_studio editor, leaflet map", () => {
             attribute: "marker_icon_size_x",
             value: "48",
         });
+        // A value the server refuses: the input shows the value of the view again.
+        respond = () => {
+            throw makeServerError({message: "The marker width is not a whole number from 1 to 512."});
+        };
+        await contains(width).edit("600");
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(".o_notification").toHaveText(/from 1 to 512/);
+        expect(width).toHaveValue(48);
     });
 
     test("the menu of views describes the map, and why it is missing", async () => {
@@ -1900,6 +1914,14 @@ describe("erplibre_studio editor, geoengine", () => {
         await contains(".o_erplibre_studio_preview_toggle").click();
         expect(".o_notification").toHaveText(/The map shows once Apply creates the view and its layers/);
         expect(".o_erplibre_studio_view_preview").toHaveCount(0);
+
+        // Refused: the toggle shows the value of the view again.
+        respond = () => {
+            throw makeServerError({message: "The view cannot change now."});
+        };
+        await contains(toggle).click();
+        expect.verifySteps(["apply_operation set_attribute"]);
+        expect(toggle).toBeChecked();
     });
     // A second vector layer, on the geo field x_spot.
     const SPOTS = {
@@ -1991,6 +2013,54 @@ describe("erplibre_studio editor, geoengine", () => {
         await contains(".o_erplibre_studio_geo_layer_up").click();
         expect.verifySteps(["save_geo_layer"]);
         expect(saved.pop()).toMatchObject({id: 3, geo_field: "x_spot", sequence: 10});
+    });
+
+    test("Discard closes the form of a layer: its layers come back under new ids", async () => {
+        onRpc("erplibre.studio.editor", "project_action", (args) => {
+            expect.step(`project_action ${args.args[1]}`);
+            const data = geoPayload();
+            data.view.added.layers = data.view.added.layers.map((layer) => ({...layer, id: layer.id + 10}));
+            return data;
+        });
+        answer = geoPayload(["name"], {}, [SPOTS]);
+        await openEditor("geoengine");
+        await contains(".o_erplibre_studio_geo_layer[data-id='3'] .o_erplibre_studio_geo_layer_pick").click();
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(1);
+        await contains(".o_erplibre_studio_apply_menu").click();
+        await contains(".o_erplibre_studio_discard").click();
+        expect.verifySteps(["project_action action_discard"]);
+        // The inspector of the layer closed: no form, no « no longer in the view ».
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layer_gone").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layer_selected").toHaveCount(0);
+        expect(queryAllTexts(".o_erplibre_studio_geo_layer").length).toBe(2);
+    });
+
+    test("a layer that leaves the view under its open form: no form to save", async () => {
+        answer = geoPayload(["name"], {}, [SPOTS]);
+        await openEditor("geoengine");
+        await contains(".o_erplibre_studio_geo_layer[data-id='3'] .o_erplibre_studio_geo_layer_pick").click();
+        expect(".o_erplibre_studio_geo_layer_name").toHaveValue("Spots");
+        // The server answers with a payload without the layer.
+        onRpc("erplibre.studio.editor", "save_geo_layer", () => {
+            expect.step("save_geo_layer");
+            return {...geoPayload(), saved_geo_layer: 3};
+        });
+        await contains(".o_erplibre_studio_geo_layer_name").edit("Spot list");
+        await contains(".o_erplibre_studio_geo_layer_save").click();
+        expect.verifySteps(["save_geo_layer"]);
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layer_gone").toHaveText("This layer is no longer in the view.");
+    });
+
+    test("a map the project does not add: its layers are not listed as none", async () => {
+        answer = geoPayload();
+        delete answer.view.added;
+        await openEditor("geoengine");
+        expect(".o_erplibre_studio_geo_layers_elsewhere").toHaveCount(1);
+        expect(".o_erplibre_studio_geo_layer").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layers").not.toHaveText(/No layer/);
+        expect(".o_erplibre_studio_geo_layer_add").toHaveCount(0);
     });
 
     test("Remove asks for a confirmation, then sends remove_geo_layer", async () => {

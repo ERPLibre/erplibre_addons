@@ -326,5 +326,12 @@ describe("erplibre_studio properties field", () => {
         expect(lastCall("check_field_name").args).toEqual(["res.country", "x_contact_fields"]);
         expect(".o_erplibre_studio_properties_save").toBeEnabled();
         expect(methods()).not.toInclude("apply_operation");
+        // An empty name: the status says what is missing, not « Checking… ».
+        await contains(".o_erplibre_studio_properties_new_name").clear({confirm: false});
+        await advanceTime(300);
+        await animationFrame();
+        expect(".o_erplibre_studio_properties_name_status").toHaveAttribute("data-status", "empty");
+        expect(".o_erplibre_studio_properties_name_status").toHaveText("Type a technical name.");
+        expect(".o_erplibre_studio_properties_save").not.toBeEnabled();
     });
 });

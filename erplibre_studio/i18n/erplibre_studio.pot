@@ -649,8 +649,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
-"A colored range needs the field whose values color it: a number, a date, a "
-"text or a selection of %(model)s."
+"A colored range needs the field whose values color it: a number, a date or "
+"a selection of %(model)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6767,6 +6767,22 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The layer %(layer)s of %(view)s reads %(field)s, which the view does not "
+"load: save the layer again to load it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The layer %(layer)s of %(view)s reads %(field)s: remove the layer, or have "
+"it read another field, first."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_geo_layer.py:0
 msgid "The layer %(name)s draws no geo field."
 msgstr ""
@@ -6779,6 +6795,14 @@ msgstr ""
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_view__layer_ids
 msgid "The layers of a GeoEngine view, written to base_geoengine by Apply."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid ""
+"The layers of a map the project does not add are not edited here: they stay "
+"as they are."
 msgstr ""
 
 #. module: erplibre_studio
@@ -7805,6 +7829,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__change_type
 msgid "Type"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "Type a technical name."
 msgstr ""
 
 #. module: erplibre_studio

@@ -182,6 +182,11 @@ export class StudioPropertiesDialog extends Component {
         Object.assign(this.state, {nameCheck: check, nameChecking: false});
     }
 
+    /** Whether the name of the definition field is empty: nothing to check. */
+    get newNameEmpty() {
+        return !this.state.newName.trim();
+    }
+
     /** The answer of the last check when it is about the name on screen, else null. */
     get nameCheck() {
         const check = this.state.nameCheck;

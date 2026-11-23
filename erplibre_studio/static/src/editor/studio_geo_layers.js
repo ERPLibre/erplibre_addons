@@ -86,7 +86,13 @@ export class StudioGeoLayers extends Component {
         onWillUpdateProps((next) => {
             const layer = this.layerOf(next);
             const form = this.state.form;
-            if (next.layerId !== this.props.layerId || (layer && form.id === layer.id && !this.dirty)) {
+            if (next.layerId !== this.props.layerId) {
+                this.state.form = this.formOf(next);
+            } else if (next.layerId !== "new" && !layer) {
+                // The layer left the view (Discard rebuilds the layers under
+                // new ids): its form would save a layer that is gone.
+                this.state.form = null;
+            } else if (layer && form && form.id === layer.id && !this.dirty) {
                 this.state.form = this.formOf(next);
             }
         });

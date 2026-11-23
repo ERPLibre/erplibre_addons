@@ -99,11 +99,12 @@
                             id="o_erplibre_studio_definition_name_status"
                             class="small mt-1 o_erplibre_studio_properties_name_status"
                             t-att-class="nameCheck ? (nameCheck.status === 'available' ? 'text-success-emphasis' : 'text-danger-emphasis') : 'text-muted'"
-                            t-att-data-status="nameCheck ? nameCheck.status : ''"
+                            t-att-data-status="nameCheck ? nameCheck.status : (newNameEmpty ? 'empty' : '')"
                             role="status"
                             aria-live="polite"
                         >
-                            <t t-if="state.nameChecking or !nameCheck">Checking…</t>
+                            <t t-if="newNameEmpty">Type a technical name.</t>
+                            <t t-elif="state.nameChecking or !nameCheck">Checking…</t>
                             <t t-else="" t-esc="nameCheck.message" />
                         </div>
                     </div>

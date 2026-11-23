@@ -15,8 +15,9 @@ SPREADSHEET_LIST_ROWS = 80
 class ErplibreStudioSpreadsheet(models.Model):
     """A spreadsheet of spreadsheet_oca the editor created from a list, a
     pivot or a graph view (``send_to_spreadsheet``): which model and view
-    it reads. Revert reports these sheets and deletes those whose model it
-    removes. ``sheet_id`` is the id of the spreadsheet.spreadsheet, an
+    it reads. Revert, an Apply and the uninstall of the generated module
+    report these sheets and delete those whose model they remove.
+    ``sheet_id`` is the id of the spreadsheet.spreadsheet, an
     integer: the studio does not depend on spreadsheet_oca, whose model
     exists only once it is installed, and a sheet deleted by hand leaves
     an id that ``exists()`` filters out."""
@@ -170,12 +171,13 @@ class ErplibreStudioProject(models.Model):
                 sheets[row] = sheet
         return sheets
 
-    def _studio_spreadsheet_report(self, removed_models):
+    def _studio_spreadsheet_report(self, removed_models, deleted_only=False):
         """[{name, model, deleted}] of the existing sheets of the project,
         in the order they were sent: ``deleted`` when their model is among
-        ``removed_models`` (Revert deletes them), else they stay. A read."""
+        ``removed_models`` (the operation deletes them), else they stay;
+        with ``deleted_only``, the deleted ones alone. A read."""
         self.ensure_one()
-        return [
+        items = [
             {
                 "name": sheet.name or "",
                 "model": row.model,
@@ -183,13 +185,26 @@ class ErplibreStudioProject(models.Model):
             }
             for row, sheet in self._studio_spreadsheets().items()
         ]
+        if deleted_only:
+            return [item for item in items if item["deleted"]]
+        return items
+
+    def _studio_drop_spreadsheets(self, removed_models):
+        """Delete, in sudo, the sheets of the project whose model is among
+        ``removed_models``, with their tracking rows: a sheet whose model
+        left the database reads nothing."""
+        self.ensure_one()
+        sheets = self._studio_spreadsheets()
+        rows = self.spreadsheet_ids.filtered(lambda row: row.model in removed_models)
+        for row in rows:
+            if row in sheets:
+                sheets[row].unlink()
+        rows.sudo().unlink()
 
     def _studio_revert_spreadsheets(self, removed_models):
-        """Delete the sheets whose model Revert removed (``removed_models``),
-        in sudo, then every tracking row of the project: the sheets that stay
-        are no longer the project's."""
+        """Delete the sheets whose model Revert removed (``removed_models``,
+        ``_studio_drop_spreadsheets``), then every tracking row of the
+        project: the sheets that stay are no longer the project's."""
         self.ensure_one()
-        for row, sheet in self._studio_spreadsheets().items():
-            if row.model in removed_models:
-                sheet.unlink()
+        self._studio_drop_spreadsheets(removed_models)
         self.spreadsheet_ids.sudo().unlink()

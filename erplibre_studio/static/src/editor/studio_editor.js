@@ -731,6 +731,10 @@ export class StudioEditor extends Component {
         if (action !== "action_apply") {
             this.state.selected = null;
         }
+        if (["action_discard", "action_revert"].includes(action)) {
+            // Discard rebuilds the layers of a GeoEngine view under new ids.
+            this.state.geoLayer = null;
+        }
         await this.refreshModelPreview();
         return data;
     }
