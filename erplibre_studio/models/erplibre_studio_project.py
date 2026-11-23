@@ -265,6 +265,7 @@ NEW_FIELD_TYPES = (
     "monetary",
     "one2many",
     "many2many",
+    "properties",
 )
 # The options of a new field set before Apply, and the types that take
 # each one. A text or html column takes no index: a btree row holds about
@@ -336,9 +337,17 @@ MODEL_NAME_CHECKS = ("format", "reserved", "prefix", "unique")
 HUMAN_ATTRIBUTES = ("string", "help", "title", "tooltip", "placeholder")
 
 # The ir.model.fields values that fix the relation of a field: Apply never
-# changes them on a field it created.
+# changes them on a field it created. The definition of a properties field
+# names its many2one and the field of the comodel that holds its properties.
 RELATION_VALUES = frozenset(
-    {"relation", "relation_field", "relation_table", "column1", "column2"}
+    {
+        "relation",
+        "relation_field",
+        "relation_table",
+        "column1",
+        "column2",
+        "erplibre_studio_properties_definition",
+    }
 )
 
 # The fields_get attributes the operations check.
@@ -1317,8 +1326,10 @@ class ErplibreStudioProject(models.Model):
             [
                 ("change_type", "=", "add_field"),
                 "|",
+                "|",
                 ("payload", "ilike", "inverse_new"),
                 ("payload", "ilike", "inverse_o2m"),
+                ("payload", "ilike", "definition_new"),
             ]
         ):
             field = change._payload().get("field") or {}
@@ -1331,10 +1342,12 @@ class ErplibreStudioProject(models.Model):
         """A checked definition of a new field: {ttype, field_description,
         readonly, help, translate, index, size, selection, relation,
         on_delete, inverse_o2m, relation_field, inverse_new, relation_table,
-        column1, column2, currency_field}; translate, index and size only
-        when set (``_clean_field_options``). ``name`` is the field name;
-        None makes one from the label. ``existing``: the definition the field had, whose relation an
-        x2many keeps, and a many2one while it has an inverse one2many."""
+        column1, column2, currency_field, definition_record,
+        definition_record_field, definition_new}; translate, index and size
+        only when set (``_clean_field_options``). ``name`` is the field
+        name; None makes one from the label. ``existing``: the definition
+        the field had, whose relation an x2many and a properties field
+        keep, and a many2one while it has an inverse one2many."""
         ttype = field.get("ttype")
         if ttype not in self._studio_field_types():
             raise UserError(self.env._("Unknown field type %(type)s.", type=ttype))
@@ -1366,6 +1379,8 @@ class ErplibreStudioProject(models.Model):
             definition["currency_field"] = self._clean_currency(model, field)
         elif ttype in studio_arch.X2MANY_TYPES and existing:
             definition.update(self._kept_relation(name, field, existing))
+        elif ttype == "properties":
+            definition.update(self._clean_properties(model, name, field, existing))
         elif ttype == "one2many":
             definition.update(self._clean_one2many(model, name, field))
         elif ttype == "many2many":
@@ -1607,8 +1622,10 @@ class ErplibreStudioProject(models.Model):
                 ("model", "in", targets),
                 ("field_name", "=", name),
                 "|",
+                "|",
                 ("payload", "ilike", "inverse_new"),
                 ("payload", "ilike", "inverse_o2m"),
+                ("payload", "ilike", "definition_new"),
             ]
         )
         for change in others:
@@ -1921,6 +1938,9 @@ class ErplibreStudioProject(models.Model):
             "json_view": lambda: self.env._(
                 "A JSON field shows in a form or a list only."
             ),
+            "properties_view": lambda: self.env._(
+                "A properties field shows in a form only."
+            ),
             "geo_view": lambda: self.env._(
                 "A geo field shows as a map in a form only."
             ),
@@ -2167,10 +2187,11 @@ class ErplibreStudioProject(models.Model):
     def _op_add_field(self, view, arch, op):
         """A new field dropped into the view; an x2many shows as an inline
         sub-list in a form, a many2many as tags in a list or a kanban, a
-        JSON field read-only (``new_field_node``). On a map, the field of a
+        JSON field read-only (``new_field_node``), a properties field with
+        its many2one (``_properties_container``). On a map, the field of a
         lane: ``attribute`` names the root attribute it becomes
         (``_leaflet_new_field``)."""
-        target, position, _node = self._check_drop(arch, op, view.type)
+        target, position, node = self._check_drop(arch, op, view.type)
         field = op.get("field") or {}
         self._refuse(studio_arch.field_type_refusal(view.type, field.get("ttype")))
         self._refuse(studio_arch.geo_refusal(view.type, field.get("ttype")))
@@ -2187,6 +2208,12 @@ class ErplibreStudioProject(models.Model):
         }
         if root_attribute:
             payload["root_attribute"] = root_attribute
+        if definition["ttype"] == "properties":
+            container = self._properties_container(
+                view, arch, node, position, definition["definition_record"]
+            )
+            if container:
+                payload["container"] = container
         display_field = None
         if definition["ttype"] in studio_arch.X2MANY_TYPES:
             display_field = self._studio_display_field(definition["relation"])
@@ -2279,6 +2306,16 @@ class ErplibreStudioProject(models.Model):
             self._refuse(studio_arch.field_type_refusal(view.type, ttype))
         node_attrs = {}
         extra = {}
+        if ttype == "properties":
+            container = self._properties_container(
+                view,
+                arch,
+                node,
+                position,
+                self._studio_properties_record(view.model, name),
+            )
+            if container:
+                extra["container"] = container
         if view.type == "timeline" and studio_arch.in_template(node):
             extra = self._item_field(view.model, arch, name)
         elif view.type == "search":
@@ -2305,6 +2342,49 @@ class ErplibreStudioProject(models.Model):
             position,
             {"field_name": name, "node_attrs": node_attrs, **extra},
         )
+
+    def _properties_container(self, view, arch, node, position, container):
+        """The many2one ``container`` a properties field dropped at
+        ``position`` of ``node`` adds before itself, or None when the view
+        has it already, outside the sub-views of its x2many fields. Odoo
+        requires it in the same view as the field: a drop inside a sub-view
+        is refused, where the many2one would be read on the comodel."""
+        parent = node if position == "inside" else node.getparent()
+        if parent is not None and any(
+            item.tag == "field" for item in [parent, *parent.iterancestors()]
+        ):
+            raise UserError(
+                self.env._(
+                    "A properties field goes in the form itself, not in the "
+                    "sub-view of a relation."
+                )
+            )
+        if not container:
+            raise UserError(
+                self.env._(
+                    "The properties field has no many2one to read its "
+                    "definition through."
+                )
+            )
+        shown = {
+            item.get("name")
+            for item in arch.iter("field")
+            if not any(a.tag == "field" for a in item.iterancestors())
+        }
+        return None if container in shown else container
+
+    def _studio_properties_record(self, model, name):
+        """The many2one the properties field ``name`` of ``model`` reads its
+        definition through: from its definition in the project, else from
+        the registry; None when neither knows it."""
+        definition, _change = self._studio_field_definitions(model).get(
+            name, ({}, None)
+        )
+        if definition.get("ttype") == "properties":
+            return definition.get("definition_record")
+        Model = self.env.get(model)
+        field = Model._fields.get(name) if Model is not None else None
+        return getattr(field, "definition_record", None)
 
     def _dms_tree_attrs(self, view, node, position, name):
         """The attributes of the field ``name`` dropped at ``position`` of
@@ -3509,6 +3589,7 @@ class ErplibreStudioProject(models.Model):
                     name=old,
                 )
             )
+        self._studio_check_container_kept(model, old)
         if old == studio_arch.LEAFLET_DATE_FIELD and change.view_type == "leaflet_map":
             raise UserError(
                 self.env._(
@@ -3545,7 +3626,9 @@ class ErplibreStudioProject(models.Model):
         the name its label proposes. The definition of ``owner`` takes the
         new name (``inverse_new`` and the ``relation_field`` of a one2many,
         ``inverse_o2m`` of a many2one), the changes of the project that name
-        it follow; same refusals as ``_studio_rename_field``."""
+        it follow; same refusals as ``_studio_rename_field``. The properties
+        definition field a properties field creates (``definition_new``) is
+        renamed the same way, with its ``definition_record_field``."""
         if self._studio_field_applied(model, old):
             raise UserError(
                 self.env._(
@@ -3554,9 +3637,12 @@ class ErplibreStudioProject(models.Model):
                     name=old,
                 )
             )
+        self._studio_check_container_kept(model, old)
         payload = owner._payload()
         definition = payload.get("field") or {}
-        key = "inverse_o2m" if definition.get("ttype") == "many2one" else "inverse_new"
+        key = {"many2one": "inverse_o2m", "properties": "definition_new"}.get(
+            definition.get("ttype"), "inverse_new"
+        )
         if op.get("auto"):
             label = definition[key].get("field_description") or ""
             taken = self._taken_field_names(model) - {old}
@@ -3578,6 +3664,8 @@ class ErplibreStudioProject(models.Model):
             definition[key]["name"] = new
             if key == "inverse_new":
                 definition["relation_field"] = new
+            elif key == "definition_new":
+                definition["definition_record_field"] = new
             owner._set_payload(payload)
             self._studio_check_field_renamed(model, old)
         return owner
@@ -5605,6 +5693,11 @@ class ErplibreStudioProject(models.Model):
                 vals[key] = definition[key]
         elif ttype == "monetary":
             vals["currency_field"] = definition["currency_field"]
+        elif ttype == "properties":
+            vals["erplibre_studio_properties_definition"] = (
+                f"{definition['definition_record']}."
+                f"{definition['definition_record_field']}"
+            )
         # A geometry field (GEO_TYPES) writes none of the srid, geo_type and
         # dim columns base_geoengine adds: a manual field is built with the
         # defaults of its class (srid 3857, 2 dimensions, a GiST index),
@@ -7022,7 +7115,7 @@ class ErplibreStudioProject(models.Model):
         if isinstance(field, dict):
             for key in ("field_description", "help", "selection"):
                 field.pop(key, None)
-            for key in ("inverse_new", "inverse_o2m"):
+            for key in ("inverse_new", "inverse_o2m", "definition_new"):
                 if isinstance(field.get(key), dict):
                     field[key].pop("field_description", None)
         node = payload.get("node")
@@ -7453,11 +7546,13 @@ class ErplibreStudioProject(models.Model):
             # for one, no group may delete.
             value = value.sudo()
             if kind == "fields":
-                # A many2one that is the inverse of a custom one2many goes
-                # only once the one2many is gone, in an unlink of its own.
-                one2many = value.filtered(lambda f: f.ttype == "one2many")
-                one2many.unlink()
-                (value - one2many).exists().unlink()
+                # A many2one that is the inverse of a custom one2many, or
+                # the container of a custom properties field, which depends
+                # on it, goes only once that field is gone, in an unlink of
+                # its own.
+                first = value.filtered(lambda f: f.ttype in ("one2many", "properties"))
+                first.unlink()
+                (value - first).exists().unlink()
             else:
                 value.unlink()
             log.append(f"{len(value)} {kind} removed")

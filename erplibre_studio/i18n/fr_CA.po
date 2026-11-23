@@ -213,6 +213,12 @@ msgstr "%(model)s ne peut pas être le comodèle."
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(model)s cannot hold the definition of a properties field."
+msgstr "%(model)s ne peut pas porter la définition d'un champ de propriétés."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "%(model)s cannot take access rights nor record rules from a studio project."
@@ -241,6 +247,12 @@ msgstr "%(model)s n'a pas de vue %(type)s à hériter."
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "%(model)s has no activities: an activity view needs the model to inherit mail.activity.mixin (a chatter)."
 msgstr "%(model)s n'a pas d'activités : une vue activité exige que le modèle hérite de mail.activity.mixin (un fil de discussion)."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(model)s properties"
+msgstr "Propriétés de %(model)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -309,6 +321,23 @@ msgid ""
 msgstr ""
 "%(name)s n'est pas un many2one de %(comodel)s vers %(model)s : choisissez un"
 " inverse, ou laissez le studio en créer un."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"%(name)s is not a many2one of %(model)s: a properties field reads its "
+"definition through one."
+msgstr ""
+"%(name)s n'est pas un many2one de %(model)s : un champ de propriétés lit sa "
+"définition par un many2one."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(name)s is not a properties definition field of %(model)s."
+msgstr ""
+"%(name)s n'est pas un champ de définition des propriétés de %(model)s."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -924,6 +953,22 @@ msgstr "Un projet a une ligne d'accès par modèle et par groupe."
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "A project makes one module:"
 msgstr "Un projet donne un module :"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A properties field goes in the form itself, not in the sub-view of a "
+"relation."
+msgstr ""
+"Un champ de propriétés va dans le formulaire lui-même, pas dans la sous-vue "
+"d'une relation."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A properties field shows in a form only."
+msgstr "Un champ de propriétés s'affiche seulement dans un formulaire."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1781,6 +1826,17 @@ msgid ""
 msgstr ""
 "Corrigez chaque nom signalé ci-dessous, un champ dans son inspecteur, un "
 "modèle dans l'espace Modèles, puis appliquez."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_ir_model_fields__erplibre_studio_properties_definition
+msgid ""
+"For a custom properties field of ERPLibre studio: the many2one of the model "
+"and the properties definition field of its comodel it reads its definition "
+"from, written « many2one.field »."
+msgstr ""
+"Pour un champ de propriétés personnalisé d'ERPLibre studio : le many2one du "
+"modèle et le champ de définition des propriétés de son comodèle d'où il lit "
+"sa définition, écrits « many2one.champ »."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5981,6 +6037,11 @@ msgid "Studio projects"
 msgstr "Projets studio"
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_ir_model_fields__erplibre_studio_properties_definition
+msgid "Studio properties definition"
+msgstr "Définition des propriétés (studio)"
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Studio spaces"
@@ -6690,6 +6751,16 @@ msgid "The list of %(model)s loses its drag handle"
 msgstr "La liste de %(model)s perd sa poignée de glisser-déposer"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The many2one %(container)s of the properties field %(name)s no longer points"
+" to %(model)s."
+msgstr ""
+"Le many2one %(container)s du champ de propriétés %(name)s ne pointe plus "
+"vers %(model)s."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
@@ -6956,6 +7027,33 @@ msgid ""
 msgstr ""
 "Le projet n'a aucun modèle en attente d'Appliquer : il n'y a rien à "
 "prévisualiser."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The properties definition field %(field)s of %(model)s, which %(name)s "
+"reads, no longer exists."
+msgstr ""
+"Le champ de définition des propriétés %(field)s de %(model)s, que lit "
+"%(name)s, n'existe plus."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The properties field %(other)s reads its definition through %(field)s: "
+"remove %(other)s first."
+msgstr ""
+"Le champ de propriétés %(other)s lit sa définition par %(field)s : retirez "
+"d'abord %(other)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The properties field has no many2one to read its definition through."
+msgstr ""
+"Le champ de propriétés n'a aucun many2one par lequel lire sa définition."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7263,6 +7361,16 @@ msgid ""
 msgstr ""
 "Le studio n'ajoute pas de champs à %(model)s : choisissez un inverse "
 "existant."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The studio does not add fields to %(model)s: choose another many2one for the"
+" properties."
+msgstr ""
+"Le studio n'ajoute pas de champs à %(model)s : choisissez un autre many2one "
+"pour les propriétés."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8602,6 +8710,12 @@ msgstr "optionnel, masqué"
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "project"
 msgstr "projet"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "properties, defined on %(model)s"
+msgstr "propriétés, définies sur %(model)s"
 
 #. module: erplibre_studio
 #. odoo-python

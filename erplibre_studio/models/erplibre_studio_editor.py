@@ -273,6 +273,13 @@ class ErplibreStudioEditor(models.AbstractModel):
                 item["special"] = studio_arch.DMS_VIEW_TYPE
             if view_type == "search" and not info.get("searchable"):
                 continue
+            if info.get("type") == "properties_definition" or (
+                info.get("type") == "properties" and view_type != "form"
+            ):
+                # A properties definition has no widget: its properties are
+                # edited from the records that read them. These show in a
+                # form only.
+                continue
             if view_type not in ("form", "list") and (
                 info.get("type") in studio_arch.UNQUERYABLE_TYPES
             ):
@@ -1835,6 +1842,20 @@ class ErplibreStudioEditor(models.AbstractModel):
             ),
             "protected": protected_model(comodel),
         }
+
+    @api.model
+    def get_properties_choices(self, project_id, model):
+        """What the dialog of a new properties field of ``model`` offers:
+        {containers: [{name, label, comodel, comodel_label, pending,
+        definitions: [{name, label}], proposed: {name, label}}]}, the
+        many2one fields it can read its definition through, the properties
+        definition fields of their comodel, and the one the project would
+        create there (``_studio_properties_choices``). A read."""
+        self._check_studio_access()
+        project = self._read_project(project_id)
+        if not (model in self.env or project._studio_pending_line(model)):
+            raise UserError(self.env._("Unknown model %(model)s.", model=model))
+        return {"containers": project._studio_properties_choices(model)}
 
     @api.model
     def check_field_name(self, project_id, model, name, field_name=False, label=False):

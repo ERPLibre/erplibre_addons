@@ -598,11 +598,14 @@ RELATIONAL_TYPES = ("many2one",) + X2MANY_TYPES
 # The view types a new field of each type goes in; a type missing from the
 # map goes in every view. A JSON field (fields.Json) shows read-only through
 # the widget « jsonb » in a form or a list: Odoo neither searches nor groups
-# it, and a kanban has no widget that reads it.
+# it, and a kanban has no widget that reads it. A properties field
+# (fields.Properties) shows its properties in a form, beside the many2one it
+# reads their definition through.
 FIELD_TYPE_VIEW_TYPES = {
     "one2many": ("form",),
     "many2many": ("form", "list", "kanban"),
     "json": ("form", "list"),
+    "properties": ("form",),
 }
 # The field types Odoo neither searches, sorts nor groups by: the editor
 # offers them to a form or a list only, never as a search, sort or group
@@ -1126,6 +1129,22 @@ def _set_attribute_spec(change, view_type):
     return data
 
 
+def _add_field_nodes(spec, payload):
+    """Append to ``spec`` the field node of an added field ``payload``: its
+    ``node_attrs`` and ``node_children``. A properties field brings first
+    its ``container``, the many2one it reads its definition through,
+    which Odoo requires in the same view: both land at the drop point."""
+    container = payload.get("container")
+    if container:
+        if not _SAFE_NAME.match(container):
+            raise ArchError(f"Invalid field {container}.", "bad_field", field=container)
+        etree.SubElement(spec, "field", name=container)
+    node = etree.SubElement(spec, "field", name=payload["field_name"])
+    _set_attributes(node, payload.get("node_attrs"))
+    for child in payload.get("node_children") or []:
+        _add_child(node, child)
+
+
 def change_spec(change, view_type):
     """The inheritance spec of ``change``, a dict {type, xpath, position,
     payload}: an ``xpath`` element, or a ``data`` of two when a move also
@@ -1168,10 +1187,7 @@ def change_spec(change, view_type):
                 etree.SubElement(load, "field", name=name)
                 return data
         else:
-            node = etree.SubElement(spec, "field", name=payload["field_name"])
-            _set_attributes(node, payload.get("node_attrs"))
-            for child in payload.get("node_children") or []:
-                _add_child(node, child)
+            _add_field_nodes(spec, payload)
             if ctype == "add_field" and payload.get("root_attribute"):
                 # The new field of a lane of a map, and the root attribute
                 # that names it: one change does both, and the value
@@ -2279,6 +2295,8 @@ def field_type_refusal(view_type, ttype):
             "A many2many shows in a form, a list or a kanban only.",
             "many2many_view",
         )
+    if ttype == "properties":
+        return ArchError("A properties field shows in a form only.", "properties_view")
     return ArchError("A JSON field shows in a form or a list only.", "json_view")
 
 

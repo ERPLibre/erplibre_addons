@@ -203,6 +203,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(model)s cannot hold the definition of a properties field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "%(model)s cannot take access rights nor record rules from a studio project."
@@ -226,6 +232,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "%(model)s has no activities: an activity view needs the model to inherit mail.activity.mixin (a chatter)."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(model)s properties"
 msgstr ""
 
 #. module: erplibre_studio
@@ -287,6 +299,20 @@ msgstr ""
 msgid ""
 "%(name)s is not a many2one of %(comodel)s to %(model)s: choose an inverse, "
 "or let the studio create one."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"%(name)s is not a many2one of %(model)s: a properties field reads its "
+"definition through one."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid "%(name)s is not a properties definition field of %(model)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -899,6 +925,20 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "A project makes one module:"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A properties field goes in the form itself, not in the sub-view of a "
+"relation."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A properties field shows in a form only."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1768,6 +1808,14 @@ msgstr ""
 msgid ""
 "Fix each name marked below, a field in its inspector, a model in the Models "
 "space, then Apply."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_ir_model_fields__erplibre_studio_properties_definition
+msgid ""
+"For a custom properties field of ERPLibre studio: the many2one of the model "
+"and the properties definition field of its comodel it reads its definition "
+"from, written « many2one.field »."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5950,6 +5998,11 @@ msgid "Studio projects"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_ir_model_fields__erplibre_studio_properties_definition
+msgid "Studio properties definition"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Studio spaces"
@@ -6619,6 +6672,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The many2one %(container)s of the properties field %(name)s no longer points"
+" to %(model)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The map draws at least one geo field: its last layer is not removed."
 msgstr ""
@@ -6879,6 +6940,28 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid ""
 "The project has no model waiting for Apply: there is nothing to preview."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The properties definition field %(field)s of %(model)s, which %(name)s "
+"reads, no longer exists."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The properties field %(other)s reads its definition through %(field)s: "
+"remove %(other)s first."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The properties field has no many2one to read its definition through."
 msgstr ""
 
 #. module: erplibre_studio
@@ -7143,6 +7226,14 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid ""
 "The studio does not add fields to %(model)s: choose an existing inverse."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
+msgid ""
+"The studio does not add fields to %(model)s: choose another many2one for the"
+" properties."
 msgstr ""
 
 #. module: erplibre_studio
@@ -8453,6 +8544,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "project"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+msgid "properties, defined on %(model)s"
 msgstr ""
 
 #. module: erplibre_studio

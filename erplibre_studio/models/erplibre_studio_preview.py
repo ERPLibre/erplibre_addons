@@ -149,6 +149,11 @@ class ErplibreStudioProject(models.Model):
                 extra["relation_field"] = definition.get("relation_field")
             if ttype == "monetary":
                 extra["currency_field"] = definition.get("currency_field")
+            if ttype == "properties":
+                extra["definition_record"] = definition.get("definition_record")
+                extra["definition_record_field"] = definition.get(
+                    "definition_record_field"
+                )
             fields_info[name] = _field_info(
                 name, ttype, definition.get("field_description") or name, **extra
             )
@@ -200,7 +205,22 @@ class ErplibreStudioProject(models.Model):
         the chatter would call the routes of mail on a model that does not
         exist. Its many2one and many2many fields of ``fields_info`` (name:
         fields_get description) get PREVIEW_FIELD_OPTIONS, merged into the
-        options of the node when they read as a dict."""
+        options of the node when they read as a dict. A properties field
+        is a placeholder too: the simulation has no record of its comodel
+        to read the definition from."""
+        for node in list(arch.iter("field")):
+            info = (fields_info or {}).get(node.get("name")) or {}
+            if info.get("type") != "properties" or node.getparent() is None:
+                continue
+            placeholder = etree_placeholder(
+                info.get("string") or node.get("name"),
+                self.env._(
+                    "properties, defined on %(model)s",
+                    model=self._studio_model_label(info.get("relation") or ""),
+                ),
+            )
+            placeholder.tail = node.tail
+            node.getparent().replace(node, placeholder)
         for node in arch.iter("field"):
             info = (fields_info or {}).get(node.get("name")) or {}
             if info.get("type") not in ("many2one", "many2many"):
@@ -455,6 +475,11 @@ class ErplibreStudioProject(models.Model):
                 continue
             relation = definition.get("relation")
             if relation and relation not in self.env:
+                continue
+            if definition["ttype"] == "properties":
+                # Its definition field may be on a model of the database,
+                # where the sandbox creates no field: it stays a
+                # placeholder.
                 continue
             if definition["ttype"] == "one2many" and (
                 relation not in pending

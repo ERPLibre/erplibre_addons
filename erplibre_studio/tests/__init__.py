@@ -10,6 +10,7 @@ from . import (
     test_editor_models,
     test_editor_payload,
     test_field_json,
+    test_field_properties,
     test_field_name,
     test_field_options,
     test_groups,

@@ -16,6 +16,7 @@ from . import (
     erplibre_studio_app,
     erplibre_studio_group,
     base_module_uninstall,
+    ir_model_fields,
     ir_module_module,
     ir_ui_view,
 )

@@ -8,8 +8,8 @@ from odoo.tools import sql
 from .. import arch as studio_arch
 from .erplibre_studio_project import protected_model
 
-# The keys of the definition of an x2many that fix its relation: they never
-# change once the field is in the draft.
+# The keys of the definition of an x2many or a properties field that fix
+# its relation: they never change once the field is in the draft.
 RELATION_KEYS = (
     "relation",
     "relation_field",
@@ -17,6 +17,9 @@ RELATION_KEYS = (
     "relation_table",
     "column1",
     "column2",
+    "definition_record",
+    "definition_record_field",
+    "definition_new",
 )
 
 
@@ -24,7 +27,10 @@ class ErplibreStudioProject(models.Model):
     """The relational fields of a project: one2many (to an existing inverse
     many2one, or to one the project creates on the comodel), many2many (to
     a relation table named after the module), and the many2one, with the
-    one2many the project may create on its comodel."""
+    one2many the project may create on its comodel. A properties field
+    reads its definition through a many2one of its model, from a
+    properties definition field of the comodel, existing or created by
+    the project on the comodel as the inverse of a one2many is."""
 
     _inherit = "erplibre.studio.project"
 
@@ -55,9 +61,20 @@ class ErplibreStudioProject(models.Model):
         record is deleted comes from the comodel, whatever the payload says:
         « cascade » on a model of the project, « set null » on a model of the
         database, whose records the deletion of a record of the project must
-        never take with it."""
+        never take with it. A properties field creates the properties
+        definition field of its comodel (``definition_new``)."""
         ttype = definition.get("ttype")
         comodel = definition.get("relation")
+        if ttype == "properties":
+            new = definition.get("definition_new") or {}
+            if not new.get("name"):
+                return None
+            return new["name"], {
+                "ttype": "properties_definition",
+                "field_description": new.get("field_description") or new["name"],
+                "readonly": False,
+                "help": "",
+            }
         if ttype == "many2one":
             inverse = definition.get("inverse_o2m") or {}
             if not inverse.get("name"):
@@ -101,7 +118,8 @@ class ErplibreStudioProject(models.Model):
         """[(model, name, definition, change)] of every new field of the
         project, in the order Apply creates them: the scalar fields and the
         many2one (inverse many2one included), then the many2many, then the
-        one2many, whose inverse must exist first."""
+        one2many, whose inverse must exist first, then the properties
+        fields, whose many2one and definition field must exist first."""
         self.ensure_one()
         items = []
         for change in self._project_field_changes():
@@ -111,7 +129,7 @@ class ErplibreStudioProject(models.Model):
             inverse = self._studio_inverse_definition(change.model, definition)
             if inverse:
                 items.append((definition["relation"], *inverse, change))
-        rank = {"many2many": 1, "one2many": 2}
+        rank = {"many2many": 1, "one2many": 2, "properties": 3}
         return sorted(items, key=lambda item: rank.get(item[2].get("ttype"), 0))
 
     # ── one2many / many2many ────────────────────────────────────────────
@@ -410,6 +428,8 @@ class ErplibreStudioProject(models.Model):
             inverse = self._studio_inverse_definition(change.model, definition)
             if inverse and inverse[1]["ttype"] == "many2one":
                 created.append((definition["relation"], inverse[0], True))
+            for model, name, _is_inverse in created:
+                self._studio_check_container_kept(model, name, staying)
             for model, name, is_inverse in created:
                 other = next(
                     (
@@ -474,11 +494,257 @@ class ErplibreStudioProject(models.Model):
             result |= found
         return result
 
+    # ── properties ──────────────────────────────────────────────────────
+
+    def _studio_check_container_kept(self, model, name, changes=None):
+        """Raise UserError when a properties field of ``changes`` (the
+        add_field changes of the project by default) reads its definition
+        through the many2one ``name`` of ``model``: that many2one keeps its
+        name and stays while the field does."""
+        self.ensure_one()
+        if changes is None:
+            changes = self._project_field_changes()
+        for other in changes.filtered(
+            lambda c: c.change_type == "add_field" and c.model == model
+        ):
+            definition = other._payload().get("field") or {}
+            if (
+                definition.get("ttype") == "properties"
+                and definition.get("definition_record") == name
+            ):
+                raise UserError(
+                    self.env._(
+                        "The properties field %(other)s reads its definition "
+                        "through %(field)s: remove %(other)s first.",
+                        other=f"{other.model}.{other.field_name}",
+                        field=f"{model}.{name}",
+                    )
+                )
+
+    def _studio_many2one_fields(self, model):
+        """{name: {name, label, comodel, pending}}: the stored many2one
+        fields of ``model`` (simulated for a model of the project not
+        created yet) and the new many2one of the project on it, inverses
+        of one2many included."""
+        self.ensure_one()
+        result = {}
+        line = self._studio_pending_line(model)
+        if line:
+            for name, info in self._studio_simulated_fields(line).items():
+                if info.get("type") == "many2one" and info.get("relation"):
+                    result[name] = {
+                        "name": name,
+                        "label": info.get("string") or name,
+                        "comodel": info["relation"],
+                        "pending": True,
+                    }
+            return result
+        for name, field in self.env[model]._fields.items():
+            if field.type == "many2one" and field.store:
+                result[name] = {
+                    "name": name,
+                    "label": field.string or name,
+                    "comodel": field.comodel_name,
+                    "pending": False,
+                }
+        for name, (definition, _change) in self._studio_field_definitions(
+            model
+        ).items():
+            if definition.get("ttype") == "many2one" and name not in result:
+                result[name] = {
+                    "name": name,
+                    "label": definition.get("field_description") or name,
+                    "comodel": definition.get("relation"),
+                    "pending": True,
+                }
+        return result
+
+    def _studio_properties_refusal(self, comodel):
+        """Why the records of ``comodel`` cannot hold the definition of a
+        properties field, or None: a model neither in the registry nor
+        created by the project, a transient or abstract model, a model the
+        studio adds no field to (``protected_model``)."""
+        if comodel not in self._studio_new_models():
+            Comodel = self.env.get(comodel) if comodel else None
+            if Comodel is None or Comodel._transient or Comodel._abstract:
+                return self.env._(
+                    "%(model)s cannot hold the definition of a properties field.",
+                    model=comodel,
+                )
+        if protected_model(comodel):
+            return self.env._(
+                "The studio does not add fields to %(model)s: choose another "
+                "many2one for the properties.",
+                model=comodel,
+            )
+        return None
+
+    def _studio_properties_definitions(self, comodel):
+        """[{name, label}] of the properties definition fields of
+        ``comodel``, those of the registry (simulated for a model of the
+        project not created yet), sorted by label."""
+        self.ensure_one()
+        line = self._studio_pending_line(comodel)
+        if line:
+            infos = {
+                name: info.get("string") or name
+                for name, info in self._studio_simulated_fields(line).items()
+                if info.get("type") == "properties_definition"
+            }
+        elif comodel in self.env:
+            infos = {
+                name: field.string or name
+                for name, field in self.env[comodel]._fields.items()
+                if field.type == "properties_definition"
+            }
+        else:
+            infos = {}
+        return sorted(
+            ({"name": name, "label": label} for name, label in infos.items()),
+            key=lambda item: item["label"].lower(),
+        )
+
+    def _studio_proposed_properties(self, model, comodel, taken=None):
+        """(name, label) of the properties definition field a new properties
+        field of ``model`` creates on ``comodel``: « <model label>
+        properties », and a name made of it, free on the comodel."""
+        label = self.env._(
+            "%(model)s properties", model=self._studio_model_label(model)
+        )
+        taken = self._taken_field_names(comodel) | set(taken or ())
+        return studio_arch.field_name_from_label(label, taken), label
+
+    def _clean_properties(self, model, name, field, existing=None):
+        """The relation keys of a new properties field ``name`` of
+        ``model``: {definition_record, relation, definition_record_field,
+        definition_new?}. ``definition_record`` is a many2one of ``model``
+        (``_studio_many2one_fields``), ``relation`` its comodel, which the
+        inverse fields follow; ``definition_record_field`` a properties
+        definition field of the comodel, or the one the project creates
+        there, ``definition_new`` {name, field_description}. ``existing``:
+        the definition the field had, whose relation keys stay."""
+        if existing:
+            return self._kept_relation(name, field, existing)
+        record = field.get("definition_record")
+        container = self._studio_many2one_fields(model).get(record)
+        if not container:
+            raise UserError(
+                self.env._(
+                    "%(name)s is not a many2one of %(model)s: a properties "
+                    "field reads its definition through one.",
+                    name=record,
+                    model=model,
+                )
+            )
+        comodel = container["comodel"]
+        problem = self._studio_properties_refusal(comodel)
+        if problem:
+            raise UserError(problem)
+        result = {"definition_record": record, "relation": comodel}
+        new = field.get("definition_new")
+        if not new:
+            record_field = field.get("definition_record_field")
+            known = [d["name"] for d in self._studio_properties_definitions(comodel)]
+            if record_field not in known:
+                raise UserError(
+                    self.env._(
+                        "%(name)s is not a properties definition field of "
+                        "%(model)s.",
+                        name=record_field,
+                        model=comodel,
+                    )
+                )
+            result["definition_record_field"] = record_field
+            return result
+        new = new if isinstance(new, dict) else {}
+        taken = {name} if comodel == model else set()
+        proposed, label = self._studio_proposed_properties(model, comodel, taken)
+        label = (new.get("field_description") or "").strip() or label
+        self._check_field_texts(label, "")
+        new_name = (new.get("name") or "").strip() or proposed
+        if new_name in taken:
+            raise UserError(
+                self.env._("The field %(name)s already exists.", name=new_name)
+            )
+        problem = self._studio_field_name_problem(comodel, new_name)
+        if problem:
+            raise UserError(problem["message"])
+        result["definition_record_field"] = new_name
+        result["definition_new"] = {
+            "name": new_name,
+            "field_description": label,
+        }
+        return result
+
+    def _studio_properties_choices(self, model):
+        """[{name, label, comodel, comodel_label, pending, definitions,
+        proposed}]: the many2one fields of ``model`` a new properties field
+        can read its definition through, those whose comodel takes it
+        (``_studio_properties_refusal``), sorted by label; ``definitions``
+        the properties definition fields of the comodel, ``proposed``
+        {name, label} the one the project would create there."""
+        self.ensure_one()
+        result = []
+        for item in self._studio_many2one_fields(model).values():
+            comodel = item["comodel"]
+            if self._studio_properties_refusal(comodel):
+                continue
+            name, label = self._studio_proposed_properties(model, comodel)
+            result.append(
+                {
+                    **item,
+                    "comodel_label": self._studio_model_label(comodel),
+                    "definitions": self._studio_properties_definitions(comodel),
+                    "proposed": {"name": name, "label": label},
+                }
+            )
+        return sorted(result, key=lambda item: item["label"].lower())
+
+    def _studio_check_properties(self, model, name, definition):
+        """Raise UserError when the properties field ``name`` of ``model``
+        (its ``definition``) no longer applies: its many2one is no longer a
+        many2one to its comodel, or its definition field no longer exists
+        and is not one the project creates."""
+        label = f"{model}.{name}"
+        record = definition.get("definition_record")
+        relation = definition.get("relation")
+        container = self._studio_many2one_fields(model).get(record)
+        if not container or container["comodel"] != relation:
+            raise UserError(
+                self.env._(
+                    "The many2one %(container)s of the properties field "
+                    "%(name)s no longer points to %(model)s.",
+                    container=record,
+                    name=label,
+                    model=relation,
+                )
+            )
+        problem = self._studio_properties_refusal(relation)
+        if problem:
+            raise UserError(problem)
+        if definition.get("definition_new"):
+            return
+        record_field = definition.get("definition_record_field")
+        if record_field not in [
+            d["name"] for d in self._studio_properties_definitions(relation)
+        ]:
+            raise UserError(
+                self.env._(
+                    "The properties definition field %(field)s of %(model)s, "
+                    "which %(name)s reads, no longer exists.",
+                    field=record_field,
+                    model=relation,
+                    name=label,
+                )
+            )
+
     def _studio_check_relations(self):
         """Raise UserError when a relational field of the draft no longer
         applies: its comodel left the registry and the project, the inverse
         of a one2many is no longer a many2one to its model, the table of a
-        many2many is too long or taken by another field."""
+        many2many is too long or taken by another field, a properties field
+        lost its many2one or its definition field
+        (``_studio_check_properties``)."""
         self.ensure_one()
         new_models = self._studio_new_models()
         Fields = self.env["ir.model.fields"].sudo()
@@ -486,6 +752,9 @@ class ErplibreStudioProject(models.Model):
         for model, name, definition, _change in self._studio_all_definitions():
             ttype = definition.get("ttype")
             relation = definition.get("relation")
+            if ttype == "properties":
+                self._studio_check_properties(model, name, definition)
+                continue
             if ttype not in ("many2one", *studio_arch.X2MANY_TYPES):
                 continue
             label = f"{model}.{name}"
