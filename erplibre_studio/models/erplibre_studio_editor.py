@@ -212,6 +212,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         else:
             Model = self.env[model]
             info = Model.fields_get(attributes=FIELD_ATTRIBUTES)
+            for field_info in info.values():
+                studio_arch.unqueryable_flags(field_info)
             names = set(Model._fields)
         definitions = project._studio_field_definitions(model) if project else {}
         for name, (definition, change) in definitions.items():
@@ -270,6 +272,12 @@ class ErplibreStudioEditor(models.AbstractModel):
                 item["string"] = self.env._("Documents (DMS)")
                 item["special"] = studio_arch.DMS_VIEW_TYPE
             if view_type == "search" and not info.get("searchable"):
+                continue
+            if view_type not in ("form", "list") and (
+                info.get("type") in studio_arch.UNQUERYABLE_TYPES
+            ):
+                # Odoo neither searches nor groups by it, whatever
+                # « searchable » or « groupable » reads.
                 continue
             if view_type == "calendar" and info.get("type") in (
                 "one2many",
@@ -354,6 +362,13 @@ class ErplibreStudioEditor(models.AbstractModel):
             ]
             return sorted(items, key=lambda item: (item[1] or "").lower())
 
+        def queryable(flag):
+            # The flag of fields_get, false for UNQUERYABLE_TYPES, which
+            # Odoo neither searches, sorts nor groups by.
+            return lambda f: (
+                f.get(flag) and f.get("type") not in studio_arch.UNQUERYABLE_TYPES
+            )
+
         def stored(types):
             return lambda f: f.get("type") in types and f.get("store")
 
@@ -370,7 +385,7 @@ class ErplibreStudioEditor(models.AbstractModel):
         }
         return {
             **choices,
-            "group_field": fields_where(lambda f: f.get("groupable")),
+            "group_field": fields_where(queryable("groupable")),
             "relation_group_field": fields_where(
                 lambda f: f.get("groupable")
                 and f.get("type") in studio_arch.RELATION_TYPES
@@ -380,8 +395,8 @@ class ErplibreStudioEditor(models.AbstractModel):
             "bool_field": fields_where(stored(("boolean",))),
             "number_field": fields_where(stored(("integer", "float"))),
             "measure": fields_where(self._measurable),
-            "search_field": fields_where(lambda f: f.get("searchable")),
-            "sort_field": fields_where(lambda f: f.get("sortable")),
+            "search_field": fields_where(queryable("searchable")),
+            "sort_field": fields_where(queryable("sortable")),
             "bool": [["True", "True"], ["False", "False"]],
             "calendar_filter": [["True", "True"]],
             "parent_field": fields_where(

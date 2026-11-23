@@ -261,6 +261,7 @@ NEW_FIELD_TYPES = (
     "many2one",
     "text",
     "html",
+    "json",
     "monetary",
     "one2many",
     "many2many",
@@ -1917,6 +1918,9 @@ class ErplibreStudioProject(models.Model):
             "many2many_view": lambda: self.env._(
                 "A many2many shows in a form, a list or a kanban only."
             ),
+            "json_view": lambda: self.env._(
+                "A JSON field shows in a form or a list only."
+            ),
             "geo_view": lambda: self.env._(
                 "A geo field shows as a map in a form only."
             ),
@@ -2035,7 +2039,9 @@ class ErplibreStudioProject(models.Model):
         Model = self.env[model]
         if not name or name not in Model._fields:
             raise UserError(self.env._("Unknown field %(name)s.", name=name))
-        return Model.fields_get([name], attributes=FIELD_INFO)[name]
+        return studio_arch.unqueryable_flags(
+            Model.fields_get([name], attributes=FIELD_INFO)[name]
+        )
 
     def _studio_pending_line(self, model):
         """The model line of the project that creates ``model``, while not
@@ -2160,12 +2166,13 @@ class ErplibreStudioProject(models.Model):
 
     def _op_add_field(self, view, arch, op):
         """A new field dropped into the view; an x2many shows as an inline
-        sub-list in a form, a many2many as tags in a list or a kanban. On a
-        map, the field of a lane: ``attribute`` names the root attribute it
-        becomes (``_leaflet_new_field``)."""
+        sub-list in a form, a many2many as tags in a list or a kanban, a
+        JSON field read-only (``new_field_node``). On a map, the field of a
+        lane: ``attribute`` names the root attribute it becomes
+        (``_leaflet_new_field``)."""
         target, position, _node = self._check_drop(arch, op, view.type)
         field = op.get("field") or {}
-        self._refuse(studio_arch.x2many_refusal(view.type, field.get("ttype")))
+        self._refuse(studio_arch.field_type_refusal(view.type, field.get("ttype")))
         self._refuse(studio_arch.geo_refusal(view.type, field.get("ttype")))
         root_attribute = None
         if view.type == "leaflet_map":
@@ -2180,15 +2187,15 @@ class ErplibreStudioProject(models.Model):
         }
         if root_attribute:
             payload["root_attribute"] = root_attribute
+        display_field = None
         if definition["ttype"] in studio_arch.X2MANY_TYPES:
-            attrs, children = studio_arch.x2many_node(
-                view.type,
-                definition["ttype"],
-                self._studio_display_field(definition["relation"]),
-            )
-            payload["node_attrs"] = attrs
-            if children:
-                payload["node_children"] = children
+            display_field = self._studio_display_field(definition["relation"])
+        attrs, children = studio_arch.new_field_node(
+            view.type, definition["ttype"], display_field
+        )
+        payload["node_attrs"] = attrs
+        if children:
+            payload["node_children"] = children
         return self._add_change(view, "add_field", target, position, payload)
 
     def _leaflet_new_field(self, op, target, position):
@@ -2258,13 +2265,18 @@ class ErplibreStudioProject(models.Model):
             raise UserError(
                 self.env._("The field %(name)s is already in the view.", name=name)
             )
+        ttype = self._field_info(view.model, name).get("type")
         self._refuse(
             studio_arch.geo_refusal(
                 view.type,
-                self._field_info(view.model, name).get("type"),
+                ttype,
                 templated=self._in_template_drop(node, position),
             )
         )
+        if ttype in studio_arch.UNQUERYABLE_TYPES:
+            # A field Odoo neither searches nor groups by, whatever its
+            # flags: the views of FIELD_TYPE_VIEW_TYPES only.
+            self._refuse(studio_arch.field_type_refusal(view.type, ttype))
         node_attrs = {}
         extra = {}
         if view.type == "timeline" and studio_arch.in_template(node):

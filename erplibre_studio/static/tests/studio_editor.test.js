@@ -16,6 +16,7 @@ import {
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
 import {findBlock, isTrue, selectionToText, textToSelection} from "@erplibre_studio/editor/studio_editor";
+import {fieldTypeFits} from "@erplibre_studio/editor/studio_relations";
 
 const NAME = "//field[@name='name']";
 const EMAIL = "//field[@name='email']";
@@ -101,6 +102,8 @@ let holdOperation;
 // with ``merge`` folds into the last one, or removes it when the columns
 // are back in their first order.
 let moveChanges;
+// The type of the field an add_field answers with, its label « Text ».
+let addedType;
 
 beforeEach(() => {
     serverState.debug = "1";
@@ -109,6 +112,7 @@ beforeEach(() => {
     answer = payload([column("name", "Name"), column("email", "Email")]);
     holdOperation = null;
     moveChanges = null;
+    addedType = "char";
     onRpc("erplibre.studio.editor", "get_editor_data", (args) => {
         expect.step(`get_editor_data ${args.args.slice(0, 4).join(" ")}`);
         if (args.kwargs.pick_project === false) {
@@ -126,14 +130,14 @@ beforeEach(() => {
             await holdOperation;
         }
         if (operation.type === "add_field") {
-            expect(operation.field.ttype).toBe("char");
+            expect(operation.field.ttype).toBe(addedType);
             answer = payload([column("name", "Name"), column("email", "Email"), column("x_text", "Text")]);
             answer.fields.x_text = {
                 string: "Text",
-                type: "char",
+                type: addedType,
                 project: true,
                 pending: true,
-                definition: {ttype: "char", field_description: "Text", help: "", readonly: false},
+                definition: {ttype: addedType, field_description: "Text", help: "", readonly: false},
             };
         } else if (operation.type === "move") {
             // The columns in their new order: the source before the target,
@@ -492,6 +496,30 @@ describe("erplibre_studio editor", () => {
         expect(".o_erplibre_studio_field[data-name=x_text] .o_erplibre_studio_flag[data-flag=pending]").toHaveCount(1);
         expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "x_text");
         expect(".o_erplibre_studio_prop_label").toHaveValue("Text");
+    });
+
+    test("a JSON field: among the other types of a form or a list, read-only", async () => {
+        const types = ["char", "integer", "float", "boolean", "date", "datetime", "selection", "many2one"];
+        answer = payload(answer.blocks.children, {field_types: [...types, "text", "html", "json", "monetary"]});
+        await openEditor();
+        // Not among the common types: under « Show the other types ».
+        expect(".o_erplibre_studio_new_field").toHaveCount(8);
+        expect(".o_erplibre_studio_new_field[data-type=json]").toHaveCount(0);
+        await contains(".o_erplibre_studio_more_types").click();
+        expect(".o_erplibre_studio_new_field[data-type=json]").toHaveCount(1);
+        expect(".o_erplibre_studio_new_field[data-type=json]").toHaveText(/JSON/);
+        // A form or a list only: a kanban, a search or a pivot leaves it out.
+        expect(["form", "list", "kanban", "search", "pivot"].filter((t) => fieldTypeFits("json", t))).toEqual([
+            "form",
+            "list",
+        ]);
+        addedType = "json";
+        await contains(".o_erplibre_studio_new_field[data-type=json]").dragAndDrop(hook("/list", "inside"));
+        expect.verifySteps(["apply_operation add_field inside /list"]);
+        expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "x_text");
+        expect(".o_erplibre_studio_json_help").toHaveText(
+            "Shown read-only: its value comes from code, an import or the API."
+        );
     });
 
     test("the properties relabel a column; apply", async () => {

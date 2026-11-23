@@ -529,6 +529,12 @@ msgstr "Une vue GeoEngine demande un champ géographique sur %(model)s : ajoutez
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A JSON field shows in a form or a list only."
+msgstr "Un champ JSON s'affiche seulement dans un formulaire ou une liste."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "A Python keyword, a namespace of Odoo (ir, res, base, web, bus, report) or a"
 " model that takes no access right. The x_ prefix avoids this case."
@@ -1857,6 +1863,12 @@ msgstr "Format invalide : minuscules, chiffres, _ et points seulement"
 msgid ""
 "Its technical name changes in a form, list or kanban view, until Apply."
 msgstr "Son nom technique se change dans une vue formulaire, liste ou kanban, jusqu'à l'Apply."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "JSON"
+msgstr "JSON"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5836,6 +5848,14 @@ msgstr "Voir : %(item)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 msgid "Shown as one selection in the user form."
 msgstr "Affiché comme une seule sélection dans la fiche utilisateur."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Shown read-only: its value comes from code, an import or the API."
+msgstr ""
+"Affiché en lecture seule : sa valeur vient du code, d'une importation ou de "
+"l'API."
 
 #. module: erplibre_studio
 #. odoo-javascript

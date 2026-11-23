@@ -68,8 +68,9 @@ def _field_info(name, ttype, string, **extra):
         "readonly": False,
         "help": "",
         "store": stored,
-        "searchable": True,
-        "sortable": stored and ttype not in studio_arch.X2MANY_TYPES,
+        "searchable": ttype not in studio_arch.UNQUERYABLE_TYPES,
+        "sortable": stored
+        and ttype not in studio_arch.X2MANY_TYPES + studio_arch.UNQUERYABLE_TYPES,
         "groupable": stored and ttype in GROUPABLE_TYPES,
         "aggregator": "sum" if ttype in SUM_TYPES else False,
         "relation": False,
@@ -166,6 +167,8 @@ class ErplibreStudioProject(models.Model):
         else:
             Model = self.env[line.model]
             infos = Model.fields_get(attributes=["string", "type", "sortable"])
+            for info in infos.values():
+                studio_arch.unqueryable_flags(info)
             definitions = self._studio_field_definitions(line.model)
             removed = set(
                 self.field_ids.filtered(lambda f: f.model == line.model).mapped("name")

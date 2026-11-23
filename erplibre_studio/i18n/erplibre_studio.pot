@@ -488,6 +488,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A JSON field shows in a form or a list only."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "A Python keyword, a namespace of Odoo (ir, res, base, web, bus, report) or a"
 " model that takes no access right. The x_ prefix avoids this case."
@@ -1842,6 +1848,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid ""
 "Its technical name changes in a form, list or kanban view, until Apply."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "JSON"
 msgstr ""
 
 #. module: erplibre_studio
@@ -5808,6 +5820,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
 msgid "Shown on opening"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Shown read-only: its value comes from code, an import or the API."
 msgstr ""
 
 #. module: erplibre_studio

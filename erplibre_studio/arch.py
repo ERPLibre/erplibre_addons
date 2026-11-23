@@ -595,10 +595,22 @@ SUBVIEW_TAGS = ("list", "field")
 X2MANY_TYPES = ("one2many", "many2many")
 # The fields whose records a domain restricts.
 RELATIONAL_TYPES = ("many2one",) + X2MANY_TYPES
-X2MANY_VIEW_TYPES = {
+# The view types a new field of each type goes in; a type missing from the
+# map goes in every view. A JSON field (fields.Json) shows read-only through
+# the widget « jsonb » in a form or a list: Odoo neither searches nor groups
+# it, and a kanban has no widget that reads it.
+FIELD_TYPE_VIEW_TYPES = {
     "one2many": ("form",),
     "many2many": ("form", "list", "kanban"),
+    "json": ("form", "list"),
 }
+# The field types Odoo neither searches, sorts nor groups by: the editor
+# offers them to a form or a list only, never as a search, sort or group
+# choice, whatever « searchable » or « sortable » fields_get answers.
+UNQUERYABLE_TYPES = ("json", "properties", "properties_definition")
+# The attributes of the node of a new field of each type, in the views of
+# FIELD_TYPE_VIEW_TYPES that take it (an x2many reads ``x2many_node``).
+NEW_FIELD_NODE_ATTRS = {"json": {"widget": "jsonb"}}
 # The geometry field types of base_geoengine, a PostGIS column each, in the
 # order the editor lists their shapes. Their widget draws a map that reads
 # the raster layers of a geoengine view of the model: a form shows one, a
@@ -2252,17 +2264,39 @@ def _leaflet_attributes(view_type, leaflet):
     }
 
 
-def x2many_refusal(view_type, ttype):
+def field_type_refusal(view_type, ttype):
     """Why a new field of type ``ttype`` cannot be added to a ``view_type``
-    view (an ArchError), or None when it can."""
-    if ttype in X2MANY_TYPES and view_type not in X2MANY_VIEW_TYPES[ttype]:
-        if ttype == "one2many":
-            return ArchError("A one2many shows in a form only.", "x2many_view")
+    view (an ArchError, after FIELD_TYPE_VIEW_TYPES), or None when it
+    can."""
+    if ttype not in FIELD_TYPE_VIEW_TYPES:
+        return None
+    if view_type in FIELD_TYPE_VIEW_TYPES[ttype]:
+        return None
+    if ttype == "one2many":
+        return ArchError("A one2many shows in a form only.", "x2many_view")
+    if ttype == "many2many":
         return ArchError(
             "A many2many shows in a form, a list or a kanban only.",
             "many2many_view",
         )
-    return None
+    return ArchError("A JSON field shows in a form or a list only.", "json_view")
+
+
+def unqueryable_flags(info):
+    """``info``, a ``fields_get`` description, with « searchable »,
+    « sortable » and « groupable » false for a field of UNQUERYABLE_TYPES:
+    fields_get answers them from the column alone."""
+    if info.get("type") in UNQUERYABLE_TYPES:
+        info.update(searchable=False, sortable=False, groupable=False)
+    return info
+
+
+def x2many_refusal(view_type, ttype):
+    """``field_type_refusal`` for an x2many ``ttype``, None for another
+    type."""
+    if ttype not in X2MANY_TYPES:
+        return None
+    return field_type_refusal(view_type, ttype)
 
 
 def geo_refusal(view_type, ttype, templated=False):
@@ -2295,6 +2329,16 @@ def number_true(text):
     except ValueError:
         return False
     return bool(value) and not math.isnan(value)
+
+
+def new_field_node(view_type, ttype, display_field=None):
+    """(node attributes, children) of a new field of type ``ttype`` in a
+    ``view_type`` view: an x2many reads ``x2many_node`` with
+    ``display_field``, another type NEW_FIELD_NODE_ATTRS and no
+    children."""
+    if ttype in X2MANY_TYPES:
+        return x2many_node(view_type, ttype, display_field)
+    return dict(NEW_FIELD_NODE_ATTRS.get(ttype, {})), []
 
 
 def x2many_node(view_type, ttype, display_field):

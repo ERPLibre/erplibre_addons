@@ -716,6 +716,10 @@
                         />
                         Read-only everywhere
                     </label>
+                    <span
+                        t-if="field.definition.ttype === 'json'"
+                        class="d-block small text-muted mb-1 o_erplibre_studio_json_help"
+                    >Shown read-only: its value comes from code, an import or the API.</span>
                     <t t-set="options" t-value="fieldOptions(field)" />
                     <div t-if="options.translate or options.index or options.size" class="o_erplibre_studio_field_options mb-1">
                         <label t-if="options.translate" class="o_erplibre_studio_check d-flex align-items-center gap-2 border rounded p-2 mb-1">
