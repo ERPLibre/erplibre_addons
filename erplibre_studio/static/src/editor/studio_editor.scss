@@ -1581,6 +1581,212 @@
         gap: 0.5rem 0.75rem;
     }
 
+    // Focus on a block of a form. The « Focus » button of the title line
+    // of a focus block stays a tab stop at rest, transparent; it shows on
+    // the hover of its block, on a focus inside it, on its selection.
+    .o_erplibre_studio_focus_btn {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        gap: 0.25rem;
+        height: 1.5rem;
+        margin-left: auto;
+        padding: 0 0.5rem;
+        border: 1px solid $border-color;
+        border-radius: 0.375rem;
+        background-color: $o-view-background-color;
+        color: $primary;
+        font-size: 0.75rem;
+        font-weight: $font-weight-bold;
+        line-height: 1;
+        white-space: nowrap;
+        opacity: 0;
+
+        &:focus-visible {
+            opacity: 1;
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+        }
+    }
+
+    .o_erplibre_studio_title_chip > .o_erplibre_studio_focus_btn {
+        margin-left: 0;
+        margin-right: 0.25rem;
+        transform: translateY(-50%);
+    }
+
+    .o_erplibre_studio_container:is(:hover, :focus-within, .o_erplibre_studio_selected)
+        > .o_erplibre_studio_container_title
+        > .o_erplibre_studio_focus_btn,
+    .o_erplibre_studio_notebook:is(
+            :hover,
+            :focus-within,
+            :has(> .o_erplibre_studio_container[data-tag="page"].o_erplibre_studio_selected)
+        )
+        > .o_erplibre_studio_notebook_head
+        > .o_erplibre_studio_focus_btn {
+        opacity: 1;
+    }
+
+    // The bar of the focus, and the one of the full form after it.
+    .o_erplibre_studio_focus_bar,
+    .o_erplibre_studio_full_bar {
+        max-width: 1140px;
+        padding: 0.3rem 0.4rem 0.3rem 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 0.5rem;
+        background-color: $o-view-background-color;
+        font-size: $font-size-sm;
+    }
+
+    .o_erplibre_studio_focus_badge {
+        color: $primary;
+        font-weight: $font-weight-bold;
+    }
+
+    .o_erplibre_studio_focus_path {
+        color: $gray-700;
+
+        > .o_erplibre_studio_focus_form {
+            color: $gray-700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+    }
+
+    .o_erplibre_studio_focus_esc {
+        color: $gray-700;
+
+        > kbd {
+            padding: 0 0.375rem;
+            border: 1px solid $gray-400;
+            border-bottom-width: 2px;
+            border-radius: 0.25rem;
+            background-color: $gray-100;
+            color: $body-color;
+            font-family: inherit;
+            font-size: 0.6875rem;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    .o_erplibre_studio_full_text {
+        color: $gray-700;
+    }
+
+    .o_erplibre_studio_full_back {
+        border: 1px solid $primary;
+        background-color: mix($primary, $white, 8%);
+        color: $primary;
+        font-weight: $font-weight-bold;
+    }
+
+    // The form with the focus on a block: one sheet of lines.
+    .o_erplibre_studio_focus_sheet {
+        max-width: 1140px;
+        padding: 1rem 1.25rem 1.25rem 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 0.5rem;
+        background-color: $o-view-background-color;
+        box-shadow: 0 1px 3px rgba($black, 0.08);
+    }
+
+    .o_erplibre_studio_focus_open {
+        margin: 0.25rem 0;
+        padding: 0.75rem 0.875rem 0.5rem 0.25rem;
+        border: 1px solid mix($primary, $white, 35%);
+        border-radius: 0.625rem;
+    }
+
+    .o_erplibre_studio_focus_open_title {
+        margin: 0 0 0.375rem 1.25rem;
+        color: $body-color;
+        font-size: 1rem;
+        font-weight: $font-weight-bold;
+    }
+
+    // A folded block, a summary: one line, muted by its background; its
+    // text keeps a contrast of 4.5:1 at least.
+    .o_erplibre_studio_folded,
+    .o_erplibre_studio_folded_static {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        min-height: 2.125rem;
+        padding: 0.3rem 0.75rem;
+        border: 1px solid $gray-200;
+        border-radius: 0.5rem;
+        background-color: $gray-100;
+        color: $gray-700;
+        font-size: $font-size-sm;
+        text-align: left;
+    }
+
+    .o_erplibre_studio_folded {
+        cursor: pointer;
+
+        &:hover {
+            border-color: $gray-300;
+            background-color: $gray-200;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+        }
+    }
+
+    .o_erplibre_studio_folded_label {
+        color: $gray-800;
+        font-weight: 500;
+    }
+
+    .o_erplibre_studio_folded_changes {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        margin-left: auto;
+        font-size: 0.75rem;
+    }
+
+    .o_erplibre_studio_folded_ring {
+        width: 7px;
+        height: 7px;
+        border: 1.5px solid $info;
+        border-radius: 50%;
+        box-sizing: border-box;
+    }
+
+    .o_erplibre_studio_focus_indent {
+        width: calc(100% - 1.125rem);
+        margin-left: 1.125rem;
+    }
+
+    .o_erplibre_studio_focus_context {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 2px 2px;
+        color: $gray-700;
+        font-size: 0.6875rem;
+        font-weight: $font-weight-bold;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .o_erplibre_studio_outline_focus {
+        box-shadow: inset 3px 0 0 $primary;
+    }
+
+    .o_erplibre_studio_palette_target {
+        background-color: $o-view-background-color;
+    }
+
+    .o_erplibre_studio_palette_target_block {
+        color: $primary;
+    }
+
     // An operation is running: no drag nor drop until its answer.
     .o_erplibre_studio_busy {
         pointer-events: none;

@@ -44,6 +44,9 @@ import {
     conditionValue,
     fieldTypeLabel,
     findBlock,
+    focusBlockOf,
+    focusBlocks,
+    focusEndHook,
     graphLaneLabel,
     graphLanes,
     isBaseInvisible,
@@ -69,6 +72,9 @@ export {
     fieldTypeLabel,
     fieldWidgets,
     findBlock,
+    focusBlockOf,
+    focusBlocks,
+    focusEndHook,
     graphAxes,
     graphLanes,
     isBaseInvisible,
@@ -297,6 +303,10 @@ export class StudioEditor extends Component {
             // The last insertion of that list (``insertAt``): {changeId,
             // where, container}, the id of the change it made; null for none.
             lastInsert: null,
+            // The focus on a block of a form (``focusBlocks``): whether it
+            // is on, the path of the block in focus, and the path of the
+            // last one, which the full form offers to go back to.
+            focus: {on: false, path: null, last: null},
         });
         this.previewCount = 0;
         // The menus of the top bar, closed by their items once chosen.
@@ -449,6 +459,7 @@ export class StudioEditor extends Component {
             // Its target was located in a draft that is gone.
             this.state.filterForm = null;
         }
+        this.checkFocus();
         await this.refreshModelPreview();
         return data;
     }
@@ -498,6 +509,7 @@ export class StudioEditor extends Component {
             insert: null,
             lastInsert: null,
         });
+        this.resetFocus();
     }
 
     /**
@@ -892,6 +904,7 @@ export class StudioEditor extends Component {
         value = String(value || "");
         this.state.selected = null;
         this.state.insert = null;
+        this.resetFocus();
         this.closePanel();
         this.state.space = "view";
         const projectId = parseInt(value) || false;
@@ -1367,6 +1380,13 @@ export class StudioEditor extends Component {
      * holds the selection, else of the first notebook of the form; only
      * a form without a notebook gets a new one, on the hooks above. The
      * drop on that hook then runs as a drop of a drag does.
+     *
+     * With the focus on a block of a form (``focusEntry``), the canvas
+     * draws the hooks of that block only: the item goes right after the
+     * selected element of the block that is no container
+     * (``focusSelectedLeaf``), else at the end of the block
+     * (``focusEndHook``); a tab goes at the end of the tabs of the
+     * notebook that holds the block, whose tabs the focus does not draw.
      */
     async addFromPalette(item) {
         if (this.state.busy) {
@@ -1399,8 +1419,19 @@ export class StudioEditor extends Component {
             })
             .filter((hook) => this.accepts(item, hook.zone, hook.target, hook.position));
         const wanted = [];
-        const trail = this.state.selected ? blockTrail(this.root, this.state.selected) : [];
+        const focus = this.focusEntry;
+        const leaf = focus && this.focusSelectedLeaf;
+        // With the focus on, only a leaf of the block in focus places the
+        // item after it; the rest goes at the end of the block.
+        const from = focus ? leaf && leaf.path : this.state.selected;
+        const trail = blockTrail(this.root, from);
         const selected = trail[trail.length - 1];
+        if (focus && item.kind === "page") {
+            const notebook = blockTrail(this.root, focus.path).findLast((b) => b.tag === "notebook");
+            if (notebook) {
+                hooks.push({target: notebook.path, position: "inside", zone: "pages"});
+            }
+        }
         const tabs = item.kind === "page" ? hooks.filter((h) => h.zone === "pages") : [];
         if (tabs.length) {
             const notebook = [...trail].reverse().find((b) => b.tag === "notebook");
@@ -1423,6 +1454,9 @@ export class StudioEditor extends Component {
                 wanted.push({target: next.path, position: "before"});
             }
             wanted.push({target: parent.path, position: "inside"});
+        }
+        if (focus) {
+            wanted.push(focusEndHook(focus));
         }
         const hook =
             wanted
@@ -1938,6 +1972,205 @@ export class StudioEditor extends Component {
         }
     }
 
+    // ── focus on a block ────────────────────────────────────────────────
+
+    /** The focus blocks of the form on screen (``focusBlocks``); none for another view type. */
+    get focusEntries() {
+        return this.viewType === "form" ? focusBlocks(this.root) : [];
+    }
+
+    /** The focus block at ``path``, or null. */
+    focusEntryAt(path) {
+        return (path && this.focusEntries.find((entry) => entry.path === path)) || null;
+    }
+
+    /** The focus block in focus, or null when the focus is off. */
+    get focusEntry() {
+        const focus = this.state.focus;
+        return focus.on ? this.focusEntryAt(focus.path) : null;
+    }
+
+    /**
+     * The last focus block once the focus is off, which the full form
+     * offers to go back to; null while the focus is on, in the preview,
+     * or without one.
+     */
+    get focusLastEntry() {
+        const focus = this.state.focus;
+        return focus.on || this.state.preview ? null : this.focusEntryAt(focus.last);
+    }
+
+    /**
+     * The selected block when the block in focus holds it and it is no
+     * container: the palette adds right after it. Null otherwise.
+     */
+    get focusSelectedLeaf() {
+        const entry = this.focusEntry;
+        const path = this.state.selected;
+        if (!entry || !path || path === entry.path) {
+            return null;
+        }
+        const block = blockTrail(entry.block, path).at(-1);
+        return block && block.kind !== "container" ? block : null;
+    }
+
+    /**
+     * The crumbs of the bar of the focus, after « Form »: [{key, label}],
+     * the page of the block when it has one, then the block.
+     */
+    get focusCrumbs() {
+        const entry = this.focusEntry;
+        if (!entry) {
+            return [];
+        }
+        const crumbs = entry.page ? [{key: entry.page.path, label: entry.pageLabel}] : [];
+        return [...crumbs, {key: entry.path, label: entry.label}];
+    }
+
+    /** What the status bar says of the focus, or "" when it is off. */
+    get focusStatus() {
+        const entry = this.focusEntry;
+        if (!entry) {
+            return "";
+        }
+        return entry.page
+            ? _t("Focus: %(page)s › %(block)s", {page: entry.pageLabel, block: entry.label})
+            : _t("Focus: %(block)s", {block: entry.label});
+    }
+
+    /** The accessible name of what puts the focus on the block of label ``label``. */
+    focusLabel(label) {
+        return _t("Focus on %(label)s", {label});
+    }
+
+    /** The label of the button of the full form that goes back to the last focus. */
+    get focusBackLabel() {
+        const entry = this.focusLastEntry;
+        return entry ? _t("Back to focus « %(label)s »", {label: entry.label}) : "";
+    }
+
+    /** Whether the focus can go on: a form on the canvas, no drag, no preview, no panel. */
+    get canFocus() {
+        return this.viewType === "form" && !this.state.dragging && !this.state.preview && !this.panel;
+    }
+
+    /**
+     * Put the focus on the focus block at ``path``: the canvas draws that
+     * block as it is and folds the others to a line. A selection or an
+     * insertion list outside it goes. With ``focus``, the first button of
+     * the block takes the keyboard focus once the canvas draws it. Answer
+     * whether the focus went on.
+     */
+    enterFocus(path, {focus = false} = {}) {
+        const entry = this.focusEntryAt(path);
+        if (!entry || !this.canFocus) {
+            return false;
+        }
+        Object.assign(this.state.focus, {on: true, path: entry.path, last: entry.path});
+        const selected = this.state.selected;
+        if (selected && !blockTrail(entry.block, selected).length) {
+            this.state.selected = null;
+        }
+        this.state.insert = null;
+        this.announce(this.focusLabel(entry.label));
+        if (focus) {
+            this.focusWhenDrawn(() => {
+                const canvas = document.querySelector(".o_erplibre_studio_canvas");
+                return canvas && canvas.querySelector(".o_erplibre_studio_focus_open .o_erplibre_studio_pick");
+            });
+        }
+        return true;
+    }
+
+    /**
+     * Turn the focus off: the full form shows, on the tab of the block
+     * that was in focus, and offers to go back to it. A keyboard focus
+     * lost with the folded lines goes to that offer.
+     */
+    leaveFocus() {
+        const entry = this.focusEntry;
+        this.state.focus.on = false;
+        if (!entry) {
+            return;
+        }
+        const notebook = blockTrail(this.root, entry.path).findLast((b) => b.tag === "notebook");
+        if (notebook) {
+            const pages = (notebook.children || []).filter((b) => b.tag === "page");
+            const page = pages.findIndex((p) => Boolean(blockTrail(p, entry.path).length));
+            if (page >= 0) {
+                this.state.pages[notebook.path] = page;
+            }
+        }
+        this.focusWhenDrawn(() => {
+            const active = document.activeElement;
+            if (active && active !== document.body && active.isConnected) {
+                return null;
+            }
+            return document.querySelector(".o_erplibre_studio_full_back");
+        });
+    }
+
+    /** Put the focus back on the last block in focus (« Back to focus »). */
+    backToFocus() {
+        return this.enterFocus(this.state.focus.last, {focus: true});
+    }
+
+    /** Turn the focus off and forget its last block: a view, a project or the preview changes. */
+    resetFocus() {
+        Object.assign(this.state.focus, {on: false, path: null, last: null});
+    }
+
+    /**
+     * Keep the focus on a block the payload holds: when its block leaves
+     * the payload, the focus goes off; a last block that left is
+     * forgotten.
+     */
+    checkFocus() {
+        const focus = this.state.focus;
+        if (focus.path && !this.focusEntryAt(focus.path)) {
+            Object.assign(focus, {on: false, path: null});
+        }
+        if (focus.last && !this.focusEntryAt(focus.last)) {
+            focus.last = null;
+        }
+    }
+
+    /**
+     * Keep the block at ``path`` on screen while the focus is on: when the
+     * block in focus does not hold it, the focus goes to the focus block
+     * that does (``focusBlockOf``), or off when none does (the header, the
+     * chatter, a page of groups).
+     */
+    followFocus(path) {
+        const current = this.focusEntry;
+        if (!current || blockTrail(current.block, path).length) {
+            return;
+        }
+        const entry = focusBlockOf(this.root, path, this.focusEntries);
+        if (entry) {
+            Object.assign(this.state.focus, {path: entry.path, last: entry.path});
+            this.state.insert = null;
+        } else {
+            this.state.focus.on = false;
+        }
+    }
+
+    /**
+     * Escape while the focus is on: it unselects what is selected, else
+     * turns the focus off. Answer whether it did one of them.
+     */
+    escapeFocus() {
+        if (!this.focusEntry) {
+            return false;
+        }
+        if (this.state.selected) {
+            this.state.selected = null;
+        } else {
+            this.leaveFocus();
+        }
+        return true;
+    }
+
     // ── selection and properties ────────────────────────────────────────
 
     onCanvasClick() {
@@ -1954,9 +2187,16 @@ export class StudioEditor extends Component {
      * first and the last. Each block stays a tab stop of its own; Enter or
      * Space on its button selects it. The keys of ``onBlockKey`` act on
      * the block itself. Another key with a modifier, or a key on another
-     * element of the canvas, passes through.
+     * element of the canvas, passes through. With the focus on a block,
+     * Escape on any element of the canvas unselects, then turns the focus
+     * off (``escapeFocus``).
      */
     onCanvasKey(ev) {
+        const plain = !ev.altKey && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey;
+        if (ev.key === "Escape" && plain && !ev.defaultPrevented && this.escapeFocus()) {
+            ev.preventDefault();
+            return;
+        }
         if (!ev.target.classList.contains("o_erplibre_studio_pick") || ev.ctrlKey || ev.metaKey) {
             return;
         }
@@ -2316,13 +2556,15 @@ export class StudioEditor extends Component {
      * pages and the kanban template that hold it show, the containers of
      * the plan above it unfold, the canvas scrolls to it, the inspector
      * shows its properties. A QWeb template shows without being selected
-     * (``canSelectBlock``).
+     * (``canSelectBlock``). With the focus on, a block outside the block in
+     * focus moves the focus (``followFocus``).
      */
     reveal(path) {
         const trail = blockTrail(this.root, path);
         if (!trail.length) {
             return;
         }
+        this.followFocus(path);
         if (canSelectBlock(trail[trail.length - 1])) {
             this.state.selected = path;
             this.state.insert = null;
@@ -3627,6 +3869,7 @@ export class StudioEditor extends Component {
         }
         this.state.preview = !this.state.preview;
         this.state.insert = null;
+        this.resetFocus();
     }
 
     /**

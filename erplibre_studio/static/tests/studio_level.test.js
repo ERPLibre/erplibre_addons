@@ -274,8 +274,11 @@ describe("the display level of the editor", () => {
         // The canvas: the field names and their types.
         expect(".o_erplibre_studio_field[data-name=user_id] code.o_erplibre_studio_tech").toHaveText("user_id");
         expect(".o_erplibre_studio_field[data-name=user_id] .badge.o_erplibre_studio_tech").toHaveText("many2one");
-        // A group shows its technical caption: its tag, then its label.
-        expect(`.o_erplibre_studio_container[data-path="${ADDRESS}"] .o_erplibre_studio_container_title`).toHaveText(
+        // A group shows its technical caption: its tag, then its label. Its
+        // title line holds the « Focus » button too, out of the caption.
+        expect(
+            `.o_erplibre_studio_container[data-path="${ADDRESS}"] .o_erplibre_studio_container_title > .o_erplibre_studio_pick`
+        ).toHaveText(
             "<group> Address"
         );
         // The inspector: the header, the name with the field, the

@@ -1057,12 +1057,47 @@
         </label>
     </t>
 
-    <!-- The changes of the draft in the view on screen. -->
+    <!-- The changes of the draft in the view on screen; with the focus
+         on a block of a form, those of the block, then the others. -->
     <t t-name="erplibre_studio.Inspector.Changes">
+        <t t-set="sections" t-value="changeSections" />
         <div t-if="!changes.length" class="small text-muted mb-3 o_erplibre_studio_no_change">No change.</div>
-        <ol t-else="" class="list-unstyled d-flex flex-column gap-2 mb-3 small o_erplibre_studio_changes">
+        <t t-elif="sections">
+            <section
+                t-foreach="sections"
+                t-as="section"
+                t-key="section.key"
+                class="o_erplibre_studio_changes_section"
+                t-att-data-section="section.key"
+                t-att-aria-label="section.title"
+            >
+                <h3 class="o_erplibre_studio_section_title mb-2" t-esc="section.title" />
+                <t t-if="section.changes.length" t-call="erplibre_studio.Inspector.ChangeList">
+                    <t t-set="list" t-value="section.changes" />
+                </t>
+            </section>
+        </t>
+        <t t-else="" t-call="erplibre_studio.Inspector.ChangeList">
+            <t t-set="list" t-value="changes" />
+        </t>
+        <p t-if="sections" class="small text-muted mb-1 o_erplibre_studio_changes_foot">A click on a change puts the focus on its block.</p>
+        <p t-else="" class="small text-muted mb-1 o_erplibre_studio_changes_foot">A click finds the element; only it is then highlighted.</p>
+        <button
+            type="button"
+            class="btn btn-sm btn-link p-0 o_erplibre_studio_open_review"
+            t-att-disabled="!props.hasProject or props.busy"
+            t-on-click="openReview"
+        >
+            Open the review
+            <i class="fa fa-arrow-right ms-1" aria-hidden="true" />
+        </button>
+    </t>
+
+    <!-- The list « list » of changes of the Changes tab. -->
+    <t t-name="erplibre_studio.Inspector.ChangeList">
+        <ol class="list-unstyled d-flex flex-column gap-2 mb-3 small o_erplibre_studio_changes">
             <li
-                t-foreach="changes"
+                t-foreach="list"
                 t-as="change"
                 t-key="change.id"
                 t-att-data-type="change.type"
@@ -1099,16 +1134,6 @@
                 </button>
             </li>
         </ol>
-        <p class="small text-muted mb-1 o_erplibre_studio_changes_foot">A click finds the element; only it is then highlighted.</p>
-        <button
-            type="button"
-            class="btn btn-sm btn-link p-0 o_erplibre_studio_open_review"
-            t-att-disabled="!props.hasProject or props.busy"
-            t-on-click="openReview"
-        >
-            Open the review
-            <i class="fa fa-arrow-right ms-1" aria-hidden="true" />
-        </button>
     </t>
 
     <!-- One change of the list: its margin dot as on the canvas (a failed
@@ -1117,7 +1142,7 @@
         <span
             t-if="change.error"
             class="badge rounded-pill text-bg-danger o_erplibre_studio_change_number"
-            t-esc="change_index + 1"
+            t-esc="changeNumber(change)"
         />
         <span
             t-else=""

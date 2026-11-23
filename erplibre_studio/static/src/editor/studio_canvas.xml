@@ -9,7 +9,56 @@
             t-if="['kanban', 'search', 'pivot', 'graph', 'timeline', 'calendar', 'hierarchy', 'activity', 'leaflet_map', 'geoengine'].includes(viewType)"
             t-call="erplibre_studio.Canvas.{{viewType}}"
         />
+        <t t-elif="focusRows" t-call="erplibre_studio.Canvas.focus" />
         <StudioBlock t-else="" block="data.blocks" editor="editor" viewType="data.view_type" />
+    </t>
+
+    <!-- A form with the focus on a block (focusRows): the block in focus
+         drawn as the full form draws it, every other focus block folded to
+         one line that puts the focus on it, the rest as summaries of one
+         line. A line is muted by its background; its text keeps a contrast
+         of 4.5:1 at least. -->
+    <t t-name="erplibre_studio.Canvas.focus">
+        <div class="o_erplibre_studio_focus_sheet d-flex flex-column gap-1">
+            <t t-foreach="focusRows" t-as="row" t-key="row.key">
+                <section
+                    t-if="row.kind === 'open'"
+                    class="o_erplibre_studio_focus_open"
+                    t-att-class="{'o_erplibre_studio_focus_indent': row.indent}"
+                    t-att-data-focus-path="row.entry.path"
+                    t-att-aria-label="row.entry.label"
+                >
+                    <div t-if="row.title" class="o_erplibre_studio_focus_open_title" t-esc="row.entry.label" />
+                    <StudioBlock block="row.entry.block" parent="row.entry.parent" editor="editor" viewType="viewType" />
+                </section>
+                <button
+                    t-elif="row.kind === 'folded'"
+                    type="button"
+                    class="o_erplibre_studio_folded"
+                    t-att-class="{'o_erplibre_studio_focus_indent': row.indent}"
+                    t-att-data-focus-path="row.entry.path"
+                    t-att-aria-label="row.aria"
+                    t-on-click.stop="() => this.enterFocus(row.entry.path)"
+                >
+                    <i class="fa fa-angle-right" aria-hidden="true" />
+                    <span class="o_erplibre_studio_folded_label" t-esc="row.label" />
+                    <span class="o_erplibre_studio_folded_meta" t-esc="'· ' + row.meta" />
+                    <span t-if="row.changes" class="o_erplibre_studio_folded_changes">
+                        <span class="o_erplibre_studio_folded_ring" aria-hidden="true" />
+                        <t t-esc="row.changes" />
+                    </span>
+                </button>
+                <div t-elif="row.kind === 'context'" class="o_erplibre_studio_focus_context">
+                    <i class="fa fa-angle-down" aria-hidden="true" />
+                    <t t-esc="row.label" />
+                </div>
+                <div t-else="" class="o_erplibre_studio_folded_static" t-att-data-key="row.key">
+                    <i class="fa fa-minus" aria-hidden="true" />
+                    <span class="o_erplibre_studio_folded_label" t-esc="row.label" />
+                    <span t-if="row.meta" class="o_erplibre_studio_folded_meta" t-esc="'· ' + row.meta" />
+                </div>
+            </t>
+        </div>
     </t>
 
     <!-- A drop hook: « target », « position », and « zone » when the hook
@@ -128,6 +177,26 @@
                 t-esc="flag.label"
             />
         </t>
+    </t>
+
+    <!-- The « Focus » button of the title line of a focus block,
+         « focusItem » being a {path, label, title} of focusButtonFor, or
+         nothing: a tab stop, transparent until its block is hovered,
+         selected or the button focused (CSS). -->
+    <t t-name="erplibre_studio.Block.focus">
+        <button
+            t-if="focusItem"
+            type="button"
+            class="o_erplibre_studio_focus_btn"
+            draggable="false"
+            t-att-data-focus-path="focusItem.path"
+            t-att-aria-label="focusItem.label"
+            t-att-title="focusItem.title"
+            t-on-click.stop="() => this.enterFocus(focusItem.path)"
+        >
+            <i class="fa fa-crosshairs" aria-hidden="true" />
+            <span>Focus</span>
+        </button>
     </t>
 
     <!-- The button that selects the block a StudioBlock renders, around
@@ -459,6 +528,10 @@
                         </t>
                     </li>
                 </ul>
+                <!-- The tab shown is the title line of its page. -->
+                <t t-call="erplibre_studio.Block.focus">
+                    <t t-set="focusItem" t-value="focusButtonFor(activePage)" />
+                </t>
             </div>
             <StudioBlock t-if="activePage" block="activePage" parent="block" editor="editor" viewType="props.viewType" />
         </div>
@@ -504,6 +577,9 @@
                         <t t-elif="!groupTitle" t-esc="titleLabel" />
                     </t>
                     <t t-call="erplibre_studio.Block.marks" />
+                    <t t-call="erplibre_studio.Block.focus">
+                        <t t-set="focusItem" t-value="focusButton" />
+                    </t>
                 </t>
             </div>
             <div

@@ -62,6 +62,7 @@
                         'o_erplibre_studio_outline_selected': row.block.path === props.selected,
                         'o_erplibre_studio_outline_context': row.context,
                         'o_erplibre_studio_outline_removed': isGhost(row.block),
+                        'o_erplibre_studio_outline_focus': isFocused(row.block),
                     }"
                     t-att-style="'padding-left: ' + (row.depth * 0.75) + 'rem'"
                     t-att-aria-level="row.depth + 1"

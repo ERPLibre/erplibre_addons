@@ -536,6 +536,66 @@
                                     Remove from the draft
                                 </button>
                             </div>
+                            <!-- The focus on a block of a form: the bar that says
+                                 which block and leaves it, else the bar of the
+                                 full form that goes back to the last one. -->
+                            <div
+                                t-if="focusEntry"
+                                class="o_erplibre_studio_focus_bar d-flex flex-wrap align-items-center gap-2 mb-2"
+                            >
+                                <span class="o_erplibre_studio_focus_badge d-inline-flex align-items-center gap-1">
+                                    <i class="fa fa-crosshairs" aria-hidden="true" />
+                                    Focus
+                                </span>
+                                <nav
+                                    class="o_erplibre_studio_focus_path d-flex flex-wrap align-items-center gap-1 min-w-0"
+                                    aria-label="Path of the block in focus"
+                                >
+                                    <button
+                                        type="button"
+                                        class="btn btn-link btn-sm p-1 o_erplibre_studio_focus_form"
+                                        t-on-click.stop="() => this.leaveFocus()"
+                                        t-esc="viewTypeLabel(viewType)"
+                                    />
+                                    <t t-foreach="focusCrumbs" t-as="crumb" t-key="crumb.key">
+                                        <i class="fa fa-angle-right" aria-hidden="true" />
+                                        <span
+                                            class="o_erplibre_studio_focus_crumb"
+                                            t-att-class="{'fw-bold text-body': crumb_last}"
+                                            t-att-aria-current="crumb_last ? 'location' : false"
+                                            t-esc="crumb.label"
+                                        />
+                                    </t>
+                                </nav>
+                                <span class="o_erplibre_studio_focus_esc ms-auto d-inline-flex align-items-center gap-1">
+                                    <kbd>Esc</kbd>
+                                    <span>to leave</span>
+                                </span>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-light border o_erplibre_studio_focus_leave"
+                                    t-on-click.stop="() => this.leaveFocus()"
+                                >
+                                    <i class="fa fa-times me-1" aria-hidden="true" />
+                                    Leave focus
+                                </button>
+                            </div>
+                            <div
+                                t-elif="focusLastEntry"
+                                class="o_erplibre_studio_full_bar d-flex flex-wrap align-items-center gap-2 mb-2"
+                            >
+                                <span class="fw-bold">Full form</span>
+                                ·
+                                <span class="o_erplibre_studio_full_text">all blocks open</span>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm ms-auto o_erplibre_studio_full_back"
+                                    t-on-click.stop="() => this.backToFocus()"
+                                >
+                                    <i class="fa fa-crosshairs me-1" aria-hidden="true" />
+                                    <t t-esc="focusBackLabel" />
+                                </button>
+                            </div>
                             <nav
                                 class="o_erplibre_studio_crumbs d-flex flex-wrap align-items-center gap-1 small text-muted mb-2"
                                 aria-label="Path of the selection"
@@ -577,6 +637,7 @@
                                 filterForm="state.filterForm"
                                 lane="state.timelineLane"
                                 geoLayer="state.geoLayer"
+                                focus="focusEntry ? focusEntry.path : null"
                             />
                         </t>
                     </main>
@@ -644,6 +705,7 @@
                         />
                         <t t-esc="statusText" />
                     </span>
+                    <span t-if="focusStatus" class="o_erplibre_studio_status_focus" t-esc="focusStatus" />
                     <span
                         t-if="nameBlockerCount"
                         class="fw-bold text-danger-emphasis o_erplibre_studio_name_blockers"

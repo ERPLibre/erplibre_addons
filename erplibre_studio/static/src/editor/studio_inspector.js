@@ -24,6 +24,7 @@ import {
     GEO_TYPES,
     MAX_FIELD_SIZE,
     attributeLabel,
+    blockTrail,
     canRemoveBlock,
     changeDot,
     changeKindLabel,
@@ -686,6 +687,44 @@ export class StudioInspector extends Component {
     /** The changes of the draft in the view on screen, in their order. */
     get changes() {
         return this.data.changes || [];
+    }
+
+    /**
+     * The changes of the view in sections while the focus is on a block of
+     * a form: [{key, title, changes}], those inside the block in focus,
+     * then the others; null when the focus is off, the list stays whole.
+     */
+    get changeSections() {
+        // Read through the state of the inspector: a move of the focus
+        // renders the list again.
+        const focus = this.editorState.focus;
+        if (!focus.on || !focus.path) {
+            return null;
+        }
+        const entry = this.editor.focusEntry;
+        if (!entry) {
+            return null;
+        }
+        const inside = (change) => Boolean(change.path) && blockTrail(entry.block, change.path).length > 0;
+        const ins = this.changes.filter(inside);
+        const others = this.changes.filter((change) => !inside(change));
+        return [
+            {
+                key: "in",
+                title: _t("In « %(block)s » · %(count)s", {block: entry.label, count: ins.length}),
+                changes: ins,
+            },
+            {
+                key: "elsewhere",
+                title: _t("Elsewhere in the form · %(count)s", {count: others.length}),
+                changes: others,
+            },
+        ];
+    }
+
+    /** The number of ``change`` in the list of the view, from 1. */
+    changeNumber(change) {
+        return this.changes.indexOf(change) + 1;
     }
 
     setTab(tab) {

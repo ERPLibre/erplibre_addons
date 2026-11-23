@@ -52,6 +52,18 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s button(s)"
+msgstr "%(count)s bouton(s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s change(s)"
+msgstr "%(count)s changement(s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "%(count)s change(s) inside"
 msgstr "%(count)s changement(s) dans le bloc"
@@ -93,6 +105,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "%(count)s field(s)"
 msgstr "%(count)s champ(s)"
@@ -734,9 +747,21 @@ msgstr "Frise chronologique, fournie par web_timeline (OCA)."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid "A click adds at the insertion point; dragging still works."
+msgstr "Un clic ajoute au point d’insertion ; glisser reste possible."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "A click finds the element; only it is then highlighted."
 msgstr "Un clic retrouve l'élément ; seul lui est alors mis en évidence."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "A click on a change puts the focus on its block."
+msgstr "Un clic sur un changement met son bloc en focus."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1421,6 +1446,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid "Additions go into"
+msgstr "Les ajouts vont dans"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Advanced: table, displayed name"
 msgstr "Avancé : table, nom affiché"
@@ -1747,6 +1778,12 @@ msgstr "Disponible"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Back to focus « %(label)s »"
+msgstr "Revenir au focus « %(label)s »"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.js:0
 msgid "Back to the proposed name (%(name)s)"
 msgstr "Revenir au nom proposé (%(name)s)"
@@ -1991,6 +2028,12 @@ msgstr "Élément %(tag)s « %(label)s »"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Elsewhere in the form · %(count)s"
+msgstr "Ailleurs dans le formulaire · %(count)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Empty tab. Drag a field here from the palette or the form."
 msgstr "Onglet vide. Glissez-y un champ depuis la palette ou le formulaire."
@@ -2010,6 +2053,7 @@ msgstr "Entrée"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Esc"
@@ -2056,6 +2100,31 @@ msgstr ""
 "modèle dans l'espace Modèles, puis appliquez."
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Focus"
+msgstr "Focus"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Focus on %(label)s"
+msgstr "Mettre le focus sur %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Focus: %(block)s"
+msgstr "Focus : %(block)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Focus: %(page)s › %(block)s"
+msgstr "Focus : %(page)s › %(block)s"
+
+#. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_ir_model_fields__erplibre_studio_properties_definition
 msgid ""
 "For a custom properties field of ERPLibre studio: the many2one of the model "
@@ -2080,9 +2149,21 @@ msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de d
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Full form"
+msgstr "Formulaire complet"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Future owner module"
 msgstr "Module propriétaire à venir"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "General information"
+msgstr "Infos générales"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2110,6 +2191,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Grouping %(label)s"
 msgstr "Regroupement %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "In « %(block)s » · %(count)s"
+msgstr "Dans « %(block)s » · %(count)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2186,6 +2273,12 @@ msgstr "Format invalide : minuscules, chiffres, _ et points seulement"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Isolate this block to work in it"
+msgstr "Isoler ce bloc pour y travailler"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid ""
 "Its technical name changes in a form, list or kanban view, until Apply."
@@ -2202,6 +2295,12 @@ msgstr "JSON"
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Layout"
 msgstr "Mise en page"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Leave focus"
+msgstr "Quitter le focus"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2390,6 +2489,12 @@ msgstr "Options · un champ chacune"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Owner module"
 msgstr "Module propriétaire"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Path of the block in focus"
+msgstr "Chemin du bloc en focus"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3804,6 +3909,7 @@ msgstr "Graphique"
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__group_id
 msgid "Group"
 msgstr "Groupe"
@@ -3860,6 +3966,7 @@ msgstr "Groupe de ce projet"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Group « %(label)s »"
 msgstr "Groupe « %(label)s »"
 
@@ -3905,6 +4012,7 @@ msgstr "HTML"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Header"
 msgstr "En-tête"
@@ -6279,6 +6387,12 @@ msgstr "Parts"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Smart buttons"
+msgstr "Boutons intelligents"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid ""
 "Some of these changes are applied: Apply then removes them from the "
@@ -6433,8 +6547,15 @@ msgstr "Résumé : droits et règles se règlent dans Sécurité."
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Tab"
 msgstr "Onglet"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "Tab %(label)s"
+msgstr "Onglet %(label)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8182,6 +8303,13 @@ msgstr "À mettre à jour"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid "To target another block, click its folded line or use the Plan."
+msgstr ""
+"Pour viser un autre bloc, cliquez sa ligne repliée ou passez par le Plan."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__help
 msgid "Tooltip"
@@ -8804,6 +8932,18 @@ msgid "after %(label)s"
 msgstr "après %(label)s"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "after « %(label)s »"
+msgstr "après « %(label)s »"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "all blocks open"
+msgstr "tous les blocs ouverts"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "app icon %(name)s"
@@ -8815,6 +8955,12 @@ msgstr "icône de l'application %(name)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "applied"
 msgstr "appliqué"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "at the end of the block"
+msgstr "à la fin du bloc"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9365,6 +9511,12 @@ msgstr "la vue %(name)s du projet"
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "through an implication"
 msgstr "par une implication"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "to leave"
+msgstr "pour sortir"
 
 #. module: erplibre_studio
 #. odoo-javascript

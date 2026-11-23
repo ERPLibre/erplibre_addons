@@ -150,7 +150,9 @@ export function outlineRows(root, {filter = "", changedOnly = false, collapsed =
  * Right unfolds a container then enters it, Left folds it or goes up to
  * its container, Enter and Space select the row's block. Alt+Up and
  * Alt+Down move the row's block as they do on the canvas, Delete removes
- * it (``moveByKeyboard``, ``removeByKeyboard`` of the editor).
+ * it (``moveByKeyboard``, ``removeByKeyboard`` of the editor). With the
+ * focus on a block of a form, a click on a row of another block moves the
+ * focus there, and Escape unselects, then turns the focus off.
  *
  * In a form, a row carries the « + » of the insertion without dragging
  * (``rowAdds``): the selected row inserts after its block, a container
@@ -331,8 +333,19 @@ export class StudioOutline extends Component {
         this.outline.filter = "";
     }
 
+    /**
+     * Select ``block`` and bring it on screen; with the focus on a block of
+     * a form, a block outside it moves the focus to its own focus block
+     * (``StudioEditor.reveal``).
+     */
     pick(block) {
         this.editor.reveal(block.path);
+    }
+
+    /** Whether ``block`` is the block in focus of a form: its row is marked. */
+    isFocused(block) {
+        const focus = this.editorState.focus;
+        return Boolean(focus.on) && focus.path === block.path;
     }
 
     /**
@@ -364,6 +377,10 @@ export class StudioOutline extends Component {
         if (!ev.shiftKey && !ev.altKey && ev.key === "Delete") {
             ev.preventDefault();
             this.removeRow(row, rows);
+            return;
+        }
+        if (!ev.shiftKey && !ev.altKey && ev.key === "Escape" && this.editor.escapeFocus()) {
+            ev.preventDefault();
             return;
         }
         if (ev.altKey) {

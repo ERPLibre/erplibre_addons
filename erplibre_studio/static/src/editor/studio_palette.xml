@@ -10,6 +10,17 @@
          the mouse reaches the div and a drag starts in every browser. -->
     <t t-name="erplibre_studio.Palette">
         <div class="o_erplibre_studio_palette_body d-flex flex-column gap-3 h-100">
+            <!-- With the focus on a block of a form: where a click adds. -->
+            <t t-set="target" t-value="focusTarget" />
+            <div t-if="target" class="o_erplibre_studio_palette_target border rounded p-2 d-flex flex-column gap-1" role="status">
+                <span class="o_erplibre_studio_section_title">Additions go into</span>
+                <span class="o_erplibre_studio_palette_target_block d-flex align-items-center gap-2 fw-bold">
+                    <i class="fa fa-crosshairs" aria-hidden="true" />
+                    <t t-esc="target.block" />
+                </span>
+                <span class="small o_erplibre_studio_palette_target_where" t-esc="target.where" />
+                <span class="small text-muted">A click adds at the insertion point; dragging still works.</span>
+            </div>
             <div class="input-group input-group-sm">
                 <span class="input-group-text">
                     <i class="fa fa-search" aria-hidden="true" />
@@ -177,6 +188,9 @@
             </p>
             <p t-elif="viewType === 'leaflet_map'" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag a decimal field onto Latitude or Longitude, a text onto the popup, an image onto Marker image; a new Decimal or Text field dropped on a lane is created for it.
+            </p>
+            <p t-elif="viewType === 'form' and target" class="small text-muted border-top pt-2 mt-auto mb-0 o_erplibre_studio_palette_hint">
+                To target another block, click its folded line or use the Plan.
             </p>
             <p t-elif="viewType === 'form'" class="small text-muted border-top pt-2 mt-auto mb-0 o_erplibre_studio_palette_hint">
                 Dragging still works. Shorter: hover the space between two fields and click the +.

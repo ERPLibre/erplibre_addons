@@ -539,6 +539,126 @@ export function conditionValue(type, value) {
     return value;
 }
 
+// ── focus on a block of a form ──────────────────────────────────────────
+
+/** Whether ``block`` is a group of a form. */
+function isGroup(block) {
+    return block.tag === "group";
+}
+
+/**
+ * Whether the page ``page`` of a notebook is the context of the groups it
+ * holds rather than a focus block itself: it holds groups only, at least
+ * one.
+ */
+export function isFocusContext(page) {
+    const children = page.children || [];
+    return page.tag === "page" && children.length > 0 && children.every(isGroup);
+}
+
+/** The label of the page ``page``: its « string », else its label, else « Tab ». */
+export function pageLabel(page) {
+    const attrs = page.attrs || {};
+    if (attrs.string) {
+        return attrs.string;
+    }
+    return page.label && page.label !== page.tag ? page.label : _t("Tab");
+}
+
+/**
+ * The focus blocks of the form whose root block is ``root``, in the order
+ * of the arch: [{path, block, kind, label, parent, page, pageLabel}]. The
+ * walk runs over the sheet, or the form itself when it has none: a group
+ * that is a child of the sheet or of a page is a block, a row of groups
+ * included as one block; a page of a notebook of the sheet is a block
+ * unless it holds groups only (``isFocusContext``), which then are the
+ * blocks and the page their context (``page``). ``kind`` is « group » or
+ * « page », ``parent`` the block that holds the focus block. The label of
+ * a group is its « string »; the first group of the sheet without one is
+ * « General information », another one « Group » or « Group « name » ».
+ * A group nested in a group is no focus block.
+ */
+export function focusBlocks(root) {
+    const entries = [];
+    if (!root) {
+        return entries;
+    }
+    const sheet = (root.children || []).find((child) => child.tag === "sheet") || root;
+    let general = true;
+    const groupLabel = (group, inSheet) => {
+        const attrs = group.attrs || {};
+        if (attrs.string) {
+            return attrs.string;
+        }
+        if (inSheet && general) {
+            general = false;
+            return _t("General information");
+        }
+        const own = group.label && group.label !== group.tag;
+        return own ? _t("Group « %(label)s »", {label: group.label}) : _t("Group");
+    };
+    const groups = (container, page) => {
+        for (const child of container.children || []) {
+            if (isGroup(child)) {
+                entries.push({
+                    path: child.path,
+                    block: child,
+                    kind: "group",
+                    label: groupLabel(child, !page),
+                    parent: container,
+                    page,
+                    pageLabel: page ? pageLabel(page) : "",
+                });
+            } else if (!page && child.tag === "notebook") {
+                for (const tab of (child.children || []).filter((b) => b.tag === "page")) {
+                    if (isFocusContext(tab)) {
+                        groups(tab, tab);
+                    } else {
+                        const label = pageLabel(tab);
+                        entries.push({
+                            path: tab.path,
+                            block: tab,
+                            kind: "page",
+                            label,
+                            parent: child,
+                            page: null,
+                            pageLabel: "",
+                        });
+                    }
+                }
+            }
+        }
+    };
+    groups(sheet, null);
+    return entries;
+}
+
+/**
+ * The focus block (``focusBlocks``) that holds the block at ``path``, the
+ * block itself included; null when no focus block holds it: the header,
+ * the chatter, a page that holds groups only, the sheet. ``entries``, the
+ * focus blocks of ``root`` when the caller has them, saves the walk.
+ */
+export function focusBlockOf(root, path, entries = null) {
+    const trail = blockTrail(root, path);
+    if (!trail.length) {
+        return null;
+    }
+    const paths = new Set(trail.map((block) => block.path));
+    return (entries || focusBlocks(root)).find((entry) => paths.has(entry.path)) || null;
+}
+
+/**
+ * The hook at the end of the focus block ``entry``: inside the block,
+ * inside its last group for a row of groups, which shows no hook of its
+ * own.
+ */
+export function focusEndHook(entry) {
+    const children = entry.block.children || [];
+    const row = isGroup(entry.block) && children.length > 0 && children.every(isGroup);
+    return {target: row ? children[children.length - 1].path : entry.path, position: "inside"};
+}
+
 /** The hook after the last block of ``blocks``, else inside ``fallback``. */
 export function endHook(blocks, fallback) {
     const last = blocks[blocks.length - 1];

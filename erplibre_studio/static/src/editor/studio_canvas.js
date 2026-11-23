@@ -7,7 +7,7 @@ import {_t} from "@web/core/l10n/translation";
 import {deserializeDate, deserializeDateTime, formatDate, formatDateTime} from "@web/core/l10n/dates";
 import {X2MANY_TYPES} from "./studio_relations";
 import {StudioInsertList} from "./studio_insert";
-import {tagLabel} from "./studio_outline";
+import {outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {LEAFLET_LANES} from "./studio_leaflet";
 import {
     CALENDAR_LANES,
@@ -35,11 +35,13 @@ import {
     endHook,
     findBlock,
     graphLaneLabel,
+    isFocusContext,
     graphLanes,
     isBaseInvisible,
     isGhost,
     isTrue,
     marginDot,
+    pageLabel,
     pivotLanes,
     searchColumns,
     searchEndHook,
@@ -612,6 +614,37 @@ export class StudioBlock extends Component {
     get pagesScope() {
         return `pages:${this.block.path}`;
     }
+
+    /**
+     * The « Focus » button of the title line of ``block`` when it is a
+     * focus block of a form (``focusBlocks``): {path, label, title}; null
+     * while the focus is on, during a drag, in the preview, or for
+     * another block.
+     */
+    focusButtonFor(block) {
+        const state = this.editorState;
+        if (!block || this.props.viewType !== "form" || state.focus.on || state.dragging || state.preview) {
+            return null;
+        }
+        const entry = this.editor.focusEntryAt(block.path);
+        return entry
+            ? {
+                  path: entry.path,
+                  label: this.editor.focusLabel(entry.label),
+                  title: _t("Isolate this block to work in it"),
+              }
+            : null;
+    }
+
+    /** The « Focus » button of the title line of the block (``focusButtonFor``). */
+    get focusButton() {
+        return this.focusButtonFor(this.block);
+    }
+
+    /** Put the focus on the block at ``path``; its first button takes the keyboard focus. */
+    enterFocus(path) {
+        this.editor.enterFocus(path, {focus: true});
+    }
 }
 StudioBlock.components = {StudioBlock, StudioInsertList};
 
@@ -651,6 +684,9 @@ export class StudioCanvas extends Component {
         // The layer of a GeoEngine view the inspector shows: its id, « new »,
         // or null.
         geoLayer: {type: [Number, String, {value: null}], optional: true},
+        // The path of the block of a form in focus (StudioEditor.focusEntry),
+        // or null when the focus is off.
+        focus: {type: [String, {value: null}], optional: true},
     };
 
     get editor() {
@@ -687,6 +723,116 @@ export class StudioCanvas extends Component {
 
     fieldInfo(name) {
         return (this.data.fields || {})[name] || {};
+    }
+
+    // ── focus on a block of a form ──────────────────────────────────────
+
+    /**
+     * The rows of a form with the focus on a block, in the order of the
+     * arch, or null when the focus is off: {kind, key, …}.
+     * « open »: the block in focus (``entry``), drawn as the full form draws
+     * it, under a title line when nothing else names it (``title``).
+     * « folded »: another focus block, one line that puts the focus on it:
+     * {label, meta, changes, aria}. « context »: a page that holds groups
+     * only, above their rows. « static »: a summary of one line, {label,
+     * meta}: the header of the form with the top of its sheet (« Header »),
+     * the smart buttons, the chatter, another node of the sheet. The tabs
+     * of a notebook are not drawn. ``indent`` marks the groups of a page.
+     */
+    get focusRows() {
+        const editor = this.editor;
+        const focused = this.props.focus ? editor.focusEntry : null;
+        if (!focused || this.viewType !== "form") {
+            return null;
+        }
+        const viewType = this.viewType;
+        const entries = new Map(editor.focusEntries.map((entry) => [entry.path, entry]));
+        const rows = [];
+        let header = false;
+        let seen = false;
+        const addHeader = () => {
+            if (!header) {
+                header = true;
+                rows.push({kind: "static", key: "header", label: _t("Header"), meta: ""});
+            }
+        };
+        const blockRow = (entry, indent) => {
+            if (entry.path === focused.path) {
+                const own = entry.kind === "group" && (entry.block.attrs || {}).string;
+                rows.push({kind: "open", key: entry.path, entry, indent, title: !own});
+                return;
+            }
+            const keys = new Set([...(entry.block.changes || []), ...changeKeysInside(entry.block)]);
+            const label = entry.kind === "page" ? _t("Tab %(label)s", {label: entry.label}) : entry.label;
+            const meta = _t("%(count)s field(s)", {count: outlineCount(entry.block, viewType)});
+            const changes = keys.size ? _t("%(count)s change(s)", {count: keys.size}) : "";
+            rows.push({
+                kind: "folded",
+                key: entry.path,
+                entry,
+                indent,
+                label,
+                meta,
+                changes,
+                aria: [editor.focusLabel(label), meta, changes].filter(Boolean).join(", "),
+            });
+        };
+        const visit = (container) => {
+            for (const child of container.children || []) {
+                const entry = entries.get(child.path);
+                if (entry) {
+                    seen = true;
+                    blockRow(entry, false);
+                } else if (child.tag === "sheet") {
+                    visit(child);
+                } else if (child.tag === "notebook") {
+                    seen = true;
+                    for (const page of (child.children || []).filter((b) => b.tag === "page")) {
+                        if (entries.has(page.path)) {
+                            blockRow(entries.get(page.path), false);
+                        } else if (isFocusContext(page)) {
+                            const label = _t("Tab %(label)s", {label: pageLabel(page)});
+                            rows.push({kind: "context", key: page.path, label});
+                            for (const group of page.children) {
+                                if (entries.has(group.path)) {
+                                    blockRow(entries.get(group.path), true);
+                                }
+                            }
+                        }
+                    }
+                } else if (child.tag === "header") {
+                    addHeader();
+                } else if (child.tag === "chatter") {
+                    rows.push({kind: "static", key: child.path, label: _t("Chatter"), meta: _t("collapsed")});
+                } else if (child.label === "button_box") {
+                    const count = (child.children || []).filter((b) => !isGhost(b, viewType)).length;
+                    rows.push({
+                        kind: "static",
+                        key: child.path,
+                        label: _t("Smart buttons"),
+                        meta: _t("%(count)s button(s)", {count}),
+                    });
+                } else if (!seen) {
+                    // The top of the sheet before its first block: its title.
+                    addHeader();
+                } else if (editor.isDrawnChild(child)) {
+                    const count = outlineCount(child, viewType);
+                    rows.push({
+                        kind: "static",
+                        key: child.path,
+                        label: outlineLabel(child),
+                        meta: count ? _t("%(count)s field(s)", {count}) : "",
+                    });
+                }
+            }
+        };
+        visit(this.root);
+        return rows;
+    }
+
+    /** Put the focus on the block at ``path`` (a folded line); its first button takes the keyboard focus. */
+    enterFocus(path) {
+        this.editor.enterFocus(path, {focus: true});
     }
 
     attributeLabel(attribute) {
