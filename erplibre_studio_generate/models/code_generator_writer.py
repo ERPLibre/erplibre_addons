@@ -35,6 +35,7 @@ import re
 
 from lxml import etree
 from odoo import models
+from odoo.exceptions import UserError
 from odoo.addons.code_generator import code_generator_data
 from odoo.addons.erplibre_studio import arch as studio_arch
 from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
@@ -453,12 +454,74 @@ def _field(parent, name, text=None, **attrs):
     return node
 
 
+def _field_ref(project, model, name):
+    """The external id a data file of the module of ``project`` names the
+    field ``name`` of ``model`` by: « field_<model>__<name> », the one Odoo
+    gives the field the module defines, for a field of the project; else
+    the first external id of the field. UserError for a field without
+    one."""
+    own = {(m, n) for m, n, _d, _c in project._studio_all_definitions()}
+    if (model, name) in own:
+        return f"field_{model.replace('.', '_')}__{name}"
+    field = project.env["ir.model.fields"].sudo()._get(model, name)
+    xml_ids = field and field.get_external_id().get(field.id)
+    if not xml_ids:
+        raise UserError(
+            project.env._(
+                "The field %(field)s has no external id: the generated module "
+                "cannot name it.",
+                field=f"{model}.{name}",
+            )
+        )
+    return xml_ids
+
+
+def _geo_layer_records(project, root, added):
+    """Append to ``root`` the layers of the GeoEngine view the view line
+    ``added`` creates: a geoengine.raster.layer or geoengine.vector.layer
+    record each, under the external id Apply gives it, bound to the view
+    by its external id; a vector layer names its fields by theirs
+    (``_field_ref``)."""
+    for layer in added.layer_ids:
+        record = etree.SubElement(
+            root,
+            "record",
+            id=layer._studio_xml_name(),
+            model=layer._studio_layer_model(),
+        )
+        _field(record, "name", layer.name)
+        _field(record, "sequence", str(layer.sequence))
+        _field(record, "view_id", ref=added._studio_xml_name())
+        if layer.kind == "raster":
+            _field(record, "raster_type", layer.raster_type or "osm")
+            continue
+        _field(
+            record,
+            "geo_field_id",
+            ref=_field_ref(project, added.model, layer.geo_field),
+        )
+        _field(record, "geo_repr", layer.geo_repr or "basic")
+        if layer.attribute_field:
+            _field(
+                record,
+                "attribute_field_id",
+                ref=_field_ref(project, added.model, layer.attribute_field),
+            )
+        for key in ("classification", "begin_color", "end_color"):
+            if layer[key]:
+                _field(record, key, layer[key])
+        if layer.nb_class and layer.nb_class != 1:
+            _field(record, "nb_class", str(layer.nb_class))
+        _field(record, "active_on_startup", eval=str(bool(layer.active_on_startup)))
+
+
 def project_views_file(project):
     """The XML data file of the views, actions and menus of ``project``,
     under the external ids the database already uses, in the order their
     references need: the default views of the new models, the views the
     project adds to existing models (primary, with the arch their line
-    recorded), one inherited view per edited view, the window actions, then the top-level menu of
+    recorded) and the layers of its GeoEngine views, one inherited view per
+    edited view, the window actions, then the top-level menu of
     each app a model goes in, with the icon the generation copies into
     the module, and the menus of the models."""
     root = etree.Element("odoo")
@@ -487,6 +550,7 @@ def project_views_file(project):
         _field(record, "priority", str(MODEL_VIEW_PRIORITY))
         arch = _field(record, "arch", type="xml")
         arch.append(etree.fromstring(added.arch, parser))
+        _geo_layer_records(project, root, added)
     for view in project.change_ids.mapped("view_id").sorted("id"):
         changes = [c._as_dict() for c in project._view_changes(view)]
         record = etree.SubElement(

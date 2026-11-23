@@ -7,6 +7,7 @@ import shutil
 import tempfile
 from unittest.mock import patch
 
+from lxml import etree
 from odoo.addons.erplibre_studio.tests.common import StudioCase
 from odoo.tests import tagged
 
@@ -63,3 +64,49 @@ class TestGenerateGeo(StudioCase):
         compile(model, "res_partner.py", "exec")
         self.assertIn(f"{self.name} = fields.GeoPoint(", model)
         self.assertIn('string="Site"', model)
+
+    def test_generate_geoengine_view(self):
+        """A GeoEngine view added once the geo field is applied: the views
+        file writes its layers after the view, each under the external id
+        Apply gave it, the vector layer naming the field by the external id
+        the module gives it."""
+        if "geoengine" not in self.Project._view_types():
+            self.skipTest("base_geoengine is not installed")
+        if self.env["ir.ui.view"].search_count(
+            [("model", "=", "res.partner"), ("type", "=", "geoengine")]
+        ):
+            self.skipTest("res.partner has a geoengine view in this database")
+        with self.server_actions():
+            self.project.action_apply()
+            self.Editor.add_view(self.project.id, "res.partner", "geoengine")
+            self.project.action_apply()
+            self.project.action_generate()
+        manifest = ast.literal_eval(self.read("__manifest__.py"))
+        self.assertIn("base_geoengine", manifest["depends"])
+        root = etree.fromstring(
+            self.read("views", "erplibre_studio_views.xml").encode()
+        )
+        records = root.xpath("/odoo/record")
+        ids = [record.get("id") for record in records]
+        view = "res_partner_view_geoengine"
+        raster, vector = "res_partner_geo_raster_10", "res_partner_geo_vector_10"
+        self.assertLess(ids.index(view), ids.index(raster))
+        self.assertLess(ids.index(view), ids.index(vector))
+        by_id = {record.get("id"): record for record in records}
+        self.assertEqual(by_id[raster].get("model"), "geoengine.raster.layer")
+        self.assertEqual(by_id[vector].get("model"), "geoengine.vector.layer")
+        for name in (raster, vector):
+            self.assertEqual(by_id[name].xpath("field[@name='view_id']/@ref"), [view])
+        self.assertEqual(
+            by_id[raster].xpath("field[@name='raster_type']/text()"), ["osm"]
+        )
+        self.assertEqual(
+            by_id[vector].xpath("field[@name='geo_field_id']/@ref"),
+            [f"field_res_partner__{self.name}"],
+        )
+        self.assertEqual(
+            by_id[vector].xpath("field[@name='active_on_startup']/@eval"), ["True"]
+        )
+        arch = by_id[view].xpath("field[@name='arch']/geoengine")[0]
+        self.assertEqual(arch.xpath("field/@name")[-1], self.name)
+        self.assertEqual(arch.xpath("templates/t/@t-name"), ["info_box"])

@@ -295,6 +295,13 @@ msgstr ""
 
 #. module: erplibre_studio_generate
 #. odoo-python
+#: code:addons/erplibre_studio_generate/models/code_generator_writer.py:0
+msgid ""
+"The field %(field)s has no external id: the generated module cannot name it."
+msgstr ""
+
+#. module: erplibre_studio_generate
+#. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid ""
 "The field %(name)s of %(model)s cannot be written in the generated module: "
