@@ -264,6 +264,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_spreadsheet.py:0
+msgid "%(model)s · %(view)s"
+msgstr "%(model)s · %(view)s"
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
 msgid "%(model)s — %(view)s"
 msgstr "%(model)s — %(view)s"
@@ -446,6 +452,22 @@ msgstr "%(name)s : %(users)s membre(s)"
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "%(name)s: %(users)s member(s) of %(via)s lose it"
 msgstr "%(name)s : %(users)s membre(s) de %(via)s le perdent"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: deleted, it reads %(model)s"
+msgstr "%(name)s : supprimée, elle lit %(model)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: kept, columns of removed fields show errors"
+msgstr "%(name)s : conservée, les colonnes des champs retirés afficheront une erreur"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1013,6 +1035,13 @@ msgid "A rule without « Global » needs at least one group."
 msgstr "Une règle sans « Globale » demande au moins un groupe."
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"A spreadsheet reads a list, a pivot or a graph view, not a %(type)s view."
+msgstr "Une feuille de calcul lit une vue liste, pivot ou graphique, pas une vue %(type)s."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "A statement waits 2 s at most for a lock"
@@ -1577,6 +1606,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Apply creates the group: it has no member yet."
 msgstr "Appliquer crée le groupe : il n'a encore aucun membre."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Apply first: the sheet reads the applied view."
+msgstr "Appliquez d'abord : la feuille lit la vue appliquée."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2748,6 +2783,7 @@ msgstr "Créé"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__create_uid
 msgid "Created by"
 msgstr "Créé par"
@@ -2770,6 +2806,7 @@ msgstr "Créé par l'Apply"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__create_date
 msgid "Created on"
 msgstr "Créé le"
@@ -2956,6 +2993,7 @@ msgstr "Abandonné"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__display_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__display_name
 msgid "Display Name"
 msgstr "Nom affiché"
@@ -3679,6 +3717,7 @@ msgstr "J'ai compris que ces données seront supprimées."
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__id
 msgid "ID"
 msgstr "ID"
@@ -3982,6 +4021,7 @@ msgstr "Dernier Apply : %(date)s"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__write_uid
 msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
@@ -3998,6 +4038,7 @@ msgstr "Dernière mise à jour par"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__write_date
 msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
@@ -4191,6 +4232,7 @@ msgstr "Mode de l'aperçu"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__model
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__model
 msgid "Model"
 msgstr "Modèle"
@@ -4361,6 +4403,7 @@ msgstr "NOUVEAU"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__name
 msgid "Name"
 msgstr "Nom"
 
@@ -5211,6 +5254,7 @@ msgstr "Aperçu : la vue avec le brouillon"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__project_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__project_id
 msgid "Project"
 msgstr "Projet"
@@ -5819,6 +5863,14 @@ msgid "Selection"
 msgstr "Sélection"
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"Sending a view to a spreadsheet needs the module spreadsheet_oca and its "
+"group of users."
+msgstr "Envoyer une vue vers une feuille de calcul exige le module spreadsheet_oca et son groupe d'utilisateurs."
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
@@ -5986,6 +6038,20 @@ msgid "Sort"
 msgstr "Tri"
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__sheet_id
+msgid "Spreadsheet"
+msgstr "Feuille de calcul"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__spreadsheet_ids
+msgid "Spreadsheets"
+msgstr "Feuilles de calcul"
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Stack the items"
@@ -6083,6 +6149,11 @@ msgstr "Définition des propriétés (studio)"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Studio spaces"
 msgstr "Espaces du studio"
+
+#. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_erplibre_studio_spreadsheet
+msgid "Studio spreadsheet"
+msgstr "Feuille de calcul du studio"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7389,6 +7460,12 @@ msgstr "Le serveur, avec le brouillon du projet"
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "The sheet reads the view as applied: its draft changes are not in it."
+msgstr "La feuille lit la vue telle qu'appliquée : ses changements en brouillon n'y sont pas."
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "The side panel of a calendar filters by a many2one or a many2many field "
@@ -7396,6 +7473,13 @@ msgid ""
 msgstr ""
 "Le panneau latéral d'un calendrier ne filtre que par un champ many2one "
 "ou many2many, pas par %(name)s."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__spreadsheet_ids
+msgid ""
+"The spreadsheets the editor created from the views of the project: Revert "
+"deletes those whose model it removes."
+msgstr "Les feuilles de calcul que l'éditeur a créées à partir des vues du projet : Défaire supprime celles dont il retire le modèle."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -8103,11 +8187,13 @@ msgstr "Valeurs"
 #: model:ir.model,name:erplibre_studio.model_ir_ui_view
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__view_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_geo_layer__view_line_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__view_id
 msgid "View"
 msgstr "Vue"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__view_type
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__view_type
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__view_type
 msgid "View Type"
 msgstr "Type de vue"

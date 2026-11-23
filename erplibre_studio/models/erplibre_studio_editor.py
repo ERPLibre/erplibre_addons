@@ -11,7 +11,13 @@ from .erplibre_studio_project import (
     PREVIEW_KEY,
     protected_model,
 )
-from .studio_pending import added_view, is_added_view, is_pending_view, pending_view
+from .studio_pending import (
+    added_view,
+    is_added_view,
+    is_draft_view,
+    is_pending_view,
+    pending_view,
+)
 
 FIELD_ATTRIBUTES = [
     "string",
@@ -835,6 +841,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
             "mail_available": Project._studio_mail_available(),
+            "spreadsheet_available": Project._studio_spreadsheet_available(),
             "field_name_rule": (project or Project)._studio_field_name_rule(),
             "model_name_rule": (project or Project)._studio_model_name_rule(),
         }
@@ -1949,6 +1956,69 @@ class ErplibreStudioEditor(models.AbstractModel):
         then asks, and why it is refused (or False). A read."""
         self._check_studio_access()
         return self._read_project(project_id)._studio_revert_report()
+
+    @api.model
+    def send_to_spreadsheet(self, project_id, model, view_id, view_type):
+        """Create a spreadsheet of spreadsheet_oca that reads the applied
+        ``view_type`` view of ``model`` (``view_id``, else its default
+        view), and track it on the project for Revert. Return {action,
+        notice}: ``action`` opens the sheet, whose client action fills it
+        from the import data (``_studio_spreadsheet_import_data``) and
+        saves it when the user leaves it; ``notice`` says that the draft
+        changes of the view are not in it, or False. Refused without
+        spreadsheet_oca or its group of users, for a view type
+        SPREADSHEET_VIEW_TYPES does not hold, and for a view not applied
+        yet."""
+        self._check_studio_access()
+        Project = self.env["erplibre.studio.project"]
+        if not Project._studio_spreadsheet_available():
+            raise UserError(
+                self.env._(
+                    "Sending a view to a spreadsheet needs the module "
+                    "spreadsheet_oca and its group of users."
+                )
+            )
+        if view_type not in studio_arch.SPREADSHEET_VIEW_TYPES:
+            raise UserError(
+                self.env._(
+                    "A spreadsheet reads a list, a pivot or a graph view, not "
+                    "a %(type)s view.",
+                    type=view_type,
+                )
+            )
+        project = self._read_project(project_id)
+        view = self._resolve_view(model, view_id, view_type, project)
+        if is_draft_view(view) or model not in self.env:
+            raise UserError(
+                self.env._("Apply first: the sheet reads the applied view.")
+            )
+        data = project._studio_spreadsheet_import_data(model, view, view_type)
+        sheet = self.env["spreadsheet.spreadsheet"].create({"name": data["name"]})
+        self.env["erplibre.studio.spreadsheet"].create(
+            {
+                "project_id": project.id,
+                "name": data["name"],
+                "model": model,
+                "view_type": view_type,
+                "view_id": view.id,
+                "sheet_id": sheet.id,
+            }
+        )
+        notice = project._studio_view_unapplied(view) and self.env._(
+            "The sheet reads the view as applied: its draft changes are not in it."
+        )
+        return {
+            "action": {
+                "type": "ir.actions.client",
+                "tag": "action_spreadsheet_oca",
+                "params": {
+                    "model": sheet._name,
+                    "spreadsheet_id": sheet.id,
+                    "import_data": data,
+                },
+            },
+            "notice": notice or False,
+        }
 
     @api.model
     def get_apply_report(self, project_id):

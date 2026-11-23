@@ -28,6 +28,7 @@ from . import (
     test_review,
     test_relations,
     test_rules,
+    test_spreadsheet,
     test_ui,
     test_uninstall,
     test_views_activity,

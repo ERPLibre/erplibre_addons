@@ -40,6 +40,7 @@ REPORT_SECTIONS = (
     "rules",
     "members",
     "others",
+    "spreadsheets",
 )
 
 
@@ -70,6 +71,20 @@ def effect_text(env, item):
     return env._("The list of %(model)s loses its drag handle", model=item["model"])
 
 
+def spreadsheet_text(env, item):
+    """The text of ``item``, a spreadsheet of the project in the report of
+    Revert (``_studio_spreadsheet_report``)."""
+    if item["deleted"]:
+        return env._(
+            "%(name)s: deleted, it reads %(model)s",
+            name=item["name"],
+            model=item["model"],
+        )
+    return env._(
+        "%(name)s: kept, columns of removed fields show errors", name=item["name"]
+    )
+
+
 def report_html(env, report):
     """The HTML of ``report`` (``_studio_removal_report``), every value
     escaped."""
@@ -88,6 +103,7 @@ def report_html(env, report):
         "rules": _("Record rules"),
         "members": _("Members who lose a group"),
         "others": _("Other records deleted with them"),
+        "spreadsheets": _("Spreadsheets"),
     }
 
     def text(section, item):
@@ -130,6 +146,8 @@ def report_html(env, report):
             return f"{item['name']} ({kind})"
         if section == "tables":
             return item
+        if section == "spreadsheets":
+            return spreadsheet_text(env, item)
         return item["name"]
 
     parts = []
@@ -239,7 +257,8 @@ class ErplibreStudioProject(models.Model):
         of the options of the models of the project among the fields,
         ``_studio_option_effects``), views: [{name, kind}], changes_removed,
         menus, actions, access: [{name, group}], rules: [{name, model}],
-        groups: [{name, users}], categories, tables}. A read, in sudo."""
+        groups: [{name, users}], categories, tables, spreadsheets (filled
+        by Revert alone, ``_studio_revert_report``)}. A read, in sudo."""
         self.ensure_one()
         self.env.flush_all()
         records = {
@@ -265,6 +284,7 @@ class ErplibreStudioProject(models.Model):
             "tables": [],
             "members": [],
             "others": [],
+            "spreadsheets": [],
         }
         for model in models_.sorted("model"):
             Model = self.env.get(model.model)
@@ -405,9 +425,14 @@ class ErplibreStudioProject(models.Model):
 
     def _studio_revert_report(self):
         """{report, digest, refused}: what Revert removes now, its digest, and
-        why Revert is refused (or False)."""
+        why Revert is refused (or False). The report lists the spreadsheets
+        of the project: those whose model Revert removes go with it, the
+        others stay (``_studio_spreadsheet_report``)."""
         self.ensure_one()
         report = self._studio_removal_report(self._studio_created_records())
+        report["spreadsheets"] = self._studio_spreadsheet_report(
+            {item["model"] for item in report["models"]}
+        )
         return {
             "report": report,
             "digest": report_digest(report),

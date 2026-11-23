@@ -947,7 +947,13 @@ describe("erplibre_studio j4", () => {
 
     test("Revert shows what it removes and sends the digest; a refusal hides the button", async () => {
         answer = payload({state: "applied", applied: true});
-        respond.get_revert_report = () => ({report: REPORT, digest: "d1g3st", refused: false});
+        // The spreadsheets sent from the project: Revert deletes the one of a
+        // model it removes and keeps the other.
+        const spreadsheets = [
+            {name: "J4 order · List", model: ORDER, deleted: true},
+            {name: "Contact · Pivot", model: "res.partner", deleted: false},
+        ];
+        respond.get_revert_report = () => ({report: {...REPORT, spreadsheets}, digest: "d1g3st", refused: false});
         respond.project_action = (args) => {
             expect.step(`project_action ${args.args[1]} ${args.kwargs.digest}`);
             return payload({state: "draft", applied: false, revision: 1});
@@ -958,10 +964,16 @@ describe("erplibre_studio j4", () => {
         await contains(".o_erplibre_studio_revert").click();
         expect(lastCall("get_revert_report").args).toEqual([3]);
         expect(".o_erplibre_studio_confirm_dialog").toHaveCount(1);
-        expect(".o_erplibre_studio_confirm_section").toHaveCount(8);
+        expect(".o_erplibre_studio_confirm_section").toHaveCount(9);
         expect(".o_erplibre_studio_confirm_section[data-section=models] .o_erplibre_studio_confirm_item").toHaveText(
             "J4 order (x_j4_order): 2 record(s)"
         );
+        const sheets = ".o_erplibre_studio_confirm_section[data-section=spreadsheets] .o_erplibre_studio_confirm_item";
+        expect(sheets).toHaveCount(2);
+        expect(`${sheets}:eq(0)`).toHaveText("J4 order · List: deleted, it reads x_j4_order");
+        expect(`${sheets}:eq(0)`).toHaveClass("text-danger");
+        expect(`${sheets}:eq(1)`).toHaveText("Contact · Pivot: kept, columns of removed fields show errors");
+        expect(`${sheets}:eq(1)`).not.toHaveClass("text-danger");
         expect(".o_erplibre_studio_confirm_section[data-section=models] .o_erplibre_studio_confirm_item").toHaveClass(
             "text-danger"
         );

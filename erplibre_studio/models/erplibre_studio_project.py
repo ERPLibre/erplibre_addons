@@ -59,6 +59,7 @@ MANAGED_FIELDS = frozenset(
         "approved_snapshot",
         "approved_uid",
         "approved_date",
+        "spreadsheet_ids",
     }
 )
 
@@ -466,6 +467,15 @@ class ErplibreStudioProject(models.Model):
         help="The views the project adds to existing models that have none "
         "of their type.",
     )
+    spreadsheet_ids = fields.One2many(
+        "erplibre.studio.spreadsheet",
+        "project_id",
+        string="Spreadsheets",
+        copy=False,
+        readonly=True,
+        help="The spreadsheets the editor created from the views of the "
+        "project: Revert deletes those whose model it removes.",
+    )
     item_count = fields.Integer(compute="_compute_item_count")
     created_model_ids = fields.Many2many(
         "ir.model",
@@ -763,6 +773,16 @@ class ErplibreStudioProject(models.Model):
         return (
             "mail.thread" in self.env
             and "is_mail_thread" in self.env["ir.model"]._fields
+        )
+
+    @api.model
+    def _studio_spreadsheet_available(self):
+        """Whether the user can send a view to a spreadsheet: spreadsheet_oca
+        is installed and the user is in its group of users. The studio does
+        not depend on it."""
+        return bool(
+            "spreadsheet.spreadsheet" in self.env
+            and self.env.user.has_group("spreadsheet_oca.group_user")
         )
 
     @api.model
@@ -7659,8 +7679,10 @@ class ErplibreStudioProject(models.Model):
         actions, rules, access rights, views, custom fields and models, with
         the records of these models, its groups and their categories. The
         lines and the changes stay, as a draft, but for the changes of the
-        default views of its models, which go with the views. Refused while
-        the generated module is installed or owns a model
+        default views of its models, which go with the views. The
+        spreadsheets sent from the project whose model leaves go too; the
+        others stay, no longer tracked (``_studio_revert_spreadsheets``).
+        Refused while the generated module is installed or owns a model
         (``_studio_revert_refusal``), even when the call skips the
         confirmation. ``digest`` must be the one of the
         report the user confirmed (``_studio_revert_report``); server code
@@ -7678,7 +7700,9 @@ class ErplibreStudioProject(models.Model):
             records["views"] = project.studio_view_ids
             records["fields"] = project.field_ids
             records.update(project._studio_geo_layer_records())
+            removed_models = set(records["models"].exists().mapped("model"))
             removed += project._studio_remove_created(records, log)
+            project._studio_revert_spreadsheets(removed_models)
             vals = {name: [(5, 0, 0)] for name in CREATED_FIELDS.values()}
             vals.update(
                 {

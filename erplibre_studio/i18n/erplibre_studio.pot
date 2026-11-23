@@ -248,6 +248,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_spreadsheet.py:0
+msgid "%(model)s · %(view)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
 msgid "%(model)s — %(view)s"
 msgstr ""
@@ -407,6 +413,22 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "%(name)s: %(users)s member(s) of %(via)s lose it"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: deleted, it reads %(model)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+msgid "%(name)s: kept, columns of removed fields show errors"
 msgstr ""
 
 #. module: erplibre_studio
@@ -978,6 +1000,13 @@ msgid "A rule without « Global » needs at least one group."
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"A spreadsheet reads a list, a pivot or a graph view, not a %(type)s view."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "A statement waits 2 s at most for a lock"
@@ -1531,6 +1560,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Apply creates the group: it has no member yet."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Apply first: the sheet reads the applied view."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2755,6 +2790,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__create_uid
 msgid "Created by"
 msgstr ""
@@ -2777,6 +2813,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__create_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__create_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__create_date
 msgid "Created on"
 msgstr ""
@@ -2963,6 +3000,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__display_name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__display_name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__display_name
 msgid "Display Name"
 msgstr ""
@@ -3665,6 +3703,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__id
 msgid "ID"
 msgstr ""
@@ -3966,6 +4005,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_uid
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -3982,6 +4022,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__write_date
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__write_date
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -4171,6 +4212,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__model
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__model
 msgid "Model"
 msgstr ""
@@ -4341,6 +4383,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_group__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__name
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__name
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__name
 msgid "Name"
 msgstr ""
 
@@ -5172,6 +5215,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_revert_wizard__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__project_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__project_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__project_id
 msgid "Project"
 msgstr ""
@@ -5777,6 +5821,14 @@ msgid "Selection"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid ""
+"Sending a view to a spreadsheet needs the module spreadsheet_oca and its "
+"group of users."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
@@ -5945,6 +5997,20 @@ msgid "Sort"
 msgstr ""
 
 #. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__sheet_id
+msgid "Spreadsheet"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__spreadsheet_ids
+msgid "Spreadsheets"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Stack the items"
@@ -6041,6 +6107,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Studio spaces"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model,name:erplibre_studio.model_erplibre_studio_spreadsheet
+msgid "Studio spreadsheet"
 msgstr ""
 
 #. module: erplibre_studio
@@ -7257,10 +7328,23 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "The sheet reads the view as applied: its draft changes are not in it."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "The side panel of a calendar filters by a many2one or a many2many field "
 "only, not by %(name)s."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__spreadsheet_ids
+msgid ""
+"The spreadsheets the editor created from the views of the project: Revert "
+"deletes those whose model it removes."
 msgstr ""
 
 #. module: erplibre_studio
@@ -7947,11 +8031,13 @@ msgstr ""
 #: model:ir.model,name:erplibre_studio.model_ir_ui_view
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__view_id
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_geo_layer__view_line_id
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__view_id
 msgid "View"
 msgstr ""
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__view_type
+#: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_spreadsheet__view_type
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__view_type
 msgid "View Type"
 msgstr ""

@@ -22,6 +22,7 @@ export const REPORT_SECTIONS = [
     "rules",
     "members",
     "others",
+    "spreadsheets",
 ];
 
 /** The title of a section of a removal report. */
@@ -41,6 +42,7 @@ export function reportTitle(section) {
             rules: _t("Record rules"),
             members: _t("Members who lose a group"),
             others: _t("Other records deleted with them"),
+            spreadsheets: _t("Spreadsheets"),
         }[section] || section
     );
 }
@@ -85,6 +87,10 @@ export function reportItemText(section, item) {
         }
         case "tables":
             return item;
+        case "spreadsheets":
+            return item.deleted
+                ? _t("%(name)s: deleted, it reads %(model)s", item)
+                : _t("%(name)s: kept, columns of removed fields show errors", item);
         default:
             return item.name;
     }
@@ -94,7 +100,7 @@ export function reportItemText(section, item) {
  * The non-empty sections of the removal report ``report``
  * (``_studio_removal_report`` of the server): [{key, title, items}], each
  * item {text, warn}; ``warn`` marks what holds data: records, values,
- * members, or records an effect reaches.
+ * members, records an effect reaches, or a spreadsheet deleted.
  */
 export function reportSections(report) {
     return REPORT_SECTIONS.map((key) => ({
@@ -102,7 +108,7 @@ export function reportSections(report) {
         title: reportTitle(key),
         items: ((report && report[key]) || []).map((item) => ({
             text: reportItemText(key, item),
-            warn: Boolean(item && (item.count || item.filled || item.users)),
+            warn: Boolean(item && (item.count || item.filled || item.users || item.deleted)),
         })),
     })).filter((section) => section.items.length);
 }

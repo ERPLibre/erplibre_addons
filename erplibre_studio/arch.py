@@ -1698,6 +1698,136 @@ def order_fields(text):
     return [name for name, _direction in order_terms(text)]
 
 
+# The view types a spreadsheet of spreadsheet_oca reads: a list as an Odoo
+# list, a pivot as an Odoo pivot, a graph as an Odoo chart.
+SPREADSHEET_VIEW_TYPES = ("list", "pivot", "graph")
+# The field types a spreadsheet list does not show as a column: the list
+# view of spreadsheet_oca leaves out binary and JSON columns, and the
+# properties have no cell value.
+SPREADSHEET_SKIPPED_TYPES = ("binary",) + UNQUERYABLE_TYPES
+# The field types a graph groups by (GROUPABLE_TYPES of
+# web/static/src/search/utils/misc.js).
+SPREADSHEET_GROUP_TYPES = GRAPH_GROUP_TYPES + ("tags",)
+_FALSE_EXPR = re.compile(r"^false|0$", re.I)
+
+
+def _expr_bool(value, default):
+    """The boolean of an attribute as exprToBoolean of the web client reads
+    it: ``default`` when absent or empty, False for a text that starts with
+    « false » or ends with « 0 », else True."""
+    if not value:
+        return default
+    return not _FALSE_EXPR.search(value)
+
+
+def spreadsheet_order(text):
+    """[{name, asc}] of the order text of a list (« a desc, b »), as the
+    list model gives its ``orderBy``; a term that is not a plain field
+    name (« a.b », a NULLS clause aside) is skipped."""
+    order = []
+    for term in (text or "").split(","):
+        words = term.split()
+        if not words or not _SAFE_NAME.match(words[0]):
+            continue
+        asc = not (len(words) > 1 and words[1].lower() == "desc")
+        order.append({"name": words[0], "asc": asc})
+    return order
+
+
+def _spreadsheet_fields(root):
+    """The <field> children of ``root`` an Odoo view reads, in arch order:
+    neither « id » nor constant invisible."""
+    return [
+        node
+        for node in elements(root)
+        if node.tag == "field"
+        and node.get("name")
+        and node.get("name") != "id"
+        and not constant_true(node.get("invisible"))
+    ]
+
+
+def spreadsheet_source(root, view_type, fields):
+    """What spreadsheet_oca reads of the arch ``root`` of a ``view_type``
+    view (SPREADSHEET_VIEW_TYPES), ``fields`` its fields_get: what its
+    list, pivot or graph view gives the import of a sheet, without the
+    model, the fields and the search, which the caller adds.
+
+    list: {columns [{name, type}], orderBy [{name, asc}]}, the columns
+    the list shows by default: no column_invisible or invisible constant,
+    no optional « hide », no handle, no type of SPREADSHEET_SKIPPED_TYPES.
+    pivot: {rowGroupBys, colGroupBys, activeMeasures, title} as its arch
+    parser reads them, « field:interval » for an interval; « __count »
+    first without a measure or with display_quantity.
+    graph: {mode, groupBy, measure, order, stacked, cumulated,
+    cumulatedStart, title} as its arch parser and the graph view read
+    them: the last measure, else « __count »; every other field of a
+    type of SPREADSHEET_GROUP_TYPES is a group-by. ``title`` is None
+    without a « string »."""
+    if view_type == "list":
+        columns = []
+        for node in _spreadsheet_fields(root):
+            name = node.get("name")
+            info = fields.get(name)
+            if (
+                not info
+                or constant_true(node.get("column_invisible"))
+                or node.get("optional") == "hide"
+                or node.get("widget") == "handle"
+                or info.get("type") in SPREADSHEET_SKIPPED_TYPES
+            ):
+                continue
+            columns.append({"name": name, "type": info["type"]})
+        return {
+            "columns": columns,
+            "orderBy": spreadsheet_order(root.get("default_order")),
+        }
+    if view_type == "pivot":
+        rows, cols, measures = [], [], []
+        for node in _spreadsheet_fields(root):
+            name = node.get("name")
+            if node.get("interval"):
+                name = f"{name}:{node.get('interval')}"
+            if node.get("type") == "measure" or node.get("operator") is not None:
+                measures.append(name)
+            if node.get("type") == "col":
+                cols.append(name)
+            if node.get("type") == "row":
+                rows.append(name)
+        if not measures or _expr_bool(root.get("display_quantity"), False):
+            measures.insert(0, "__count")
+        return {
+            "rowGroupBys": rows,
+            "colGroupBys": cols,
+            "activeMeasures": measures,
+            "title": root.get("string") or None,
+        }
+    if view_type == "graph":
+        group_by, measure = [], "__count"
+        for node in _spreadsheet_fields(root):
+            name = node.get("name")
+            if node.get("type") == "measure":
+                measure = name
+            elif (fields.get(name) or {}).get("type") in SPREADSHEET_GROUP_TYPES:
+                interval = node.get("interval")
+                group_by.append(f"{name}:{interval}" if interval else name)
+        mode = root.get("type")
+        order = root.get("order")
+        return {
+            "mode": mode if mode in GRAPH_TYPES else "bar",
+            "groupBy": group_by,
+            "measure": measure,
+            "order": (
+                order.upper() if order and order.lower() in GRAPH_ORDERS else None
+            ),
+            "stacked": _expr_bool(root.get("stacked"), True),
+            "cumulated": _expr_bool(root.get("cumulated"), False),
+            "cumulatedStart": _expr_bool(root.get("cumulated_start"), False),
+            "title": root.get("string") or None,
+        }
+    raise ValueError(f"A spreadsheet does not read a {view_type} view.")
+
+
 # The ``options`` of a field: at most OPTIONS_SIZE characters of text,
 # nested at most OPTIONS_DEPTH levels; an option name is an identifier
 # that may hold « - » (an html widget names its options in camelCase).

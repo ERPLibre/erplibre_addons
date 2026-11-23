@@ -11,6 +11,7 @@ from . import (
     erplibre_studio_model,
     erplibre_studio_view,
     erplibre_studio_geo_layer,
+    erplibre_studio_spreadsheet,
     erplibre_studio_access,
     erplibre_studio_rule,
     erplibre_studio_app,
