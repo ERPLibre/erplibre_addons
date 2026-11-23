@@ -5163,16 +5163,29 @@ class ErplibreStudioProject(models.Model):
 
     @api.model
     def _studio_geo_fields(self, model):
-        """The stored geo fields (GEO_TYPES) ``model`` has in the registry,
-        in the order of its fields: a GeoEngine view draws a field Apply
-        created."""
+        """The stored geo fields (GEO_TYPES) ``model`` has in the registry:
+        the fields of the code in the order of the code, then the custom
+        fields in their creation order (ir.model.fields id). The registry
+        loads custom fields in the order the table returns them, which
+        changes between loads; the first field of this tuple is the one a
+        new GeoEngine view draws, so its order is fixed here."""
         if model not in self.env:
             return ()
-        return tuple(
-            name
-            for name, field in self.env[model]._fields.items()
+        fields = [
+            field
+            for field in self.env[model]._fields.values()
             if field.type in studio_arch.GEO_TYPES and field.store
+        ]
+        ids = self.env["ir.model.fields"]._get_ids(model)
+        # A stable sort: code fields share the key (False, 0) and keep the
+        # order of the code.
+        fields.sort(
+            key=lambda field: (
+                field.manual,
+                ids.get(field.name, 0) if field.manual else 0,
+            )
         )
+        return tuple(field.name for field in fields)
 
     def _studio_default_geo_layers(self, line, geo_fields):
         """The layers of the new GeoEngine view ``line``: an OpenStreetMap
