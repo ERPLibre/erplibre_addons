@@ -20,4 +20,5 @@ from . import (
     ir_model_fields,
     ir_module_module,
     ir_ui_view,
+    res_users_settings,
 )

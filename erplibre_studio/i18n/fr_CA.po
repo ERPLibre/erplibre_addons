@@ -3437,13 +3437,14 @@ msgstr "Filtrer les modèles"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
 msgid "Filter the plan"
 msgstr "Filtrer le plan"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Filter: label or technical name"
 msgstr "Filtrer : libellé ou nom technique"
 
@@ -9221,18 +9222,6 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Advanced"
-msgstr "Avancé"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Advanced: widget, options, domain, groups"
-msgstr "Avancé — widget, options, domaine, groupes"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Apply first"
 msgstr "Appliquer d'abord"
 
@@ -9894,3 +9883,88 @@ msgstr "Classification %(classification)s inconnue."
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Unknown representation %(repr)s."
 msgstr "Représentation %(repr)s inconnue."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "+ %(views)s inherited view(s) from %(modules)s module(s)"
+msgstr "+ %(views)s vue(s) héritée(s) de %(modules)s module(s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Always see these options:"
+msgstr "Toujours voir ces options :"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__res_users_settings__erplibre_studio_display_level__detailed
+msgid "Detailed"
+msgstr "Détaillé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Display level of the editor"
+msgstr "Niveau d'affichage de l'éditeur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "More options"
+msgstr "Plus d'options"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Remembered for your account"
+msgstr "Mémorisé pour votre compte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: model:ir.model.fields.selection,name:erplibre_studio.selection__res_users_settings__erplibre_studio_display_level__simple
+msgid "Simple"
+msgstr "Simple"
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_res_users_settings__erplibre_studio_display_level
+msgid "Studio display level"
+msgstr "Niveau d'affichage du studio"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Switch to Detailed"
+msgstr "Passer en Détaillé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Technical"
+msgstr "Technique"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Technical name, widget and visibility: Detailed level."
+msgstr "Nom technique, widget et visibilité : niveau Détaillé."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "Unknown display level %(level)s."
+msgstr "Niveau d'affichage %(level)s inconnu."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "created by this project"
+msgstr "créé par ce projet"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "from the view %(xml_id)s"
+msgstr "de la vue %(xml_id)s"

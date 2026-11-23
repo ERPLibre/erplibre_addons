@@ -372,6 +372,36 @@
         max-width: 22rem;
     }
 
+    // The display level of the top bar: a segmented control whose pressed
+    // option stands out; the focus ring shows on the keyboard only.
+    .o_erplibre_studio_level_option {
+        min-height: 1.875rem;
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 1px;
+            box-shadow: none;
+        }
+    }
+
+    .o_erplibre_studio_level_switch:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
+        border-radius: 0.25rem;
+        box-shadow: none;
+    }
+
+    // The xml id and the inherited views of the view on screen, at the
+    // right of the path of the selection (Detailed level).
+    .o_erplibre_studio_crumbs_tech code {
+        color: $text-muted;
+    }
+
+    // The technical name under the label of a row of the plan.
+    .o_erplibre_studio_outline_tech {
+        font-size: 0.6875rem;
+    }
+
     .o_erplibre_studio_palette_item,
     .o_erplibre_studio_field {
         cursor: grab;

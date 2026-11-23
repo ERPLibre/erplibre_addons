@@ -7,6 +7,7 @@
             class="o_erplibre_studio o_action d-flex flex-column h-100 bg-view"
             t-att-data-view-type="viewType"
             t-att-data-space="state.space"
+            t-att-data-level="state.level"
         >
             <header
                 class="o_erplibre_studio_toolbar o_erplibre_studio_topbar d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom"
@@ -25,7 +26,8 @@
                         <i class="fa fa-angle-right" aria-hidden="true" />
                         <span class="text-body fw-bold" t-esc="viewTypeLabel(viewType)" />
                         <code
-                            class="o_erplibre_studio_xml_id px-1 rounded bg-200 text-truncate"
+                            t-if="detailed"
+                            class="o_erplibre_studio_xml_id o_erplibre_studio_tech px-1 rounded bg-200 text-truncate"
                             t-esc="data.view.xml_id or data.view.name"
                         />
                     </nav>
@@ -77,7 +79,7 @@
                         <t t-set-slot="content">
                             <div class="dropdown-header d-flex align-items-center gap-2">
                                 <span class="fw-bold" t-esc="viewTabsLabel" />
-                                <code t-esc="data.model" />
+                                <code t-if="detailed" class="o_erplibre_studio_tech" t-esc="data.model" />
                             </div>
                             <div class="dropdown-header small text-uppercase" role="presentation">
                                 In the project or the model
@@ -107,7 +109,11 @@
                                         >Model</span>
                                         <span t-if="tab.pending" class="badge text-bg-warning">created by Apply</span>
                                     </span>
-                                    <code t-if="tab.xml_id" class="small text-muted text-truncate" t-esc="tab.xml_id" />
+                                    <code
+                                        t-if="detailed and tab.xml_id"
+                                        class="small text-muted text-truncate o_erplibre_studio_tech"
+                                        t-esc="tab.xml_id"
+                                    />
                                 </span>
                                 <span class="ms-auto small text-primary">Open</span>
                             </button>
@@ -257,6 +263,37 @@
                         </button>
                     </t>
                 </Dropdown>
+                <!-- The display level: Simple shows the view as a user sees
+                     it, Detailed adds its technical names. -->
+                <div t-if="!state.loading and !state.error" class="d-flex align-items-center gap-2">
+                    <div
+                        role="group"
+                        class="o_erplibre_studio_level d-inline-flex gap-1 p-1 rounded bg-200"
+                        aria-label="Display level of the editor"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-sm o_erplibre_studio_level_option"
+                            t-att-class="state.level === 'simple' ? 'btn-light fw-bold shadow-sm text-primary' : 'btn-link text-body'"
+                            data-level="simple"
+                            t-att-aria-pressed="state.level === 'simple' ? 'true' : 'false'"
+                            t-on-click="() => this.setLevel('simple')"
+                        >
+                            Simple
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm o_erplibre_studio_level_option"
+                            t-att-class="state.level === 'detailed' ? 'btn-light fw-bold shadow-sm text-primary' : 'btn-link text-body'"
+                            data-level="detailed"
+                            t-att-aria-pressed="state.level === 'detailed' ? 'true' : 'false'"
+                            t-on-click="() => this.setLevel('detailed')"
+                        >
+                            Detailed
+                        </button>
+                    </div>
+                    <span class="small text-muted o_erplibre_studio_level_note">Remembered for your account</span>
+                </div>
                 <div class="ms-auto d-flex flex-wrap align-items-center gap-1">
                     <t t-if="project">
                         <button
@@ -488,7 +525,7 @@
                             >
                                 <i class="fa fa-check-circle" aria-hidden="true" />
                                 <span class="flex-grow-1" t-esc="addedViewNotice" />
-                                <code class="small" t-esc="addedView.xml_id" />
+                                <code t-if="detailed" class="small o_erplibre_studio_tech" t-esc="addedView.xml_id" />
                                 <button
                                     class="btn btn-sm btn-outline-danger o_erplibre_studio_remove_view"
                                     t-att-disabled="state.busy"
@@ -513,6 +550,17 @@
                                         t-esc="crumb.label"
                                     />
                                 </t>
+                                <span
+                                    t-if="detailed"
+                                    class="o_erplibre_studio_tech o_erplibre_studio_crumbs_tech ms-auto d-inline-flex flex-wrap align-items-center gap-2"
+                                >
+                                    <code t-esc="data.view.xml_id or data.view.name" />
+                                    <span
+                                        t-if="inheritedText"
+                                        class="o_erplibre_studio_inherited"
+                                        t-esc="inheritedText"
+                                    />
+                                </span>
                             </nav>
                             <StudioCanvas
                                 editor="editor"

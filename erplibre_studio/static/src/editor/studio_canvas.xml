@@ -95,6 +95,20 @@
         </button>
     </t>
 
+    <!-- The title of a container or of another node: its tag, then its
+         label when it has one of its own. Its tag is a technical bit: with
+         a label of its own, it shows at the Detailed level only. -->
+    <t t-name="erplibre_studio.Block.tagLabel">
+        <t t-if="block.label === block.tag or !block.label" t-esc="block.tag" />
+        <t t-else="">
+            <span t-if="detailed" class="o_erplibre_studio_tech">
+                <t t-esc="block.tag" />
+                ·
+            </span>
+            <t t-esc="block.label" />
+        </t>
+    </t>
+
     <t t-name="erplibre_studio.Block">
         <div
             t-if="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
@@ -125,14 +139,25 @@
                 <t t-elif="block.kind === 'widget'">
                     <i class="fa fa-bookmark text-muted" aria-hidden="true" />
                     <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
-                    <code class="small text-muted" t-esc="block.name" />
+                    <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
                 </t>
                 <t t-else="">
                     <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
-                    <code t-if="block.kind === 'field'" class="small text-muted" t-esc="block.name" />
-                    <code t-if="block.kind === 'filter'" class="small text-muted text-truncate" t-esc="block.domain" />
-                    <code t-if="block.kind === 'group_by'" class="small text-muted" t-esc="block.group_by" />
-                    <span class="badge text-bg-light" t-if="field.type and block.kind === 'field'" t-esc="field.type" />
+                    <!-- The technical bits show at the Detailed level only. -->
+                    <t t-if="detailed">
+                        <code t-if="block.kind === 'field'" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                        <code
+                            t-if="block.kind === 'filter'"
+                            class="small text-muted text-truncate o_erplibre_studio_tech"
+                            t-esc="block.domain"
+                        />
+                        <code t-if="block.kind === 'group_by'" class="small text-muted o_erplibre_studio_tech" t-esc="block.group_by" />
+                        <span
+                            t-if="field.type and block.kind === 'field'"
+                            class="badge text-bg-light o_erplibre_studio_tech"
+                            t-esc="field.type"
+                        />
+                    </t>
                 </t>
             </t>
             <t t-call="erplibre_studio.Block.changes" />
@@ -141,6 +166,7 @@
                 t-as="flag"
                 t-key="flag_index"
                 class="badge text-bg-secondary o_erplibre_studio_flag"
+                t-att-class="{'o_erplibre_studio_tech': flag.key === 'widget'}"
                 t-att-data-flag="flag.key"
                 t-esc="flag.label"
             />
@@ -153,7 +179,7 @@
                 <i class="fa fa-list me-1" />
                 Sub-list of
                 <span class="fw-bold" t-esc="sub.label" />
-                <code class="ms-1" t-esc="sub.comodel" />
+                <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
             </div>
         </div>
         <div
@@ -214,17 +240,14 @@
             >
                 <t t-call="erplibre_studio.Block.pick">
                     <i t-if="canDrag" class="fa fa-arrows" aria-hidden="true" />
-                    <t t-esc="block.tag" />
-                    <t t-if="block.label !== block.tag">
-                        ·
-                        <t t-esc="block.label" />
-                    </t>
+                    <t t-call="erplibre_studio.Block.tagLabel" />
                 </t>
                 <span
                     t-foreach="flags"
                     t-as="flag"
                     t-key="flag_index"
                     class="badge text-bg-secondary ms-1 o_erplibre_studio_flag"
+                    t-att-class="{'o_erplibre_studio_tech': flag.key === 'widget'}"
                     t-att-data-flag="flag.key"
                     t-esc="flag.label"
                 />
@@ -260,12 +283,12 @@
                 <t t-if="block.tag === 'chatter'">
                     <i class="fa fa-comments" aria-hidden="true" />
                     Chatter: messages, followers and activities
+                    <t t-if="block.label !== block.tag">
+                        ·
+                        <t t-esc="block.label" />
+                    </t>
                 </t>
-                <t t-else="" t-esc="block.tag" />
-                <t t-if="block.label !== block.tag">
-                    ·
-                    <t t-esc="block.label" />
-                </t>
+                <t t-else="" t-call="erplibre_studio.Block.tagLabel" />
             </t>
             <t t-call="erplibre_studio.Block.changes" />
         </div>

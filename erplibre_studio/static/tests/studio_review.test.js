@@ -90,6 +90,8 @@ function payload(extra = {}) {
             ],
         },
         projects: [{id: 3, name: "Visits", module_name: "studio_visits", state: "draft"}],
+        // The level that shows the technical bits these tests read.
+        display_level: "detailed",
         preview_key: "erplibre_studio_view_ref",
         sample_res_id: false,
         ...extra,

@@ -3,7 +3,7 @@
 
 {
     "name": "ERPLibre studio",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "license": "AGPL-3",

@@ -174,6 +174,8 @@ function payload(extra = {}) {
             applied: false,
         },
         projects: [{id: 3, name: "Contacts", module_name: "studio_contacts", state: "draft"}],
+        // The level that shows the technical bits these tests read.
+        display_level: "detailed",
         preview_key: "erplibre_studio_view_ref",
         sample_res_id: false,
         ...extra,
@@ -1035,6 +1037,8 @@ describe("erplibre_studio editor, inspector", () => {
                     field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
                 },
                 operations: [...payload().operations, "set_attribute"],
+                // « More options » folds at the Simple level.
+                display_level: "simple",
                 ...extra,
             });
             return data;
@@ -1148,6 +1152,8 @@ describe("erplibre_studio editor, inspector", () => {
                     field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
                 },
                 operations: [...payload().operations, "set_attribute"],
+                // « More options » folds at the Simple level.
+                display_level: "simple",
             });
         onRpc("erplibre.studio.editor", "get_studio_choices", () => ({
             groups: [],
@@ -1203,6 +1209,8 @@ describe("erplibre_studio editor, inspector", () => {
                 field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
             },
             operations: [...payload().operations, "set_attribute"],
+            // « More options » folds at the Simple level.
+            display_level: "simple",
         });
         data.fields.x_sponsor.relation = "x_desk";
         data.fields.x_sponsor.definition.relation = "x_desk";
@@ -1235,6 +1243,8 @@ describe("erplibre_studio editor, inspector", () => {
                     field: {widget: "widget", options: "field_options", domain: "field_domain", groups: "groups"},
                 },
                 operations: [...payload().operations, "set_attribute"],
+                // « More options » folds at the Simple level.
+                display_level: "simple",
             });
         /** ``data`` with the options ``text`` on the field user_id. */
         const withOptions = (data, text) => {
@@ -1337,7 +1347,12 @@ describe("erplibre_studio editor, inspector", () => {
                 }
                 return next;
             };
-            const data = payload({settable: SETTABLE, operations: [...payload().operations, "set_attribute"]});
+            const data = payload({
+                settable: SETTABLE,
+                operations: [...payload().operations, "set_attribute"],
+                // « More options » folds at the Simple level.
+                display_level: "simple",
+            });
             data.fields.x_amount = {string: "Amount", type: "monetary"};
             data.fields.currency_id = {string: "Currency", type: "many2one", relation: "res.currency"};
             return {...data, blocks: set(data.blocks)};

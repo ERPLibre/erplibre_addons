@@ -87,6 +87,9 @@ export const SPACES = ["view", "models", "security", "review"];
 export const SECURITY_TABS = ["access", "rules", "apps"];
 // The tabs of the left panel of the view space: the palette, the plan.
 export const LEFT_TABS = ["palette", "plan"];
+// The display levels of the editor, as the server stores them on the
+// settings of the user (res.users.settings).
+export const DISPLAY_LEVELS = ["simple", "detailed"];
 // The ``reason_code`` of the view types the menu of views lists « to add »:
 // a type the model has no view of, which the project can add; a timeline
 // once web_timeline is installed; a type a model not created yet gets
@@ -263,6 +266,9 @@ export class StudioEditor extends Component {
             localNameBlockers: new Set(),
             // What the live region of the editor says (``announce``).
             announce: "",
+            // The display level (DISPLAY_LEVELS): « simple » shows the view
+            // as a user sees it, « detailed » adds its technical names.
+            level: "simple",
         });
         this.previewCount = 0;
         // The menus of the top bar, closed by their items once chosen.
@@ -329,6 +335,53 @@ export class StudioEditor extends Component {
         return (this.data.fields || {})[name] || {};
     }
 
+    // ── display level ───────────────────────────────────────────────────
+
+    /** Whether the editor shows the technical names (the « detailed » level). */
+    get detailed() {
+        return this.state.level === "detailed";
+    }
+
+    /** The level of the payload ``data`` when it carries one; else the level stays. */
+    takeLevel(data) {
+        if (data && DISPLAY_LEVELS.includes(data.display_level)) {
+            this.state.level = data.display_level;
+        }
+    }
+
+    /**
+     * Show the editor at ``level`` at once, and remember it for the account
+     * of the user. The call neither replaces the payload nor makes the
+     * editor busy; a refusal puts the former level back.
+     */
+    async setLevel(level) {
+        const before = this.state.level;
+        if (level === before || !DISPLAY_LEVELS.includes(level)) {
+            return;
+        }
+        this.state.level = level;
+        try {
+            await this.orm.call(MODEL, "set_display_level", [level]);
+        } catch (error) {
+            if (this.state.level === level) {
+                this.state.level = before;
+            }
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+        }
+    }
+
+    /** The text of the inherited views of the view on screen, for the Detailed level. */
+    get inheritedText() {
+        const inherited = (this.data.view && this.data.view.inherited) || {};
+        if (!inherited.views) {
+            return "";
+        }
+        return _t("+ %(views)s inherited view(s) from %(modules)s module(s)", {
+            views: inherited.views,
+            modules: inherited.modules || 0,
+        });
+    }
+
     // ── server ──────────────────────────────────────────────────────────
 
     errorMessage(error) {
@@ -357,6 +410,7 @@ export class StudioEditor extends Component {
             this.state.busy = false;
         }
         this.state.data = data;
+        this.takeLevel(data);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
         if (!this.formIsCurrent(this.state.filterForm, data.project)) {
@@ -381,6 +435,7 @@ export class StudioEditor extends Component {
                 this.state.projectId,
             ]);
             this.state.data = data;
+            this.takeLevel(data);
             this.params.viewId = data.view.id;
             this.launch.viewId = this.launch.viewId || data.view.id;
             this.state.projectId = (data.project && data.project.id) || false;
@@ -428,6 +483,7 @@ export class StudioEditor extends Component {
             Object.assign(this.params, {resModel, viewType, viewId: data.view.id});
             this.resetCanvas();
             this.state.data = data;
+            this.takeLevel(data);
             const keep = this.state.projectId === "new" ? "new" : false;
             this.state.projectId = (data.project && data.project.id) || keep;
             return true;
@@ -580,6 +636,7 @@ export class StudioEditor extends Component {
         Object.assign(this.params, {resModel: data.model, viewType: data.view_type, viewId: data.view.id});
         this.resetCanvas();
         this.state.data = data;
+        this.takeLevel(data);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
         return data;
@@ -723,6 +780,7 @@ export class StudioEditor extends Component {
             Object.assign(this.state, {space, selected: null, preview: false});
         }
         this.state.data = data;
+        this.takeLevel(data);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
         if (!this.formIsCurrent(this.state.filterForm, data.project)) {

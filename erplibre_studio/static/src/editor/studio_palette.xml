@@ -85,7 +85,7 @@
                         t-key="item.name"
                         class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1 mb-1"
                         t-att-data-name="item.name"
-                        t-att-title="item.type"
+                        t-att-title="detailed ? item.type : false"
                         draggable="true"
                         t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                         t-on-dragend="() => this.endDrag()"
@@ -94,10 +94,10 @@
                         <button
                             type="button"
                             class="o_erplibre_studio_pick o_erplibre_studio_palette_add gap-1 w-100"
-                            t-att-aria-label="itemLabel(item.string + ' (' + item.name + ')')"
+                            t-att-aria-label="existingItemLabel(item)"
                         >
                             <span class="text-truncate flex-grow-1" t-esc="item.string" />
-                            <code class="small text-muted text-truncate" t-esc="item.name" />
+                            <code t-if="detailed" class="small text-muted text-truncate o_erplibre_studio_tech" t-esc="item.name" />
                             <span
                                 t-foreach="item.axes or []"
                                 t-as="axis"

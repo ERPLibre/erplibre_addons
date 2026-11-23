@@ -47,15 +47,17 @@ registry.category("web_tour.tours").add("erplibre_studio_models", {
         {trigger: ".o_erplibre_studio_state[data-state=applied]"},
         {trigger: ".o_erplibre_studio_field[data-name=x_name]"},
         {trigger: ".o_erplibre_studio_new_field[data-type=char]", run: `drag_and_drop ${LEFT}`},
-        // The new field is selected: the server checks its technical name
-        // live; a name without x_ blocks Apply, a valid one renames it.
+        // The new field is selected: at the Simple level its technical name
+        // is under « More options ». The server checks it live; a name
+        // without x_ blocks Apply, a valid one renames it.
+        {trigger: ".o_erplibre_studio[data-level=simple] .o_erplibre_studio_field_advanced_toggle", run: "click"},
         {trigger: ".o_erplibre_studio_name_status:contains(Available)"},
-        {trigger: ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name", run: "edit tour_code"},
+        {trigger: ".o_erplibre_studio_field_advanced .o_erplibre_studio_prop_name", run: "edit tour_code"},
         {trigger: ".o_erplibre_studio_name_status:contains(Prefix x_ required)"},
         {trigger: ".o_erplibre_studio_name_blockers"},
         {trigger: ".o_erplibre_studio_apply_bar:disabled"},
         {
-            trigger: ".o_erplibre_studio_field_props .o_erplibre_studio_prop_name",
+            trigger: ".o_erplibre_studio_field_advanced .o_erplibre_studio_prop_name",
             // Typing alone fires no « change »: the browser fires it on
             // Enter or when the input loses the focus.
             async run(helpers) {

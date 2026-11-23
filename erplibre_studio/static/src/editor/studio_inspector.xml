@@ -599,6 +599,18 @@
                 </div>
             </div>
             <div
+                t-if="detailed and block.kind === 'field'"
+                class="d-flex flex-wrap align-items-center gap-2 o_erplibre_studio_tech o_erplibre_studio_inspector_tech"
+            >
+                <code t-esc="block.name" />
+                <span
+                    t-if="field.modules"
+                    class="badge text-bg-light border font-monospace fw-normal o_erplibre_studio_inspector_modules"
+                    t-esc="field.modules"
+                />
+                <span class="text-muted o_erplibre_studio_inspector_origin" t-esc="fieldOrigin(block, field)" />
+            </div>
+            <div
                 t-if="changedNote(block)"
                 class="d-flex gap-2 align-items-start border rounded p-2 o_erplibre_studio_inspector_changed"
             >
@@ -629,11 +641,11 @@
             >
                 The view loads this field for its templates: it cannot move nor be hidden here.
             </div>
-            <div t-if="block.kind === 'filter'">
+            <div t-if="detailed and block.kind === 'filter'" class="o_erplibre_studio_tech">
                 <span class="text-muted">Domain</span>
                 <code class="d-block text-break" t-esc="block.domain" />
             </div>
-            <div t-if="block.kind === 'group_by'">
+            <div t-if="detailed and block.kind === 'group_by'" class="o_erplibre_studio_tech">
                 <span class="text-muted">Group by</span>
                 <code class="d-block" t-esc="block.group_by" />
             </div>
@@ -661,30 +673,7 @@
                         t-att-disabled="props.busy"
                     />
                 </label>
-                <StudioFieldName
-                    t-if="nameEditable(field)"
-                    editor="editor"
-                    model="data.model"
-                    name="block.name"
-                    field="field"
-                    rule="data.field_name_rule or null"
-                    busy="!!props.busy"
-                />
-                <label t-else="" class="form-label mb-1 w-100">
-                    Technical name
-                    <span class="input-group input-group-sm mt-1">
-                        <input
-                            class="form-control font-monospace o_erplibre_studio_prop_name"
-                            readonly="readonly"
-                            t-att-value="block.name"
-                        />
-                        <span class="input-group-text">
-                            <i class="fa fa-lock me-1" aria-hidden="true" />
-                            locked
-                        </span>
-                    </span>
-                    <span class="d-block fw-normal text-muted mt-1 o_erplibre_studio_name_help" t-esc="nameHelp(field)" />
-                </label>
+                <t t-if="detailed" t-call="erplibre_studio.Inspector.FieldName" />
                 <t t-set="owner" t-value="ownerNote" />
                 <div
                     t-if="owner"
@@ -905,7 +894,22 @@
                 </t>
             </fieldset>
 
-            <div t-if="advancedEntries(block).length" class="o_erplibre_studio_field_advanced_section border-top pt-1">
+            <!-- Detailed: the technical attributes, always shown. -->
+            <fieldset
+                t-if="detailed and advancedEntries(block).length"
+                class="o_erplibre_studio_fieldset o_erplibre_studio_field_advanced"
+            >
+                <legend class="o_erplibre_studio_section_title">Technical</legend>
+                <t t-foreach="advancedEntries(block)" t-as="entry" t-key="entry.attribute">
+                    <t t-call="erplibre_studio.Inspector.SettableEntry" />
+                </t>
+            </fieldset>
+            <!-- Simple: the technical name and attributes fold under « More
+                 options », open while the name does not apply. -->
+            <div
+                t-elif="!detailed and hasAdvanced(block)"
+                class="o_erplibre_studio_field_advanced_section border-top pt-1"
+            >
                 <t t-set="isAdvancedOpen" t-value="advancedOpen(block)" />
                 <button
                     type="button"
@@ -913,15 +917,27 @@
                     t-att-aria-expanded="isAdvancedOpen ? 'true' : 'false'"
                     t-on-click="() => this.toggleAdvanced(block)"
                 >
-                    Advanced: widget, options, domain, groups
+                    More options
                     <i t-att-class="isAdvancedOpen ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true" />
                 </button>
                 <fieldset t-if="isAdvancedOpen" class="o_erplibre_studio_fieldset o_erplibre_studio_field_advanced pt-1">
-                    <legend class="visually-hidden">Advanced</legend>
+                    <legend class="visually-hidden">More options</legend>
+                    <t t-call="erplibre_studio.Inspector.FieldName" />
                     <t t-foreach="advancedEntries(block)" t-as="entry" t-key="entry.attribute">
                         <t t-call="erplibre_studio.Inspector.SettableEntry" />
                     </t>
                 </fieldset>
+                <p class="small text-muted mt-1 mb-0 o_erplibre_studio_level_hint">
+                    <t t-if="isAdvancedOpen">Always see these options:</t>
+                    <t t-else="">Technical name, widget and visibility: Detailed level.</t>
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm p-0 ms-1 align-baseline o_erplibre_studio_level_switch"
+                        t-on-click="() => editor.setLevel('detailed')"
+                    >
+                        Switch to Detailed
+                    </button>
+                </p>
             </div>
 
             <button
@@ -935,6 +951,36 @@
                 Remove from the view
             </button>
         </div>
+    </t>
+
+    <!-- The technical name of the field block « block » (« field »: its
+         entry of the payload): the input of a new field not created yet
+         (StudioFieldName), else the locked name and why it is locked. -->
+    <t t-name="erplibre_studio.Inspector.FieldName">
+        <StudioFieldName
+            t-if="nameEditable(field)"
+            editor="editor"
+            model="data.model"
+            name="block.name"
+            field="field"
+            rule="data.field_name_rule or null"
+            busy="!!props.busy"
+        />
+        <label t-else="" class="form-label mb-1 w-100">
+            Technical name
+            <span class="input-group input-group-sm mt-1">
+                <input
+                    class="form-control font-monospace o_erplibre_studio_prop_name"
+                    readonly="readonly"
+                    t-att-value="block.name"
+                />
+                <span class="input-group-text">
+                    <i class="fa fa-lock me-1" aria-hidden="true" />
+                    locked
+                </span>
+            </span>
+            <span class="d-block fw-normal text-muted mt-1 o_erplibre_studio_name_help" t-esc="nameHelp(field)" />
+        </label>
     </t>
 
     <!-- The changes of the draft in the view on screen. -->
@@ -1003,6 +1049,11 @@
         <span class="d-flex flex-column flex-grow-1">
             <span class="text-muted o_erplibre_studio_change_kind" t-esc="changeKind(change)" />
             <span class="o_erplibre_studio_change_summary" t-esc="change.summary" />
+            <code
+                t-if="detailed and change.xpath"
+                class="small text-muted text-break o_erplibre_studio_tech o_erplibre_studio_change_xpath"
+                t-esc="change.xpath"
+            />
             <span t-if="change.error" class="text-danger o_erplibre_studio_change_error">
                 <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
                 <t t-esc="change.error" />
@@ -1056,7 +1107,7 @@
                     onRename="(name) => this.updateInverse(field, {name})"
                     help="inverseHelp(inverse)"
                 />
-                <div t-else="" class="small">
+                <div t-elif="detailed" class="small o_erplibre_studio_tech">
                     <span class="text-muted">Technical name</span>
                     <code class="ms-1 o_erplibre_studio_inverse_name" t-esc="inverse.name" />
                 </div>

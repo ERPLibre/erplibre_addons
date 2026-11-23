@@ -11,6 +11,15 @@ export const NAME_CHECK_DELAY = 250;
 // The ids the input and its status take, one pair per component.
 let nextId = 0;
 
+/**
+ * The key of the technical name input of the field ``name`` of ``model``
+ * among the local blockers of the editor (``setLocalNameBlocker``): the
+ * inspector reads it to keep the input of a refused name on screen.
+ */
+export function fieldNameKey(model, name) {
+    return `field_name:${model}:${name}`;
+}
+
 /** The label of the new field ``field`` (an entry of the payload), or "". */
 function fieldLabel(field) {
     return (field.definition && field.definition.field_description) || "";
@@ -64,8 +73,6 @@ export class StudioFieldName extends Component {
         // it names (``check.name``); ``checking``: a request is on its way.
         this.state = useState({value: this.props.name, check: null, checking: false});
         this.request = 0;
-        // The key of this input among the local blockers of the editor.
-        this.blockerKey = Symbol("field_name");
         this.inputId = `o_erplibre_studio_name_${++nextId}`;
         this.scheduleCheck = useDebounced(() => this.check(), NAME_CHECK_DELAY);
         onMounted(() => this.check());
@@ -157,6 +164,11 @@ export class StudioFieldName extends Component {
         Object.assign(this.state, {check, checking: false});
         this.reportBlocker(value !== props.name);
         return check;
+    }
+
+    /** The key of this input among the local blockers of the editor: one per field. */
+    get blockerKey() {
+        return fieldNameKey(this.props.model, this.props.name);
     }
 
     reportBlocker(blocked) {

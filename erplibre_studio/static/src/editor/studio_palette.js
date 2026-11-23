@@ -2,7 +2,7 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component} from "@odoo/owl";
+import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {fieldTypeFits} from "./studio_relations";
 import {GEO_TYPES, RIBBON_COLORS, newFieldLabel, searchText, typeGlyph, valueLabel} from "./studio_utils";
@@ -46,8 +46,22 @@ export class StudioPalette extends Component {
         palette: Object,
     };
 
+    setup() {
+        this.editorState = useState(this.props.editor.state);
+    }
+
     get editor() {
         return this.props.editor;
+    }
+
+    /** Whether the existing fields show their technical names (the Detailed level). */
+    get detailed() {
+        return this.editorState.level === "detailed";
+    }
+
+    /** The accessible name of the existing field ``item``: its technical name at the Detailed level only. */
+    existingItemLabel(item) {
+        return this.itemLabel(this.detailed ? `${item.string} (${item.name})` : item.string);
     }
 
     get data() {

@@ -150,6 +150,8 @@ function payload(viewType, blocks, extra = {}) {
             applied: false,
         },
         projects: [{id: 3, name: "Contacts", module_name: "studio_contacts", state: "draft"}],
+        // The level that shows the technical bits these tests read.
+        display_level: "detailed",
         preview_key: "erplibre_studio_view_ref",
         sample_res_id: false,
         ...extra,

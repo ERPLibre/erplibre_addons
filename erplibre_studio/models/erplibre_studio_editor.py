@@ -210,7 +210,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         ``definition``, ``inverse_protected`` for a many2one whose comodel
         takes no inverse one2many, and ``name_auto``: whether the technical
         name still follows the label (False for an inverse field, which the
-        field that creates it names)."""
+        field that creates it names). A field of the database also gives
+        ``modules``, the installed modules that define or extend it."""
         line = project._studio_pending_line(model) if project else None
         if line:
             info = project._studio_simulated_fields(line)
@@ -252,6 +253,16 @@ class ErplibreStudioEditor(models.AbstractModel):
             if definition.get("ttype") == "many2one":
                 # The studio adds no inverse one2many to such a comodel.
                 entry["inverse_protected"] = protected_model(definition.get("relation"))
+        if not line:
+            # The modules that define or extend each field, « a, b »: the
+            # Detailed level of the inspector names them.
+            for row in (
+                self.env["ir.model.fields"]
+                .sudo()
+                .search_read([("model", "=", model)], ["name", "modules"])
+            ):
+                if row["name"] in info:
+                    info[row["name"]]["modules"] = row["modules"] or ""
         return info
 
     @api.model
@@ -798,7 +809,9 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "pending": pending,
                 "model_line_id": view.line.id if pending else False,
                 "added": self._added_payload(project, view),
+                "inherited": self._inherited_payload(view),
             },
+            "display_level": self._display_level(),
             "blocks": blocks,
             "layout": {
                 **self._layout(view.type, arch, fields_info),
@@ -845,6 +858,46 @@ class ErplibreStudioEditor(models.AbstractModel):
             "field_name_rule": (project or Project)._studio_field_name_rule(),
             "model_name_rule": (project or Project)._studio_model_name_rule(),
         }
+
+    @api.model
+    def _display_level(self):
+        """The display level of the editor the user chose (DISPLAY_LEVELS),
+        « simple » until he chooses one. A read creates no settings row."""
+        settings = self.env.user.res_users_settings_ids[:1]
+        return (settings and settings.erplibre_studio_display_level) or "simple"
+
+    @api.model
+    def set_display_level(self, level):
+        """Remember ``level`` as the display level of the editor for the
+        user, on his own settings row (created when he has none); answer
+        it."""
+        self._check_studio_access()
+        Settings = self.env["res.users.settings"]
+        allowed = dict(Settings._fields["erplibre_studio_display_level"].selection)
+        if level not in allowed:
+            raise UserError(self.env._("Unknown display level %(level)s.", level=level))
+        # The finder answers in sudo; the write goes through the rule that
+        # lets a user write his own row.
+        settings = Settings._find_or_create_for_user(self.env.user).sudo(False)
+        settings.write({"erplibre_studio_display_level": level})
+        return level
+
+    @api.model
+    def _inherited_payload(self, view):
+        """{views, modules}: how many views extend the view ``view`` of the
+        database (the extensions of its extensions too), and from how many
+        modules their external ids come; a view without external id counts
+        as a view only. 0 and 0 for a view of the draft."""
+        if is_draft_view(view):
+            return {"views": 0, "modules": 0}
+        inheriting = view._get_inheriting_views() - view
+        modules = set(
+            self.env["ir.model.data"]
+            .sudo()
+            .search([("model", "=", "ir.ui.view"), ("res_id", "in", inheriting.ids)])
+            .mapped("module")
+        )
+        return {"views": len(inheriting), "modules": len(modules)}
 
     @api.model
     def _added_payload(self, project, view):

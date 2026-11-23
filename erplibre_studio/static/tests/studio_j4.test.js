@@ -218,6 +218,8 @@ function payload(project = {}, {blocks = formBlocks(), fields = {}} = {}) {
             ...project,
         },
         projects: [{id: 3, name: "J4", module_name: "studio_j4", state: "draft"}],
+        // The level that shows the technical bits these tests read.
+        display_level: "detailed",
         preview_key: "erplibre_studio_view_ref",
         sample_res_id: false,
         mail_available: false,

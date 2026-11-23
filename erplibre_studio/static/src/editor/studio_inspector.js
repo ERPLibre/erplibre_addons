@@ -2,10 +2,10 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, useState} from "@odoo/owl";
+import {Component, onWillUpdateProps, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {StudioDomainDialog} from "./studio_domain";
-import {StudioFieldName} from "./studio_field_name";
+import {StudioFieldName, fieldNameKey} from "./studio_field_name";
 import {StudioGeoLayers} from "./studio_geo_layers";
 import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
@@ -46,7 +46,8 @@ export const MODULE_OWNING_STATES = ["installed", "to upgrade", "to remove"];
 // the view.
 const FIELD_CHANGES = ["add_field", "update_field"];
 const RELATION_TYPES = ["many2one", "one2many", "many2many"];
-// The kinds of attribute a field of a form or a list sets under « Advanced ».
+// The kinds of attribute a field of a form or a list sets under « More
+// options » (« Technical » at the Detailed level).
 const ADVANCED_KINDS = ["widget", "field_options", "field_domain", "groups"];
 // The view types whose fields show the attributes of ADVANCED_KINDS apart.
 const ADVANCED_VIEW_TYPES = ["form", "list"];
@@ -111,6 +112,50 @@ export class StudioInspector extends Component {
         // Whether the attributes the draft gives a timeline show; whether
         // « Advanced » is open ({path, open}), null to follow the block.
         this.local = useState({generated: false, advanced: null, groupText: "", viewAdvanced: false});
+        this.editorState = useState(this.props.editor.state);
+        onWillUpdateProps((next) => {
+            // A rename gives the selected field another path: « More
+            // options » stays as it was on the field.
+            const local = this.local.advanced;
+            const before = this.props.selected;
+            if (
+                local &&
+                before &&
+                local.path === before &&
+                next.selected &&
+                next.selected !== before &&
+                !findBlock(next.data.blocks, (b) => b.path === before)
+            ) {
+                this.local.advanced = {path: next.selected, open: local.open};
+            }
+        });
+    }
+
+    /** Whether the technical bits show (the Detailed level of the editor). */
+    get detailed() {
+        return this.editorState.level === "detailed";
+    }
+
+    /**
+     * Whether the technical name input of the field block ``block`` holds a
+     * name that does not apply (a local blocker of the editor).
+     */
+    nameBlocked(block) {
+        return Boolean(
+            block.kind === "field" && this.editorState.localNameBlockers.has(fieldNameKey(this.data.model, block.name))
+        );
+    }
+
+    /**
+     * Where the field block ``block`` came from, for the Detailed header:
+     * created by the project, else the view it is read from.
+     */
+    fieldOrigin(block, field) {
+        if (field.project) {
+            return _t("created by this project");
+        }
+        const view = this.data.view || {};
+        return _t("from the view %(xml_id)s", {xml_id: view.xml_id || view.name || ""});
     }
 
     get editor() {
@@ -249,10 +294,14 @@ export class StudioInspector extends Component {
     }
 
     /**
-     * Whether « Advanced » shows for ``block``: as toggled on this block,
-     * else open when the block has one of its attributes.
+     * Whether « More options » shows for ``block``: always while its
+     * technical name does not apply, else as toggled on this block, else
+     * open when the block has one of its attributes.
      */
     advancedOpen(block) {
+        if (this.nameBlocked(block)) {
+            return true;
+        }
         const local = this.local.advanced;
         if (local && local.path === block.path) {
             return local.open;

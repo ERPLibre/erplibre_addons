@@ -164,6 +164,8 @@ function payload(project = {}, {model = "res.partner", chatter = true, viewId = 
             ...project,
         },
         projects: [{id: 3, name: "Loans", module_name: "studio_loans", state: "draft"}],
+        // The level that shows the technical bits these tests read.
+        display_level: "detailed",
         preview_key: "erplibre_studio_view_ref",
         sample_res_id: false,
         mail_available: true,

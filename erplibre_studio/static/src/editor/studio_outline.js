@@ -154,10 +154,32 @@ export class StudioOutline extends Component {
     setup() {
         // The path of the row that holds the tab stop of the tree.
         this.state = useState({focus: null});
+        this.editorState = useState(this.props.editor.state);
     }
 
     get editor() {
         return this.props.editor;
+    }
+
+    /** Whether the rows show the technical names (the Detailed level). */
+    get detailed() {
+        return this.editorState.level === "detailed";
+    }
+
+    /** The placeholder of the filter: the Detailed level names what it searches. */
+    get filterPlaceholder() {
+        return this.detailed ? _t("Filter: label or technical name") : _t("Filter the plan");
+    }
+
+    /**
+     * The technical name a row shows under its label at the Detailed
+     * level: the name of a field, a widget or a filter, the tag of a
+     * container with a label of its own; "" when it would repeat the label.
+     */
+    technicalName(block) {
+        const own = block.label && block.label !== block.tag;
+        const name = block.name || (isOutlineContainer(block) && own ? block.tag : "");
+        return name && name !== this.label(block) ? name : "";
     }
 
     get outline() {

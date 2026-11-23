@@ -14,7 +14,7 @@
                 <input
                     type="text"
                     class="form-control o_erplibre_studio_outline_filter"
-                    placeholder="Filter: label or technical name"
+                    t-att-placeholder="filterPlaceholder"
                     aria-label="Filter the plan"
                     t-model="outline.filter"
                 />
@@ -93,7 +93,7 @@
                         tabindex="-1"
                         t-att-class="{'fw-bold': isContainer(row.block) and !row.context}"
                         t-att-draggable="canDrag(row.block) ? 'true' : 'false'"
-                        t-att-title="row.block.name or ''"
+                        t-att-title="detailed and row.block.name ? row.block.name : false"
                         t-on-click="() => this.pick(row.block)"
                         t-on-dragstart="(ev) => this.startDrag(ev, row.block)"
                         t-on-dragend="() => this.endDrag()"
@@ -104,7 +104,15 @@
                             aria-hidden="true"
                             t-esc="glyph(row.block)"
                         />
-                        <span class="text-truncate flex-grow-1 o_erplibre_studio_outline_label" t-esc="label(row.block)" />
+                        <t t-set="technical" t-value="detailed and technicalName(row.block)" />
+                        <span t-if="technical" class="d-flex flex-column flex-grow-1 min-w-0 lh-sm">
+                            <span class="text-truncate o_erplibre_studio_outline_label" t-esc="label(row.block)" />
+                            <code
+                                class="small text-muted text-truncate fw-normal o_erplibre_studio_tech o_erplibre_studio_outline_tech"
+                                t-esc="technical"
+                            />
+                        </span>
+                        <span t-else="" class="text-truncate flex-grow-1 o_erplibre_studio_outline_label" t-esc="label(row.block)" />
                         <span
                             t-if="isContainer(row.block) and count(row.block)"
                             class="small text-muted fw-normal"

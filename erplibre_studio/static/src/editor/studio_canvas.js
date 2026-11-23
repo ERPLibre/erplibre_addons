@@ -74,6 +74,11 @@ export class StudioBlock extends Component {
         return this.props.editor;
     }
 
+    /** Whether the technical bits of the block show (the Detailed level). */
+    get detailed() {
+        return this.editorState.level === "detailed";
+    }
+
     get field() {
         return (this.editor.data.fields || {})[this.block.name] || {};
     }
@@ -195,7 +200,8 @@ export class StudioBlock extends Component {
         if (attrs.optional) {
             flags.push({key: "optional", label: attrs.optional === "hide" ? _t("optional, hidden") : _t("optional")});
         }
-        if (attrs.widget && this.props.viewType !== "form") {
+        // The widget is a technical bit: the Detailed level shows it.
+        if (attrs.widget && this.props.viewType !== "form" && this.detailed) {
             flags.push({key: "widget", label: attrs.widget});
         }
         if (attrs.groups) {

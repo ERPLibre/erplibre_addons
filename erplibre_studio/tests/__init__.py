@@ -7,6 +7,7 @@ from . import (
     test_arch_views,
     test_change_removal,
     test_confirm,
+    test_display_level,
     test_editor_models,
     test_editor_payload,
     test_field_json,
