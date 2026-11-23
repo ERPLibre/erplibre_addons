@@ -38,6 +38,7 @@ import {
     isBaseInvisible,
     isGhost,
     isTrue,
+    marginDot,
     pivotLanes,
     searchColumns,
     searchEndHook,
@@ -274,15 +275,9 @@ export class StudioBlock extends Component {
         return this.dotOf(this.block.change_kinds || []);
     }
 
-    /** The margin dot of the change kinds ``kinds``, or null (marginDot). */
+    /** The margin dot of the change kinds ``kinds``, or null (``marginDot`` of studio_utils). */
     dotOf(kinds) {
-        if (!kinds.length) {
-            return null;
-        }
-        return {
-            dot: kinds.includes("hidden") ? "ring" : "filled",
-            label: kinds.map(changeKindLabel).join(", "),
-        };
+        return marginDot(kinds);
     }
 
     /**

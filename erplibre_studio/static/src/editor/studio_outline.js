@@ -8,8 +8,10 @@ import {
     CHANGE_TAGS,
     allBlocks,
     canDragBlock,
+    changeKeysInside,
     changeKindLabel,
     isGhost,
+    marginDot,
     searchText,
     typeGlyph,
 } from "./studio_utils";
@@ -209,9 +211,12 @@ export class StudioOutline extends Component {
         return Boolean(this.outline.filter.trim()) || this.outline.changedOnly;
     }
 
-    /** How many blocks a draft change touches. */
-    get changedCount() {
-        return allBlocks(this.root).filter((b) => b.changed).length;
+    /**
+     * How many changes the draft holds in the view on screen: the count of
+     * the list of the Changes tab, the one « Modified » shows.
+     */
+    get changeCount() {
+        return (this.props.data.changes || []).length;
     }
 
     countLabel(result) {
@@ -268,13 +273,37 @@ export class StudioOutline extends Component {
         return kind ? changeKindLabel(kind) : "";
     }
 
+    /**
+     * The margin dot of the row of ``block`` (``marginDot``): a ring with
+     * the label « removed » for an element the draft removes; null for a
+     * block no change touches.
+     */
+    rowDot(block) {
+        if (!block.changed) {
+            return null;
+        }
+        if (this.isGhost(block)) {
+            return {dot: "ring", label: _t("removed")};
+        }
+        return marginDot(block.change_kinds) || {dot: "filled", label: ""};
+    }
+
+    /**
+     * How many changes the folded container of ``row`` holds under it
+     * (``changeKeysInside``); 0 for an open row or a leaf, whose changed
+     * blocks show their own dots.
+     */
+    holdsCount(row) {
+        return row.open || !isOutlineContainer(row.block) ? 0 : changeKeysInside(row.block).length;
+    }
+
+    holdsLabel(count) {
+        return _t("%(count)s change(s) inside", {count});
+    }
+
     toggleLabel(row) {
         const label = this.label(row.block);
         return row.open ? _t("Collapse %(label)s", {label}) : _t("Expand %(label)s", {label});
-    }
-
-    holdsLabel() {
-        return _t("Holds changes of the draft");
     }
 
     canDrag(block) {

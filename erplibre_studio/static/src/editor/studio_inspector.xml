@@ -647,7 +647,11 @@
                 t-if="changedNote(block)"
                 class="d-flex gap-2 align-items-start border rounded p-2 o_erplibre_studio_inspector_changed"
             >
-                <span class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed mt-1" aria-hidden="true" />
+                <span
+                    class="o_erplibre_studio_margin_dot o_erplibre_studio_change_mark"
+                    t-att-data-dot="blockDot(block)"
+                    aria-hidden="true"
+                />
                 <span class="flex-grow-1">
                     <t t-esc="changedNote(block)" />
                     <button
@@ -664,7 +668,8 @@
                         t-att-disabled="props.busy or !props.hasProject"
                         t-on-click="() => this.removeBlockChange(block)"
                     >
-                        Undo this change
+                        <t t-if="blockDot(block) === 'ring'">Restore</t>
+                        <t t-else="">Undo</t>
                     </button>
                 </span>
             </div>
@@ -1058,9 +1063,7 @@
                 </button>
             </li>
         </ol>
-        <p class="small text-muted mb-1">
-            Click a change to find its element, or undo it with its button. The review of the whole project is in the Review space.
-        </p>
+        <p class="small text-muted mb-1 o_erplibre_studio_changes_foot">A click finds the element; only it is then highlighted.</p>
         <button
             type="button"
             class="btn btn-sm btn-link p-0 o_erplibre_studio_open_review"
@@ -1072,12 +1075,19 @@
         </button>
     </t>
 
-    <!-- One change of the list: its number, kind, summary and error. -->
+    <!-- One change of the list: its margin dot as on the canvas (a failed
+         change: its number on a danger badge), kind, summary and error. -->
     <t t-name="erplibre_studio.Inspector.Change">
         <span
-            class="badge rounded-pill o_erplibre_studio_change_number"
-            t-att-class="change.error ? 'text-bg-danger' : 'o_erplibre_studio_change_number_ok'"
+            t-if="change.error"
+            class="badge rounded-pill text-bg-danger o_erplibre_studio_change_number"
             t-esc="change_index + 1"
+        />
+        <span
+            t-else=""
+            class="o_erplibre_studio_margin_dot o_erplibre_studio_change_mark"
+            t-att-data-dot="changeDot(change)"
+            aria-hidden="true"
         />
         <span class="d-flex flex-column flex-grow-1">
             <span class="text-muted o_erplibre_studio_change_kind" t-esc="changeKind(change)" />

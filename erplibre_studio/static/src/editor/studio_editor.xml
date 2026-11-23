@@ -473,9 +473,9 @@
                             >
                                 Plan
                                 <span
-                                    t-if="changedBlockCount"
+                                    t-if="viewChangeCount"
                                     class="badge rounded-pill text-bg-info ms-1 o_erplibre_studio_plan_count"
-                                    t-esc="changedBlockCount"
+                                    t-esc="viewChangeCount"
                                 />
                             </button>
                         </div>

@@ -312,6 +312,11 @@ describe("an element the draft removes", () => {
         expect(row).toHaveClass("o_erplibre_studio_outline_removed");
         expect(`${row} .o_erplibre_studio_margin_dot[data-dot=ring]`).toHaveCount(1);
         expect(`${row} .o_erplibre_studio_change_dot`).toHaveCount(0);
+        // The Simple level shows the ring alone; its text stays for a
+        // screen reader, and the Detailed level writes it out.
+        expect(`${row} .o_erplibre_studio_outline_tag`).toHaveCount(0);
+        expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("removed");
+        await contains(DETAILED).click();
         expect(`${row} .o_erplibre_studio_outline_tag`).toHaveText("removed");
         expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("draggable", "false");
         // The group counts the three fields left.

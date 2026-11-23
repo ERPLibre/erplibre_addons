@@ -354,7 +354,13 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "city");
         expect(".o_erplibre_studio_inspector_title").toHaveText("Town");
         expect(".o_erplibre_studio_inspector_kind").toHaveText("Existing field · Text");
-        expect(".o_erplibre_studio_inspector_changed").toHaveText(/renamed/);
+        // The note of its change: the dot of the margin, the summary, Undo.
+        expect(".o_erplibre_studio_inspector_changed").toHaveText(/Rename City to Town/);
+        expect(".o_erplibre_studio_inspector_changed .o_erplibre_studio_margin_dot").toHaveAttribute(
+            "data-dot",
+            "filled"
+        );
+        expect(".o_erplibre_studio_undo_block_change").toHaveText("Undo");
         expect(".o_erplibre_studio_field_props .o_erplibre_studio_prop_label").toHaveValue("Town");
         expect(".o_erplibre_studio_field_props .o_erplibre_studio_prop_name").toHaveValue("city");
         expect(".o_erplibre_studio_field_props .o_erplibre_studio_prop_name").toHaveAttribute("readonly");
@@ -999,7 +1005,19 @@ describe("erplibre_studio editor, inspector", () => {
             "View · moved",
             "View · hidden",
         ]);
-        expect(queryAllTexts(".o_erplibre_studio_change_number")).toEqual(["1", "2", "3", "4"]);
+        // The healthy changes carry the dot of the canvas: a ring for the
+        // one that removes; the failed one keeps its number, in red.
+        expect(queryAllTexts(".o_erplibre_studio_change_number")).toEqual(["3"]);
+        expect(".o_erplibre_studio_changes li[data-type=move] .o_erplibre_studio_change_number").toHaveClass(
+            "text-bg-danger"
+        );
+        expect(".o_erplibre_studio_changes li[data-type=move] .o_erplibre_studio_margin_dot").toHaveCount(0);
+        expect(
+            [...document.querySelectorAll(".o_erplibre_studio_changes .o_erplibre_studio_margin_dot")].map(
+                (dot) => dot.dataset.dot
+            )
+        ).toEqual(["filled", "filled", "ring"]);
+        expect(".o_erplibre_studio_changes_foot").toHaveText("A click finds the element; only it is then highlighted.");
         // A change in error says why, and the canvas has no block for it.
         expect(".o_erplibre_studio_changes li[data-type=move]").toHaveClass("o_erplibre_studio_change_failed");
         expect(".o_erplibre_studio_changes li[data-type=move] .o_erplibre_studio_change_error").toHaveText(
@@ -1008,11 +1026,21 @@ describe("erplibre_studio editor, inspector", () => {
         expect(".o_erplibre_studio_change_pick").toHaveCount(2);
         expect(".o_erplibre_studio_changes li[data-type=remove] .o_erplibre_studio_change_unplaced").toHaveCount(1);
 
-        // A click selects the block, shows its page, and the properties.
+        // A click selects the block, shows its page, and the properties;
+        // the block selected before lets go: one element highlighted, on
+        // the canvas and in the plan.
+        await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        await contains(".o_erplibre_studio_field[data-name=street]").click();
+        await contains(TAB_CHANGES).click();
         await contains(".o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_pick").click();
         expect(TAB_PROPERTIES).toHaveAttribute("aria-selected", "true");
         expect(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).toHaveClass("active");
         expect(".o_erplibre_studio_field[data-name=x_sponsor]").toHaveClass("o_erplibre_studio_selected");
+        expect(".o_erplibre_studio_selected").toHaveCount(1);
+        expect(".o_erplibre_studio_outline_selected").toHaveCount(1);
+        expect(`.o_erplibre_studio_outline_row[data-path="${named("x_sponsor")}"]`).toHaveClass(
+            "o_erplibre_studio_outline_selected"
+        );
         expect(".o_erplibre_studio_properties").toHaveAttribute("data-name", "x_sponsor");
         // The note of a changed block leads back to the list.
         await contains(".o_erplibre_studio_show_changes").click();
@@ -1614,7 +1642,7 @@ describe("erplibre_studio editor, inspector", () => {
         await openEditor();
         await contains(".o_erplibre_studio_field[data-name=city]").click();
         expect(".o_erplibre_studio_inspector_changed .o_erplibre_studio_show_changes").toHaveCount(1);
-        expect(".o_erplibre_studio_undo_block_change").toHaveText("Undo this change");
+        expect(".o_erplibre_studio_undo_block_change").toHaveText("Undo");
         await contains(".o_erplibre_studio_undo_block_change").click();
         expect.verifySteps(["get_change_removal 1", "remove_change 1 [1] 0"]);
         expect(".o_erplibre_studio_changes_count").toHaveText("3");
@@ -1630,7 +1658,8 @@ describe("erplibre_studio editor, inspector", () => {
         answer = {...payload(), blocks: twice(payload().blocks)};
         await openEditor();
         await contains(".o_erplibre_studio_field[data-name=city]").click();
-        expect(".o_erplibre_studio_inspector_changed").toHaveCount(1);
+        // Its kinds then stand for the summary of a single change.
+        expect(".o_erplibre_studio_inspector_changed").toHaveText(/Changed by the draft: renamed\./);
         expect(".o_erplibre_studio_undo_block_change").toHaveCount(0);
     });
 

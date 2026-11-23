@@ -267,14 +267,16 @@
         border-color: $danger !important;
     }
 
+    // The number of a failed change, on a danger badge.
     .o_erplibre_studio_change_number {
         flex: none;
         min-width: 1.375rem;
     }
 
-    .o_erplibre_studio_change_number_ok {
-        background-color: rgba($primary, 0.12);
-        color: $primary;
+    // The margin dot of a change of the list or of the note of a block,
+    // lined up with the first line of its text.
+    .o_erplibre_studio_change_mark {
+        margin-top: 0.4rem;
     }
 
     // The technical name of a new field: the input framed by its status,

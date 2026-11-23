@@ -46,6 +46,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "%(count)s change(s) inside"
 msgstr "%(count)s changement(s) dans le bloc"
 
@@ -532,7 +533,7 @@ msgstr "%(rights)s droit(s) · %(rules)s règle(s)"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
-msgid "%(state)s · %(count)s change(s) not applied"
+msgid "%(state)s · %(count)s unapplied change(s)"
 msgstr "%(state)s · %(count)s changement(s) non appliqué(s)"
 
 #. module: erplibre_studio
@@ -709,14 +710,19 @@ msgstr "Frise chronologique, fournie par web_timeline (OCA)."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "A click finds the element; only it is then highlighted."
+msgstr "Un clic retrouve l'élément ; seul lui est alors mis en évidence."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
 msgid ""
-"A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a\n"
-"                filled dot marks a change of the draft."
+"A click selects the element on the canvas. Drag a row, or press Alt+Up or "
+"Alt+Down, to move it."
 msgstr ""
 "Un clic sélectionne l'élément dans le canevas. Glissez une ligne, ou "
-"appuyez sur Alt+Haut ou Alt+Bas, pour la déplacer ; un point plein marque un "
-"changement du brouillon."
+"appuyez sur Alt+Haut ou Alt+Bas, pour la déplacer."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2686,16 +2692,6 @@ msgstr "Effacer le résultat"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid ""
-"Click a change to find its element, or undo it with its button. The review "
-"of the whole project is in the Review space."
-msgstr ""
-"Cliquez un changement pour retrouver l'élément, ou annulez-le avec son "
-"bouton. La revue complète du projet est dans l'espace Revue."
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid ""
 "Click a group of the table to see its app, the groups it implies and its "
@@ -3519,6 +3515,16 @@ msgstr "Filtrer : libellé ou nom technique"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
+msgid ""
+"Filled dot: added or modified. Ring: hidden or removed. Number: changes "
+"folded inside the block."
+msgstr ""
+"Pastille pleine : ajouté ou modifié. Anneau : masqué ou retiré. Chiffre : "
+"changements repliés dans le bloc."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Filters"
 msgstr "Filtres"
@@ -3757,12 +3763,6 @@ msgstr "Masquer ou afficher"
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__hierarchy
 msgid "Hierarchy"
 msgstr "Hiérarchie"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "Holds changes of the draft"
-msgstr "Contient des changements du brouillon"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_base_module_uninstall__studio_understood
@@ -8089,6 +8089,7 @@ msgstr "Sous un menu existant"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Undo"
 msgstr "Annuler"
@@ -8110,12 +8111,6 @@ msgstr "Annuler un changement"
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "Undo the change"
 msgstr "Annuler le changement"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Undo this change"
-msgstr "Annuler ce changement"
 
 #. module: erplibre_studio
 #. odoo-javascript

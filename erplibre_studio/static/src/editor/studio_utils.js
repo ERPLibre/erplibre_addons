@@ -147,6 +147,30 @@ export function changeKindLabel(kind) {
     );
 }
 
+/**
+ * The margin dot of the change kinds ``kinds`` (``change_kinds`` of a
+ * block): {dot, label}, « ring » when one of them hides the node, else
+ * « filled »; the label joins the kinds (``changeKindLabel``). Null for no
+ * kind.
+ */
+export function marginDot(kinds) {
+    if (!kinds || !kinds.length) {
+        return null;
+    }
+    return {
+        dot: kinds.includes("hidden") ? "ring" : "filled",
+        label: kinds.map(changeKindLabel).join(", "),
+    };
+}
+
+/**
+ * The dot of ``change``, a change of the payload: « ring » for a change
+ * that hides or removes its node, else « filled ».
+ */
+export function changeDot(change) {
+    return change.kind === "hidden" || change.type === "remove" ? "ring" : "filled";
+}
+
 /** ``text`` in lower case without accents, as a filter compares it. */
 export function searchText(text) {
     return (text || "")

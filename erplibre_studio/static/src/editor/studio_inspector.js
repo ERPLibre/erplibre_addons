@@ -25,6 +25,7 @@ import {
     MAX_FIELD_SIZE,
     attributeLabel,
     canRemoveBlock,
+    changeDot,
     changeKindLabel,
     fieldOptions,
     fieldTypeLabel,
@@ -32,6 +33,7 @@ import {
     findBlock,
     isGhost,
     isTrue,
+    marginDot,
     selectionToText,
     textToSelection,
     valueLabel,
@@ -591,13 +593,28 @@ export class StudioInspector extends Component {
         return (block.children || []).map((child) => outlineLabel(child));
     }
 
-    /** The kinds of the draft changes on ``block``, as text; "" for none. */
+    /**
+     * The note of the draft changes on ``block``: the summary of its one
+     * change (``blockChange``) when the view lists it, else its kinds as
+     * text; "" for none.
+     */
     changedNote(block) {
         const kinds = block.change_kinds || [];
         if (!kinds.length) {
             return "";
         }
+        const changeId = this.blockChange(block);
+        const change = changeId && this.changes.find((c) => c.id === changeId);
+        if (change && change.summary) {
+            return change.summary;
+        }
         return _t("Changed by the draft: %(kinds)s.", {kinds: kinds.map((k) => changeKindLabel(k)).join(", ")});
+    }
+
+    /** The margin dot of the note of ``block``: « ring » or « filled » (``marginDot``). */
+    blockDot(block) {
+        const dot = marginDot(block.change_kinds);
+        return dot ? dot.dot : "filled";
     }
 
     /**
@@ -675,6 +692,11 @@ export class StudioInspector extends Component {
     changeKind(change) {
         const area = FIELD_CHANGES.includes(change.type) ? _t("Field") : _t("View");
         return change.kind ? `${area} · ${changeKindLabel(change.kind)}` : area;
+    }
+
+    /** The dot of ``change`` in the list: « ring » or « filled » (``changeDot``). */
+    changeDot(change) {
+        return changeDot(change);
     }
 
     pickChange(change) {

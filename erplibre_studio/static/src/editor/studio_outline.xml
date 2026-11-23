@@ -3,7 +3,7 @@
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <templates xml:space="preserve">
     <!-- The plan of the view: a filter, « All | Modified », the tree of
-         its blocks. -->
+         its blocks, the legend of its marks. -->
     <t t-name="erplibre_studio.Outline">
         <t t-set="shown" t-value="result" />
         <div class="o_erplibre_studio_outline d-flex flex-column gap-2 h-100">
@@ -45,7 +45,7 @@
                         t-on-click="() => this.showChanged(true)"
                     >
                         Modified ·
-                        <t t-esc="changedCount" />
+                        <t t-esc="changeCount" />
                     </button>
                 </div>
                 <span class="ms-auto small text-muted o_erplibre_studio_outline_count" t-esc="countLabel(shown)" />
@@ -119,39 +119,41 @@
                             class="small text-muted fw-normal"
                             t-esc="count(row.block)"
                         />
-                        <t t-if="row.block.changed">
-                            <span
-                                class="small fw-bold text-info-emphasis o_erplibre_studio_outline_tag"
-                                t-esc="changeLabel(row.block)"
-                            />
-                            <!-- An element the draft removes: a ring. -->
-                            <span
-                                t-if="isGhost(row.block)"
-                                class="o_erplibre_studio_margin_dot"
-                                data-dot="ring"
-                                aria-hidden="true"
-                            />
-                            <span
-                                t-else=""
-                                class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_changed"
-                                aria-hidden="true"
-                            />
-                        </t>
                         <span
-                            t-if="row.block.changed_inside and !row.open"
-                            role="img"
-                            class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_inside"
-                            t-att-aria-label="holdsLabel()"
-                            t-att-title="holdsLabel()"
+                            t-if="detailed and row.block.changed"
+                            class="small fw-bold text-info-emphasis o_erplibre_studio_outline_tag"
+                            t-esc="changeLabel(row.block)"
                         />
+                        <!-- The folded container: how many changes it holds. -->
+                        <t t-set="holds" t-value="holdsCount(row)" />
+                        <span
+                            t-if="holds"
+                            role="img"
+                            class="o_erplibre_studio_margin_count o_erplibre_studio_outline_holds"
+                            t-att-aria-label="holdsLabel(holds)"
+                            t-att-title="holdsLabel(holds)"
+                            t-esc="holds"
+                        />
+                        <!-- The dot of the row's own change, as on the canvas:
+                             filled, or a ring for a change that hides; its
+                             kinds as text for a screen reader. -->
+                        <t t-set="dot" t-value="rowDot(row.block)" />
+                        <t t-if="dot">
+                            <span class="o_erplibre_studio_margin_dot" t-att-data-dot="dot.dot" aria-hidden="true" />
+                            <span class="visually-hidden o_erplibre_studio_outline_dot_text" t-esc="dot.label" />
+                        </t>
                     </div>
                 </li>
             </ul>
             <p t-if="!shown.rows.length" class="small text-muted mb-0 o_erplibre_studio_outline_empty" t-esc="emptyLabel" />
-            <p class="small text-muted border-top pt-2 mt-auto mb-0">
-                A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a
-                filled dot marks a change of the draft.
-            </p>
+            <div class="small text-muted border-top pt-2 mt-auto">
+                <p class="mb-1 o_erplibre_studio_outline_legend">
+                    Filled dot: added or modified. Ring: hidden or removed. Number: changes folded inside the block.
+                </p>
+                <p class="mb-0">
+                    A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it.
+                </p>
+            </div>
         </div>
     </t>
 </templates>

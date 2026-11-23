@@ -626,7 +626,7 @@ describe("erplibre_studio editor", () => {
         expect(".o_erplibre_studio_rail_item[data-space=models] .o_erplibre_studio_rail_count").toHaveText("2");
         expect(".o_erplibre_studio_rail_item[data-space=security] .o_erplibre_studio_rail_count").toHaveText("5");
         expect(".o_erplibre_studio_rail_item[data-space=review] .o_erplibre_studio_rail_count").toHaveText("8");
-        expect(".o_erplibre_studio_status_state").toHaveText(/Draft · 8 change\(s\) not applied/);
+        expect(".o_erplibre_studio_status_state").toHaveText("Draft · 8 unapplied change(s)");
         expect(".o_erplibre_studio_status_applied").toHaveText("Never applied");
         expect(".o_erplibre_studio_undo").toHaveAttribute("aria-label");
         expect(".o_erplibre_studio_preview_toggle").toHaveAttribute("aria-pressed", "false");

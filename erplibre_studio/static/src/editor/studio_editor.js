@@ -61,6 +61,7 @@ export {
     allBlocks,
     attributeLabel,
     blockTrail,
+    changeDot,
     changeKeysInside,
     conditionValue,
     fieldTypeLabel,
@@ -71,6 +72,7 @@ export {
     isBaseInvisible,
     isGhost,
     isTrue,
+    marginDot,
     namedKeys,
     pivotAxes,
     pivotLanes,
@@ -1849,20 +1851,35 @@ export class StudioEditor extends Component {
             .map((block) => ({path: block.path, label: outlineLabel(block)}));
     }
 
-    /** How many blocks of the view on screen a draft change touches. */
-    get changedBlockCount() {
-        return allBlocks(this.root).filter((b) => b.changed).length;
+    /**
+     * How many changes the draft holds in the view on screen: the count of
+     * the Changes tab, of the tab of the plan and of its « Modified ».
+     */
+    get viewChangeCount() {
+        return ((this.data && this.data.changes) || []).length;
     }
 
     /**
-     * Reveal the block of ``change`` (a change of the payload): its
-     * ``path`` is false when the canvas shows no block for it (a removed
-     * node, a change in error).
+     * Reveal the block of ``change`` (a change of the payload), then bring
+     * its row of the plan on screen too; its ``path`` is false when the
+     * canvas shows no block for it (a removed node, a change in error).
      */
     revealChange(change) {
         if (change && change.path) {
             this.reveal(change.path);
+            this.scrollToOutlineRow(change.path);
         }
+    }
+
+    /** Scroll the plan, when it shows, to the row of ``path`` once it renders. */
+    scrollToOutlineRow(path) {
+        browser.requestAnimationFrame(() => {
+            const tree = document.querySelector(".o_erplibre_studio_outline_tree");
+            const row = tree && tree.querySelector(`[data-path="${CSS.escape(path)}"]`);
+            if (row && row.scrollIntoView) {
+                row.scrollIntoView({block: "nearest"});
+            }
+        });
     }
 
     /** Show the tab ``tab`` of the inspector (INSPECTOR_TABS). */
@@ -3198,7 +3215,7 @@ export class StudioEditor extends Component {
             return _t("%(state)s · the database has the draft", {state: project.state_label});
         }
         if (!project.applied) {
-            return _t("%(state)s · %(count)s change(s) not applied", {
+            return _t("%(state)s · %(count)s unapplied change(s)", {
                 state: project.state_label,
                 count: this.changeCount,
             });

@@ -44,6 +44,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "%(count)s change(s) inside"
 msgstr ""
 
@@ -494,7 +495,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
-msgid "%(state)s · %(count)s change(s) not applied"
+msgid "%(state)s · %(count)s unapplied change(s)"
 msgstr ""
 
 #. module: erplibre_studio
@@ -657,10 +658,16 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "A click finds the element; only it is then highlighted."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
 msgid ""
-"A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it; a\n"
-"                filled dot marks a change of the draft."
+"A click selects the element on the canvas. Drag a row, or press Alt+Up or "
+"Alt+Down, to move it."
 msgstr ""
 
 #. module: erplibre_studio
@@ -2700,14 +2707,6 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid ""
-"Click a change to find its element, or undo it with its button. The review "
-"of the whole project is in the Review space."
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid ""
 "Click a group of the table to see its app, the groups it implies and its "
@@ -3512,6 +3511,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
+msgid ""
+"Filled dot: added or modified. Ring: hidden or removed. Number: changes "
+"folded inside the block."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Filters"
 msgstr ""
@@ -3745,12 +3752,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__view_type__hierarchy
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_view__view_type__hierarchy
 msgid "Hierarchy"
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "Holds changes of the draft"
 msgstr ""
 
 #. module: erplibre_studio
@@ -7928,6 +7929,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Undo"
 msgstr ""
@@ -7948,12 +7950,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "Undo the change"
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Undo this change"
 msgstr ""
 
 #. module: erplibre_studio

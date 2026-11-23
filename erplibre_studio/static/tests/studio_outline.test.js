@@ -82,6 +82,17 @@ function formBlocks() {
     return container("/form", "form", "form", [sheet]);
 }
 
+/**
+ * The changes of the draft in the form: one per changed block, and one
+ * whose node the canvas does not show (no path).
+ */
+const CHANGES = [
+    {id: 1, type: "relabel", kind: "renamed", summary: "Rename City to Town", path: named("city"), error: false},
+    {id: 2, type: "add_field", kind: "new", summary: "Add Sponsor", path: named("x_sponsor"), error: false},
+    {id: 3, type: "hide", kind: "hidden", summary: "Hide Langue préférée", path: named("lang"), error: false},
+    {id: 4, type: "set_attribute", kind: "attribute", summary: "Set a class", path: false, error: false},
+];
+
 function payload(extra = {}) {
     return {
         model: "res.partner",
@@ -102,7 +113,7 @@ function payload(extra = {}) {
             {name: "vat", string: "Tax ID", type: "char"},
         ],
         field_types: ["char", "integer", "selection"],
-        changes: [],
+        changes: CHANGES,
         errors: [],
         project: {
             id: 3,
@@ -265,14 +276,32 @@ describe("erplibre_studio editor, plan and change marks", () => {
     test("the plan selects, filters, folds, and drags", async () => {
         await openEditor();
         expect(".o_erplibre_studio_left_tab[data-panel=palette]").toHaveAttribute("aria-selected", "true");
-        expect(".o_erplibre_studio_plan_count").toHaveText("3");
+        // The tab of the plan and « Modified » count the changes of the
+        // view, as the Changes tab does: one has no block on the canvas.
+        expect(".o_erplibre_studio_plan_count").toHaveText("4");
+        expect(".o_erplibre_studio_changes_count").toHaveText("4");
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
         expect(".o_erplibre_studio_left_tab[data-panel=plan]").toHaveAttribute("aria-selected", "true");
         expect(".o_erplibre_studio_palette [data-tab]").toHaveCount(0);
         expect(".o_erplibre_studio_outline_row").toHaveCount(11);
         expect(".o_erplibre_studio_outline_count").toHaveText("11 item(s)");
-        expect(".o_erplibre_studio_outline_changed").toHaveText("Modified · 3");
+        expect(".o_erplibre_studio_outline_changed").toHaveText("Modified · 4");
         expect(`${row(named("x_sponsor"))} .o_erplibre_studio_outline_tag`).toHaveText("new");
+        // One margin dot per changed row, as on the canvas, its kinds as
+        // text for a screen reader; a ring for the removed element.
+        expect(".o_erplibre_studio_outline_row .o_erplibre_studio_margin_dot").toHaveCount(3);
+        expect(`${row(named("city"))} .o_erplibre_studio_margin_dot`).toHaveAttribute("data-dot", "filled");
+        expect(`${row(named("city"))} .o_erplibre_studio_outline_dot_text`).toHaveText("renamed");
+        expect(`${row(named("x_sponsor"))} .o_erplibre_studio_margin_dot`).toHaveAttribute("data-dot", "filled");
+        expect(`${row(named("lang"))} .o_erplibre_studio_margin_dot`).toHaveAttribute("data-dot", "ring");
+        expect(`${row(ADDRESS)} .o_erplibre_studio_margin_dot`).toHaveCount(0);
+        expect(".o_erplibre_studio_change_dot").toHaveCount(0);
+        // Open containers show no count of the changes inside.
+        expect(".o_erplibre_studio_outline_holds").toHaveCount(0);
+        // The legend of the marks, under the tree.
+        expect(".o_erplibre_studio_outline_legend").toHaveText(
+            "Filled dot: added or modified. Ring: hidden or removed. Number: changes folded inside the block."
+        );
 
         // A click on a field of a page not shown: the page shows, the
         // field is selected on the canvas and in the inspector.
@@ -302,16 +331,28 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(".o_erplibre_studio_outline_changed").toHaveAttribute("aria-pressed", "true");
         expect(".o_erplibre_studio_outline_count").toHaveText("3 result(s)");
         expect(".o_erplibre_studio_outline_row:not(.o_erplibre_studio_outline_context)").toHaveCount(3);
+        // The removed element shows among them.
+        expect(`${row(named("lang"))}:not(.o_erplibre_studio_outline_context)`).toHaveClass(
+            "o_erplibre_studio_outline_removed"
+        );
         await contains(".o_erplibre_studio_outline_all").click();
         expect(".o_erplibre_studio_outline_row").toHaveCount(11);
 
-        // A folded container hides its blocks and marks their changes.
+        // A folded container hides its blocks and counts their changes;
+        // its count of fields stays.
         await contains(`${row(ADDRESS)} .o_erplibre_studio_outline_toggle`).click();
         expect(row(ADDRESS)).toHaveAttribute("aria-expanded", "false");
         expect(row(named("street"))).toHaveCount(0);
-        expect(`${row(ADDRESS)} .o_erplibre_studio_change_dot_inside`).toHaveCount(1);
+        expect(`${row(ADDRESS)} .o_erplibre_studio_outline_holds`).toHaveText("1");
+        expect(`${row(ADDRESS)} .o_erplibre_studio_outline_holds`).toHaveAttribute("aria-label", "1 change(s) inside");
+        expect(`${row(ADDRESS)} .o_erplibre_studio_outline_pick`).toHaveText(/2\s*1$/);
+        await contains(`${row(SALES)} .o_erplibre_studio_outline_toggle`).click();
+        expect(`${row(SALES)} .o_erplibre_studio_outline_holds`).toHaveText("2");
+        await contains(`${row(SALES)} .o_erplibre_studio_outline_toggle`).click();
+        expect(`${row(SALES)} .o_erplibre_studio_outline_holds`).toHaveCount(0);
         await contains(`${row(ADDRESS)} .o_erplibre_studio_outline_toggle`).click();
         expect(row(named("street"))).toHaveCount(1);
+        expect(".o_erplibre_studio_outline_holds").toHaveCount(0);
 
         // A row drags onto a hook of the canvas as a block does.
         await contains(`${row(named("street"))} .o_erplibre_studio_outline_pick`).dragAndDrop(
