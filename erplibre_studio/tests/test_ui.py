@@ -200,6 +200,38 @@ class TestStudioUi(HttpCase):
         box = arch.xpath("//div[@t-name='activity-box']")[0]
         self.assertIn("phone", [f.get("name") for f in box.iter("field")])
 
+    def test_spreadsheet_tour(self):
+        """The contact list sent to a spreadsheet from the menu of Apply:
+        the sheet of spreadsheet_oca opens with the list, the breadcrumbs
+        go back to the editor, and the sheet saved on leave reads the
+        contacts. The tour waits for that save, which is not awaited."""
+        if "spreadsheet.spreadsheet" not in self.env:
+            self.skipTest("spreadsheet_oca is not installed")
+        self.env["res.lang"]._activate_lang("en_US")
+        self.env.ref("base.user_admin").lang = "en_US"
+        Sheet = self.env["spreadsheet.spreadsheet"]
+        before = Sheet.search([], order="id desc", limit=1).id
+        self.start_tour(
+            "/odoo/action-base.action_partner_form?debug=1&view_type=list",
+            "erplibre_studio_spreadsheet",
+            login="admin",
+            timeout=300,
+        )
+        project = self.env["erplibre.studio.project"].search(
+            [("module_name", "=", "studio_tour_spreadsheet")]
+        )
+        sheet = Sheet.search([("id", ">", before)])
+        self.assertEqual(len(sheet), 1)
+        row = project.spreadsheet_ids
+        self.assertEqual(
+            (row.sheet_id, row.model, row.view_type),
+            (sheet.id, "res.partner", "list"),
+        )
+        lists = list(sheet.spreadsheet_raw["lists"].values())
+        self.assertEqual(len(lists), 1)
+        self.assertEqual(lists[0]["model"], "res.partner")
+        self.assertIn("email", lists[0]["columns"])
+
     def timeline_setup(self):
         """A timeline view of the contacts, a contact of a company to show
         in it, and an action that opens the view: (view, action). Skips the

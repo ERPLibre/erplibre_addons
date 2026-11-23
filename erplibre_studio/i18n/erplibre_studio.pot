@@ -1735,6 +1735,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Create a spreadsheet that reads the data of this view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr ""
@@ -5826,6 +5832,12 @@ msgstr ""
 msgid ""
 "Sending a view to a spreadsheet needs the module spreadsheet_oca and its "
 "group of users."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Send to a spreadsheet"
 msgstr ""
 
 #. module: erplibre_studio

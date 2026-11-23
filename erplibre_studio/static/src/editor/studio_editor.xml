@@ -326,6 +326,17 @@
                                     </button>
                                     <div class="dropdown-divider" role="separator" />
                                     <button
+                                        t-if="data.spreadsheet_available and spreadsheetViewType"
+                                        role="menuitem"
+                                        class="dropdown-item o-navigable o_erplibre_studio_send_spreadsheet"
+                                        t-att-disabled="state.busy or !viewApplied"
+                                        title="Create a spreadsheet that reads the data of this view"
+                                        t-on-click="() => this.runApplyMenu('spreadsheet')"
+                                    >
+                                        <i class="fa fa-fw fa-table" aria-hidden="true" />
+                                        Send to a spreadsheet
+                                    </button>
+                                    <button
                                         role="menuitem"
                                         class="dropdown-item o-navigable o_erplibre_studio_open_project"
                                         title="Open the form of the project"

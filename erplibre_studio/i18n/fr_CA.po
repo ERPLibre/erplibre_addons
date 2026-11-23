@@ -1753,6 +1753,12 @@ msgstr "Créer %(label)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Create a spreadsheet that reads the data of this view"
+msgstr "Crée une feuille de calcul qui lit les données de cette vue"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr "Ordre de création"
@@ -5869,6 +5875,12 @@ msgid ""
 "Sending a view to a spreadsheet needs the module spreadsheet_oca and its "
 "group of users."
 msgstr "Envoyer une vue vers une feuille de calcul exige le module spreadsheet_oca et son groupe d'utilisateurs."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+msgid "Send to a spreadsheet"
+msgstr "Envoyer vers une feuille de calcul"
 
 #. module: erplibre_studio
 #. odoo-javascript

@@ -12,6 +12,7 @@ import {browser} from "@web/core/browser/browser";
 import {useHotkey} from "@web/core/hotkeys/hotkey_hook";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
+import {useSetupAction} from "@web/search/action_hook";
 import {View} from "@web/views/view";
 import {StudioCanvas} from "./studio_canvas";
 import {StudioChangeRemovalDialog, StudioConfirmDialog} from "./studio_confirm";
@@ -100,6 +101,9 @@ export const ADDABLE_REASONS = [
     "needs_field",
     "needs_geo_field",
 ];
+// The view types a spreadsheet of spreadsheet_oca reads, as the server
+// (arch.SPREADSHEET_VIEW_TYPES) accepts them in send_to_spreadsheet.
+export const SPREADSHEET_VIEW_TYPES = ["list", "pivot", "graph"];
 // The palette items of the section « Layout » (LAYOUT_ITEMS of the palette).
 export const LAYOUT_KINDS = ["group", "page", "separator"];
 // The classes of the element a StudioBlock renders, one per kind of block
@@ -152,12 +156,23 @@ export class StudioEditor extends Component {
         this.dialog = useService("dialog");
         this.menuService = useService("menu");
         const params = (this.props.action && this.props.action.params) || {};
+        // Back through the breadcrumbs, ``props.state`` holds what
+        // ``getLocalState`` exported when an action left the editor: the
+        // view and the project on screen then, which the editor reopens
+        // rather than the view of its action.
+        const back = (this.props.state && this.props.state.studioView) || null;
         this.params = {
             resModel: params.res_model,
             viewId: params.view_id || false,
             viewType: params.view_type || "form",
             actionId: params.action_id || false,
         };
+        if (back) {
+            Object.assign(this.params, {resModel: back.resModel, viewId: back.viewId, viewType: back.viewType});
+        }
+        useSetupAction({
+            getLocalState: () => ({studioView: {...this.params, projectId: this.state.projectId}}),
+        });
         // The view the editor was opened on: where the canvas goes back to
         // when the model on screen leaves the project.
         this.launch = {resModel: params.res_model, viewId: params.view_id || false, viewType: params.view_type || "form"};
@@ -176,7 +191,7 @@ export class StudioEditor extends Component {
             busy: false,
             error: null,
             data: {},
-            projectId: params.project_id || false,
+            projectId: (back ? back.projectId : params.project_id) || false,
             selected: null,
             dragging: null,
             hook: null,
@@ -3153,16 +3168,62 @@ export class StudioEditor extends Component {
         });
     }
 
-    /** Run ``action`` of the menu of Apply (discard, revert, open the project). */
+    /**
+     * Run ``action`` of the menu of Apply (discard, revert, send to a
+     * spreadsheet, open the project).
+     */
     async runApplyMenu(action) {
         this.menus.apply.close();
         if (action === "discard") {
             await this.projectAction("action_discard");
         } else if (action === "revert") {
             await this.revertProject();
+        } else if (action === "spreadsheet") {
+            await this.sendToSpreadsheet();
         } else if (action === "project") {
             await this.openProject();
         }
+    }
+
+    /** Whether the view on screen is a list, a pivot or a graph: what a spreadsheet reads. */
+    get spreadsheetViewType() {
+        return SPREADSHEET_VIEW_TYPES.includes(this.viewType);
+    }
+
+    /**
+     * Whether the view on screen exists in the database: neither the
+     * pending default view of a model not created yet nor a view a view
+     * line adds before Apply.
+     */
+    get viewApplied() {
+        const view = this.data.view;
+        return Boolean(view && !view.pending && !(view.added && !view.added.applied));
+    }
+
+    /**
+     * Create a spreadsheet of spreadsheet_oca that reads the applied view on
+     * screen, then open it: its client action fills the sheet and saves it
+     * when the user leaves it. The notice of the server, that the draft
+     * changes of the view are not in the sheet, shows as a warning.
+     */
+    async sendToSpreadsheet() {
+        if (this.state.busy || !this.project) {
+            return;
+        }
+        this.state.busy = true;
+        let data;
+        try {
+            data = await this.orm.call(MODEL, "send_to_spreadsheet", [this.project.id, ...this.viewArgs()]);
+        } catch (error) {
+            this.notification.add(this.errorMessage(error), {type: "danger"});
+            return;
+        } finally {
+            this.state.busy = false;
+        }
+        if (data.notice) {
+            this.notification.add(data.notice, {type: "warning"});
+        }
+        await this.action.doAction(data.action);
     }
 
     async openProject() {
