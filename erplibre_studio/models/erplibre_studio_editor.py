@@ -2,7 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, MissingError, UserError
+from odoo.tools import html2plaintext
 
 from .. import arch as studio_arch
 from .erplibre_studio_project import (
@@ -80,6 +81,26 @@ VIEW_REASONS = (
 # How many members ``get_group_members`` and ``get_group_losses`` name at
 # most; their ``count`` says how many there are.
 MEMBERS_SHOWN = 20
+# The field types whose value the canvas of a form shows from the sample
+# record (``_sample_values``); a binary, a json or a properties field shows
+# its placeholder.
+SAMPLE_TYPES = (
+    "char",
+    "text",
+    "html",
+    "selection",
+    "many2one",
+    "one2many",
+    "many2many",
+    "boolean",
+    "integer",
+    "float",
+    "monetary",
+    "date",
+    "datetime",
+)
+# The longest text the canvas shows of a value, ellipsis included.
+SAMPLE_TEXT_LENGTH = 80
 
 
 class ErplibreStudioEditor(models.AbstractModel):
@@ -796,6 +817,15 @@ class ErplibreStudioEditor(models.AbstractModel):
             sample = Model.search([], limit=1).id if view.type == "form" else False
             model_name = self.env["ir.model"]._get(model).name
             view_types = list(Project._view_types())
+        # The values the canvas of a form shows under the labels: those of
+        # the sample record, for a view of the database.
+        sample_values = {}
+        if sample and not is_added_view(view):
+            sample_values = self._sample_values(
+                Model.browse(sample),
+                self._block_field_names(blocks),
+                fields_info,
+            )
         return {
             "model": model,
             "model_name": model_name,
@@ -853,11 +883,96 @@ class ErplibreStudioEditor(models.AbstractModel):
             ],
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
+            "sample_values": sample_values,
             "mail_available": Project._studio_mail_available(),
             "spreadsheet_available": Project._studio_spreadsheet_available(),
             "field_name_rule": (project or Project)._studio_field_name_rule(),
             "model_name_rule": (project or Project)._studio_model_name_rule(),
         }
+
+    @api.model
+    def _block_field_names(self, block):
+        """The names of the fields the blocks under ``block`` show, each
+        once, in the order of the arch."""
+        names = []
+        stack = [block]
+        while stack:
+            node = stack.pop()
+            name = node.get("kind") == "field" and node.get("name")
+            if name and name not in names:
+                names.append(name)
+            stack.extend(reversed(node.get("children") or []))
+        return names
+
+    @api.model
+    def _sample_values(self, record, names, fields_info):
+        """{name: value} of the fields ``names`` on ``record``, read with
+        the rights of the user: the values the canvas of a form shows. A
+        field leaves out when the user may not read it, when it is not
+        stored (no compute runs), when its type is not one of SAMPLE_TYPES,
+        when it is a new field of the project not created yet
+        (``fields_info``), or when it has no value; a record the user may
+        not read, or gone, gives {}.
+
+        A text is cut at SAMPLE_TEXT_LENGTH, an html reduced to its text
+        first; a selection gives its label, a many2one the name of its
+        record, an x2many {count}, a date or a datetime the string of the
+        ORM, a boolean and a number themselves."""
+        readable = []
+        for name in names:
+            field = record._fields.get(name)
+            if (
+                field is None
+                or (fields_info.get(name) or {}).get("pending")
+                or not field.store
+                or field.type not in SAMPLE_TYPES
+                or not field.is_accessible(record.env)
+            ):
+                continue
+            readable.append(name)
+        if not record or not readable:
+            return {}
+        try:
+            # A record deleted since reads as no row, without MissingError.
+            rows = record.read(readable)
+        except (AccessError, MissingError):
+            return {}
+        if not rows:
+            return {}
+        row = rows[0]
+        values = {}
+        for name in readable:
+            value = self._sample_value(record._fields[name], row[name], record.env)
+            if value is not None:
+                values[name] = value
+        return values
+
+    @api.model
+    def _sample_value(self, field, value, env):
+        """The value ``_sample_values`` gives of ``value``, the ``read`` of
+        ``field``; None for an empty one."""
+        ftype = field.type
+        if ftype in ("one2many", "many2many"):
+            return {"count": len(value or ())}
+        if ftype == "boolean":
+            return bool(value)
+        if ftype in ("integer", "float", "monetary"):
+            return value or 0
+        if not value:
+            return None
+        if ftype == "many2one":
+            return value[1]
+        if ftype == "selection":
+            return dict(field._description_selection(env)).get(value, value)
+        if ftype == "date":
+            return fields.Date.to_string(value)
+        if ftype == "datetime":
+            return fields.Datetime.to_string(value)
+        text = html2plaintext(value) if ftype == "html" else str(value)
+        text = text.strip()
+        if len(text) > SAMPLE_TEXT_LENGTH:
+            text = text[: SAMPLE_TEXT_LENGTH - 1].rstrip() + "…"
+        return text or None
 
     @api.model
     def _display_level(self):

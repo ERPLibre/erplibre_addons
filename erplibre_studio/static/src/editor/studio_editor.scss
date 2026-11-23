@@ -621,6 +621,35 @@
         border-radius: 0.2rem;
     }
 
+    // The value of the sample record: a long one wraps, its line breaks
+    // kept, never a horizontal scroll.
+    .o_erplibre_studio_sample_value {
+        min-width: 0;
+        max-width: 100%;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    // A boolean of the sample record: a disabled checkbox look.
+    .o_erplibre_studio_sample_check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 0.875rem;
+        height: 0.875rem;
+        margin-top: 0.2rem;
+        border: 1px solid $gray-500;
+        border-radius: 0.2rem;
+        background-color: $gray-100;
+        color: $gray-700;
+        font-size: 0.625rem;
+
+        &.o_erplibre_studio_sample_checked {
+            border-color: $gray-600;
+            background-color: $gray-200;
+        }
+    }
+
     // A node of a form outside a group: its value only, the title large.
     .o_erplibre_studio_bare {
         display: grid;

@@ -4,6 +4,7 @@
 
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
+import {deserializeDate, deserializeDateTime, formatDate, formatDateTime} from "@web/core/l10n/dates";
 import {X2MANY_TYPES} from "./studio_relations";
 import {tagLabel} from "./studio_outline";
 import {LEAFLET_LANES} from "./studio_leaflet";
@@ -205,6 +206,36 @@ export class StudioBlock extends Component {
     /** Whether the value placeholder looks like an empty checkbox. */
     get isBoolean() {
         return this.field.type === "boolean";
+    }
+
+    /**
+     * The value of the field on the sample record of a form, as its cell
+     * shows it: {kind: « boolean », checked, text}, {kind: « count »,
+     * count, text} for an x2many, else {kind: « text », text}, a date in
+     * the format of the user. Null when the payload gives no value
+     * (``sample_values``): the cell keeps its placeholder.
+     */
+    get sample() {
+        const values = this.editor.data.sample_values || {};
+        const name = this.block.name;
+        if (this.props.viewType !== "form" || this.block.kind !== "field" || !(name in values)) {
+            return null;
+        }
+        const value = values[name];
+        if (this.isBoolean) {
+            return {kind: "boolean", checked: Boolean(value), text: value ? _t("Yes") : _t("No")};
+        }
+        if (value && typeof value === "object") {
+            const count = value.count || 0;
+            return {kind: "count", count, text: _t("%(count)s record(s)", {count})};
+        }
+        let text = String(value);
+        if (this.field.type === "date") {
+            text = formatDate(deserializeDate(value));
+        } else if (this.field.type === "datetime") {
+            text = formatDateTime(deserializeDateTime(value));
+        }
+        return {kind: "text", text};
     }
 
     /**

@@ -5,6 +5,7 @@ import {after, beforeEach, describe, expect, test} from "@odoo/hoot";
 import {press, queryOne} from "@odoo/hoot-dom";
 import {animationFrame} from "@odoo/hoot-mock";
 import {contains, defineWebModels, getService, mountWithCleanup, onRpc} from "@web/../tests/web_test_helpers";
+import {deserializeDate, deserializeDateTime, formatDate, formatDateTime} from "@web/core/l10n/dates";
 import {translatedTerms, translationLoaded} from "@web/core/l10n/translation";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
@@ -35,6 +36,9 @@ const FIELDS = {
     user_id: {string: "Salesperson", type: "many2one"},
     x_sponsor: {string: "Sponsor", type: "many2one", project: true, pending: true, definition: {}},
     terms: {string: "Payment terms", type: "many2one"},
+    birthday: {string: "Birthday", type: "date"},
+    last_visit: {string: "Last visit", type: "datetime"},
+    child_ids: {string: "Contacts", type: "one2many", relation: "res.partner"},
 };
 
 let nextKey = 1;
@@ -371,6 +375,51 @@ describe("the calm canvas of a form", () => {
         ).toHaveCount(1);
     });
 
+    test("the values of the sample record under their labels, placeholders elsewhere", async () => {
+        const blocks = formBlocks();
+        const [left, right] = blocks.children[0].children[1].children;
+        left.children.push(field("birthday"), field("last_visit"));
+        right.children.push(field("child_ids"));
+        answer = payload({
+            blocks,
+            sample_res_id: 4,
+            sample_values: {
+                name: "Studio sample company",
+                street: "12 Invented Road\nSample City",
+                birthday: "2024-03-05",
+                last_visit: "2024-03-05 14:30:00",
+                is_vendor: true,
+                child_ids: {count: 3},
+            },
+        });
+        await openEditor();
+        const value = (name) => `${line(name)} > .o_erplibre_studio_line_value`;
+        // The title: the name of the record, in place of the label.
+        expect(`${line("name")} .o_erplibre_studio_sample_value`).toHaveText("Studio sample company");
+        expect(`${line("name")} .o_erplibre_studio_sample_value`).toHaveClass("o_erplibre_studio_label");
+        expect(`${line("name")} .o_erplibre_studio_placeholder`).toHaveCount(0);
+        // A text keeps its line break; a date and a datetime in the user's format.
+        expect(`${value("street")} .o_erplibre_studio_sample_value`).toHaveText(/^12 Invented Road\s+Sample City$/);
+        expect(`${value("street")} .o_erplibre_studio_placeholder`).toHaveCount(0);
+        expect(`${value("birthday")} .o_erplibre_studio_sample_value`).toHaveText(
+            formatDate(deserializeDate("2024-03-05"))
+        );
+        expect(`${value("last_visit")} .o_erplibre_studio_sample_value`).toHaveText(
+            formatDateTime(deserializeDateTime("2024-03-05 14:30:00"))
+        );
+        // A boolean: a checkbox look; an x2many: its count in the sub-list.
+        expect(`${value("is_vendor")} .o_erplibre_studio_sample_check`).toHaveAttribute("data-checked", "true");
+        expect(`${value("is_vendor")} .o_erplibre_studio_sample_check`).toHaveAttribute("aria-label", "Yes");
+        expect(`${value("is_vendor")} .o_erplibre_studio_placeholder_check`).toHaveCount(0);
+        expect(`${value("child_ids")} .o_erplibre_studio_sublist .o_erplibre_studio_sample_count`).toHaveText(
+            "3 record(s)"
+        );
+        // No value given: the placeholder, a new field of the project too.
+        expect(`${value("phone")} .o_erplibre_studio_placeholder`).toHaveText("—");
+        expect(`${value("x_level")} .o_erplibre_studio_placeholder`).toHaveText("—");
+        expect(`${value("phone")} .o_erplibre_studio_sample_value`).toHaveCount(0);
+    });
+
     test("keyboard: every block is a button, Enter selects, the arrows walk", async () => {
         await openEditor();
         const pick = (name) => `${line(name)} > .o_erplibre_studio_pick`;
@@ -399,5 +448,12 @@ describe("the calm canvas of a list", () => {
         expect(".o_erplibre_studio_canvas .fa-arrows").toHaveCount(0);
         await contains(DETAILED).click();
         expect(`${line("email")} .o_erplibre_studio_change_tag[data-kind=new]`).toHaveCount(1);
+    });
+
+    test("a column keeps its placeholder: the values are a form's", async () => {
+        answer = {...listPayload(), sample_values: {name: "Studio sample company"}};
+        await openEditor("list");
+        expect(`${line("name")} > .o_erplibre_studio_line_value`).toHaveText("—");
+        expect(".o_erplibre_studio_sample_value").toHaveCount(0);
     });
 });

@@ -148,12 +148,15 @@
         </t>
     </t>
 
-    <!-- The value cell of a field: the sub-list of an x2many, else a muted
-         placeholder (an empty box for a checkbox); then the lock of a field
-         the view loads, shown with the outline, and the technical marks. -->
+    <!-- The value cell of a field: the sub-list of an x2many, with the
+         count of the sample record; else the value of the sample record (a
+         checkbox look for a boolean), or a muted placeholder (an empty box
+         for a checkbox); then the lock of a field the view loads, shown
+         with the outline, and the technical marks. -->
     <t t-name="erplibre_studio.Block.value">
         <span class="o_erplibre_studio_line_value">
             <t t-set="sub" t-value="subList" />
+            <t t-set="value" t-value="sample" />
             <span
                 t-if="sub"
                 class="o_erplibre_studio_sublist d-block border rounded small text-muted px-2 py-1"
@@ -163,12 +166,27 @@
                 Sub-list of
                 <span class="fw-bold" t-esc="sub.label" />
                 <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
+                <t t-if="value and value.kind === 'count'">
+                    ·
+                    <span class="o_erplibre_studio_sample_count" t-esc="value.text" />
+                </t>
+            </span>
+            <span
+                t-elif="value and value.kind === 'boolean'"
+                class="o_erplibre_studio_sample_check"
+                t-att-class="{'o_erplibre_studio_sample_checked': value.checked}"
+                t-att-data-checked="value.checked ? 'true' : 'false'"
+                role="img"
+                t-att-aria-label="value.text"
+            >
+                <i t-if="value.checked" class="fa fa-check" aria-hidden="true" />
             </span>
             <span
                 t-elif="isBoolean"
                 class="o_erplibre_studio_placeholder o_erplibre_studio_placeholder_check"
                 aria-hidden="true"
             />
+            <span t-elif="value" class="o_erplibre_studio_sample_value" t-esc="value.text" />
             <span t-else="" class="o_erplibre_studio_placeholder" aria-hidden="true">—</span>
             <!-- The lock keeps its tooltip: it stays out of the button. -->
             <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
@@ -233,8 +251,16 @@
                         <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
                     </t>
                     <t t-else="">
-                        <!-- The label stands for the value, as a placeholder. -->
-                        <span class="o_erplibre_studio_label o_erplibre_studio_placeholder" t-esc="block.label" />
+                        <!-- The title shows the name of the sample record;
+                             elsewhere the label stands for the value, as a
+                             placeholder. -->
+                        <t t-set="value" t-value="isTitle and sample" />
+                        <span
+                            t-if="value and value.kind === 'text'"
+                            class="o_erplibre_studio_label o_erplibre_studio_sample_value"
+                            t-esc="value.text"
+                        />
+                        <span t-else="" class="o_erplibre_studio_label o_erplibre_studio_placeholder" t-esc="block.label" />
                         <t t-if="detailed">
                             <code class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
                             <span t-if="field.type" class="badge text-bg-light o_erplibre_studio_tech" t-esc="field.type" />

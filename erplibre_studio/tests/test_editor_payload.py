@@ -1,13 +1,15 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from unittest.mock import patch
+
 from lxml import etree
 from odoo.exceptions import UserError
 from odoo.tests import new_test_user, tagged
 
 from .. import arch as studio_arch
 from ..models.erplibre_studio_access import PERMS
-from ..models.erplibre_studio_editor import UNSUPPORTED_VIEW_TYPES
+from ..models.erplibre_studio_editor import SAMPLE_TEXT_LENGTH, UNSUPPORTED_VIEW_TYPES
 from .common import StudioCase
 
 MODULE = "studio_test_payload_a2"
@@ -590,3 +592,151 @@ class TestEditorPayload(StudioCase):
         # The same members the Apply report counts.
         report = self.project._studio_apply_report()["report"]["members"]
         self.assertEqual([item["users"] for item in report], [loss["count"]])
+
+    # ── sample values ───────────────────────────────────────────────────
+
+    SAMPLE_FORM = """<form>
+        <sheet>
+            <div class="oe_title"><h1><field name="name"/></h1></div>
+            <group>
+                <field name="ref"/>
+                <field name="parent_id"/>
+                <field name="type"/>
+                <field name="is_company"/>
+                <field name="contact_address"/>
+                <field name="comment"/>
+            </group>
+            <notebook>
+                <page name="contacts"><field name="child_ids"/></page>
+            </notebook>
+        </sheet>
+    </form>"""
+
+    def sample_partner(self):
+        """An invented company with two contacts, and a contact of it."""
+        company = self.env["res.partner"].create(
+            {
+                "name": "Studio sample company",
+                "is_company": True,
+                "ref": "S" * (SAMPLE_TEXT_LENGTH + 20),
+                "comment": "<p>Sample <b>note</b></p>",
+            }
+        )
+        contact = self.env["res.partner"].create(
+            {
+                "name": "Studio sample contact",
+                "parent_id": company.id,
+                "type": "invoice",
+            }
+        )
+        self.env["res.partner"].create(
+            {"name": "Studio sample other", "parent_id": company.id}
+        )
+        return company, contact
+
+    def sample_values(self, record, names, fields_info=None):
+        return self.Editor._sample_values(record, names, fields_info or {})
+
+    def test_sample_values_of_a_known_record(self):
+        """A char, an html as text, a many2one by its name, a selection by
+        its label, a boolean, an x2many as its count; a long text cut."""
+        company, contact = self.sample_partner()
+        names = ["name", "ref", "comment", "parent_id", "type", "is_company"]
+        values = self.sample_values(contact, names + ["child_ids"])
+        label = dict(contact._fields["type"]._description_selection(self.env))
+        self.assertEqual(values["name"], "Studio sample contact")
+        self.assertEqual(values["parent_id"], company.display_name)
+        self.assertEqual(values["type"], label["invoice"])
+        self.assertIs(values["is_company"], False)
+        self.assertEqual(values["child_ids"], {"count": 0})
+        # The contact has no reference nor note: no entry, a placeholder.
+        self.assertNotIn("ref", values)
+        self.assertNotIn("comment", values)
+        values = self.sample_values(company, names + ["child_ids"])
+        self.assertIs(values["is_company"], True)
+        self.assertEqual(values["child_ids"], {"count": 2})
+        self.assertEqual(len(values["ref"]), SAMPLE_TEXT_LENGTH)
+        self.assertTrue(values["ref"].endswith("…"))
+        self.assertNotIn("<", values["comment"])
+        self.assertIn("Sample", values["comment"])
+        self.assertNotIn("parent_id", values)
+
+    def test_sample_values_leave_out_what_the_user_may_not_read(self):
+        """A field of a group the user lacks, a field not stored (no compute
+        runs), a new field the project has not created yet: no entry. A
+        record gone gives {}."""
+        company, contact = self.sample_partner()
+        editor, _other = self.make_users()
+        Partner = type(self.env["res.partner"])
+
+        def no_compute(records):
+            raise AssertionError("a non-stored field was computed")
+
+        with (
+            patch.object(contact._fields["ref"], "groups", "base.group_portal"),
+            patch.object(Partner, "_compute_contact_address", no_compute),
+        ):
+            values = self.Editor.with_user(editor)._sample_values(
+                company.with_user(editor),
+                ["name", "ref", "contact_address", "x_studio_new"],
+                {"x_studio_new": {"pending": True}},
+            )
+        self.assertEqual(list(values), ["name"])
+        # A pending field of the project that bears a name of the model.
+        self.assertEqual(
+            self.sample_values(company, ["name"], {"name": {"pending": True}}),
+            {},
+        )
+        gone = self.env["res.partner"].browse(contact.id)
+        contact.unlink()
+        self.assertEqual(self.sample_values(gone, ["name"]), {})
+
+    def test_sample_values_of_the_payload(self):
+        """The form gives the values of its sample record for the fields its
+        blocks show, without computing a non-stored one; a list gives
+        none."""
+        self.sample_partner()
+        view = self.make_view("form", self.SAMPLE_FORM)
+        Partner = type(self.env["res.partner"])
+
+        def no_compute(records):
+            raise AssertionError("a non-stored field was computed")
+
+        with patch.object(Partner, "_compute_contact_address", no_compute):
+            data = self.Editor.get_editor_data(
+                "res.partner", view.id, "form", self.project.id
+            )
+        sample = self.env["res.partner"].browse(data["sample_res_id"])
+        self.assertTrue(sample)
+        names = self.Editor._block_field_names(data["blocks"])
+        self.assertEqual(
+            names,
+            [
+                "name",
+                "ref",
+                "parent_id",
+                "type",
+                "is_company",
+                "contact_address",
+                "comment",
+                "child_ids",
+            ],
+        )
+        values = data["sample_values"]
+        self.assertEqual(values, self.sample_values(sample, names, data["fields"]))
+        self.assertEqual(values["name"], sample.name[:SAMPLE_TEXT_LENGTH])
+        self.assertEqual(values["child_ids"], {"count": len(sample.child_ids)})
+        self.assertNotIn("contact_address", values)
+        self.assertEqual(self.data("list")["sample_values"], {})
+        self.assertEqual(self.data("kanban")["sample_values"], {})
+
+    def test_sample_values_of_a_model_without_record(self):
+        """A model the project creates: before Apply, a pending form without
+        sample; after, a form of a model without record, {}."""
+        self.make_model(self.project, "Studio test payload item", model=ITEM)
+        data = self.data("form", ITEM)
+        self.assertEqual((data["sample_res_id"], data["sample_values"]), (False, {}))
+        self.project.action_apply()
+        data = self.data("form", ITEM)
+        self.assertFalse(data["view"]["pending"])
+        self.assertEqual((data["sample_res_id"], data["sample_values"]), (False, {}))

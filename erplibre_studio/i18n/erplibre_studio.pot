@@ -114,6 +114,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s record(s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "%(count)s result(s)"
 msgstr ""
@@ -4546,6 +4552,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
@@ -8337,6 +8344,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
