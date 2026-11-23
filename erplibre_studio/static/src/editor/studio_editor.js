@@ -46,6 +46,7 @@ import {
     findBlock,
     graphLaneLabel,
     graphLanes,
+    isBaseInvisible,
     isGhost,
     namedKeys,
     newFieldLabel,
@@ -290,6 +291,12 @@ export class StudioEditor extends Component {
             // The display level (DISPLAY_LEVELS): « simple » shows the view
             // as a user sees it, « detailed » adds its technical names.
             level: "simple",
+            // The hook of a form whose insertion list is open (``openInsert``):
+            // {target, position, zone, key, where, container}; null for none.
+            insert: null,
+            // The last insertion of that list (``insertAt``): {changeId,
+            // where, container}, the id of the change it made; null for none.
+            lastInsert: null,
         });
         this.previewCount = 0;
         // The menus of the top bar, closed by their items once chosen.
@@ -434,6 +441,10 @@ export class StudioEditor extends Component {
         this.takeLevel(data);
         this.state.projectId = (data.project && data.project.id) || false;
         this.state.error = null;
+        if (this.state.insert && !this.insertPlace(this.state.insert.target, this.state.insert.position)) {
+            // The hook of the insertion list is gone with the draft it was in.
+            this.state.insert = null;
+        }
         if (!this.formIsCurrent(this.state.filterForm, data.project)) {
             // Its target was located in a draft that is gone.
             this.state.filterForm = null;
@@ -484,6 +495,8 @@ export class StudioEditor extends Component {
             preview: false,
             timelineLane: null,
             geoLayer: null,
+            insert: null,
+            lastInsert: null,
         });
     }
 
@@ -878,6 +891,7 @@ export class StudioEditor extends Component {
         }
         value = String(value || "");
         this.state.selected = null;
+        this.state.insert = null;
         this.closePanel();
         this.state.space = "view";
         const projectId = parseInt(value) || false;
@@ -951,6 +965,8 @@ export class StudioEditor extends Component {
             return;
         }
         this.state.dragging = item;
+        // A drag closes the insertion list: its hooks show the drop instead.
+        this.state.insert = null;
         if (ev.dataTransfer) {
             ev.dataTransfer.effectAllowed = "move";
             ev.dataTransfer.setData("text/plain", item.path || item.ttype || item.name || item.kind || "");
@@ -1243,7 +1259,8 @@ export class StudioEditor extends Component {
                 type: "add_field",
                 target,
                 position,
-                field: {ttype: item.ttype, field_description: newFieldLabel(item.ttype)},
+                // The label typed in the insertion list, else the type's.
+                field: {ttype: item.ttype, field_description: item.label || newFieldLabel(item.ttype)},
             };
         }
         if (item.kind === "widget") {
@@ -1596,11 +1613,337 @@ export class StudioEditor extends Component {
         });
     }
 
+    // ── insertion without dragging ──────────────────────────────────────
+
+    /**
+     * Whether the « + » of the hooks of ``container`` shows (rule 5): a
+     * container of a form whose children take drops and draw as a column
+     * (a group of groups, the buttons of a header or of the smart buttons
+     * line up, a notebook holds tabs), the form itself left out.
+     */
+    insertsIn(container) {
+        if (this.viewType !== "form" || !container || container.kind !== "container" || !container.drop) {
+            return false;
+        }
+        if (["form", "notebook", "header"].includes(container.tag) || container.label === "button_box") {
+            return false;
+        }
+        const children = container.children || [];
+        return !(container.tag === "group" && children.length && children.every((child) => child.tag === "group"));
+    }
+
+    /**
+     * Whether the canvas draws ``child``, as StudioBlock.isDrawn decides: at
+     * the Simple level a form leaves out a node its arch always hides,
+     * unless it holds the selection.
+     */
+    isDrawnChild(child) {
+        if (this.detailed || this.viewType !== "form" || !isBaseInvisible(child)) {
+            return true;
+        }
+        const selected = this.state.selected;
+        return Boolean(selected) && Boolean(findBlock(child, (b) => b.path === selected));
+    }
+
+    /**
+     * Where the hook (``target``, ``position``) of a form sits: {where,
+     * container, containerPath}, null when the tree has no such hook.
+     * ``where`` names its neighbours as the canvas shows them (« between A
+     * and B », « before A », « after A », « in C »): an element the draft
+     * removes or a node the canvas does not draw is no neighbour.
+     */
+    insertPlace(target, position) {
+        const trail = blockTrail(this.root, target);
+        if (!trail.length) {
+            return null;
+        }
+        const container = position === "inside" ? trail.at(-1) : trail.at(-2);
+        if (!container) {
+            return null;
+        }
+        const children = container.children || [];
+        const shown = (child) => !isGhost(child, this.viewType) && this.isDrawnChild(child);
+        const index = position === "inside" ? children.length : children.findIndex((c) => c.path === target);
+        const prev = children.slice(0, index).findLast(shown);
+        const next = children.slice(index).find(shown);
+        const label = (block) => outlineLabel(block);
+        const containerLabel = outlineLabel(container);
+        let where;
+        if (prev && next) {
+            where = _t("between %(a)s and %(b)s", {a: label(prev), b: label(next)});
+        } else if (next) {
+            where = _t("before %(label)s", {label: label(next)});
+        } else if (prev) {
+            where = _t("after %(label)s", {label: label(prev)});
+        } else {
+            where = _t("in %(container)s", {container: containerLabel});
+        }
+        return {where, container: containerLabel, containerPath: container.path};
+    }
+
+    /** The accessible name of a « + » at ``place`` (``insertPlace``). */
+    insertLabel(place) {
+        return place ? _t("Insert here, %(where)s", {where: place.where}) : _t("Insert here");
+    }
+
+    /**
+     * The hook right after the block at ``path``, as the canvas draws it:
+     * {target, position}, the hook before the next sibling that holds one
+     * (not inside a t-if chain, drawn), else the hook at the end of its
+     * container; null when its container shows no « + » (``insertsIn``).
+     */
+    hookAfter(path) {
+        const trail = blockTrail(this.root, path);
+        const block = trail.at(-1);
+        const parent = trail.at(-2);
+        if (!block || !this.insertsIn(parent)) {
+            return null;
+        }
+        const children = parent.children || [];
+        const next = children
+            .slice(children.indexOf(block) + 1)
+            .find((child) => !["elif", "else"].includes(child.chain) && this.isDrawnChild(child));
+        return next ? {target: next.path, position: "before"} : {target: parent.path, position: "inside"};
+    }
+
+    /** Whether the « + » of the canvas and of the plan show: a form, a project, no drag, no preview. */
+    get canInsert() {
+        return (
+            this.viewType === "form" &&
+            Boolean(this.project) &&
+            !this.state.dragging &&
+            !this.state.preview &&
+            !this.panel &&
+            this.state.space === "view"
+        );
+    }
+
+    /**
+     * Open the insertion list at ``hook`` ({target, position, zone}): the
+     * selection goes, the inspector shows the insertion point. Answer
+     * whether it opened.
+     */
+    openInsert(hook) {
+        const place = this.insertPlace(hook.target, hook.position);
+        if (!place || !this.canInsert || this.state.busy) {
+            return false;
+        }
+        Object.assign(this.state, {
+            insert: {
+                target: hook.target,
+                position: hook.position,
+                zone: hook.zone,
+                key: this.hookKey(hook.target, hook.position, hook.zone),
+                where: place.where,
+                container: place.container,
+            },
+            selected: null,
+            colors: null,
+            inspectorTab: "properties",
+        });
+        return true;
+    }
+
+    /** A click on the « + » of ``hook``: its list opens, or closes when it is the one open. */
+    toggleInsert(hook) {
+        const insert = this.state.insert;
+        if (insert && insert.key === this.hookKey(hook.target, hook.position, hook.zone)) {
+            this.state.insert = null;
+            return;
+        }
+        this.openInsert(hook);
+    }
+
+    /**
+     * Close the insertion list; with ``focus``, its « + » takes the focus
+     * once it renders.
+     */
+    closeInsert({focus = false} = {}) {
+        const insert = this.state.insert;
+        this.state.insert = null;
+        if (focus && insert) {
+            this.focusInsertButton(insert.key);
+        }
+    }
+
+    /**
+     * Focus the element ``find()`` answers, once the canvas draws it: it
+     * tries on each of the next frames, five at most.
+     */
+    async focusWhenDrawn(find) {
+        for (let frame = 0; frame < 5; frame++) {
+            await new Promise((resolve) => browser.requestAnimationFrame(resolve));
+            const element = find();
+            if (element) {
+                element.focus();
+                return;
+            }
+        }
+    }
+
+    /** Focus the « + » of the hook of key ``key`` once the canvas draws it. */
+    focusInsertButton(key) {
+        return this.focusWhenDrawn(() => {
+            const canvas = document.querySelector(".o_erplibre_studio_canvas");
+            return canvas && canvas.querySelector(`.o_erplibre_studio_insert[data-hook="${CSS.escape(key)}"]`);
+        });
+    }
+
+    /** The id of the newest change of the view on screen, 0 for none. */
+    get newestChangeId() {
+        return (this.data.changes || []).reduce((max, change) => Math.max(max, change.id || 0), 0);
+    }
+
+    /**
+     * Insert ``item`` at the hook of the open list: the list closes, then
+     * the drop runs on that hook as ``addFromPalette`` does (a relation or
+     * a properties field asks its dialog first, and the list leaves the
+     * rest to it). An element the draft removes (``kind`` « ghost »)
+     * comes back, then moves to the hook. Once a change of the draft made
+     * it, the new block is selected and focused, ``lastInsert`` holds it
+     * and the live region says it.
+     */
+    async insertAt(item) {
+        const insert = this.state.insert;
+        if (!insert || this.state.busy) {
+            return;
+        }
+        const newest = this.newestChangeId;
+        this.state.insert = null;
+        const drop = async (dropped) => {
+            this.state.dragging = dropped;
+            await this.dropOnHook({preventDefault: () => {}}, insert.target, insert.position, insert.zone);
+            // A relation or a properties field asks its dialog first,
+            // which keeps the focus.
+            const asks =
+                dropped.kind === "new" && (dropped.ttype === "properties" || X2MANY_TYPES.includes(dropped.ttype));
+            if (!asks) {
+                this.afterInsert(insert, newest, item);
+            }
+        };
+        if (item.kind !== "ghost") {
+            await drop(item);
+            return;
+        }
+        const block = findBlock(this.root, (b) => b.path === item.path);
+        const changeId = this.removalChange(block);
+        if (!changeId) {
+            return;
+        }
+        await this.removeChange(changeId, {
+            onRemoved: async (data) => {
+                const found = this.fieldBlock(data.blocks, item.name);
+                if (!found) {
+                    return;
+                }
+                if (found.path === insert.target) {
+                    // Back at its place, which is the hook.
+                    this.state.selected = found.path;
+                    this.afterInsert(insert, newest, item);
+                    return;
+                }
+                await drop({kind: "node", path: found.path, name: item.name});
+            },
+        });
+    }
+
+    /**
+     * What follows an insertion at ``insert`` once its operation ran: when
+     * the view holds a change newer than ``newest``, the selection (the
+     * block the operation added) takes the focus, ``lastInsert`` keeps the
+     * change, and the live region says it. Otherwise the « + » takes the
+     * focus back.
+     */
+    afterInsert(insert, newest, item) {
+        const change = (this.data.changes || []).find((c) => c.id > newest && c.id === this.newestChangeId);
+        const path = this.state.selected;
+        if (!change || !path) {
+            this.focusInsertButton(insert.key);
+            return;
+        }
+        const block = findBlock(this.root, (b) => b.path === path);
+        this.state.lastInsert = {changeId: change.id, where: insert.where, container: insert.container};
+        this.state.inspectorTab = "properties";
+        this.announce(
+            _t("%(label)s inserted %(where)s.", {
+                label: block ? outlineLabel(block) : item.label || "",
+                where: insert.where,
+            })
+        );
+        this.focusWhenDrawn(() => {
+            const el = this.blockElement(path);
+            return (
+                el &&
+                el.querySelector(
+                    ":scope > .o_erplibre_studio_pick, :scope > .o_erplibre_studio_container_title > .o_erplibre_studio_pick"
+                )
+            );
+        });
+    }
+
+    /**
+     * Whether ``block`` holds the change of the last insertion
+     * (``lastInsert``), still in the draft.
+     */
+    isLastInsert(block) {
+        const last = this.state.lastInsert;
+        return Boolean(
+            last &&
+                block &&
+                (block.changes || []).includes(last.changeId) &&
+                (this.data.changes || []).some((c) => c.id === last.changeId)
+        );
+    }
+
+    /** Undo the last insertion (« Cancel this insertion »): its change leaves, the selection goes. */
+    async cancelInsert() {
+        const last = this.state.lastInsert;
+        if (!last) {
+            return;
+        }
+        await this.removeChange(last.changeId, {
+            onRemoved: () => {
+                Object.assign(this.state, {lastInsert: null, selected: null});
+            },
+        });
+    }
+
+    /**
+     * Open the insertion list at ``hook`` from the plan: the container of
+     * the hook shows (its tab, its row unfolded), then the list opens on
+     * the canvas and its input takes the focus.
+     */
+    insertFromPlan(hook) {
+        const place = this.insertPlace(hook.target, hook.position);
+        if (!place) {
+            return;
+        }
+        this.reveal(place.containerPath);
+        delete this.state.outline.collapsed[place.containerPath];
+        this.openInsert(hook);
+    }
+
+    /** Add a tab at the end of the notebook at ``path`` (« Add a tab » of the plan). */
+    async addTab(path) {
+        if (this.state.busy || !this.canInsert) {
+            return;
+        }
+        const newest = this.newestChangeId;
+        this.state.insert = null;
+        this.state.dragging = {kind: "page"};
+        await this.dropOnHook({preventDefault: () => {}}, path, "inside", "pages");
+        if (this.newestChangeId > newest && this.state.selected) {
+            const block = findBlock(this.root, (b) => b.path === this.state.selected);
+            this.announce(_t("%(label)s added.", {label: block ? outlineLabel(block) : _t("Tab")}));
+        }
+    }
+
     // ── selection and properties ────────────────────────────────────────
 
     onCanvasClick() {
         if (!this.state.preview) {
             this.state.selected = null;
+            this.state.insert = null;
         }
     }
 
@@ -1960,6 +2303,7 @@ export class StudioEditor extends Component {
     select(path) {
         this.state.selected = this.state.selected === path ? null : path;
         this.state.colors = null;
+        this.state.insert = null;
         if (this.state.selected) {
             this.state.inspectorTab = "properties";
             this.state.timelineLane = null;
@@ -1981,6 +2325,7 @@ export class StudioEditor extends Component {
         }
         if (canSelectBlock(trail[trail.length - 1])) {
             this.state.selected = path;
+            this.state.insert = null;
             this.state.colors = null;
             this.state.inspectorTab = "properties";
             this.state.timelineLane = null;
@@ -2860,7 +3205,7 @@ export class StudioEditor extends Component {
             return;
         }
         this.closePanel();
-        Object.assign(this.state, {space, selected: null, preview: false});
+        Object.assign(this.state, {space, selected: null, preview: false, insert: null});
     }
 
     /** Show the tab ``panel`` (SECURITY_TABS) of the security space. */
@@ -3281,6 +3626,7 @@ export class StudioEditor extends Component {
             return;
         }
         this.state.preview = !this.state.preview;
+        this.state.insert = null;
     }
 
     /**

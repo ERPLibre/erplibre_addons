@@ -6,6 +6,7 @@ import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {deserializeDate, deserializeDateTime, formatDate, formatDateTime} from "@web/core/l10n/dates";
 import {X2MANY_TYPES} from "./studio_relations";
+import {StudioInsertList} from "./studio_insert";
 import {tagLabel} from "./studio_outline";
 import {LEAFLET_LANES} from "./studio_leaflet";
 import {
@@ -189,6 +190,37 @@ export class StudioBlock extends Component {
 
     get showHooks() {
         return Boolean(this.block.drop) && !this.isRow;
+    }
+
+    /**
+     * Whether the hooks of the block hold a « + » (rule 5, insert without
+     * dragging): a container of a form the editor inserts in
+     * (``insertsIn``), while no drag runs, outside the preview, with a
+     * project.
+     */
+    get canInsert() {
+        const state = this.editorState;
+        return (
+            !state.dragging &&
+            !state.preview &&
+            !state.panel &&
+            Boolean(state.data && state.data.project) &&
+            this.editor.insertsIn(this.block)
+        );
+    }
+
+    /**
+     * The key (``hookKey``) of the hook right after the selected block
+     * when the block holds it (``hookAfter``): its « + » is a tab stop, so
+     * that Tab from a selected block reaches it. Null otherwise.
+     */
+    get afterSelectedKey() {
+        const selected = this.editorState.selected;
+        if (!selected || !(this.block.children || []).some((child) => child.path === selected)) {
+            return null;
+        }
+        const hook = this.editor.hookAfter(selected);
+        return hook ? this.editor.hookKey(hook.target, hook.position) : null;
     }
 
     get parentTag() {
@@ -581,7 +613,7 @@ export class StudioBlock extends Component {
         return `pages:${this.block.path}`;
     }
 }
-StudioBlock.components = {StudioBlock};
+StudioBlock.components = {StudioBlock, StudioInsertList};
 
 /**
  * The canvas of the editor: the arch tree of a form or a list, the template
@@ -596,7 +628,7 @@ StudioBlock.components = {StudioBlock};
  */
 export class StudioCanvas extends Component {
     static template = "erplibre_studio.Canvas";
-    static components = {StudioBlock, StudioFrise};
+    static components = {StudioBlock, StudioFrise, StudioInsertList};
     static props = {
         editor: Object,
         // The payload of the editor (get_editor_data).

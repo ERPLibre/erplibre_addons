@@ -143,6 +143,25 @@
                             <span class="visually-hidden o_erplibre_studio_outline_dot_text" t-esc="dot.label" />
                         </t>
                     </div>
+                    <!-- The « + » of the row (rowAdds): out of the tab
+                         order, Insert reaches the list from the row. -->
+                    <button
+                        t-foreach="rowAdds(row)"
+                        t-as="add"
+                        t-key="add.kind"
+                        type="button"
+                        tabindex="-1"
+                        class="btn btn-sm o_erplibre_studio_outline_add"
+                        t-att-class="{'o_erplibre_studio_outline_add_shown': add.kind === 'after' or add.open}"
+                        t-att-data-add="add.kind"
+                        t-att-aria-label="add.label"
+                        t-att-title="add.label"
+                        t-att-aria-haspopup="add.kind === 'tab' ? false : 'dialog'"
+                        t-att-aria-expanded="add.kind === 'tab' ? false : (add.open ? 'true' : 'false')"
+                        t-on-click.stop="() => this.runAdd(add, row.block)"
+                    >
+                        <i class="fa fa-plus" aria-hidden="true" />
+                    </button>
                 </li>
             </ul>
             <p t-if="!shown.rows.length" class="small text-muted mb-0 o_erplibre_studio_outline_empty" t-esc="emptyLabel" />
@@ -152,6 +171,9 @@
                 </p>
                 <p class="mb-0">
                     A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it.
+                </p>
+                <p t-if="props.viewType === 'form'" class="mb-0 mt-1 o_erplibre_studio_outline_insert_help">
+                    The + of a row opens the same list as the margin of the form: after the selected element, or at the end of a container. Insert opens it from the keyboard.
                 </p>
             </div>
         </div>

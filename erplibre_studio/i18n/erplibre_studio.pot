@@ -35,6 +35,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "%(container)s, %(where)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
@@ -198,8 +204,20 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(label)s added."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "%(label)s hidden"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(label)s inserted %(where)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1246,6 +1264,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "Add a tab"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Add a view"
 msgstr ""
@@ -1276,6 +1300,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Add columns"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "Add in %(label)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1701,6 +1731,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Cancel this insertion"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
 msgid "Change nothing"
 msgstr ""
@@ -1748,6 +1784,14 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"Choose in the list open on the form: an existing field, a new field or a "
+"layout element. It takes the place of the purple line."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
 msgid "Classes"
 msgstr ""
@@ -1756,6 +1800,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
 msgid "Close"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "Close the list"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1786,6 +1836,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Create a spreadsheet that reads the data of this view"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "Create « %(text)s » as…"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1828,6 +1884,21 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Documents tree"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid ""
+"Dragging from the palette leads to the same change; it is no longer needed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
+msgid ""
+"Dragging still works. Shorter: hover the space between two fields and click "
+"the +."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1897,8 +1968,34 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Empty tab. The + above inserts a first field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
 msgid "End color"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Enter"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Esc"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "Existing fields"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1994,6 +2091,43 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Indexed (faster search)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "Insert after %(label)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "Insert here"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Insert here, %(where)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "Insert in %(container)s, %(where)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Inserted %(where)s in %(container)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Insertion point"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2145,6 +2279,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "New field…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
 msgid "New layer"
 msgstr ""
@@ -2165,6 +2305,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "No embedded DMS template for this model: the tree stays empty until one exists."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "No existing field matches."
 msgstr ""
 
 #. module: erplibre_studio
@@ -5869,6 +6015,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "Search a field or create…"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Search fields"
 msgstr ""
@@ -6292,6 +6444,15 @@ msgstr ""
 msgid ""
 "The %(view)s view leaves the draft with its changes; the next Apply removes "
 "it from the database."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
+msgid ""
+"The + of a row opens the same list as the margin of the form: after the "
+"selected element, or at the end of a container. Insert opens it from the "
+"keyboard."
 msgstr ""
 
 #. module: erplibre_studio
@@ -8461,6 +8622,12 @@ msgid "action %(name)s"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "after %(label)s"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "app icon %(name)s"
@@ -8481,8 +8648,32 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "before %(label)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "between %(a)s and %(b)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_timeline.js:0
 msgid "boolean"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "browse"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "browse the list"
 msgstr ""
 
 #. module: erplibre_studio
@@ -8495,6 +8686,18 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change « %(change)s » of the view %(view)s (project %(project)s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "close"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "close without changing anything"
 msgstr ""
 
 #. module: erplibre_studio
@@ -8638,6 +8841,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "in %(container)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 msgid "in the database"
 msgstr ""
@@ -8648,6 +8857,18 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "inherited"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.xml:0
+msgid "insert"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "insert the highlighted element"
 msgstr ""
 
 #. module: erplibre_studio
@@ -8853,6 +9074,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "removed"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "removed by this draft"
 msgstr ""
 
 #. module: erplibre_studio

@@ -550,6 +550,7 @@
             >
                 <t t-if="tab === 'changes'" t-call="erplibre_studio.Inspector.Changes" />
                 <t t-elif="props.preview" t-call="erplibre_studio.Inspector.Preview" />
+                <t t-elif="insertPoint" t-call="erplibre_studio.Inspector.InsertPoint" />
                 <StudioGeoLayers
                     t-elif="props.geoLayer"
                     editor="editor"
@@ -559,6 +560,32 @@
                 />
                 <t t-else="" t-call="erplibre_studio.Inspector.Properties" />
             </div>
+        </div>
+    </t>
+
+    <!-- The insertion point of the list open on the form: where it
+         inserts, what to choose, its keys. -->
+    <t t-name="erplibre_studio.Inspector.InsertPoint">
+        <div class="o_erplibre_studio_insert_point small d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <span
+                    class="o_erplibre_studio_glyph o_erplibre_studio_glyph_large o_erplibre_studio_glyph_container"
+                    aria-hidden="true"
+                >+</span>
+                <div class="o_erplibre_studio_inspector_name">
+                    <div class="fw-bold fs-6 o_erplibre_studio_inspector_title">Insertion point</div>
+                    <div class="text-muted o_erplibre_studio_insert_point_where" t-esc="insertPoint.where" />
+                </div>
+            </div>
+            <p class="mb-0">
+                Choose in the list open on the form: an existing field, a new field or a layout element. It takes the place of the purple line.
+            </p>
+            <ul class="list-unstyled mb-0 d-flex flex-column gap-1 o_erplibre_studio_insert_point_keys">
+                <li><kbd>↑</kbd> <kbd>↓</kbd> <span>browse the list</span></li>
+                <li><kbd>Enter</kbd> <span>insert the highlighted element</span></li>
+                <li><kbd>Esc</kbd> <span>close without changing anything</span></li>
+            </ul>
+            <p class="mb-0 text-muted">Dragging from the palette leads to the same change; it is no longer needed.</p>
         </div>
     </t>
 
@@ -662,7 +689,16 @@
                         See the changes of this view
                     </button>
                     <button
-                        t-if="blockChange(block)"
+                        t-if="isLastInsert(block)"
+                        type="button"
+                        class="btn btn-link btn-sm p-0 d-block fw-bold o_erplibre_studio_cancel_insert"
+                        t-att-disabled="props.busy or !props.hasProject"
+                        t-on-click="cancelInsert"
+                    >
+                        Cancel this insertion
+                    </button>
+                    <button
+                        t-elif="blockChange(block)"
                         type="button"
                         class="btn btn-link btn-sm p-0 d-block fw-bold o_erplibre_studio_undo_block_change"
                         t-att-disabled="props.busy or !props.hasProject"

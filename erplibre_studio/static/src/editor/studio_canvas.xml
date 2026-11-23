@@ -16,7 +16,9 @@
          belongs to a column, an axis or the loaded fields. The component
          that renders it (StudioCanvas, StudioBlock) names « activeHook »,
          the hook a drop goes to: that one holds the label « Drop here »
-         with the glyph and the name of the dragged item. -->
+         with the glyph and the name of the dragged item. A hook of a
+         form container whose caller sets « insertable » holds its « + »
+         (erplibre_studio.Insert). -->
     <t t-name="erplibre_studio.Hook">
         <t t-set="hookActive" t-value="activeHook === editor.hookKey(target, position, zone)" />
         <div
@@ -30,6 +32,7 @@
             t-on-dragleave="(ev) => editor.leaveHook(target, position, zone, ev)"
             t-on-drop="(ev) => editor.dropOnHook(ev, target, position, zone)"
         >
+            <t t-if="insertable and !zone" t-call="erplibre_studio.Insert" />
             <t t-if="hookActive">
                 <t t-set="dropItem" t-value="editor.dropItem" />
                 <span t-if="dropItem" class="o_erplibre_studio_drop_label" aria-hidden="true">
@@ -512,6 +515,10 @@
                 t-on-dragover="(ev) => showHooks and editor.overScope(ev, block.path)"
                 t-on-drop="(ev) => showHooks and editor.dropOnScope(ev)"
             >
+                <!-- Its hooks hold a « + » in a form (canInsert); the
+                     one after the selected block is a tab stop. -->
+                <t t-set="insertable" t-value="canInsert" />
+                <t t-set="insertTabKey" t-value="insertable ? afterSelectedKey : null" />
                 <t t-foreach="drawnChildren" t-as="child" t-key="child.path">
                     <t t-if="hookBefore(child)" t-call="erplibre_studio.Hook">
                         <t t-set="target" t-value="child.path" />
@@ -519,13 +526,14 @@
                     </t>
                     <StudioBlock block="child" parent="block" editor="editor" viewType="props.viewType" />
                 </t>
-                <p t-if="isEmptyPage" class="o_erplibre_studio_empty_hint">
-                    Empty tab. Drag a field here from the palette or the form.
-                </p>
                 <t t-if="showHooks" t-call="erplibre_studio.Hook">
                     <t t-set="target" t-value="block.path" />
                     <t t-set="position" t-value="'inside'" />
                 </t>
+                <p t-if="isEmptyPage" class="o_erplibre_studio_empty_hint">
+                    <t t-if="insertable">Empty tab. The + above inserts a first field.</t>
+                    <t t-else="">Empty tab. Drag a field here from the palette or the form.</t>
+                </p>
             </div>
         </div>
         <div

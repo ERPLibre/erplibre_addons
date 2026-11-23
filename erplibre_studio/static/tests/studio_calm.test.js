@@ -305,11 +305,11 @@ describe("the calm canvas of a form", () => {
         expect(".o_erplibre_studio_empty_hint").toHaveCount(0);
         await contains(`.o_erplibre_studio_page_tab[data-path="${LOYALTY}"]`).click();
         expect(`.o_erplibre_studio_container[data-path="${LOYALTY}"] .o_erplibre_studio_empty_hint`).toHaveText(
-            "Empty tab. Drag a field here from the palette or the form."
+            "Empty tab. The + above inserts a first field."
         );
-        // The hook of the empty page stays under its hint.
+        // The hook of the empty page, with its « + », sits above its hint.
         expect(
-            `.o_erplibre_studio_container[data-path="${LOYALTY}"] .o_erplibre_studio_empty_hint + .o_erplibre_studio_hook`
+            `.o_erplibre_studio_container[data-path="${LOYALTY}"] .o_erplibre_studio_hook:has(.o_erplibre_studio_insert) + .o_erplibre_studio_empty_hint`
         ).toHaveCount(1);
         // The chatter: one collapsed line, selectable, not draggable.
         const chatter = `.o_erplibre_studio_other[data-tag=chatter]`;

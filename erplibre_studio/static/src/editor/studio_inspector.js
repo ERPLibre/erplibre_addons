@@ -603,6 +603,10 @@ export class StudioInspector extends Component {
         if (!kinds.length) {
             return "";
         }
+        const last = this.editorState.lastInsert;
+        if (last && this.editor.isLastInsert(block)) {
+            return _t("Inserted %(where)s in %(container)s.", {where: last.where, container: last.container});
+        }
         const changeId = this.blockChange(block);
         const change = changeId && this.changes.find((c) => c.id === changeId);
         if (change && change.summary) {
@@ -720,6 +724,26 @@ export class StudioInspector extends Component {
     blockChange(block) {
         const keys = block.changes || [];
         return keys.length === 1 && Number.isInteger(keys[0]) ? keys[0] : false;
+    }
+
+    /** Whether ``block`` holds the last insertion of the list of the canvas (« Cancel this insertion »). */
+    isLastInsert(block) {
+        return this.editorState.lastInsert ? this.editor.isLastInsert(block) : false;
+    }
+
+    cancelInsert() {
+        return this.editor.cancelInsert();
+    }
+
+    /**
+     * The insertion point of the list open on the form: {where}, null
+     * when none is open.
+     */
+    get insertPoint() {
+        const insert = this.editorState.insert;
+        return insert
+            ? {where: _t("%(container)s, %(where)s", {container: insert.container, where: insert.where})}
+            : null;
     }
 
     removeBlockChange(block) {

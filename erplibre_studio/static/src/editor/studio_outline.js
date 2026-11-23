@@ -151,6 +151,12 @@ export function outlineRows(root, {filter = "", changedOnly = false, collapsed =
  * its container, Enter and Space select the row's block. Alt+Up and
  * Alt+Down move the row's block as they do on the canvas, Delete removes
  * it (``moveByKeyboard``, ``removeByKeyboard`` of the editor).
+ *
+ * In a form, a row carries the « + » of the insertion without dragging
+ * (``rowAdds``): the selected row inserts after its block, a container
+ * that takes drops inserts at its end, a notebook adds a tab. The list
+ * opens on the canvas (``insertFromPlan`` of the editor); Insert on a row
+ * opens it after the row's block.
  */
 export class StudioOutline extends Component {
     static template = "erplibre_studio.Outline";
@@ -350,6 +356,11 @@ export class StudioOutline extends Component {
             }
             return;
         }
+        if (!ev.shiftKey && !ev.altKey && ev.key === "Insert") {
+            ev.preventDefault();
+            this.insertFromRow(row);
+            return;
+        }
         if (!ev.shiftKey && !ev.altKey && ev.key === "Delete") {
             ev.preventDefault();
             this.removeRow(row, rows);
@@ -401,6 +412,81 @@ export class StudioOutline extends Component {
         ev.preventDefault();
         if (next !== null && next >= 0 && next < rows.length) {
             this.focusRow(ev.currentTarget.parentElement, rows[next].block.path);
+        }
+    }
+
+    /**
+     * Whether the « + » of the rows show (``StudioEditor.canInsert``); it
+     * reads the state the plan renders from.
+     */
+    get canInsert() {
+        const state = this.editorState;
+        return !state.dragging && !state.preview && this.editor.canInsert;
+    }
+
+    /**
+     * The « + » of the row ``row``: [{kind, label, hook, open}], « after »
+     * on the selected row (the hook right after its block), « in » on a
+     * container that takes drops (its hook at the end), « tab » on a
+     * notebook (a new tab, at once). ``open``: its list is the one open.
+     */
+    rowAdds(row) {
+        if (!this.canInsert) {
+            return [];
+        }
+        const editor = this.editor;
+        const block = row.block;
+        const label = this.label(block);
+        const openKey = this.editorState.insert && this.editorState.insert.key;
+        const add = (kind, text, hook) => ({
+            kind,
+            label: text,
+            hook,
+            open: Boolean(hook) && openKey === editor.hookKey(hook.target, hook.position, hook.zone),
+        });
+        const adds = [];
+        if (block.path === this.props.selected) {
+            const hook = editor.hookAfter(block.path);
+            if (hook) {
+                adds.push(add("after", _t("Insert after %(label)s", {label}), hook));
+            }
+        }
+        if (block.tag === "notebook") {
+            if ((this.props.data.operations || []).includes("add_page")) {
+                adds.push(add("tab", _t("Add a tab"), null));
+            }
+        } else if (editor.insertsIn(block)) {
+            adds.push(add("in", _t("Add in %(label)s", {label}), {target: block.path, position: "inside"}));
+        }
+        return adds;
+    }
+
+    /** Run the « + » ``add`` of the row of ``block``: open the list at its hook, or add a tab. */
+    runAdd(add, block) {
+        if (add.kind === "tab") {
+            return this.editor.addTab(block.path);
+        }
+        if (add.open) {
+            this.editor.closeInsert();
+            return;
+        }
+        this.editor.insertFromPlan(add.hook);
+    }
+
+    /**
+     * Insert on the row ``row``: the list opens after its block, else at
+     * the end of the container it is.
+     */
+    insertFromRow(row) {
+        if (!this.canInsert) {
+            return;
+        }
+        const editor = this.editor;
+        const hook =
+            editor.hookAfter(row.block.path) ||
+            (editor.insertsIn(row.block) ? {target: row.block.path, position: "inside"} : null);
+        if (hook) {
+            editor.insertFromPlan(hook);
         }
     }
 

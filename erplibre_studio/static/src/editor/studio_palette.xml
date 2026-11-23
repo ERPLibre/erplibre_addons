@@ -178,6 +178,9 @@
             <p t-elif="viewType === 'leaflet_map'" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag a decimal field onto Latitude or Longitude, a text onto the popup, an image onto Marker image; a new Decimal or Text field dropped on a lane is created for it.
             </p>
+            <p t-elif="viewType === 'form'" class="small text-muted border-top pt-2 mt-auto mb-0 o_erplibre_studio_palette_hint">
+                Dragging still works. Shorter: hover the space between two fields and click the +.
+            </p>
             <p t-else="" class="small text-muted border-top pt-2 mt-auto mb-0">
                 Drag an item onto a drop zone of the canvas, or press Enter on it: it goes into the selected group or page, after the selected element, else at the end of the view.
             </p>

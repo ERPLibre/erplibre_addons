@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The list a « + » of the margin opens at its hook: a dialog that
+         holds a search combobox and the listbox of its options, grouped;
+         the focus stays in the input, the active option is its
+         aria-activedescendant. A click inside it stays in it. -->
+    <t t-name="erplibre_studio.InsertList">
+        <t t-set="shownGroups" t-value="groups" />
+        <t t-set="shownOptions" t-value="shownGroups.flatMap((group) => group.options)" />
+        <t t-set="active" t-value="shownOptions[activeIndex(shownOptions)]" />
+        <div
+            t-ref="root"
+            role="dialog"
+            class="o_erplibre_studio_insert_list"
+            t-att-aria-label="title"
+            t-on-click.stop="stay"
+            t-on-dragstart.stop="stay"
+        >
+            <div class="o_erplibre_studio_insert_head">
+                <span class="o_erplibre_studio_insert_title" t-esc="title" />
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link text-body o_erplibre_studio_insert_close"
+                    aria-label="Close the list"
+                    title="Close the list"
+                    t-on-click="close"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <label class="o_erplibre_studio_insert_search">
+                <i class="fa fa-search" aria-hidden="true" />
+                <input
+                    t-ref="input"
+                    type="text"
+                    class="o_erplibre_studio_insert_input"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="true"
+                    placeholder="Search a field or create…"
+                    aria-label="Search a field or create…"
+                    t-att-aria-controls="listId"
+                    t-att-aria-activedescendant="active ? active.id : false"
+                    t-att-value="state.query"
+                    t-on-input="onInput"
+                    t-on-keydown="onKeydown"
+                />
+            </label>
+            <div role="listbox" class="o_erplibre_studio_insert_options" t-att-id="listId" t-att-aria-label="title">
+                <div
+                    t-foreach="shownGroups"
+                    t-as="group"
+                    t-key="group.key"
+                    role="group"
+                    class="o_erplibre_studio_insert_group"
+                    t-att-data-group="group.key"
+                    t-att-aria-labelledby="group.id"
+                >
+                    <div class="o_erplibre_studio_insert_group_title" t-att-id="group.id" t-esc="group.title" />
+                    <div t-att-class="group.chips ? 'o_erplibre_studio_insert_chips' : 'o_erplibre_studio_insert_rows'">
+                        <div
+                            t-foreach="group.options"
+                            t-as="option"
+                            t-key="option.key"
+                            role="option"
+                            class="o_erplibre_studio_insert_option"
+                            t-att-class="{
+                                'o_erplibre_studio_insert_chip': group.chips,
+                                'o_erplibre_studio_insert_active': option === active,
+                            }"
+                            t-att-id="option.id"
+                            t-att-data-key="option.key"
+                            t-att-aria-selected="option === active ? 'true' : 'false'"
+                            t-on-mousedown.prevent="stay"
+                            t-on-mouseenter="() => this.hover(option)"
+                            t-on-click="() => this.pick(option)"
+                        >
+                            <span class="o_erplibre_studio_glyph" aria-hidden="true" t-esc="option.glyph" />
+                            <span class="o_erplibre_studio_insert_label" t-esc="option.label" />
+                            <span t-if="option.note" class="o_erplibre_studio_insert_note" t-esc="option.note" />
+                            <code
+                                t-if="detailed and option.name"
+                                class="o_erplibre_studio_tech o_erplibre_studio_insert_name"
+                                t-esc="option.name"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <p t-if="noExisting" class="o_erplibre_studio_insert_empty" role="status">No existing field matches.</p>
+            </div>
+            <div class="o_erplibre_studio_insert_keys" aria-hidden="true">
+                <span><kbd>↑</kbd><kbd>↓</kbd><span>browse</span></span>
+                <span><kbd>Enter</kbd><span>insert</span></span>
+                <span><kbd>Esc</kbd><span>close</span></span>
+            </div>
+        </div>
+    </t>
+
+    <!-- The « + » of a hook of a form and its line, while no drag runs:
+         hidden until the hook is hovered, the « + » has the keyboard
+         focus or its list is open, which renders under it. The caller
+         sets « target », « position », « zone » and « insertTabKey », the
+         key of the hook whose « + » is a tab stop. -->
+    <t t-name="erplibre_studio.Insert">
+        <t t-set="insertKey" t-value="editor.hookKey(target, position, zone)" />
+        <t t-set="insertOpen" t-value="editorState.insert and editorState.insert.key === insertKey" />
+        <t t-set="insertPlace" t-value="editor.insertPlace(target, position)" />
+        <span class="o_erplibre_studio_insert_line" aria-hidden="true" />
+        <button
+            type="button"
+            class="o_erplibre_studio_insert"
+            title="Insert here"
+            aria-haspopup="dialog"
+            t-att-data-hook="insertKey"
+            t-att-aria-label="editor.insertLabel(insertPlace)"
+            t-att-aria-expanded="insertOpen ? 'true' : 'false'"
+            t-att-tabindex="insertOpen or insertKey === insertTabKey ? '0' : '-1'"
+            t-on-click.stop="() => editor.toggleInsert({target, position, zone})"
+        >
+            <i class="fa fa-plus" aria-hidden="true" />
+        </button>
+        <StudioInsertList t-if="insertOpen" editor="editor" insert="editorState.insert" />
+    </t>
+</templates>

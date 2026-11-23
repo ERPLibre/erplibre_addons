@@ -21,6 +21,25 @@ export const LAYOUT_ITEMS = [
 ];
 
 /**
+ * The new field types of ``fieldTypes`` (the « field_types » of the
+ * payload) a view of ``viewType`` offers, the common ones first: an
+ * x2many only where it shows. The geometry types are one item,
+ * « Geometry », that drops a point; the inspector changes its shape.
+ * [{ttype, index, label, glyph}]
+ */
+export function paletteFieldTypes(fieldTypes, viewType) {
+    const rank = (ttype) => {
+        const index = COMMON_TYPES.indexOf(ttype);
+        return index < 0 ? COMMON_TYPES.length : index;
+    };
+    return (fieldTypes || [])
+        .filter((ttype) => fieldTypeFits(ttype, viewType))
+        .filter((ttype) => !GEO_TYPES.includes(ttype) || ttype === GEO_TYPES[0])
+        .map((ttype, index) => ({ttype, index, label: newFieldLabel(ttype), glyph: typeGlyph(ttype)}))
+        .sort((a, b) => rank(a.ttype) - rank(b.ttype) || a.index - b.index);
+}
+
+/**
  * The palette of the editor, one column of sections: a search box, the new
  * field types, the existing fields (a section that folds), the layout
  * items (a group, a tab, a separator) and the other items (a ribbon) that
@@ -102,22 +121,9 @@ export class StudioPalette extends Component {
         return searchText(this.palette.filter.trim());
     }
 
-    /**
-     * The new field types the view offers, the common ones first: an
-     * x2many only where it shows. The geometry types are one item,
-     * « Geometry », that drops a point; the inspector changes its shape.
-     * [{ttype, label, glyph}]
-     */
+    /** The new field types the view offers (``paletteFieldTypes``). */
     get fieldTypes() {
-        const rank = (ttype) => {
-            const index = COMMON_TYPES.indexOf(ttype);
-            return index < 0 ? COMMON_TYPES.length : index;
-        };
-        return (this.data.field_types || [])
-            .filter((ttype) => fieldTypeFits(ttype, this.viewType))
-            .filter((ttype) => !GEO_TYPES.includes(ttype) || ttype === GEO_TYPES[0])
-            .map((ttype, index) => ({ttype, index, label: newFieldLabel(ttype), glyph: typeGlyph(ttype)}))
-            .sort((a, b) => rank(a.ttype) - rank(b.ttype) || a.index - b.index);
+        return paletteFieldTypes(this.data.field_types, this.viewType);
     }
 
     /**

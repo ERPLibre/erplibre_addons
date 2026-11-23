@@ -1189,6 +1189,287 @@
         }
     }
 
+    // Insert without dragging: the « + » of a hook of a form sits in the
+    // left margin, its line across the column; both stay transparent
+    // until the hook is hovered, the « + » has the keyboard focus or its
+    // list is open.
+    .o_erplibre_studio_insert_line {
+        position: absolute;
+        top: 50%;
+        left: 0.75rem;
+        right: 0;
+        height: 1px;
+        background-color: $gray-400;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.12s;
+    }
+
+    .o_erplibre_studio_insert {
+        position: absolute;
+        top: 50%;
+        left: -0.125rem;
+        z-index: 3;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.25rem;
+        height: 1.25rem;
+        padding: 0;
+        transform: translate(-50%, -50%);
+        border: 1px solid $gray-400;
+        border-radius: 50%;
+        background-color: $o-view-background-color;
+        box-shadow: 0 1px 2px rgba($black, 0.06);
+        color: $gray-700;
+        font-size: 0.625rem;
+        opacity: 0;
+        transition: opacity 0.12s;
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 1px;
+        }
+
+        &[aria-expanded="true"] {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+    }
+
+    .o_erplibre_studio_hook:hover > .o_erplibre_studio_insert,
+    .o_erplibre_studio_hook:hover > .o_erplibre_studio_insert_line,
+    .o_erplibre_studio_insert:focus-visible,
+    .o_erplibre_studio_insert[aria-expanded="true"],
+    .o_erplibre_studio_hook:has(> .o_erplibre_studio_insert:focus-visible) > .o_erplibre_studio_insert_line {
+        opacity: 1;
+    }
+
+    .o_erplibre_studio_hook:has(> .o_erplibre_studio_insert[aria-expanded="true"]) > .o_erplibre_studio_insert_line {
+        height: 2px;
+        background-color: $primary;
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .o_erplibre_studio_insert,
+        .o_erplibre_studio_insert_line {
+            transition: none;
+        }
+    }
+
+    // The list a « + » opens, under its line.
+    .o_erplibre_studio_insert_list {
+        position: absolute;
+        top: calc(50% + 0.75rem);
+        left: 0.75rem;
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        width: 22rem;
+        max-width: calc(100vw - 2rem);
+        overflow: hidden;
+        border: 1px solid $border-color;
+        border-radius: 0.625rem;
+        background-color: $o-view-background-color;
+        box-shadow:
+            0 16px 36px rgba($black, 0.16),
+            0 2px 6px rgba($black, 0.06);
+        color: $body-color;
+        font-size: $font-size-sm;
+        cursor: default;
+    }
+
+    .o_erplibre_studio_insert_head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.5rem 0 0.75rem;
+    }
+
+    .o_erplibre_studio_insert_title {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        color: $text-muted;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .o_erplibre_studio_insert_search {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: 2.25rem;
+        margin: 0.5rem 0.75rem 0.625rem;
+        padding: 0 0.625rem;
+        border: 2px solid $primary;
+        border-radius: 0.5rem;
+        color: $text-muted;
+    }
+
+    .o_erplibre_studio_insert_input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: $body-color;
+    }
+
+    .o_erplibre_studio_insert_options {
+        display: flex;
+        flex-direction: column;
+        max-height: 21rem;
+        overflow-y: auto;
+        padding: 0 0.375rem 0.375rem;
+    }
+
+    .o_erplibre_studio_insert_group_title {
+        padding: 0.625rem 0.375rem 0.25rem;
+        color: $text-muted;
+        font-size: 0.6875rem;
+        font-weight: $font-weight-bold;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .o_erplibre_studio_insert_rows {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .o_erplibre_studio_insert_chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        padding: 0.125rem 0.375rem 0.25rem;
+    }
+
+    .o_erplibre_studio_insert_option {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        min-height: 2rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+
+        &.o_erplibre_studio_insert_active {
+            background-color: rgba($primary, 0.1);
+
+            .o_erplibre_studio_glyph {
+                background-color: $o-view-background-color;
+                color: $primary;
+            }
+        }
+    }
+
+    .o_erplibre_studio_insert_chip {
+        display: inline-flex;
+        gap: 0.375rem;
+        padding: 0.3125rem 0.5625rem;
+        border: 1px solid $border-color;
+
+        &.o_erplibre_studio_insert_active {
+            border-color: $primary;
+        }
+    }
+
+    .o_erplibre_studio_insert_label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .o_erplibre_studio_insert_chip .o_erplibre_studio_insert_label {
+        flex: none;
+    }
+
+    .o_erplibre_studio_insert_note,
+    .o_erplibre_studio_insert_name {
+        color: $text-muted;
+        font-size: 0.6875rem;
+    }
+
+    .o_erplibre_studio_insert_empty {
+        margin: 0.5rem 0.375rem;
+        color: $text-muted;
+    }
+
+    .o_erplibre_studio_insert_keys {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-top: 1px solid $border-color;
+        background-color: $gray-100;
+        color: $text-muted;
+        font-size: 0.6875rem;
+
+        > span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+    }
+
+    .o_erplibre_studio_insert_keys kbd,
+    .o_erplibre_studio_insert_point_keys kbd {
+        padding: 0 0.3125rem;
+        border: 1px solid $gray-400;
+        border-bottom-width: 2px;
+        border-radius: 0.25rem;
+        background-color: $o-view-background-color;
+        color: $body-color;
+        font-family: inherit;
+        font-size: 0.6875rem;
+        font-weight: $font-weight-bold;
+        line-height: 1rem;
+    }
+
+    // The « + » of a row of the plan: on the hover or the focus of its
+    // row, always on the selected row and while its list is open.
+    .o_erplibre_studio_outline_add {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-right: 0.125rem;
+        padding: 0;
+        border: 1px solid $gray-400;
+        border-radius: 0.375rem;
+        background-color: $o-view-background-color;
+        color: $gray-700;
+        font-size: 0.625rem;
+        opacity: 0;
+
+        &:focus-visible {
+            outline: 2px solid $primary;
+            outline-offset: 1px;
+            opacity: 1;
+        }
+
+        &[aria-expanded="true"] {
+            border-color: $primary;
+            background-color: $primary;
+            color: color-contrast($primary);
+        }
+    }
+
+    .o_erplibre_studio_outline_row:hover > .o_erplibre_studio_outline_add,
+    .o_erplibre_studio_outline_row:focus-within > .o_erplibre_studio_outline_add,
+    .o_erplibre_studio_outline_add_shown {
+        opacity: 1;
+    }
+
     .o_erplibre_studio_preview {
         min-height: 300px;
     }
