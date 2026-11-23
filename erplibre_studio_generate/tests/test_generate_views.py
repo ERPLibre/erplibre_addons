@@ -159,6 +159,47 @@ class TestGenerateViews(StudioCase):
         self.assertIn("mail", names)
         self.assertIn("base", names)
 
+    def test_dms_tree_dependency(self):
+        """The documents tree of dms_field in a form of the contacts: the
+        generated module depends on dms_field, the module of the field,
+        and writes the field with its mode."""
+        Project = self.Project
+        if not Project._studio_dms_available() or (
+            "dms_directory_ids" not in self.env["res.partner"]._fields
+        ):
+            self.skipTest("dms_field is not installed")
+        form = self.make_view(
+            "form",
+            "<form><sheet><notebook><page name='p'><field name='name'/></page>"
+            "</notebook></sheet></form>",
+            xml_id="base.erplibre_studio_test_dms_form",
+        )
+        module = "studio_test_generate_dms"
+        project = self.make_project(module, destination=self.destination)
+        self.op(
+            project,
+            form,
+            type="add_existing_field",
+            target="//page[@name='p']",
+            position="inside",
+            field_name="dms_directory_ids",
+            special="dms_list",
+        )
+        self.assertIn("dms_field", project._dependencies())
+        project.action_apply()
+        with self.server_actions():
+            project.action_generate()
+        path = os.path.join(self.destination, module)
+        with open(os.path.join(path, "__manifest__.py"), encoding="utf-8") as fh:
+            manifest = ast.literal_eval(fh.read())
+        self.assertIn("dms_field", manifest["depends"])
+        with open(
+            os.path.join(path, "views", "erplibre_studio_views.xml"), encoding="utf-8"
+        ) as fh:
+            views = etree.fromstring(fh.read().encode())
+        node = views.xpath(".//field[@name='dms_directory_ids']")[0]
+        self.assertEqual((node.get("mode"), node.get("nolabel")), ("dms_list", "1"))
+
     def test_groups_dependency(self):
         """A field shown for a group of another installed module: the
         generated module depends on that module."""
