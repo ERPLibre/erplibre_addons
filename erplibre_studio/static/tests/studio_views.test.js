@@ -1732,7 +1732,7 @@ describe("erplibre_studio editor, geoengine", () => {
      * loads the name and the geo field x_site, its « info_box » shows the
      * fields ``names``; two layers.
      */
-    function geoPayload(names = ["name"], rootAttrs = {}) {
+    function geoPayload(names = ["name"], rootAttrs = {}, extraLayers = []) {
         const box = {
             path: BOX,
             tag: "t",
@@ -1792,11 +1792,21 @@ describe("erplibre_studio editor, geoengine", () => {
                         {
                             id: 2,
                             kind: "vector",
+                            sequence: 10,
                             name: "Site",
                             geo_field: "x_site",
                             geo_repr: "basic",
                             active_on_startup: true,
                         },
+                        ...extraLayers,
+                    ],
+                    geo_fields: [
+                        ["x_site", "Site"],
+                        ["x_spot", "Spot"],
+                    ],
+                    attribute_fields: [
+                        ["color", "Color", true],
+                        ["name", "Name", false],
                     ],
                 },
             },
@@ -1890,6 +1900,118 @@ describe("erplibre_studio editor, geoengine", () => {
         await contains(".o_erplibre_studio_preview_toggle").click();
         expect(".o_notification").toHaveText(/The map shows once Apply creates the view and its layers/);
         expect(".o_erplibre_studio_view_preview").toHaveCount(0);
+    });
+    // A second vector layer, on the geo field x_spot.
+    const SPOTS = {
+        id: 3,
+        kind: "vector",
+        sequence: 20,
+        name: "Spots",
+        geo_field: "x_spot",
+        geo_repr: "basic",
+        active_on_startup: false,
+    };
+
+    test("a layer row opens its form; the range shows for a colored layer; Save sends it", async () => {
+        const saved = [];
+        onRpc("erplibre.studio.editor", "save_geo_layer", (args) => {
+            expect.step("save_geo_layer");
+            saved.push(args.args[1]);
+            return {...geoPayload(["name"], {}, [SPOTS]), saved_geo_layer: args.args[1].id || 3};
+        });
+        answer = geoPayload();
+        await openEditor("geoengine");
+        // The background shows read only.
+        await contains(".o_erplibre_studio_geo_layer[data-kind=raster] .o_erplibre_studio_geo_layer_pick").click();
+        expect(".o_erplibre_studio_geo_background_note").toHaveCount(1);
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(0);
+
+        await contains(".o_erplibre_studio_geo_layer[data-id='2'] .o_erplibre_studio_geo_layer_pick").click();
+        expect(".o_erplibre_studio_geo_layer[data-id='2']").toHaveClass("o_erplibre_studio_geo_layer_selected");
+        expect(".o_erplibre_studio_geo_layer_name").toHaveValue("Site");
+        expect(".o_erplibre_studio_geo_layer_field").toHaveValue("x_site");
+        expect(".o_erplibre_studio_geo_layer_repr").toHaveValue("basic");
+        expect(".o_erplibre_studio_geo_layer_range").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layer_load").toHaveCount(0);
+        // A single vector layer stays: no Remove.
+        expect(".o_erplibre_studio_geo_layer_remove").toHaveCount(0);
+
+        await contains(".o_erplibre_studio_geo_layer_repr").select("colored");
+        expect(".o_erplibre_studio_geo_layer_range").toHaveCount(1);
+        expect(".o_erplibre_studio_geo_layer_classification option[value=interval]").toHaveAttribute("disabled");
+        await contains(".o_erplibre_studio_geo_layer_attribute").select("name");
+        expect(".o_erplibre_studio_geo_layer_classification option[value=quantile]").toHaveAttribute("disabled");
+        // The view loads the name already.
+        expect(".o_erplibre_studio_geo_layer_load").toHaveCount(0);
+        await contains(".o_erplibre_studio_geo_layer_attribute").select("color");
+        expect(".o_erplibre_studio_geo_layer_classification option[value=interval]").not.toHaveAttribute("disabled");
+        expect(".o_erplibre_studio_geo_layer_load").toHaveText(
+            "Save also loads color in the view: the map reads them from the records."
+        );
+        await contains(".o_erplibre_studio_geo_layer_classification").select("interval");
+        await contains(".o_erplibre_studio_geo_layer_classes").edit("4");
+        await contains(".o_erplibre_studio_geo_layer_save").click();
+        expect.verifySteps(["save_geo_layer"]);
+        expect(saved.pop()).toEqual({
+            id: 2,
+            name: "Site",
+            geo_field: "x_site",
+            geo_repr: "colored",
+            active_on_startup: true,
+            attribute_field: "color",
+            classification: "interval",
+            nb_class: 4,
+            begin_color: "#ffffff",
+            end_color: "#ff680a",
+        });
+
+        // Add layer: a basic layer of the first geo field, then its own.
+        await contains(".o_erplibre_studio_geo_layer_add").click();
+        expect(".o_erplibre_studio_inspector_title").toHaveText("New layer");
+        expect(".o_erplibre_studio_geo_layer_name").toHaveValue("Site");
+        await contains(".o_erplibre_studio_geo_layer_field").select("x_spot");
+        await contains(".o_erplibre_studio_geo_layer_name").edit(" Spots ");
+        expect(".o_erplibre_studio_geo_layer_load").toHaveText(
+            "Save also loads x_spot in the view: the map reads them from the records."
+        );
+        await contains(".o_erplibre_studio_geo_layer_save").click();
+        expect.verifySteps(["save_geo_layer"]);
+        expect(saved.pop()).toEqual({
+            name: "Spots",
+            geo_field: "x_spot",
+            geo_repr: "basic",
+            active_on_startup: true,
+        });
+        // The inspector shows the layer saved, its row selected.
+        expect(".o_erplibre_studio_geo_layer[data-id='3']").toHaveClass("o_erplibre_studio_geo_layer_selected");
+        expect(".o_erplibre_studio_inspector_title").toHaveText("Spots");
+
+        // Its place: up swaps it with the layer before.
+        expect(".o_erplibre_studio_geo_layer_down").toHaveAttribute("disabled");
+        await contains(".o_erplibre_studio_geo_layer_up").click();
+        expect.verifySteps(["save_geo_layer"]);
+        expect(saved.pop()).toMatchObject({id: 3, geo_field: "x_spot", sequence: 10});
+    });
+
+    test("Remove asks for a confirmation, then sends remove_geo_layer", async () => {
+        onRpc("erplibre.studio.editor", "remove_geo_layer", (args) => {
+            expect.step(`remove_geo_layer ${args.args[1]}`);
+            return geoPayload();
+        });
+        answer = geoPayload(["name"], {}, [SPOTS]);
+        await openEditor("geoengine");
+        await contains(".o_erplibre_studio_geo_layer[data-id='3'] .o_erplibre_studio_geo_layer_pick").click();
+        await contains(".o_erplibre_studio_geo_layer_remove").click();
+        expect(".modal-body").toHaveText("The layer Spots leaves the draft.");
+        await contains(".modal-footer .btn-secondary").click();
+        expect.verifySteps([]);
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(1);
+
+        await contains(".o_erplibre_studio_geo_layer_remove").click();
+        await contains(".modal-footer .btn-primary").click();
+        expect.verifySteps(["remove_geo_layer 3"]);
+        expect(".o_erplibre_studio_geo_layer_form").toHaveCount(0);
+        expect(".o_erplibre_studio_geo_layer").toHaveCount(2);
     });
 });
 

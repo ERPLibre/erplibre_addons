@@ -335,7 +335,8 @@
     }
 
     .o_erplibre_studio_rule_selected,
-    .o_erplibre_studio_group_selected {
+    .o_erplibre_studio_group_selected,
+    .o_erplibre_studio_geo_layer_selected {
         border-color: $primary !important;
         box-shadow: 0 0 0 0.2rem rgba($primary, 0.15);
     }

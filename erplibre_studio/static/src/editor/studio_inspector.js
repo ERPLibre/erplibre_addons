@@ -6,6 +6,7 @@ import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {StudioDomainDialog} from "./studio_domain";
 import {StudioFieldName} from "./studio_field_name";
+import {StudioGeoLayers} from "./studio_geo_layers";
 import {StudioWidgetOptions} from "./studio_widget_options";
 import {blockGlyph, isOutlineContainer, outlineCount, outlineLabel, tagLabel} from "./studio_outline";
 import {
@@ -75,7 +76,7 @@ const FOLDED_KINDS = ["pixels", "offset"];
  */
 export class StudioInspector extends Component {
     static template = "erplibre_studio.Inspector";
-    static components = {StudioFieldName, StudioWidgetOptions};
+    static components = {StudioFieldName, StudioGeoLayers, StudioWidgetOptions};
     static props = {
         editor: Object,
         // The payload of the editor (get_editor_data).
@@ -97,6 +98,9 @@ export class StudioInspector extends Component {
         // The preview on screen (StudioEditor.previewInfo), or null: the
         // tab « Properties » then describes it.
         preview: {type: [Object, {value: null}], optional: true},
+        // The layer of a GeoEngine view shown (its id, « new »), or null:
+        // the tab « Properties » then edits it (StudioGeoLayers).
+        geoLayer: {type: [Number, String, {value: null}], optional: true},
     };
 
     setup() {

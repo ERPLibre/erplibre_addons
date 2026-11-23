@@ -5026,6 +5026,251 @@ class ErplibreStudioProject(models.Model):
             ]
         )
 
+    @api.model
+    def _studio_geo_attribute_fields(self, model):
+        """{name: type} of the stored fields of ``model`` in the registry
+        whose values color a colored range (GEO_ATTRIBUTE_TYPES)."""
+        if model not in self.env:
+            return {}
+        return {
+            name: field.type
+            for name, field in self.env[model]._fields.items()
+            if field.type in studio_arch.GEO_ATTRIBUTE_TYPES and field.store
+        }
+
+    def _studio_geo_line(self, view):
+        """The view line of the project behind the GeoEngine view ``view``
+        (``_studio_view_line_of``); UserError for another view."""
+        line = self._studio_view_line_of(view)
+        if not line or line.view_type != "geoengine":
+            raise UserError(
+                self.env._("Layers belong to a GeoEngine view the project adds.")
+            )
+        return line
+
+    def _studio_geo_layer(self, line, layer_id):
+        """The layer ``layer_id`` of the view line ``line``; UserError when
+        it is not one of its layers."""
+        layer = line.layer_ids.filtered(lambda item: item.id == int(layer_id or 0))
+        if not layer:
+            raise UserError(self.env._("This layer is not a layer of the view."))
+        return layer
+
+    @api.model
+    def _studio_geo_color(self, value):
+        """The color ``value`` as « #rrggbb » in lower case, False when
+        empty; UserError for another text."""
+        text = (value or "").strip()
+        if not text:
+            return False
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", text):
+            raise UserError(
+                self.env._("A color reads #rrggbb: %(color)s does not.", color=text)
+            )
+        return text.lower()
+
+    def _studio_geo_layer_values(self, line, values):
+        """The values of a vector layer of the GeoEngine view line ``line``
+        from ``values`` {name, geo_field, geo_repr, attribute_field,
+        classification, nb_class, begin_color, end_color,
+        active_on_startup}, cleaned as geoengine.vector.layer accepts them
+        at Apply (its _check_geo_repr): a colored range reads an attribute
+        of GEO_ATTRIBUTE_TYPES, a number (GEO_NUMBER_TYPES) for an interval
+        or a quantile, in 1 to 20 classes. A basic layer keeps its color only.
+        UserError for a value it refuses."""
+        model = line.model
+        layer_fields = self.env["erplibre.studio.geo.layer"]._fields
+        name = (values.get("name") or "").strip()
+        if not name:
+            raise UserError(self.env._("A layer needs a name."))
+        geo_field = values.get("geo_field") or ""
+        if geo_field not in self._studio_geo_fields(model):
+            raise UserError(
+                self.env._(
+                    "A layer draws a geo field of %(model)s that Apply created: "
+                    "%(field)s is not one.",
+                    model=model,
+                    field=geo_field or "-",
+                )
+            )
+        geo_repr = values.get("geo_repr") or "basic"
+        if geo_repr not in dict(layer_fields["geo_repr"].selection):
+            raise UserError(
+                self.env._("Unknown representation %(repr)s.", repr=geo_repr)
+            )
+        vals = {
+            "name": name,
+            "geo_field": geo_field,
+            "geo_repr": geo_repr,
+            "attribute_field": False,
+            "classification": False,
+            "nb_class": 1,
+            "begin_color": self._studio_geo_color(values.get("begin_color")),
+            "end_color": False,
+            "active_on_startup": bool(values.get("active_on_startup")),
+        }
+        if geo_repr != "colored":
+            return vals
+        attributes = self._studio_geo_attribute_fields(model)
+        attribute = values.get("attribute_field") or ""
+        if attribute not in attributes:
+            raise UserError(
+                self.env._(
+                    "A colored range needs the field whose values color it: a "
+                    "number, a date, a text or a selection of %(model)s.",
+                    model=model,
+                )
+            )
+        classification = values.get("classification") or "unique"
+        if classification not in dict(layer_fields["classification"].selection):
+            raise UserError(
+                self.env._(
+                    "Unknown classification %(classification)s.",
+                    classification=classification,
+                )
+            )
+        numbers = studio_arch.GEO_NUMBER_TYPES
+        if classification != "unique" and attributes[attribute] not in numbers:
+            raise UserError(
+                self.env._(
+                    "An interval or a quantile classification needs a number "
+                    "field: %(field)s is not one.",
+                    field=attribute,
+                )
+            )
+        try:
+            nb_class = int(values.get("nb_class") or 0)
+        except (TypeError, ValueError):
+            nb_class = 0
+        low, high = studio_arch.GEO_CLASS_RANGE
+        if not low <= nb_class <= high:
+            raise UserError(
+                self.env._(
+                    "A colored range has %(low)s to %(high)s classes.",
+                    low=low,
+                    high=high,
+                )
+            )
+        vals.update(
+            {
+                "attribute_field": attribute,
+                "classification": classification,
+                "nb_class": nb_class,
+                "end_color": self._studio_geo_color(values.get("end_color")),
+            }
+        )
+        return vals
+
+    def _studio_save_geo_layer(self, line, values):
+        """Create the vector layer of ``values`` (see
+        ``_studio_geo_layer_values``) on the GeoEngine view line ``line``,
+        after its other vector layers, or write the one of ``id``; a
+        ``sequence`` moves it (``_studio_move_geo_layer``). The background
+        is not edited. The view loads the geo field and the attribute the
+        layer reads, the renderer finds them in the records: a field it
+        does not load yet gets an add_existing_field change, its own step
+        of Undo. Return the layer."""
+        self.ensure_one()
+        project = self._editing()
+        vals = project._studio_geo_layer_values(line, values)
+        if values.get("id"):
+            layer = project._studio_geo_layer(line, values["id"])
+            if layer.kind != "vector":
+                raise UserError(
+                    self.env._(
+                        "The background of the map is not edited: only the "
+                        "layers of geo fields are."
+                    )
+                )
+            layer.with_context(**{NO_TOUCH_KEY: True}).write(vals)
+            if values.get("sequence"):
+                project._studio_move_geo_layer(layer, int(values["sequence"]))
+        else:
+            vectors = line.layer_ids.filtered(lambda item: item.kind == "vector")
+            layer = project.env["erplibre.studio.geo.layer"].create(
+                dict(
+                    vals,
+                    project_id=self.id,
+                    view_line_id=line.id,
+                    kind="vector",
+                    sequence=max(vectors.mapped("sequence") or [0]) + 10,
+                )
+            )
+        project._studio_load_geo_fields(
+            line, [vals["geo_field"], vals["attribute_field"]]
+        )
+        self._touch()
+        return layer
+
+    def _studio_move_geo_layer(self, layer, sequence):
+        """Give the layer ``layer`` the place ``sequence``; the layer of the
+        same kind of its view that had it takes the former place of
+        ``layer``. Each write is flushed on its own, through a free place:
+        the layers of a view keep a unique (kind, sequence) at each
+        step."""
+        old = layer.sequence
+        if sequence == old:
+            return
+        if sequence < 1:
+            raise UserError(self.env._("A layer takes a place from 1."))
+        same = layer.view_line_id.layer_ids.filtered(
+            lambda item: item.kind == layer.kind
+        )
+        other = same.filtered(lambda item: item.sequence == sequence)
+        layer = layer.with_context(**{NO_TOUCH_KEY: True})
+        if other:
+            other = other.with_context(**{NO_TOUCH_KEY: True})
+            other.write({"sequence": max(same.mapped("sequence")) + 1})
+            other.flush_recordset(["sequence"])
+        layer.write({"sequence": sequence})
+        layer.flush_recordset(["sequence"])
+        if other:
+            other.write({"sequence": old})
+            other.flush_recordset(["sequence"])
+
+    def _studio_load_geo_fields(self, line, names):
+        """Load in the GeoEngine view of ``line`` the fields of ``names``
+        it does not load yet, before its templates: one add_existing_field
+        change each."""
+        view = self._studio_added_view(line.model, line.view_type) or line.view_id
+        if not view:
+            return
+        arch, _errors = self._draft_arch(view)
+        loaded = self._loaded_fields(arch)
+        templates = arch.find("templates")
+        for name in dict.fromkeys(names):
+            if not name or name in loaded:
+                continue
+            op = {"type": "add_existing_field", "field_name": name}
+            if templates is None:
+                op.update(target=f"/{arch.tag}", position="inside")
+            else:
+                op.update(target=f"/{arch.tag}/templates", position="before")
+            self._apply_operation(view, op)
+            loaded.add(name)
+
+    def _studio_remove_geo_layer(self, layer):
+        """Take ``layer`` out of its view; the next Apply removes the layer
+        it wrote. The last background stays, and so does the last vector
+        layer: the map draws at least one geo field."""
+        self.ensure_one()
+        same = layer.view_line_id.layer_ids.filtered(
+            lambda item: item.kind == layer.kind
+        )
+        if len(same) == 1:
+            if layer.kind == "raster":
+                raise UserError(
+                    self.env._("The map keeps its background: it is not removed.")
+                )
+            raise UserError(
+                self.env._(
+                    "The map draws at least one geo field: its last layer is "
+                    "not removed."
+                )
+            )
+        layer.with_context(**{NO_TOUCH_KEY: True}).unlink()
+        self._touch()
+
     def _studio_leaflet_date_definition(self, model, label):
         """The definition of the date field LEAFLET_DATE_FIELD a map added to
         ``model`` creates with its view line: a date with the label of

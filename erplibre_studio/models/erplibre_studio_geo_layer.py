@@ -110,18 +110,29 @@ class ErplibreStudioGeoLayer(models.Model):
         ]
 
     def _payload(self):
-        """[{id, kind, name, geo_field, geo_repr, active_on_startup}]: the
-        layers as the editor lists them."""
+        """[{id, kind, sequence, name, geo_field, geo_repr, attribute_field,
+        classification, nb_class, begin_color, end_color,
+        active_on_startup}]: the layers as the editor lists them, the
+        background first, then the vector layers by sequence."""
+        layers = self.sorted(
+            lambda layer: (layer.kind != "raster", layer.sequence, layer.id)
+        )
         return [
             {
                 "id": layer.id,
                 "kind": layer.kind,
+                "sequence": layer.sequence,
                 "name": layer.name,
                 "geo_field": layer.geo_field or False,
                 "geo_repr": layer.geo_repr or False,
+                "attribute_field": layer.attribute_field or False,
+                "classification": layer.classification or False,
+                "nb_class": layer.nb_class,
+                "begin_color": layer.begin_color or False,
+                "end_color": layer.end_color or False,
                 "active_on_startup": layer.active_on_startup,
             }
-            for layer in self
+            for layer in layers
         ]
 
     # ── constraints ─────────────────────────────────────────────────────

@@ -514,6 +514,7 @@
                                 template="state.template"
                                 filterForm="state.filterForm"
                                 lane="state.timelineLane"
+                                geoLayer="state.geoLayer"
                             />
                         </t>
                     </main>
@@ -530,6 +531,7 @@
                             hasProject="!!project"
                             lane="['timeline', 'calendar', 'leaflet_map'].includes(viewType) ? state.timelineLane : null"
                             preview="previewInfo"
+                            geoLayer="viewType === 'geoengine' ? state.geoLayer : null"
                         />
                     </aside>
                 </t>

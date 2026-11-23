@@ -207,6 +207,9 @@ export class StudioEditor extends Component {
             // The lane of a timeline or of a calendar the inspector shows
             // (VIEW_LANES), null for none.
             timelineLane: null,
+            // The layer of a GeoEngine view the inspector shows: its id,
+            // « new » for the form of a new one, null for none.
+            geoLayer: null,
             // The space the rail shows (SPACES): the centre of the editor.
             space: "view",
             // The id of the model line whose form the editor opens once the
@@ -388,6 +391,7 @@ export class StudioEditor extends Component {
             template: null,
             preview: false,
             timelineLane: null,
+            geoLayer: null,
         });
     }
 
@@ -1639,6 +1643,7 @@ export class StudioEditor extends Component {
         if (this.state.selected) {
             this.state.inspectorTab = "properties";
             this.state.timelineLane = null;
+            this.state.geoLayer = null;
         }
     }
 
@@ -1659,6 +1664,7 @@ export class StudioEditor extends Component {
             this.state.colors = null;
             this.state.inspectorTab = "properties";
             this.state.timelineLane = null;
+            this.state.geoLayer = null;
         }
         trail.forEach((block, index) => {
             const child = trail[index + 1];
@@ -1740,8 +1746,65 @@ export class StudioEditor extends Component {
      */
     selectLane(key) {
         if (laneOf(this.viewType, key)) {
-            Object.assign(this.state, {timelineLane: key, selected: null, colors: null, inspectorTab: "properties"});
+            Object.assign(this.state, {
+                timelineLane: key,
+                selected: null,
+                colors: null,
+                geoLayer: null,
+                inspectorTab: "properties",
+            });
         }
+    }
+
+    // ── the layers of a GeoEngine view ──────────────────────────────────
+
+    /**
+     * Show the layer ``id`` of the GeoEngine view on screen in the
+     * inspector, « new » for the form of a new one, null for none; the
+     * layer shown is hidden again.
+     */
+    selectGeoLayer(id) {
+        const geoLayer = id === null || this.state.geoLayer === id ? null : id;
+        Object.assign(this.state, {geoLayer, selected: null, colors: null, timelineLane: null});
+        if (geoLayer !== null) {
+            this.state.inspectorTab = "properties";
+        }
+    }
+
+    /**
+     * Save the layer ``values`` (geoLayerValues of studio_geo_layers):
+     * the inspector then shows the layer saved.
+     */
+    async saveGeoLayer(values) {
+        const data = await this.projectCall("save_geo_layer", [values]);
+        if (data && data.saved_geo_layer) {
+            this.state.geoLayer = data.saved_geo_layer;
+        }
+        return data;
+    }
+
+    /**
+     * Remove the layer ``layer`` of the GeoEngine view once the user
+     * confirms; once applied, the next Apply removes it from the database.
+     */
+    removeGeoLayer(layer) {
+        const added = (this.data.view && this.data.view.added) || {};
+        const body = added.applied
+            ? _t("The layer %(layer)s leaves the draft; the next Apply removes it from the map.", {
+                  layer: layer.name,
+              })
+            : _t("The layer %(layer)s leaves the draft.", {layer: layer.name});
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Remove this layer"),
+            body,
+            confirmLabel: _t("Remove"),
+            confirm: async () => {
+                if (await this.projectCall("remove_geo_layer", [layer.id])) {
+                    this.state.geoLayer = null;
+                }
+            },
+            cancel: () => {},
+        });
     }
 
     /**

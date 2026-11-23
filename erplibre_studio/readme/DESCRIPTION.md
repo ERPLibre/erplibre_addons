@@ -54,7 +54,11 @@ list, kanban, search and pivot views, and timeline views once
   a model with a geo field applied a map with an OpenStreetMap background
   and a vector layer on its first geo field. Its `info_box` template, the
   popup of a record, is edited as a kanban card; a geo field goes among
-  the fields the view loads, never in the popup. **Apply** writes the
+  the fields the view loads, never in the popup. A layer row opens its
+  form in the inspector: name, geo field, a basic or a colored range
+  representation, shown on opening; **Add layer** draws another geo
+  field, the arrows reorder the layers, **Remove** asks first. Saving a
+  layer loads the fields it reads in the view. **Apply** writes the
   layers to base_geoengine with the view; the map shows in the Preview
   once applied.
 - Each change is recorded in a **studio project**, as a draft. **Preview**

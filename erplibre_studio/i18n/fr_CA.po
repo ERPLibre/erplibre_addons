@@ -9316,3 +9316,225 @@ msgstr ""
 "Glissez un champ décimal sur Latitude ou Longitude, un texte sur la fenêtre "
 "contextuelle, une image sur Image du marqueur; un nouveau champ Décimal ou "
 "Texte déposé sur un couloir est créé pour lui."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A color reads #rrggbb: %(color)s does not."
+msgstr "Une couleur s'écrit #rrggbb : %(color)s ne s'écrit pas ainsi."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A colored range has %(low)s to %(high)s classes."
+msgstr "Une plage colorée compte de %(low)s à %(high)s classes."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A colored range needs the field whose values color it: a number, a date, a "
+"text or a selection of %(model)s."
+msgstr "Une plage colorée demande le champ dont les valeurs la colorent : un nombre, une date, un texte ou une sélection de %(model)s."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A layer draws a geo field of %(model)s that Apply created: %(field)s is not "
+"one."
+msgstr "Une couche dessine un champ géographique de %(model)s créé par l'Apply : %(field)s n'en est pas un."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A layer needs a name."
+msgstr "Une couche demande un nom."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A layer takes a place from 1."
+msgstr "Une couche prend une place à partir de 1."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Add layer"
+msgstr "Ajouter une couche"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Add the layer"
+msgstr "Ajouter la couche"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"An interval or a quantile classification needs a number field: %(field)s is "
+"not one."
+msgstr "Une classification par intervalle ou par quantile demande un champ numérique : %(field)s n'en est pas un."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Attribute field"
+msgstr "Champ d'attribut"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "Background layer"
+msgstr "Couche de fond de carte"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Choose a field…"
+msgstr "Choisir un champ…"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Classes"
+msgstr "Classes"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Close"
+msgstr "Fermer"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "End color"
+msgstr "Couleur de fin"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Layer"
+msgstr "Couche"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "Layer of a geo field"
+msgstr "Couche d'un champ géographique"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Layers belong to a GeoEngine view the project adds."
+msgstr "Les couches appartiennent à une vue GeoEngine que le projet ajoute."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Move down"
+msgstr "Descendre"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Move up"
+msgstr "Monter"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "New layer"
+msgstr "Nouvelle couche"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Remove this layer"
+msgstr "Retirer cette couche"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid ""
+"Save also loads %(fields)s in the view: the map reads them from the records."
+msgstr "Enregistrer charge aussi %(fields)s dans la vue : la carte les lit dans les enregistrements."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Shown on opening"
+msgstr "Affichée à l'ouverture"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Start color"
+msgstr "Couleur de début"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The background of the map is not edited: only the layers of geo fields are."
+msgstr "Le fond de carte ne se modifie pas : seules les couches des champs géographiques se modifient."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The layer %(layer)s leaves the draft."
+msgstr "La couche %(layer)s quitte le brouillon."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"The layer %(layer)s leaves the draft; the next Apply removes it from the "
+"map."
+msgstr "La couche %(layer)s quitte le brouillon; le prochain Apply la retire de la carte."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map draws at least one geo field: its last layer is not removed."
+msgstr "La carte dessine au moins un champ géographique : sa dernière couche n'est pas retirée."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid ""
+"The map draws the geo fields over OpenStreetMap: the background stays as it "
+"is."
+msgstr "La carte dessine les champs géographiques sur OpenStreetMap : le fond de carte reste tel quel."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map keeps its background: it is not removed."
+msgstr "La carte garde son fond de carte : il n'est pas retiré."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "This layer is no longer in the view."
+msgstr "Cette couche n'est plus dans la vue."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This layer is not a layer of the view."
+msgstr "Cette couche n'est pas une couche de la vue."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unknown classification %(classification)s."
+msgstr "Classification %(classification)s inconnue."
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unknown representation %(repr)s."
+msgstr "Représentation %(repr)s inconnue."

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- © 2026 TechnoLibre (http://www.technolibre.ca)
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates xml:space="preserve">
+    <!-- The inspector of a layer of a GeoEngine view: the background read
+         only; a vector layer as a small form, the colored range only for
+         « Colored range ». -->
+    <t t-name="erplibre_studio.GeoLayers">
+        <div class="o_erplibre_studio_properties o_erplibre_studio_geo_layer_props small d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-2 o_erplibre_studio_inspector_head">
+                <div class="o_erplibre_studio_inspector_name flex-grow-1">
+                    <div class="fw-bold fs-6 text-truncate o_erplibre_studio_inspector_title" t-esc="title" />
+                    <div class="text-muted o_erplibre_studio_inspector_kind" t-esc="kindLabel" />
+                </div>
+                <button
+                    type="button"
+                    class="btn btn-link btn-sm p-0 text-body o_erplibre_studio_geo_layer_close"
+                    aria-label="Close"
+                    title="Close"
+                    t-on-click="close"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <div t-if="isBackground" class="text-muted o_erplibre_studio_geo_background_note">
+                The map draws the geo fields over OpenStreetMap: the background stays as it is.
+            </div>
+            <div t-elif="!state.form" class="text-muted">This layer is no longer in the view.</div>
+            <fieldset t-else="" class="o_erplibre_studio_fieldset o_erplibre_studio_geo_layer_form">
+                <legend class="o_erplibre_studio_section_title">Layer</legend>
+                <label class="form-label mb-1 w-100">
+                    Name
+                    <input
+                        class="form-control form-control-sm mt-1 o_erplibre_studio_geo_layer_name"
+                        t-att-value="state.form.name"
+                        t-on-input="(ev) => this.setForm('name', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    />
+                </label>
+                <label class="form-label mb-1 w-100">
+                    Geo field
+                    <select
+                        class="form-select form-select-sm mt-1 o_erplibre_studio_geo_layer_field"
+                        t-on-change="(ev) => this.setForm('geo_field', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    >
+                        <option
+                            t-foreach="geoFields"
+                            t-as="item"
+                            t-key="item[0]"
+                            t-att-value="item[0]"
+                            t-att-selected="item[0] === state.form.geo_field"
+                            t-esc="item[1]"
+                        />
+                    </select>
+                </label>
+                <label class="form-label mb-1 w-100">
+                    Representation
+                    <select
+                        class="form-select form-select-sm mt-1 o_erplibre_studio_geo_layer_repr"
+                        t-on-change="(ev) => this.setForm('geo_repr', ev.target.value)"
+                        t-att-disabled="props.busy"
+                    >
+                        <option
+                            t-foreach="representations"
+                            t-as="item"
+                            t-key="item[0]"
+                            t-att-value="item[0]"
+                            t-att-selected="item[0] === state.form.geo_repr"
+                            t-esc="item[1]"
+                        />
+                    </select>
+                </label>
+                <div t-if="state.form.geo_repr === 'colored'" class="o_erplibre_studio_geo_layer_range border rounded p-2 mb-1">
+                    <label class="form-label mb-1 w-100">
+                        Attribute field
+                        <select
+                            class="form-select form-select-sm mt-1 o_erplibre_studio_geo_layer_attribute"
+                            t-on-change="(ev) => this.setForm('attribute_field', ev.target.value)"
+                            t-att-disabled="props.busy"
+                        >
+                            <option value="" t-att-selected="!state.form.attribute_field">Choose a field…</option>
+                            <option
+                                t-foreach="attributeFields"
+                                t-as="item"
+                                t-key="item[0]"
+                                t-att-value="item[0]"
+                                t-att-selected="item[0] === state.form.attribute_field"
+                                t-esc="item[1]"
+                            />
+                        </select>
+                    </label>
+                    <div class="d-flex gap-2">
+                        <label class="form-label mb-1 flex-grow-1">
+                            Classification
+                            <select
+                                class="form-select form-select-sm mt-1 o_erplibre_studio_geo_layer_classification"
+                                t-on-change="(ev) => this.setForm('classification', ev.target.value)"
+                                t-att-disabled="props.busy"
+                            >
+                                <option
+                                    t-foreach="classifications"
+                                    t-as="item"
+                                    t-key="item.value"
+                                    t-att-value="item.value"
+                                    t-att-disabled="item.disabled"
+                                    t-att-selected="item.value === state.form.classification"
+                                    t-esc="item.label"
+                                />
+                            </select>
+                        </label>
+                        <label class="form-label mb-1 o_erplibre_studio_geo_layer_classes_label">
+                            Classes
+                            <input
+                                type="number"
+                                class="form-control form-control-sm mt-1 o_erplibre_studio_geo_layer_classes"
+                                t-att-min="classRange[0]"
+                                t-att-max="classRange[1]"
+                                t-att-value="state.form.nb_class"
+                                t-on-input="(ev) => this.setForm('nb_class', ev.target.value)"
+                                t-att-disabled="props.busy"
+                            />
+                        </label>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <label class="form-label mb-0 flex-grow-1">
+                            Start color
+                            <input
+                                type="color"
+                                class="form-control form-control-sm form-control-color mt-1 o_erplibre_studio_geo_layer_begin"
+                                t-att-value="state.form.begin_color"
+                                t-on-input="(ev) => this.setForm('begin_color', ev.target.value)"
+                                t-att-disabled="props.busy"
+                            />
+                        </label>
+                        <label class="form-label mb-0 flex-grow-1">
+                            End color
+                            <input
+                                type="color"
+                                class="form-control form-control-sm form-control-color mt-1 o_erplibre_studio_geo_layer_end"
+                                t-att-value="state.form.end_color"
+                                t-on-input="(ev) => this.setForm('end_color', ev.target.value)"
+                                t-att-disabled="props.busy"
+                            />
+                        </label>
+                    </div>
+                </div>
+                <div class="form-check mb-1">
+                    <label class="form-check-label">
+                        <input
+                            type="checkbox"
+                            class="form-check-input o_erplibre_studio_geo_layer_startup"
+                            t-att-checked="state.form.active_on_startup"
+                            t-on-change="(ev) => this.setForm('active_on_startup', ev.target.checked)"
+                            t-att-disabled="props.busy"
+                        />
+                        Shown on opening
+                    </label>
+                </div>
+                <div t-if="loadNote" class="text-muted mb-1 o_erplibre_studio_geo_layer_load" t-esc="loadNote" />
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-sm o_erplibre_studio_geo_layer_save"
+                        t-att-disabled="props.busy"
+                        t-on-click="save"
+                    >
+                        <t t-if="isNew">Add the layer</t>
+                        <t t-else="">Save</t>
+                    </button>
+                    <t t-if="layer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm o_erplibre_studio_geo_layer_up"
+                            aria-label="Move up"
+                            title="Move up"
+                            t-att-disabled="props.busy or !neighbour(-1)"
+                            t-on-click="() => this.move(-1)"
+                        >
+                            <i class="fa fa-arrow-up" aria-hidden="true" />
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm o_erplibre_studio_geo_layer_down"
+                            aria-label="Move down"
+                            title="Move down"
+                            t-att-disabled="props.busy or !neighbour(1)"
+                            t-on-click="() => this.move(1)"
+                        >
+                            <i class="fa fa-arrow-down" aria-hidden="true" />
+                        </button>
+                        <button
+                            t-if="canRemove"
+                            type="button"
+                            class="btn btn-link btn-sm text-danger ms-auto o_erplibre_studio_geo_layer_remove"
+                            t-att-disabled="props.busy"
+                            t-on-click="remove"
+                        >
+                            Remove
+                        </button>
+                    </t>
+                </div>
+            </fieldset>
+        </div>
+    </t>
+</templates>

@@ -599,6 +599,22 @@ GEO_TYPES = (
 )
 # The template a GeoEngine view shows in the popup of a record.
 GEO_INFO_BOX = "info_box"
+# The field types whose values color a colored range of a GeoEngine layer
+# (SUPPORTED_ATT of base_geoengine), and among them the numbers an interval
+# or a quantile classification needs (NUMBER_ATT): geoengine.vector.layer
+# refuses another attribute with a ValidationError.
+GEO_ATTRIBUTE_TYPES = (
+    "float",
+    "integer",
+    "date",
+    "datetime",
+    "char",
+    "text",
+    "selection",
+)
+GEO_NUMBER_TYPES = ("float", "integer")
+# The bounds of the number of classes of a colored range.
+GEO_CLASS_RANGE = (1, 20)
 # The longest name of a PostgreSQL table.
 TABLE_NAME_SIZE = 63
 # The longest field name: a column of the table of its model.

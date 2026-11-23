@@ -318,6 +318,9 @@ export class StudioCanvas extends Component {
         // The lane of a timeline or of a calendar the inspector shows
         // (VIEW_LANES), or null.
         lane: {type: [String, {value: null}], optional: true},
+        // The layer of a GeoEngine view the inspector shows: its id, « new »,
+        // or null.
+        geoLayer: {type: [Number, String, {value: null}], optional: true},
     };
 
     get editor() {
@@ -400,8 +403,19 @@ export class StudioCanvas extends Component {
                     representation: representations[layer.geo_repr] || layer.geo_repr,
                 });
             }
-            return {id: layer.id, kind: layer.kind, name: layer.name, description};
+            return {
+                id: layer.id,
+                kind: layer.kind,
+                name: layer.name,
+                description,
+                selected: this.props.geoLayer === layer.id,
+            };
         });
+    }
+
+    /** Whether the project can edit the layers: one holds the view. */
+    get geoLayersEditable() {
+        return Boolean(this.props.project && this.data.view && this.data.view.added);
     }
 
     /** Whether the map of the GeoEngine view waits for Apply. */

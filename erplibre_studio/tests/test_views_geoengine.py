@@ -13,12 +13,10 @@ ZONE = "x_studio_test_zone"
 INFO_BOX = "//t[@t-name='info_box']"
 
 
-@tagged("post_install", "-at_install")
-class TestGeoengineStudio(StudioCase):
-    """A GeoEngine view added to the contacts, when base_geoengine is
-    installed: two geo fields made for the test, a view that loads the
-    first one, an OpenStreetMap background and a vector layer on it,
-    written to base_geoengine by Apply and removed by Revert."""
+class GeoengineCase(StudioCase):
+    """A project and two geo fields made for the test on the contacts,
+    when base_geoengine is installed and res.partner has no GeoEngine
+    view."""
 
     def setUp(self):
         super().setUp()
@@ -72,6 +70,13 @@ class TestGeoengineStudio(StudioCase):
     def layers(self, res_model):
         data = self.module_records(MODULE, res_model)
         return self.env[res_model].browse(data.mapped("res_id"))
+
+
+@tagged("post_install", "-at_install")
+class TestGeoengineStudio(GeoengineCase):
+    """A GeoEngine view added to the contacts: a view that loads the first
+    geo field, an OpenStreetMap background and a vector layer on it,
+    written to base_geoengine by Apply and removed by Revert."""
 
     def test_needs_a_geo_field(self):
         model = "res.partner.category"
@@ -239,3 +244,195 @@ class TestGeoengineStudio(StudioCase):
         self.project._studio_remove_view(line)
         self.assertFalse(line.exists())
         self.assertFalse(layers.exists())
+
+
+@tagged("post_install", "-at_install")
+class TestGeoengineLayers(GeoengineCase):
+    """The layers of a GeoEngine view the project adds, edited from the
+    editor: a vector layer per geo field, cleaned as base_geoengine
+    accepts it, loaded by the view, written by Apply."""
+
+    def save(self, **values):
+        return self.Editor.save_geo_layer(
+            self.project.id, values, "res.partner", False, "geoengine"
+        )
+
+    def remove(self, layer):
+        return self.Editor.remove_geo_layer(
+            self.project.id, layer.id, "res.partner", False, "geoengine"
+        )
+
+    def vector(self, line, geo_field):
+        return line.layer_ids.filtered(lambda layer: layer.geo_field == geo_field)
+
+    def test_choices(self):
+        _line, data = self.add_map()
+        added = data["view"]["added"]
+        self.assertEqual(
+            [name for name, _label in added["geo_fields"]][-2:], [SITE, ZONE]
+        )
+        attributes = {
+            name: numeric for name, _label, numeric in added["attribute_fields"]
+        }
+        self.assertIs(attributes["color"], True)
+        self.assertIs(attributes["name"], False)
+        self.assertNotIn(SITE, attributes)
+        raster, vector = added["layers"]
+        self.assertEqual((raster["kind"], vector["kind"]), ("raster", "vector"))
+        self.assertEqual(vector["sequence"], 10)
+
+    def test_save_loads_the_geo_field(self):
+        line, _data = self.add_map()
+        data = self.save(name=" Zones ", geo_field=ZONE, active_on_startup=True)
+        layer = self.vector(line, ZONE)
+        self.assertEqual(data["saved_geo_layer"], layer.id)
+        self.assertEqual(
+            (layer.kind, layer.name, layer.geo_repr, layer.sequence),
+            ("vector", "Zones", "basic", 20),
+        )
+        self.assertTrue(layer.active_on_startup)
+        change = self.project.change_ids
+        self.assertEqual(
+            (change.change_type, change.field_name),
+            ("add_existing_field", ZONE),
+        )
+        arch = self.draft(self.project, self.resolve())
+        self.assertEqual(
+            arch.xpath("/geoengine/templates/preceding-sibling::field[1]/@name"),
+            [ZONE],
+        )
+        # A save of a field the view loads records no change.
+        self.save(id=layer.id, name="Zones", geo_field=ZONE)
+        self.assertEqual(len(self.project.change_ids), 1)
+        self.assertFalse(layer.active_on_startup)
+
+    def test_refusals(self):
+        line, _data = self.add_map()
+        with self.assertRaisesRegex(UserError, "needs a name"):
+            self.save(name=" ", geo_field=ZONE)
+        with self.assertRaisesRegex(UserError, "draws a geo field"):
+            self.save(name="Email", geo_field="email")
+        with self.assertRaisesRegex(UserError, "needs the field whose values"):
+            self.save(name="Zones", geo_field=ZONE, geo_repr="colored")
+        with self.assertRaisesRegex(UserError, "needs a number field"):
+            self.save(
+                name="Zones",
+                geo_field=ZONE,
+                geo_repr="colored",
+                attribute_field="name",
+                classification="interval",
+                nb_class=3,
+            )
+        with self.assertRaisesRegex(UserError, "1 to 20 classes"):
+            self.save(
+                name="Zones",
+                geo_field=ZONE,
+                geo_repr="colored",
+                attribute_field="color",
+                classification="quantile",
+                nb_class=21,
+            )
+        with self.assertRaisesRegex(UserError, "#rrggbb"):
+            self.save(name="Zones", geo_field=ZONE, begin_color="red")
+        raster = line.layer_ids.filtered(lambda layer: layer.kind == "raster")
+        with self.assertRaisesRegex(UserError, "background of the map"):
+            self.save(id=raster.id, name="Map", geo_field=ZONE)
+        with self.assertRaisesRegex(UserError, "keeps its background"):
+            self.remove(raster)
+        with self.assertRaisesRegex(UserError, "at least one geo field"):
+            self.remove(self.vector(line, SITE))
+        self.assertEqual(len(line.layer_ids), 2)
+        self.assertFalse(self.project.change_ids)
+        # A text colors a range by unique value.
+        self.save(
+            name="Zones",
+            geo_field=ZONE,
+            geo_repr="colored",
+            attribute_field="name",
+            classification="unique",
+            nb_class=1,
+        )
+        self.assertEqual(self.vector(line, ZONE).attribute_field, "name")
+
+    def test_basic_drops_the_range(self):
+        line, _data = self.add_map()
+        site = self.vector(line, SITE)
+        self.save(
+            id=site.id,
+            name="Site",
+            geo_field=SITE,
+            geo_repr="basic",
+            attribute_field="color",
+            classification="interval",
+            nb_class=4,
+            begin_color="#AABBCC",
+            end_color="#000000",
+        )
+        self.assertEqual(
+            (
+                site.attribute_field,
+                site.classification,
+                site.nb_class,
+                site.begin_color,
+                site.end_color,
+            ),
+            (False, False, 1, "#aabbcc", False),
+        )
+
+    def test_move(self):
+        line, _data = self.add_map()
+        self.save(name="Zones", geo_field=ZONE)
+        site, zone = self.vector(line, SITE), self.vector(line, ZONE)
+        self.assertEqual((site.sequence, zone.sequence), (10, 20))
+        self.save(id=zone.id, name="Zones", geo_field=ZONE, sequence=10)
+        self.assertEqual((site.sequence, zone.sequence), (20, 10))
+        payload = self.Editor.get_editor_data(
+            "res.partner", False, "geoengine", self.project.id
+        )["view"]["added"]["layers"]
+        self.assertEqual(
+            [layer["name"] for layer in payload],
+            ["OpenStreetMap", "Zones", "Test site"],
+        )
+
+    def test_apply_writes_and_removes(self):
+        line, _data = self.add_map()
+        self.save(
+            name="Zones",
+            geo_field=ZONE,
+            geo_repr="colored",
+            attribute_field="color",
+            classification="interval",
+            nb_class=5,
+            begin_color="#ffffff",
+            end_color="#ff680a",
+        )
+        self.assertEqual(
+            sorted(self.project.change_ids.mapped("field_name")),
+            ["color", ZONE],
+        )
+        self.project.action_apply()
+        vectors = self.layers("geoengine.vector.layer")
+        self.assertEqual(len(vectors), 2)
+        zone = vectors.filtered(lambda layer: layer.geo_field_id.name == ZONE)
+        self.assertEqual(zone.view_id, line.view_id)
+        self.assertEqual(
+            (
+                zone.geo_repr,
+                zone.attribute_field_id.name,
+                zone.classification,
+                zone.nb_class,
+                zone.begin_color,
+                zone.end_color,
+            ),
+            ("colored", "color", "interval", 5, "#ffffff", "#ff680a"),
+        )
+        site = vectors - zone
+        self.assertEqual(site.geo_field_id.name, SITE)
+        self.assertFalse(site.attribute_field_id)
+
+        # After Apply, a layer leaves the draft, then the database.
+        self.remove(self.vector(line, ZONE))
+        self.assertEqual(len(line.layer_ids), 2)
+        self.project.action_apply()
+        self.assertFalse(zone.exists())
+        self.assertEqual(self.layers("geoengine.vector.layer"), site)

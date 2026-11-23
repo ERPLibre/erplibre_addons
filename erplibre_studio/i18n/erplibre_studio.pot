@@ -576,7 +576,27 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A color reads #rrggbb: %(color)s does not."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "A color rule cannot compare %(name)s, a %(type)s field."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A colored range has %(low)s to %(high)s classes."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A colored range needs the field whose values color it: a number, a date, a "
+"text or a selection of %(model)s."
 msgstr ""
 
 #. module: erplibre_studio
@@ -682,6 +702,26 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_geo_layer.py:0
 msgid "A layer belongs to the project of its view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"A layer draws a geo field of %(model)s that Apply created: %(field)s is not "
+"one."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A layer needs a name."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "A layer takes a place from 1."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1115,6 +1155,12 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Add layer"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Add the existing field, or choose another name."
@@ -1124,6 +1170,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 msgid "Add the filter"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Add the layer"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1253,6 +1305,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "An existing many2one of the comodel"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"An interval or a quantile classification needs a number field: %(field)s is "
+"not one."
 msgstr ""
 
 #. module: erplibre_studio
@@ -1465,6 +1525,12 @@ msgid "Ascending"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Attribute field"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Available"
@@ -1481,6 +1547,12 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_geo_layer__kind__raster
 msgid "Background"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "Background layer"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1524,9 +1596,27 @@ msgid "Children field"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Choose a field…"
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Choose another name."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Classes"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Close"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1616,6 +1706,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Element %(tag)s « %(label)s »"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "End color"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1732,6 +1828,24 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Layer"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "Layer of a geo field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Layers belong to a GeoEngine view the project adds."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Layout"
 msgstr ""
@@ -1794,6 +1908,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Move down"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Move up"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Multi-point"
 msgstr ""
@@ -1808,6 +1934,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Multi-polyline"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid "New layer"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1947,6 +2079,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Remove this element from the draft"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Remove this layer"
 msgstr ""
 
 #. module: erplibre_studio
@@ -5423,6 +5561,13 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
+msgid ""
+"Save also loads %(fields)s in the view: the map reads them from the records."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Saving replaces the rules above."
 msgstr ""
@@ -5624,6 +5769,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Shown on opening"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
 msgid "Simulation"
@@ -5665,6 +5816,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Stacked"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "Start color"
 msgstr ""
 
 #. module: erplibre_studio
@@ -5908,6 +6065,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The attribute %(attribute)s of <%(tag)s> cannot be set here."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid ""
+"The background of the map is not edited: only the layers of geo fields are."
 msgstr ""
 
 #. module: erplibre_studio
@@ -6355,6 +6519,20 @@ msgid ""
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The layer %(layer)s leaves the draft."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid ""
+"The layer %(layer)s leaves the draft; the next Apply removes it from the "
+"map."
+msgstr ""
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_geo_layer.py:0
 msgid "The layer %(name)s draws no geo field."
@@ -6376,6 +6554,26 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "The list of %(model)s loses its drag handle"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map draws at least one geo field: its last layer is not removed."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid ""
+"The map draws the geo fields over OpenStreetMap: the background stays as it "
+"is."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "The map keeps its background: it is not removed."
 msgstr ""
 
 #. module: erplibre_studio
@@ -7127,6 +7325,18 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
+msgid "This layer is no longer in the view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "This layer is not a layer of the view."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
 msgid "This model is no longer in the project."
 msgstr ""
@@ -7434,6 +7644,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unknown classification %(classification)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Unknown field %(name)s."
 msgstr ""
 
@@ -7479,6 +7695,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "Unknown preview mode %(mode)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+msgid "Unknown representation %(repr)s."
 msgstr ""
 
 #. module: erplibre_studio

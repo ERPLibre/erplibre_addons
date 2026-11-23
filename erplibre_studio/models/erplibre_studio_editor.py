@@ -795,17 +795,34 @@ class ErplibreStudioEditor(models.AbstractModel):
         """{line_id, applied, name, xml_id, layers} of the view line of
         ``project`` behind ``view`` (see ``_studio_view_line_of``), or False
         when ``view`` is not a view the project adds. ``layers``: the layers
-        of a GeoEngine view (``erplibre.studio.geo.layer._payload``)."""
+        of a GeoEngine view (``erplibre.studio.geo.layer._payload``); such a
+        view also answers what a layer may read, ``geo_fields`` [[name,
+        label]] and ``attribute_fields`` [[name, label, numeric]]."""
         line = project._studio_view_line_of(view) if project else False
         if not line:
             return False
-        return {
+        payload = {
             "line_id": line.id,
             "applied": line.applied,
             "name": line._studio_view_name(),
             "xml_id": f"{project.module_name}.{line._studio_xml_name()}",
             "layers": line.layer_ids._payload(),
         }
+        if line.view_type == "geoengine":
+            Model = self.env[line.model]
+            label = lambda name: Model._fields[name].string or name  # noqa: E731
+            payload["geo_fields"] = [
+                [name, label(name)] for name in project._studio_geo_fields(line.model)
+            ]
+            attributes = project._studio_geo_attribute_fields(line.model)
+            payload["attribute_fields"] = sorted(
+                (
+                    [name, label(name), ttype in studio_arch.GEO_NUMBER_TYPES]
+                    for name, ttype in attributes.items()
+                ),
+                key=lambda item: item[1].lower(),
+            )
+        return payload
 
     @api.model
     def _project_payload(self, project):
@@ -1506,6 +1523,34 @@ class ErplibreStudioEditor(models.AbstractModel):
         project = self._edited_project(project_id, revision)
         view = self._resolve_view(model, view_id, view_type, project)
         project._studio_remove_rule(project._studio_rule_line(rule_id))
+        return self._answer(project, model, view.id, view_type)
+
+    @api.model
+    def save_geo_layer(
+        self, project_id, values, model, view_id, view_type, revision=None
+    ):
+        """Create or update a vector layer of the GeoEngine view on screen
+        (``_studio_save_geo_layer``); the payload with ``saved_geo_layer``."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        line = project._studio_geo_line(view)
+        layer = project._studio_save_geo_layer(line, values or {})
+        return self._answer(
+            project, model, view.id, view_type, saved_geo_layer=layer.id
+        )
+
+    @api.model
+    def remove_geo_layer(
+        self, project_id, layer_id, model, view_id, view_type, revision=None
+    ):
+        """Remove a layer of the GeoEngine view on screen
+        (``_studio_remove_geo_layer``)."""
+        self._check_studio_access()
+        project = self._edited_project(project_id, revision)
+        view = self._resolve_view(model, view_id, view_type, project)
+        line = project._studio_geo_line(view)
+        project._studio_remove_geo_layer(project._studio_geo_layer(line, layer_id))
         return self._answer(project, model, view.id, view_type)
 
     @api.model

@@ -524,6 +524,13 @@
             >
                 <t t-if="tab === 'changes'" t-call="erplibre_studio.Inspector.Changes" />
                 <t t-elif="props.preview" t-call="erplibre_studio.Inspector.Preview" />
+                <StudioGeoLayers
+                    t-elif="props.geoLayer"
+                    editor="editor"
+                    data="data"
+                    layerId="props.geoLayer"
+                    busy="!!props.busy"
+                />
                 <t t-else="" t-call="erplibre_studio.Inspector.Properties" />
             </div>
         </div>

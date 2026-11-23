@@ -311,28 +311,50 @@
 
     <!-- The canvas of a GeoEngine view (base_geoengine): its « info_box »
          template, the popup of a record, edited as a kanban card; the
-         fields it loads, where its geo fields go; then its layers, read
-         only. base_geoengine reads the layers from the database: the map
-         shows in the Preview once Apply created the view. -->
+         fields it loads, where its geo fields go; then its layers, each a
+         row the inspector edits, and « Add layer ». base_geoengine reads
+         the layers from the database: the map shows in the Preview once
+         Apply created the view. -->
     <t t-name="erplibre_studio.Canvas.geoengine">
         <div class="small text-muted mb-1 o_erplibre_studio_geoengine_caption">The popup of a record on the map</div>
         <t t-call="erplibre_studio.Canvas.kanban" />
         <section class="o_erplibre_studio_geo_layers mt-3" aria-label="Layers">
             <div class="small text-muted mb-1">Layers</div>
-            <ul class="list-unstyled small mb-1">
+            <ul class="list-unstyled small d-flex flex-column gap-1 mb-1">
                 <li
                     t-foreach="geoLayers"
                     t-as="layer"
                     t-key="layer.id"
-                    class="o_erplibre_studio_geo_layer"
+                    class="o_erplibre_studio_geo_layer border rounded"
+                    t-att-class="{'o_erplibre_studio_geo_layer_selected': layer.selected}"
                     t-att-data-kind="layer.kind"
+                    t-att-data-id="layer.id"
                 >
-                    <span class="fw-bold" t-esc="layer.name" />
-                    ·
-                    <span class="text-muted" t-esc="layer.description" />
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm w-100 px-2 py-1 text-start text-body text-decoration-none o_erplibre_studio_geo_layer_pick"
+                        t-att-aria-pressed="layer.selected ? 'true' : 'false'"
+                        t-att-disabled="props.busy or !geoLayersEditable"
+                        t-on-click="() => editor.selectGeoLayer(layer.id)"
+                    >
+                        <span class="fw-bold" t-esc="layer.name" />
+                        ·
+                        <span class="text-muted" t-esc="layer.description" />
+                    </button>
                 </li>
                 <li t-if="!geoLayers.length" class="text-muted">No layer</li>
             </ul>
+            <button
+                t-if="geoLayersEditable"
+                type="button"
+                class="btn btn-link btn-sm p-0 o_erplibre_studio_geo_layer_add"
+                t-att-class="{'fw-bold': props.geoLayer === 'new'}"
+                t-att-disabled="props.busy"
+                t-on-click="() => editor.selectGeoLayer('new')"
+            >
+                <i class="fa fa-plus me-1" aria-hidden="true" />
+                Add layer
+            </button>
             <div t-if="geoMapPending" class="small text-muted o_erplibre_studio_geo_pending">
                 The map shows once Apply creates the view and its layers.
             </div>
