@@ -1133,7 +1133,8 @@ describe("erplibre_studio editor, inspector", () => {
         });
         expect(".o_erplibre_studio_group_chip").toHaveCount(1);
         expect(".o_erplibre_studio_group_chip").toHaveText("Settings / Administration");
-        expect(".o_erplibre_studio_field[data-name=user_id] [data-flag=groups]").toHaveCount(1);
+        // The canvas flags the restriction at the Detailed level only.
+        expect(".o_erplibre_studio_field[data-name=user_id] [data-flag=groups]").toHaveCount(0);
         afterOperation = () => advanced();
         await contains(".o_erplibre_studio_group_remove").click();
         expect(operations.pop()).toEqual({

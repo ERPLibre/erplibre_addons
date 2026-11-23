@@ -52,47 +52,86 @@
         </div>
     </t>
 
-    <!-- The marks of the draft changes of the block a StudioBlock renders:
-         a tag per kind CHANGE_TAGS names, a dot for the other kinds or for
-         a container that holds changes. -->
-    <t t-name="erplibre_studio.Block.changes">
-        <span
-            t-foreach="changeTags"
-            t-as="tag"
-            t-key="tag.kind"
-            class="badge o_erplibre_studio_change_tag"
-            t-att-class="'o_erplibre_studio_change_tag_' + tag.kind"
-            t-att-data-kind="tag.kind"
-            t-esc="tag.label"
-        />
-        <t t-set="dot" t-value="changeDot" />
+    <!-- The dot of the margin of the block a StudioBlock renders, « dot »
+         being a {dot, label} of marginDot, or nothing: « filled » for a
+         change that adds or edits, « ring » for one that hides. It keeps its
+         tooltip: it stays out of the button of the block. -->
+    <t t-name="erplibre_studio.Block.dot">
         <span
             t-if="dot"
             role="img"
-            class="o_erplibre_studio_change_dot"
-            t-att-class="'o_erplibre_studio_change_dot_' + dot"
-            t-att-data-dot="dot"
-            t-att-aria-label="dotTitle(dot)"
-            t-att-title="dotTitle(dot)"
+            class="o_erplibre_studio_margin_dot"
+            t-att-data-dot="dot.dot"
+            t-att-aria-label="dot.label"
+            t-att-title="dot.label"
         />
     </t>
 
+    <!-- The gutter of a line: the drag handle, shown with the outline of
+         the block, and its margin dot. -->
+    <t t-name="erplibre_studio.Block.gutter">
+        <span class="o_erplibre_studio_gutter">
+            <i t-if="canDrag" class="o_erplibre_studio_handle fa fa-ellipsis-v" aria-hidden="true" />
+            <t t-call="erplibre_studio.Block.dot">
+                <t t-set="dot" t-value="marginDot" />
+            </t>
+        </span>
+    </t>
+
+    <!-- The technical marks of the block a StudioBlock renders, at the
+         Detailed level only: a tag per kind of change CHANGE_TAGS names,
+         then its flags (required, read-only…). -->
+    <t t-name="erplibre_studio.Block.marks">
+        <t t-if="detailed">
+            <span
+                t-foreach="changeTags"
+                t-as="tag"
+                t-key="tag.kind"
+                class="badge o_erplibre_studio_change_tag"
+                t-att-class="'o_erplibre_studio_change_tag_' + tag.kind"
+                t-att-data-kind="tag.kind"
+                t-esc="tag.label"
+            />
+            <span
+                t-foreach="flags"
+                t-as="flag"
+                t-key="flag_index"
+                class="badge text-bg-secondary o_erplibre_studio_flag"
+                t-att-class="{'o_erplibre_studio_tech': flag.key === 'widget'}"
+                t-att-data-flag="flag.key"
+                t-esc="flag.label"
+            />
+        </t>
+    </t>
+
     <!-- The button that selects the block a StudioBlock renders, around
-         the body of the t-call (« 0 »): the tab stop of the block. Enter or
-         Space clicks it, and the click bubbles to the div of the block.
-         The CSS lets no pointer event reach it, so a drag starts on the
-         div. « aria-keyshortcuts » names the keys the editor reads on it;
+         the body of the t-call (« 0 »): the tab stop of the block, with the
+         classes « pickClass » besides its own. Enter or Space clicks it,
+         and the click bubbles to the div of the block. The CSS lets no
+         pointer event reach it, so a drag starts on the div.
+         « aria-keyshortcuts » names the keys the editor reads on it;
          nothing shows them on screen. -->
     <t t-name="erplibre_studio.Block.pick">
         <button
             type="button"
             class="o_erplibre_studio_pick"
+            t-att-class="pickClass or ''"
             t-att-aria-pressed="isSelected ? 'true' : 'false'"
             t-att-aria-label="pickLabel"
             t-att-aria-keyshortcuts="pickShortcuts"
         >
             <t t-out="0" />
         </button>
+    </t>
+
+    <!-- A block at the Simple level as one muted line (mutedLine): its
+         ring dot, then « label hidden ». -->
+    <t t-name="erplibre_studio.Block.muted">
+        <t t-call="erplibre_studio.Block.gutter" />
+        <t t-call="erplibre_studio.Block.pick">
+            <t t-set="pickClass" t-value="'o_erplibre_studio_muted_text'" />
+            <t t-esc="mutedText" />
+        </t>
     </t>
 
     <!-- The title of a container or of another node: its tag, then its
@@ -109,11 +148,46 @@
         </t>
     </t>
 
+    <!-- The value cell of a field: the sub-list of an x2many, else a muted
+         placeholder (an empty box for a checkbox); then the lock of a field
+         the view loads, shown with the outline, and the technical marks. -->
+    <t t-name="erplibre_studio.Block.value">
+        <span class="o_erplibre_studio_line_value">
+            <t t-set="sub" t-value="subList" />
+            <span
+                t-if="sub"
+                class="o_erplibre_studio_sublist d-block border rounded small text-muted px-2 py-1"
+                t-att-data-comodel="sub.comodel"
+            >
+                <i class="fa fa-list me-1" />
+                Sub-list of
+                <span class="fw-bold" t-esc="sub.label" />
+                <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
+            </span>
+            <span
+                t-elif="isBoolean"
+                class="o_erplibre_studio_placeholder o_erplibre_studio_placeholder_check"
+                aria-hidden="true"
+            />
+            <span t-else="" class="o_erplibre_studio_placeholder" aria-hidden="true">—</span>
+            <!-- The lock keeps its tooltip: it stays out of the button. -->
+            <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
+            <t t-call="erplibre_studio.Block.marks" />
+        </span>
+    </t>
+
     <t t-name="erplibre_studio.Block">
         <div
             t-if="['field', 'widget', 'filter', 'group_by', 'separator'].includes(block.kind)"
-            class="o_erplibre_studio_field o_erplibre_studio_node d-flex flex-wrap align-items-center gap-1 rounded border px-2 py-1"
+            class="o_erplibre_studio_field o_erplibre_studio_node"
             t-att-class="{
+                'o_erplibre_studio_line': !mutedLine and layout === 'line',
+                'o_erplibre_studio_bare': !mutedLine and layout === 'bare',
+                'o_erplibre_studio_list_column': !mutedLine and layout === 'column',
+                'o_erplibre_studio_field_chip d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1': !mutedLine and layout === 'chip',
+                'o_erplibre_studio_muted_line': mutedLine,
+                'o_erplibre_studio_form_title': isTitle,
+                'o_erplibre_studio_base_invisible': baseInvisible,
                 'o_erplibre_studio_selected': isSelected,
                 'o_erplibre_studio_project_field': field.project,
                 'o_erplibre_studio_fixed': !canDrag,
@@ -128,101 +202,151 @@
             t-on-dragend="() => editor.endDrag()"
             t-on-click.stop="() => this.select()"
         >
-            <!-- The lock keeps its tooltip: it stays out of the button. -->
-            <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock text-muted" title="Loaded by the view" />
-            <t t-call="erplibre_studio.Block.pick">
-                <i t-if="canDrag" class="fa fa-arrows text-muted" aria-hidden="true" />
-                <t t-if="block.kind === 'separator'">
-                    <span class="o_erplibre_studio_label text-muted">Separator</span>
-                    <span t-if="block.attrs.string" class="fw-bold" t-esc="block.attrs.string" />
-                </t>
-                <t t-elif="block.kind === 'widget'">
-                    <i class="fa fa-bookmark text-muted" aria-hidden="true" />
-                    <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
-                    <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
-                </t>
-                <t t-else="">
-                    <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
-                    <!-- The technical bits show at the Detailed level only. -->
+            <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />
+            <t t-elif="layout === 'line' or layout === 'column'">
+                <!-- A form line or a list column: gutter, label, value. -->
+                <t t-call="erplibre_studio.Block.gutter" />
+                <t t-call="erplibre_studio.Block.pick">
+                    <t t-set="pickClass" t-value="'o_erplibre_studio_line_label'" />
+                    <span class="o_erplibre_studio_label" t-esc="block.label" />
                     <t t-if="detailed">
-                        <code t-if="block.kind === 'field'" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
-                        <code
-                            t-if="block.kind === 'filter'"
-                            class="small text-muted text-truncate o_erplibre_studio_tech"
-                            t-esc="block.domain"
-                        />
-                        <code t-if="block.kind === 'group_by'" class="small text-muted o_erplibre_studio_tech" t-esc="block.group_by" />
-                        <span
-                            t-if="field.type and block.kind === 'field'"
-                            class="badge text-bg-light o_erplibre_studio_tech"
-                            t-esc="field.type"
-                        />
+                        <code class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                        <span t-if="field.type" class="badge text-bg-light o_erplibre_studio_tech" t-esc="field.type" />
                     </t>
                 </t>
+                <t t-call="erplibre_studio.Block.value" />
             </t>
-            <t t-call="erplibre_studio.Block.changes" />
-            <span
-                t-foreach="flags"
-                t-as="flag"
-                t-key="flag_index"
-                class="badge text-bg-secondary o_erplibre_studio_flag"
-                t-att-class="{'o_erplibre_studio_tech': flag.key === 'widget'}"
-                t-att-data-flag="flag.key"
-                t-esc="flag.label"
-            />
-            <t t-set="sub" t-value="subList" />
-            <div
-                t-if="sub"
-                class="o_erplibre_studio_sublist w-100 border rounded small text-muted px-2 py-1 mt-1"
-                t-att-data-comodel="sub.comodel"
-            >
-                <i class="fa fa-list me-1" />
-                Sub-list of
-                <span class="fw-bold" t-esc="sub.label" />
-                <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
-            </div>
+            <t t-elif="layout === 'bare'">
+                <!-- A node of a form outside a group: its value only. -->
+                <t t-call="erplibre_studio.Block.gutter" />
+                <t t-call="erplibre_studio.Block.pick">
+                    <t t-set="pickClass" t-value="'o_erplibre_studio_bare_label'" />
+                    <t t-if="block.kind === 'separator'">
+                        <span class="o_erplibre_studio_label o_erplibre_studio_separator_label">
+                            <t t-if="block.attrs.string" t-esc="block.attrs.string" />
+                            <t t-else="">Separator</t>
+                        </span>
+                    </t>
+                    <t t-elif="block.kind === 'widget'">
+                        <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                        <span class="o_erplibre_studio_label" t-esc="block.attrs.title or block.label" />
+                        <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                    </t>
+                    <t t-else="">
+                        <!-- The label stands for the value, as a placeholder. -->
+                        <span class="o_erplibre_studio_label o_erplibre_studio_placeholder" t-esc="block.label" />
+                        <t t-if="detailed">
+                            <code class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                            <span t-if="field.type" class="badge text-bg-light o_erplibre_studio_tech" t-esc="field.type" />
+                        </t>
+                    </t>
+                </t>
+                <t t-if="block.kind === 'field' and subList" t-call="erplibre_studio.Block.value" />
+                <t t-else="">
+                    <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
+                    <t t-call="erplibre_studio.Block.marks" />
+                </t>
+            </t>
+            <t t-else="">
+                <!-- A card, a search view, an axis: the label in a chip. -->
+                <t t-call="erplibre_studio.Block.gutter" />
+                <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
+                <t t-call="erplibre_studio.Block.pick">
+                    <t t-if="block.kind === 'separator'">
+                        <span class="o_erplibre_studio_label text-muted">Separator</span>
+                        <span t-if="block.attrs.string" class="fw-bold" t-esc="block.attrs.string" />
+                    </t>
+                    <t t-elif="block.kind === 'widget'">
+                        <i class="fa fa-bookmark text-muted" aria-hidden="true" />
+                        <span class="o_erplibre_studio_label fw-bold" t-esc="block.attrs.title or block.label" />
+                        <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                    </t>
+                    <t t-else="">
+                        <span class="o_erplibre_studio_label fw-bold" t-esc="block.label" />
+                        <!-- The technical bits show at the Detailed level only. -->
+                        <t t-if="detailed">
+                            <code t-if="block.kind === 'field'" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
+                            <code
+                                t-if="block.kind === 'filter'"
+                                class="small text-muted text-truncate o_erplibre_studio_tech"
+                                t-esc="block.domain"
+                            />
+                            <code t-if="block.kind === 'group_by'" class="small text-muted o_erplibre_studio_tech" t-esc="block.group_by" />
+                            <span
+                                t-if="field.type and block.kind === 'field'"
+                                class="badge text-bg-light o_erplibre_studio_tech"
+                                t-esc="field.type"
+                            />
+                        </t>
+                    </t>
+                </t>
+                <t t-call="erplibre_studio.Block.marks" />
+            </t>
         </div>
         <div
             t-elif="block.tag === 'notebook'"
-            class="o_erplibre_studio_notebook border rounded p-2 my-1"
+            class="o_erplibre_studio_notebook"
+            t-att-class="{'o_erplibre_studio_selected': isSelected}"
             t-att-data-path="block.path"
         >
-            <ul class="nav nav-tabs mb-2">
-                <li class="nav-item" t-foreach="pages" t-as="page" t-key="page.path">
-                    <a
-                        href="#"
-                        class="nav-link py-1 px-2 o_erplibre_studio_page_tab"
-                        t-att-class="{'active': page === activePage}"
-                        t-att-data-path="page.path"
-                        t-on-click.prevent.stop="() => this.selectPage(page_index, page)"
-                    >
-                        <t t-esc="page.label" />
-                        <span
-                            t-if="page.changed or page.changed_inside"
-                            role="img"
-                            class="o_erplibre_studio_change_dot o_erplibre_studio_change_dot_inside ms-1"
-                            data-dot="inside"
-                            t-att-aria-label="dotTitle('inside')"
-                            t-att-title="dotTitle('inside')"
-                        />
-                    </a>
-                </li>
-                <!-- The hook of a new tab, at the end of the tabs. -->
-                <li t-if="editor.data.operations and editor.data.operations.includes('add_page')" class="nav-item o_erplibre_studio_page_hook">
-                    <t t-call="erplibre_studio.Hook">
-                        <t t-set="target" t-value="block.path" />
-                        <t t-set="position" t-value="'inside'" />
-                        <t t-set="zone" t-value="'pages'" />
+            <div class="o_erplibre_studio_notebook_head">
+                <span class="o_erplibre_studio_gutter">
+                    <t t-call="erplibre_studio.Block.dot">
+                        <t t-set="dot" t-value="notebookDot" />
                     </t>
-                </li>
-            </ul>
-            <StudioBlock t-if="activePage" block="activePage" editor="editor" viewType="props.viewType" />
+                </span>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item" t-foreach="pages" t-as="page" t-key="page.path">
+                        <a
+                            href="#"
+                            class="nav-link o_erplibre_studio_page_tab"
+                            t-att-class="{'active': page === activePage}"
+                            t-att-data-path="page.path"
+                            t-on-click.prevent.stop="() => this.selectPage(page_index, page)"
+                        >
+                            <t t-esc="page.label" />
+                            <t t-set="count" t-value="tabCount(page)" />
+                            <span
+                                t-if="count"
+                                role="img"
+                                class="o_erplibre_studio_margin_count"
+                                t-att-aria-label="tabCountLabel(count)"
+                                t-att-title="tabCountLabel(count)"
+                                t-esc="count"
+                            />
+                            <t t-if="detailed">
+                                <span
+                                    t-foreach="changeTagsOf(page)"
+                                    t-as="tag"
+                                    t-key="tag.kind"
+                                    class="badge o_erplibre_studio_change_tag"
+                                    t-att-class="'o_erplibre_studio_change_tag_' + tag.kind"
+                                    t-att-data-kind="tag.kind"
+                                    t-esc="tag.label"
+                                />
+                            </t>
+                        </a>
+                    </li>
+                    <!-- The hook of a new tab, at the end of the tabs. -->
+                    <li t-if="editor.data.operations and editor.data.operations.includes('add_page')" class="nav-item o_erplibre_studio_page_hook">
+                        <t t-call="erplibre_studio.Hook">
+                            <t t-set="target" t-value="block.path" />
+                            <t t-set="position" t-value="'inside'" />
+                            <t t-set="zone" t-value="'pages'" />
+                        </t>
+                    </li>
+                </ul>
+            </div>
+            <StudioBlock t-if="activePage" block="activePage" parent="block" editor="editor" viewType="props.viewType" />
         </div>
         <div
             t-elif="block.kind === 'container' or block.kind === 'template'"
             class="o_erplibre_studio_container"
             t-att-class="{
                 'o_erplibre_studio_row': isRow,
+                'o_erplibre_studio_button_row': isButtonRow,
+                'o_erplibre_studio_muted_line': mutedLine,
+                'o_erplibre_studio_base_invisible': baseInvisible,
                 'o_erplibre_studio_selected': isSelected,
                 'o_erplibre_studio_changed_hidden': isHiddenChange,
             }"
@@ -230,37 +354,46 @@
             t-att-data-tag="block.tag"
             t-att-data-kind="block.kind"
         >
+            <!-- Its title: a group title for a group with a « string »;
+                 else, at the Simple level, a chip that shows with its
+                 outline, or a title line for a container a change touches,
+                 whose dot sits in its gutter; the technical caption at the
+                 Detailed level. -->
             <div
                 t-if="block.kind !== 'template' and !['form', 'list', 'page', 'sheet'].includes(block.tag)"
-                class="o_erplibre_studio_container_title small text-muted"
+                class="o_erplibre_studio_container_title"
+                t-att-class="{
+                    'o_erplibre_studio_group_title': !mutedLine and groupTitle,
+                    'o_erplibre_studio_title_chip': !mutedLine and !groupTitle and !detailed and !marginDot,
+                }"
                 t-att-draggable="canDrag ? 'true' : 'false'"
                 t-on-dragstart="(ev) => this.startDrag(ev)"
                 t-on-dragend="() => editor.endDrag()"
                 t-on-click.stop="() => this.select()"
             >
-                <t t-call="erplibre_studio.Block.pick">
-                    <i t-if="canDrag" class="fa fa-arrows" aria-hidden="true" />
-                    <t t-call="erplibre_studio.Block.tagLabel" />
+                <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />
+                <t t-else="">
+                    <t t-call="erplibre_studio.Block.gutter" />
+                    <t t-call="erplibre_studio.Block.pick">
+                        <t t-set="pickClass" t-value="'o_erplibre_studio_label_chip'" />
+                        <t t-if="groupTitle" t-esc="groupTitle" />
+                        <code t-if="detailed" class="o_erplibre_studio_tech" t-esc="techCaption" />
+                        <t t-elif="!groupTitle" t-esc="titleLabel" />
+                    </t>
+                    <t t-call="erplibre_studio.Block.marks" />
                 </t>
-                <span
-                    t-foreach="flags"
-                    t-as="flag"
-                    t-key="flag_index"
-                    class="badge text-bg-secondary ms-1 o_erplibre_studio_flag"
-                    t-att-class="{'o_erplibre_studio_tech': flag.key === 'widget'}"
-                    t-att-data-flag="flag.key"
-                    t-esc="flag.label"
-                />
-                <t t-call="erplibre_studio.Block.changes" />
             </div>
-            <div class="o_erplibre_studio_children">
-                <t t-foreach="block.children" t-as="child" t-key="child.path">
+            <div t-if="!mutedLine" class="o_erplibre_studio_children">
+                <t t-foreach="drawnChildren" t-as="child" t-key="child.path">
                     <t t-if="hookBefore(child)" t-call="erplibre_studio.Hook">
                         <t t-set="target" t-value="child.path" />
                         <t t-set="position" t-value="'before'" />
                     </t>
-                    <StudioBlock block="child" editor="editor" viewType="props.viewType" />
+                    <StudioBlock block="child" parent="block" editor="editor" viewType="props.viewType" />
                 </t>
+                <p t-if="isEmptyPage" class="o_erplibre_studio_empty_hint">
+                    Empty tab. Drag a field here from the palette or the form.
+                </p>
                 <t t-if="showHooks" t-call="erplibre_studio.Hook">
                     <t t-set="target" t-value="block.path" />
                     <t t-set="position" t-value="'inside'" />
@@ -269,8 +402,14 @@
         </div>
         <div
             t-else=""
-            class="o_erplibre_studio_other small text-muted rounded px-2 py-1"
-            t-att-class="{'o_erplibre_studio_selected': isSelected, 'o_erplibre_studio_changed_hidden': isHiddenChange}"
+            class="o_erplibre_studio_other"
+            t-att-class="{
+                'o_erplibre_studio_button_chip': !mutedLine and isButtonChip,
+                'o_erplibre_studio_muted_line': mutedLine,
+                'o_erplibre_studio_base_invisible': baseInvisible,
+                'o_erplibre_studio_selected': isSelected,
+                'o_erplibre_studio_changed_hidden': isHiddenChange,
+            }"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"
             t-att-draggable="canDrag ? 'true' : 'false'"
@@ -278,19 +417,32 @@
             t-on-dragend="() => editor.endDrag()"
             t-on-click.stop="() => this.select()"
         >
-            <t t-call="erplibre_studio.Block.pick">
-                <i t-if="canDrag" class="fa fa-arrows" aria-hidden="true" />
-                <t t-if="block.tag === 'chatter'">
-                    <i class="fa fa-comments" aria-hidden="true" />
-                    Chatter: messages, followers and activities
-                    <t t-if="block.label !== block.tag">
-                        ·
-                        <t t-esc="block.label" />
-                    </t>
-                </t>
-                <t t-else="" t-call="erplibre_studio.Block.tagLabel" />
+            <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />
+            <t t-elif="block.tag === 'chatter'">
+                <!-- The chatter as the form shows it collapsed: one line. -->
+                <t t-call="erplibre_studio.Block.gutter" />
+                <button
+                    type="button"
+                    class="o_erplibre_studio_pick o_erplibre_studio_chatter_line"
+                    aria-expanded="false"
+                    t-att-aria-pressed="isSelected ? 'true' : 'false'"
+                    t-att-aria-label="pickLabel"
+                    t-att-aria-keyshortcuts="pickShortcuts"
+                >
+                    <i class="fa fa-angle-right" aria-hidden="true" />
+                    <span class="o_erplibre_studio_chatter_title" t-esc="chatterText.title" />
+                    <span class="o_erplibre_studio_chatter_state" t-esc="chatterText.state" />
+                    <span t-if="block.label !== block.tag" class="o_erplibre_studio_chatter_state" t-esc="block.label" />
+                </button>
+                <t t-call="erplibre_studio.Block.marks" />
             </t>
-            <t t-call="erplibre_studio.Block.changes" />
+            <t t-else="">
+                <t t-call="erplibre_studio.Block.gutter" />
+                <t t-call="erplibre_studio.Block.pick">
+                    <t t-call="erplibre_studio.Block.tagLabel" />
+                </t>
+                <t t-call="erplibre_studio.Block.marks" />
+            </t>
         </div>
     </t>
 

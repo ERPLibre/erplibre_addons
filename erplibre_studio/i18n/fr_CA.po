@@ -45,6 +45,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s change(s) inside"
+msgstr "%(count)s changement(s) dans le bloc"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
@@ -192,6 +198,12 @@ msgstr "%(kind)s %(name)s (%(why)s)"
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "%(label)s (%(model)s.%(name)s): %(filled)s value(s)"
 msgstr "%(label)s (%(model)s.%(name)s) : %(filled)s valeur(s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s hidden"
+msgstr "%(label)s masqué"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1859,6 +1871,12 @@ msgstr "Élément %(tag)s « %(label)s »"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Empty tab. Drag a field here from the palette or the form."
+msgstr "Onglet vide. Glissez-y un champ depuis la palette ou le formulaire."
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Field %(label)s (%(name)s)"
 msgstr "Champ %(label)s (%(name)s)"
@@ -2511,11 +2529,13 @@ msgid "Changes wait for Apply"
 msgstr "Des changements attendent Appliquer"
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__chatter
 msgid "Chatter"
-msgstr "Fil de discussion"
+msgstr "Discussion"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3691,7 +3711,6 @@ msgstr "Hiérarchie"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Holds changes of the draft"
 msgstr "Contient des changements du brouillon"
@@ -8575,6 +8594,12 @@ msgstr "changement du projet %(project)s"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change « %(change)s » of the view %(view)s (project %(project)s)"
 msgstr "modification « %(change)s » de la vue %(view)s (projet %(project)s)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "collapsed"
+msgstr "repliée"
 
 #. module: erplibre_studio
 #. odoo-javascript

@@ -26,7 +26,10 @@ const FIELDS = {
     lang: {string: "Langue préférée", type: "selection"},
 };
 
-/** A field block; ``kinds``: the kinds of the draft changes that touch it. */
+/**
+ * A field block; ``kinds``: the kinds of the draft changes that touch it,
+ * one change keyed by the name of the field.
+ */
 function field(name, kinds = [], extra = {}) {
     return {
         path: named(name),
@@ -36,7 +39,7 @@ function field(name, kinds = [], extra = {}) {
         label: FIELDS[name].string,
         attrs: {},
         movable: true,
-        changes: kinds.length ? [1] : [],
+        changes: kinds.length ? [name] : [],
         change_kinds: kinds,
         changed: kinds.length > 0,
         changed_inside: false,
@@ -225,17 +228,22 @@ describe("the outline of a view", () => {
 
 describe.current.tags("desktop");
 describe("erplibre_studio editor, plan and change marks", () => {
-    test("the canvas tags the changed fields and marks the containers that hold changes", async () => {
+    test("the canvas tags the changed fields and counts the changes of a tab not shown", async () => {
         await openEditor();
         expect(`.o_erplibre_studio_field[data-name=city] .o_erplibre_studio_change_tag[data-kind=renamed]`).toHaveCount(
             1
         );
-        // The pages: the first one shows; the tab of the second marks its changes.
-        expect(`.o_erplibre_studio_page_tab[data-path="${SALES}"] .o_erplibre_studio_change_dot`).toHaveCount(1);
-        expect(`.o_erplibre_studio_page_tab[data-path="${NOTES}"] .o_erplibre_studio_change_dot`).toHaveCount(0);
+        // The changed field carries its dot in its margin; the group that
+        // holds it carries none: one dot per change.
+        expect(`.o_erplibre_studio_field[data-name=city] .o_erplibre_studio_margin_dot[data-dot=filled]`).toHaveCount(
+            1
+        );
         expect(
-            `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title .o_erplibre_studio_change_dot[data-dot=inside]`
-        ).toHaveCount(1);
+            `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title .o_erplibre_studio_margin_dot`
+        ).toHaveCount(0);
+        // The pages: the first one shows; the tab of the second counts its changes.
+        expect(`.o_erplibre_studio_page_tab[data-path="${SALES}"] .o_erplibre_studio_margin_count`).toHaveText("2");
+        expect(`.o_erplibre_studio_page_tab[data-path="${NOTES}"] .o_erplibre_studio_margin_count`).toHaveCount(0);
         await contains(`.o_erplibre_studio_page_tab[data-path="${SALES}"]`).click();
         expect(".o_erplibre_studio_field[data-name=x_sponsor] .o_erplibre_studio_change_tag[data-kind=new]").toHaveCount(
             1
@@ -245,6 +253,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(".o_erplibre_studio_field[data-name=lang]").toHaveClass("o_erplibre_studio_changed_hidden");
         expect(".o_erplibre_studio_field[data-name=lang] .o_erplibre_studio_change_tag[data-kind=hidden]").toHaveCount(1);
         expect(".o_erplibre_studio_field[data-name=lang] .o_erplibre_studio_flag[data-flag=hidden]").toHaveCount(0);
+        expect(".o_erplibre_studio_field[data-name=lang] .o_erplibre_studio_margin_dot[data-dot=ring]").toHaveCount(1);
         // A click on the canvas selects at once, and the trail shows it.
         await contains(".o_erplibre_studio_field[data-name=user_id]").click();
         expect(".o_erplibre_studio_field[data-name=user_id]").toHaveClass("o_erplibre_studio_selected");
@@ -387,6 +396,12 @@ describe("erplibre_studio editor, plan and change marks", () => {
     });
 
     test("a container title and the chatter are buttons too", async () => {
+        // The group itself changed: its dot sits in the gutter of its title.
+        Object.assign(answer.blocks.children[0].children[0], {
+            changes: ["address"],
+            change_kinds: ["attribute"],
+            changed: true,
+        });
         answer.blocks.children.push({
             path: "/form/chatter",
             tag: "chatter",
@@ -403,9 +418,12 @@ describe("erplibre_studio editor, plan and change marks", () => {
         const title = `.o_erplibre_studio_container[data-path="${ADDRESS}"] > .o_erplibre_studio_container_title`;
         const chatter = ".o_erplibre_studio_other[data-tag=chatter]";
         expect(`${title} > .o_erplibre_studio_pick`).toHaveAttribute("aria-label", "Container Group « Address »");
-        // The dot of the changes inside keeps its tooltip: out of the button.
-        expect(`${title} > .o_erplibre_studio_change_dot`).toHaveCount(1);
-        expect(`${title} .o_erplibre_studio_pick .o_erplibre_studio_change_dot`).toHaveCount(0);
+        // The dot of its change keeps its tooltip: out of the button.
+        expect(`${title} > .o_erplibre_studio_gutter > .o_erplibre_studio_margin_dot`).toHaveAttribute(
+            "title",
+            "edited"
+        );
+        expect(`${title} .o_erplibre_studio_pick .o_erplibre_studio_margin_dot`).toHaveCount(0);
         expect(`${chatter} > .o_erplibre_studio_pick`).toHaveAttribute(
             "aria-label",
             "Chatter: messages, followers and activities"

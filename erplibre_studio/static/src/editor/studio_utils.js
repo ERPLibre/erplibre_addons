@@ -310,6 +310,36 @@ export function findBlock(root, predicate) {
     return null;
 }
 
+/**
+ * The keys of the draft changes that touch a block under ``block``, its
+ * own left out: the union of the ``changes`` of its descendants, each key
+ * once, in the order of the tree.
+ */
+export function changeKeysInside(block) {
+    const keys = [];
+    for (const child of (block && block.children) || []) {
+        for (const descendant of allBlocks(child)) {
+            for (const key of descendant.changes || []) {
+                if (!keys.includes(key)) {
+                    keys.push(key);
+                }
+            }
+        }
+    }
+    return keys;
+}
+
+/**
+ * Whether the arch the draft starts from always hides ``block``: a
+ * constant true « invisible » that no change of the draft wrote (a node the
+ * draft hides carries the change kind « hidden »). A condition is no
+ * constant: the node shows for some records.
+ */
+export function isBaseInvisible(block) {
+    const attrs = (block && block.attrs) || {};
+    return isTrue(attrs.invisible) && !(block.change_kinds || []).includes("hidden");
+}
+
 /** Every block of the tree ``root``, depth first. */
 export function allBlocks(root) {
     const blocks = [];

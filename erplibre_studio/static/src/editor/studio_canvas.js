@@ -27,12 +27,14 @@ import {
     canDragBlock,
     canRemoveBlock,
     canSelectBlock,
+    changeKeysInside,
     changeKindLabel,
     columnLabel,
     endHook,
     findBlock,
     graphLaneLabel,
     graphLanes,
+    isBaseInvisible,
     isTrue,
     pivotLanes,
     searchColumns,
@@ -54,13 +56,27 @@ import {
  * bubbles to the ``t-on-click.stop`` of the div, which selects. The
  * button takes no pointer event (CSS), so the mouse lands on the div: a
  * mousedown on a ``<button>`` starts no drag in Firefox. What carries a
- * tooltip (the lock, the change dot) stays outside the button. The editor
+ * tooltip (the lock, the margin dot) stays outside the button. The editor
  * reads the other keys of the button (``onCanvasKey``): Alt+Up and
  * Alt+Down move the block, Delete removes it, Escape unselects.
+ *
+ * The canvas of a form draws the form as the web client does: a field of a
+ * group is a line « gutter | label | value », a field elsewhere its value
+ * only. A change of the draft is one dot in the gutter; its tags and the
+ * flags of the block show at the Detailed level. The outline, the drag
+ * handle and the label chip of a block show on hover, on focus, on the
+ * selection and during a drag (CSS).
  */
 export class StudioBlock extends Component {
     static template = "erplibre_studio.Block";
-    static props = {block: Object, editor: Object, viewType: String};
+    static props = {
+        block: Object,
+        editor: Object,
+        viewType: String,
+        // The block the block is a child of, when there is one: a field
+        // of a group draws as a form line, a button of a header as a chip.
+        parent: {type: [Object, {value: null}], optional: true},
+    };
 
     setup() {
         this.editorState = useState(this.props.editor.state);
@@ -163,6 +179,171 @@ export class StudioBlock extends Component {
         return Boolean(this.block.drop) && !this.isRow;
     }
 
+    get parentTag() {
+        return (this.props.parent && this.props.parent.tag) || "";
+    }
+
+    /**
+     * How a field block draws: « line » for a field of a group of a form
+     * (gutter, label, value), « bare » for another node of a form (its
+     * value only), « column » for a column of a list (its header, a cell
+     * under it), « chip » for the others (a card, a search view, an axis).
+     */
+    get layout() {
+        const kind = this.block.kind;
+        if (this.props.viewType === "form") {
+            return kind === "field" && this.parentTag === "group" ? "line" : "bare";
+        }
+        return this.props.viewType === "list" && kind === "field" ? "column" : "chip";
+    }
+
+    /** Whether the field is the title of a form: the field of an <h1>. */
+    get isTitle() {
+        return ["h1", "h2"].includes(this.parentTag);
+    }
+
+    /** Whether the value placeholder looks like an empty checkbox. */
+    get isBoolean() {
+        return this.field.type === "boolean";
+    }
+
+    /**
+     * Whether a button draws as a flat chip: a button of a header or of the
+     * box of the smart buttons of a form.
+     */
+    get isButtonChip() {
+        const parent = this.props.parent;
+        return (
+            this.block.tag === "button" && Boolean(parent) && (parent.tag === "header" || parent.label === "button_box")
+        );
+    }
+
+    /** Whether the children of the container line up: a header, the box of the smart buttons. */
+    get isButtonRow() {
+        return this.props.viewType === "form" && (this.block.tag === "header" || this.block.label === "button_box");
+    }
+
+    /**
+     * The dot of the margin of the block: {dot, label}, « filled » for a
+     * block the draft adds or changes, « ring » for one it hides; the label
+     * joins the kinds of its changes (``changeKindLabel``). Null for a
+     * block no change touches.
+     */
+    get marginDot() {
+        return this.dotOf(this.block.change_kinds || []);
+    }
+
+    /** The margin dot of the change kinds ``kinds``, or null (marginDot). */
+    dotOf(kinds) {
+        if (!kinds.length) {
+            return null;
+        }
+        return {
+            dot: kinds.includes("hidden") ? "ring" : "filled",
+            label: kinds.map(changeKindLabel).join(", "),
+        };
+    }
+
+    /**
+     * The margin dot of a notebook: its own changes and those of its pages
+     * themselves (a new tab, a renamed one), which have no gutter of their
+     * own.
+     */
+    get notebookDot() {
+        const kinds = new Set(this.block.change_kinds || []);
+        for (const page of this.pages) {
+            for (const kind of page.change_kinds || []) {
+                kinds.add(kind);
+            }
+        }
+        return this.dotOf([...kinds]);
+    }
+
+    /**
+     * The number of the changes under the page ``page`` of a notebook,
+     * when its tab is not the one shown (``changeKeysInside``); 0 for the
+     * tab shown, whose blocks carry their own dots.
+     */
+    tabCount(page) {
+        return page === this.activePage ? 0 : changeKeysInside(page).length;
+    }
+
+    tabCountLabel(count) {
+        return _t("%(count)s change(s) inside", {count});
+    }
+
+    /** Whether the arch the draft starts from always hides the block (``isBaseInvisible``). */
+    get baseInvisible() {
+        return this.props.viewType === "form" && isBaseInvisible(this.block);
+    }
+
+    /**
+     * Whether the block draws as one muted line at the Simple level: a
+     * block the draft hides, or the selection when the form never shows
+     * it.
+     */
+    get mutedLine() {
+        return !this.detailed && (this.isHiddenChange || (this.baseInvisible && this.isSelected));
+    }
+
+    /** The text of the muted line (mutedLine). */
+    get mutedText() {
+        return _t("%(label)s hidden", {label: this.titleLabel});
+    }
+
+    /** The label a block shows: a widget its title, another node its label or tag. */
+    get titleLabel() {
+        const block = this.block;
+        if (block.kind === "widget") {
+            return (block.attrs && block.attrs.title) || block.label;
+        }
+        if (block.label && block.label !== block.tag) {
+            return block.label;
+        }
+        return tagLabel(block.tag);
+    }
+
+    /**
+     * Whether the child ``child`` draws on the canvas: at the Simple level
+     * a form does not draw a node its arch always hides (isBaseInvisible),
+     * as the web client does, unless it holds the selection. The plan
+     * lists it all the same.
+     */
+    isDrawn(child) {
+        if (this.detailed || this.props.viewType !== "form" || !isBaseInvisible(child)) {
+            return true;
+        }
+        const selected = this.editorState.selected;
+        return Boolean(selected) && Boolean(findBlock(child, (b) => b.path === selected));
+    }
+
+    /** The children of the block the canvas draws (isDrawn). */
+    get drawnChildren() {
+        return (this.block.children || []).filter((child) => this.isDrawn(child));
+    }
+
+    /** The title of a group: its « string », as a form shows it. */
+    get groupTitle() {
+        const attrs = this.block.attrs || {};
+        return this.block.tag === "group" ? attrs.string || "" : "";
+    }
+
+    /**
+     * The technical caption of a container at the Detailed level:
+     * « <group> label », the label left out when it is the tag or the
+     * group title.
+     */
+    get techCaption() {
+        const block = this.block;
+        const own = block.label && block.label !== block.tag && block.label !== this.groupTitle;
+        return own ? `<${block.tag}> ${block.label}` : `<${block.tag}>`;
+    }
+
+    /** Whether the block is a page without children: it shows a hint. */
+    get isEmptyPage() {
+        return this.block.tag === "page" && !(this.block.children || []).length;
+    }
+
     /**
      * Whether a hook goes before ``child``: never inside a t-if chain,
      * whose nodes must stay next to each other.
@@ -222,29 +403,18 @@ export class StudioBlock extends Component {
      * they touch (``change_kinds``).
      */
     get changeTags() {
-        const kinds = this.block.change_kinds || [];
+        return this.changeTagsOf(this.block);
+    }
+
+    /** The tags of the draft changes of ``block`` (changeTags). */
+    changeTagsOf(block) {
+        const kinds = block.change_kinds || [];
         return CHANGE_TAGS.filter((kind) => kinds.includes(kind)).map((kind) => ({kind, label: changeKindLabel(kind)}));
     }
 
-    /**
-     * The dot of the block: « changed » for a change of another kind than
-     * the tags show (moved, an attribute), « inside » for a block under
-     * which a block changed, else null.
-     */
-    get changeDot() {
-        const block = this.block;
-        if (block.changed && !this.changeTags.length) {
-            return "changed";
-        }
-        return block.changed_inside ? "inside" : null;
-    }
-
-    /** The title of a change dot. */
-    dotTitle(dot) {
-        if (dot === "inside") {
-            return _t("Holds changes of the draft");
-        }
-        return (this.block.change_kinds || []).map(changeKindLabel).join(", ");
+    /** The texts of the line of a collapsed chatter. */
+    get chatterText() {
+        return {title: _t("Chatter"), state: _t("collapsed")};
     }
 
     /** Whether the hidden tag of the block marks a node the draft hides. */

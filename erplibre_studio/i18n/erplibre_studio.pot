@@ -43,6 +43,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s change(s) inside"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
@@ -181,6 +187,12 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "%(label)s (%(model)s.%(name)s): %(filled)s value(s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s hidden"
 msgstr ""
 
 #. module: erplibre_studio
@@ -1836,6 +1848,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+msgid "Empty tab. Drag a field here from the palette or the form."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.xml:0
 msgid "End color"
 msgstr ""
@@ -2527,8 +2545,10 @@ msgid "Changes wait for Apply"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__chatter
 msgid "Chatter"
 msgstr ""
@@ -3680,7 +3700,6 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Holds changes of the draft"
 msgstr ""
@@ -8407,6 +8426,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "change « %(change)s » of the view %(view)s (project %(project)s)"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "collapsed"
 msgstr ""
 
 #. module: erplibre_studio
