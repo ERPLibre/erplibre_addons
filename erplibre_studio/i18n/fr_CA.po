@@ -1193,6 +1193,16 @@ msgid "Add a level to %(app)s"
 msgstr "Ajouter un niveau à %(app)s"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid ""
+"Add a many2one field first: the properties are defined on the record it "
+"points to."
+msgstr ""
+"Ajoutez d'abord un champ many2one : les propriétés se définissent sur "
+"l'enregistrement qu'il désigne."
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__add_field
 msgid "Add a new field"
 msgstr "Ajout d'un nouveau champ"
@@ -1658,6 +1668,7 @@ msgstr "Type de graphique"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
 msgstr "Vérification…"
@@ -1701,6 +1712,12 @@ msgstr "Conteneur %(tag)s « %(label)s »"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+msgid "Create %(label)s"
+msgstr "Créer %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr "Ordre de création"
@@ -1710,6 +1727,12 @@ msgstr "Ordre de création"
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Cumulative"
 msgstr "Cumulatif"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Defined on %(target)s through %(field)s"
+msgstr "Défini sur %(target)s par %(field)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2005,6 +2028,12 @@ msgstr "Multipolygone"
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Multi-polyline"
 msgstr "Multipolyligne"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "New properties field"
+msgstr "Nouveau champ de propriétés"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2365,6 +2394,7 @@ msgstr "Peut %(rights)s les enregistrements de %(model)s."
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
@@ -2660,6 +2690,7 @@ msgstr "Confirmation"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 msgid "Container"
 msgstr "Conteneur"
 
@@ -2673,6 +2704,7 @@ msgstr "Contenu"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__perm_create
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__perm_create
@@ -3884,6 +3916,7 @@ msgstr "Sorte"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__name
 msgid "Label"
@@ -4001,6 +4034,7 @@ msgstr "Chargé par la vue"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
@@ -4800,6 +4834,7 @@ msgstr "OU"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "On"
 msgstr "Sur"
@@ -5196,6 +5231,8 @@ msgstr "Projets"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Properties"
 msgstr "Propriétés"
 
@@ -6090,6 +6127,7 @@ msgstr "Onglets"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__module_name
 msgid "Technical name"
@@ -6759,6 +6797,12 @@ msgid ""
 msgstr ""
 "Le many2one %(container)s du champ de propriétés %(name)s ne pointe plus "
 "vers %(model)s."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "The many2one whose record holds the list of properties."
+msgstr "Le many2one dont l'enregistrement porte la liste des propriétés."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8195,6 +8239,12 @@ msgstr "Où mettre le menu"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+msgid "Where the properties are defined on %(model)s"
+msgstr "Où les propriétés se définissent sur %(model)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
 msgid ""
 "While it renders, a statement of the real preview waits 2 s at most for a "
@@ -8632,6 +8682,7 @@ msgstr "name asc, id desc"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "new"

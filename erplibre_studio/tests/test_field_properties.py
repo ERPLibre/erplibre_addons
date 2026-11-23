@@ -212,6 +212,28 @@ class TestFieldProperties(StudioCase):
         names = [node.get("name") for node in arch.xpath(f"{VAT}/following::field")]
         self.assertEqual(names[:2], [container, name])
 
+    def test_undo_removes_the_field_and_its_container(self):
+        container = "commercial_partner_id"
+        change = self.add(
+            definition_record=container,
+            definition_new={"name": "x_studio_definitions"},
+        )
+        name = change.field_name
+        arch = self.draft(self.project, self.form)
+        self.assertTrue(arch.xpath(f"//field[@name='{container}']"))
+        self.assertTrue(arch.xpath(f"//field[@name='{name}']"))
+        # One change brings both nodes: undo takes both away, and the
+        # definition field the change creates on the comodel.
+        self.project.action_undo(self.form)
+        self.assertFalse(change.exists())
+        arch = self.draft(self.project, self.form)
+        self.assertFalse(arch.xpath(f"//field[@name='{container}']"))
+        self.assertFalse(arch.xpath(f"//field[@name='{name}']"))
+        self.assertNotIn(
+            "x_studio_definitions",
+            self.project._studio_field_definitions("res.partner"),
+        )
+
     def test_drop_in_a_sub_view_is_refused(self):
         form = self.make_view(
             "form",

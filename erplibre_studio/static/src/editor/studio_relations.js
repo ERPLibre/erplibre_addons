@@ -13,11 +13,13 @@ import {GEO_TYPES} from "./studio_utils";
 export const X2MANY_TYPES = ["one2many", "many2many"];
 // The view types a new field of each type goes in (FIELD_TYPE_VIEW_TYPES of
 // the server); a type missing from the map goes in every view. A JSON field
-// shows read-only in a form or a list.
+// shows read-only in a form or a list, a properties field in a form, beside
+// the many2one it reads their definition through.
 export const FIELD_TYPE_VIEW_TYPES = {
     one2many: ["form"],
     many2many: ["form", "list", "kanban"],
     json: ["form", "list"],
+    properties: ["form"],
 };
 
 // The new field types a map creates from its lanes (LEAFLET_NEW_FIELD_TYPES

@@ -1147,6 +1147,14 @@ msgid "Add a level to %(app)s"
 msgstr ""
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid ""
+"Add a many2one field first: the properties are defined on the record it "
+"points to."
+msgstr ""
+
+#. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_change__change_type__add_field
 msgid "Add a new field"
 msgstr ""
@@ -1624,6 +1632,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_field_name.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "Checking…"
 msgstr ""
@@ -1685,6 +1694,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+msgid "Create %(label)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Creation order"
 msgstr ""
@@ -1693,6 +1708,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Cumulative"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Defined on %(target)s through %(field)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2018,6 +2039,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_geo_layers.js:0
 msgid "New layer"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "New properties field"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2383,6 +2410,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
@@ -2669,6 +2697,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 msgid "Container"
 msgstr ""
 
@@ -2682,6 +2711,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_access__perm_create
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__perm_create
@@ -3870,6 +3900,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__name
 msgid "Label"
@@ -3987,6 +4018,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
@@ -4767,6 +4799,7 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "On"
 msgstr ""
@@ -5159,6 +5192,8 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Properties"
 msgstr ""
 
@@ -6051,6 +6086,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__model
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__module_name
 msgid "Technical name"
@@ -6676,6 +6712,12 @@ msgstr ""
 msgid ""
 "The many2one %(container)s of the properties field %(name)s no longer points"
 " to %(model)s."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
+msgid "The many2one whose record holds the list of properties."
 msgstr ""
 
 #. module: erplibre_studio
@@ -8037,6 +8079,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.js:0
+msgid "Where the properties are defined on %(model)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_preview.xml:0
 msgid ""
 "While it renders, a statement of the real preview waits 2 s at most for a "
@@ -8467,6 +8515,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "new"

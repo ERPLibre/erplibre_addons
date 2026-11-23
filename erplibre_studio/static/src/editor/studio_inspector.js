@@ -433,6 +433,19 @@ export class StudioInspector extends Component {
         return selectionToText((field.definition && field.definition.selection) || field.selection);
     }
 
+    /**
+     * Where the new properties field ``field`` reads its definition:
+     * « Defined on <comodel>.<definition field> through <many2one> ». It
+     * never changes once the field is in the draft.
+     */
+    propertiesSource(field) {
+        const definition = field.definition || {};
+        return _t("Defined on %(target)s through %(field)s", {
+            target: `${definition.relation}.${definition.definition_record_field}`,
+            field: definition.definition_record,
+        });
+    }
+
     // ── the header of the properties ────────────────────────────────────
 
     /** The glyph of ``block``, as the plan shows it. */

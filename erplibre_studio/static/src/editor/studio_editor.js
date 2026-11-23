@@ -25,6 +25,7 @@ import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
 import {StudioReview} from "./studio_review";
 import {LANE_ZONE_PREFIX, VIEW_LANES, laneLabel, laneOf, laneOfZone, writableColorRules} from "./studio_timeline";
+import {StudioPropertiesDialog} from "./studio_properties";
 import {StudioRelationDialog, X2MANY_TYPES, fieldTypeFits} from "./studio_relations";
 import {
     DATE_TYPES,
@@ -1059,6 +1060,12 @@ export class StudioEditor extends Component {
             this.openFilterForm(target, position, item.name);
             return;
         }
+        if (item.kind === "new" && item.ttype === "properties") {
+            // A properties field needs its many2one and where its
+            // properties are defined.
+            await this.openPropertiesDialog(target, position);
+            return;
+        }
         if (item.kind === "new" && X2MANY_TYPES.includes(item.ttype)) {
             // A relation needs its comodel, and its inverse or its table.
             await this.openRelationDialog(item.ttype, target, position);
@@ -1172,8 +1179,12 @@ export class StudioEditor extends Component {
                 return data;
             }
         } else if (item.kind === "new") {
-            const name = Object.keys(data.fields).find((n) => !before.has(n));
-            block = name && this.fieldBlock(data.blocks, name);
+            // The first new field the view shows: a field may come with
+            // another one created on its model, outside the view.
+            block = Object.keys(data.fields)
+                .filter((n) => !before.has(n))
+                .map((n) => this.fieldBlock(data.blocks, n))
+                .find(Boolean);
         } else if (item.name && ["add_existing_field", "move"].includes(operation.type)) {
             block = this.fieldBlock(data.blocks, item.name);
         }
@@ -1294,6 +1305,27 @@ export class StudioEditor extends Component {
             projectModels: this.projectModels.map((m) => m.model),
             loadChoices: (comodel, label) =>
                 this.orm.call(MODEL, "get_relation_choices", [projectId, model, comodel, ttype], {label}),
+            save: async (field) =>
+                Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
+            checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
+        });
+    }
+
+    /**
+     * The dialog of a new properties field dropped on the hook ``target`` /
+     * ``position``: Create adds it there, with its many2one when the view
+     * lacks it.
+     */
+    openPropertiesDialog(target, position) {
+        if (!this.project) {
+            return;
+        }
+        const projectId = this.project.id;
+        const model = this.params.resModel;
+        this.dialog.add(StudioPropertiesDialog, {
+            model,
+            modelLabel: this.data.model_name || model,
+            loadChoices: () => this.orm.call(MODEL, "get_properties_choices", [projectId, model]),
             save: async (field) =>
                 Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
             checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),

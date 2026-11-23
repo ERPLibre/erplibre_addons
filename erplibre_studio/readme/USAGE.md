@@ -7,6 +7,10 @@
 3. Drag a field to move it; drag a field type or an existing field from
    the left onto a drop zone to add it. Click a field to edit its
    properties on the right. **Undo** removes the last change of the view.
+   **Properties**, among the other types of a form, asks the many2one
+   whose record holds the properties, then where they are defined on its
+   comodel: an existing properties definition field, or one the studio
+   creates; the many2one lands beside the field when the form lacks it.
    In a search view, **New filter** builds a filter from a field, an
    operator and a value; the interval of the palette applies to a date
    field dropped on the group-by column or on a pivot axis. In a pivot
