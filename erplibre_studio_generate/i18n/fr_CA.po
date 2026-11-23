@@ -430,6 +430,12 @@ msgstr "application %(app)s, groupes : %(groups)s"
 #. module: erplibre_studio_generate
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
+msgid "definition %(definition)s"
+msgstr "définition %(definition)s"
+
+#. module: erplibre_studio_generate
+#. odoo-python
+#: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "every user"
 msgstr "tous les utilisateurs"
 

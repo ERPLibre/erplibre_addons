@@ -971,7 +971,9 @@ class ErplibreStudioProject(models.Model):
 
     def _readme_field(self, definition):
         """The type and label of a new field in the readme, with its relation:
-        the comodel, the inverse of a one2many, the table of a many2many."""
+        the comodel, the inverse of a one2many, the table of a many2many, the
+        many2one and the properties definition field a properties field
+        reads its definition from."""
         text = f"{definition['ttype']}, {definition['field_description']}"
         ttype = definition["ttype"]
         if ttype in ("many2one", "one2many", "many2many"):
@@ -983,6 +985,12 @@ class ErplibreStudioProject(models.Model):
         elif ttype == "many2many":
             text += ", " + self.env._(
                 "table %(table)s", table=f"`{definition['relation_table']}`"
+            )
+        elif ttype == "properties":
+            text += ", " + self.env._(
+                "definition %(definition)s",
+                definition=f"`{definition['definition_record']}."
+                f"{definition['definition_record_field']}`",
             )
         return text
 

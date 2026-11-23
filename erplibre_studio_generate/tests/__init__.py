@@ -5,6 +5,7 @@ from . import (
     test_generate_j4,
     test_generate_json,
     test_generate_models,
+    test_generate_properties,
     test_generate_views,
     test_project_generate,
     test_unprefixed_models,

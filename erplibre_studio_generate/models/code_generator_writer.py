@@ -37,6 +37,7 @@ from lxml import etree
 from odoo import models
 from odoo.exceptions import UserError
 from odoo.addons.code_generator import code_generator_data
+from odoo.addons.code_generator.models.code_generator_writer import py_str
 from odoo.addons.erplibre_studio import arch as studio_arch
 from odoo.addons.erplibre_studio.models.erplibre_studio_project import (
     FIELD_OPTIONS,
@@ -70,10 +71,12 @@ class PayloadField:
     field, the options its type takes (translatable, indexed, maximum size
     of FIELD_OPTIONS), the relation of a relational field (the inverse
     of a one2many, the table and columns of a many2many, what a many2one
-    does when its record is deleted), and the default of a field of an
-    option of a model: a constant (a text, as ir.model.fields holds it) or
-    the source of a lambda, which the class writes as it is. Every other
-    attribute is the record's."""
+    does when its record is deleted), the ``definition`` of a properties
+    field (« many2one.field »: the many2one of its model, then the
+    properties definition field of the comodel), and the default of a
+    field of an option of a model: a constant (a text, as ir.model.fields
+    holds it) or the source of a lambda, which the class writes as it is.
+    Every other attribute is the record's."""
 
     def __init__(self, record, definition):
         self._record = record
@@ -110,6 +113,15 @@ class PayloadField:
         elif ttype == "many2many" and definition.get("relation_table"):
             for key in ("relation_table", "column1", "column2"):
                 self._values[key] = definition[key]
+        elif ttype == "properties":
+            self._values["definition"] = (
+                f"{definition.get('definition_record')}."
+                f"{definition.get('definition_record_field')}"
+            )
+
+    def properties_definition(self):
+        """The ``definition`` of a properties field, else None."""
+        return self._values.get("definition")
 
     def __getattr__(self, name):
         if name in self._values:
@@ -275,9 +287,39 @@ class CodeGeneratorWriter(models.Model):
             definitions.update(self._studio_option_fields(project, f2export.model))
             if f2export.name in definitions:
                 f2export = PayloadField(f2export, definitions[f2export.name])
-        return super()._generate_field_from_model(
+        result = super()._generate_field_from_model(
             f2export, model_name, lst_field_inherit, dct_field_attr_diff
         )
+        if isinstance(f2export, PayloadField) and result[3]:
+            result = self._studio_properties_attributes(f2export, *result)
+        return result
+
+    @staticmethod
+    def _studio_properties_attributes(f2export, attributes, *rest):
+        """The writer's result for ``f2export`` (attributes, has_endline,
+        compute, ok), whose attributes, for a properties field, begin with
+        its ``definition``, which the writer does not write, and end with
+        ``copy=True``: a custom field is copied (``ir.model.fields.copied``),
+        a ``fields.Properties`` is not by default."""
+        definition = f2export.properties_definition()
+        if not definition:
+            return (attributes, *rest)
+        attributes = [
+            f"definition={py_str(definition)}",
+            *(a for a in attributes if not a.startswith(("definition=", "copy="))),
+            "copy=True",
+        ]
+        return (attributes, *rest)
+
+    def _get_compute_fct(self, field_id):
+        """None for a properties field of a studio project: the registry
+        field is computed from its ``definition`` by ``fields.Properties``
+        itself (``_compute``, a method of the field, not of the model),
+        which the writer would otherwise write as « compute=<bound
+        method> » with « store=True »."""
+        if field_id.ttype == "properties" and self._studio_project():
+            return None
+        return super()._get_compute_fct(field_id)
 
     def _set_model_py_file(self, module, model, model_model):
         """Under a studio project, an extended model loses the attributes
