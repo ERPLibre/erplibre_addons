@@ -4,4 +4,5 @@ from . import test_requirement_control
 from . import test_requirement_inventory
 from . import test_requirement_monitoring
 from . import test_requirement_upgrade
+from . import test_streamdeck_identifying_data
 from . import test_streamdeck_requirement_data
