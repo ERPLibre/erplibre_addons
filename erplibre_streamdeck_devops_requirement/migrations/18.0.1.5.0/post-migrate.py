@@ -43,7 +43,8 @@ REWRITTEN = {
     ),
     # The proofs whose test ERPLibre or the extension renamed or moved,
     # and the requirements whose proof is gone: those are to do again,
-    # their missing work named.
+    # their missing work named. A requirement whose name cites a constant
+    # or a file the code no longer has takes the name of the file.
     "data/devops_requirement_test.xml": (
         "test_sd_bundle_r01b_1",
         "test_sd_deploy_r29_1",
@@ -54,7 +55,6 @@ REWRITTEN = {
         "test_sd_grepo_r40_1",
         "test_sd_grepo_r40_2",
         "test_sd_grepo_r42_2",
-        "test_sd_grepo_r43_1",
         "test_sd_grepo_r44_1",
         "test_sd_grepo_r47_1",
         "test_sd_grepo_r48_1",
@@ -81,6 +81,7 @@ REWRITTEN = {
         "req_sd_grepo_r40",
         "req_sd_grepo_r41",
         "req_sd_grepo_r42",
+        "req_sd_grepo_r43",
         "req_sd_grepo_r44",
         "req_sd_grepo_r45",
         "req_sd_grepo_r46",
@@ -100,13 +101,14 @@ REWRITTEN = {
         "req_sd_grepo_r76",
         "req_sd_grepo_r88",
         "req_sd_plugin_r88",
+        "req_sd_rename_r28",
         "req_sd_service_r61",
     ),
 }
 
 # XML ids of the proofs whose test no longer exists in any repository,
-# removed from the data files: an upgrade does not delete a noupdate
-# record on its own.
+# or does not prove its requirement, removed from the data files: an
+# upgrade does not delete a noupdate record on its own.
 DELETED = (
     "test_sd_bundle_r05_1",
     "test_sd_bundle_r05_2",
@@ -118,6 +120,7 @@ DELETED = (
     "test_sd_grepo_r40_3",
     "test_sd_grepo_r41_1",
     "test_sd_grepo_r42_1",
+    "test_sd_grepo_r43_1",
     "test_sd_grepo_r45_1",
     "test_sd_grepo_r46_1",
     "test_sd_grepo_r46_2",

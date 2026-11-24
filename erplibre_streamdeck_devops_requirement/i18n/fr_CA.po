@@ -2213,15 +2213,6 @@ msgstr ""
 ".venv.streamdeck/bin/python"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r28
-msgid ""
-"CONTROLLER_REL in lib/deck-service.js stays the checkout-relative path "
-"script/stream_deck/erplibre_controller.py"
-msgstr ""
-"CONTROLLER_REL de lib/deck-service.js reste le chemin "
-"script/stream_deck/erplibre_controller.py, relatif à la racine du checkout"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r13
 msgid ""
 "Cache data lives under ~/.cache/erplibre-home/; erplibre_controller.py and "
@@ -6322,6 +6313,15 @@ msgstr ""
 "deck et de surcharges par poste"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_rename_r28
+msgid ""
+"The controller lib/deck-service.js opens is a file of the checkout, at the "
+"path deckPaths() of lib/deck-layout.js settles on"
+msgstr ""
+"Le contrôleur qu'ouvre lib/deck-service.js est un fichier du checkout, au "
+"chemin que retient deckPaths() de lib/deck-layout.js"
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r32
 msgid "The controller's Open prefs item opens the preferences window"
 msgstr ""
@@ -9767,8 +9767,12 @@ msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r56
-msgid "venv step: pip install -r script/stream_deck/requirements.txt"
-msgstr "Étape du venv : pip install -r script/stream_deck/requirements.txt"
+msgid ""
+"venv step: pip install -r script/stream_deck/deck/requirements.txt, the "
+"requirements of the deck clone"
+msgstr ""
+"Étape du venv : pip install -r script/stream_deck/deck/requirements.txt, "
+"les dépendances du clone du deck"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r121

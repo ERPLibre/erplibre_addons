@@ -354,6 +354,62 @@ class TestRequirementUpgrade(TransactionCase):
             self._in_file("req_sd_grepo_r41", "missing", REQUIREMENTS),
         )
 
+    def test_an_upgrade_to_1_5_renames_what_the_code_no_longer_names(self):
+        # Un requis qui nomme une constante ou un fichier que le code n'a
+        # plus prend le nom du fichier, dans les deux langues ; un requis
+        # fait dont la seule preuve ne le prouvait pas redevient à faire.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        renamed = self.env.ref("%s.req_sd_rename_r28" % MODULE)
+        renamed.with_context(lang="en_US").write(
+            {"name": "CONTROLLER_REL in lib/deck-service.js stays"}
+        )
+        renamed.with_context(lang="fr_CA").write(
+            {"name": "CONTROLLER_REL de lib/deck-service.js reste"}
+        )
+        reset = self.env.ref("%s.req_sd_grepo_r43" % MODULE)
+        reset.write(
+            {
+                "done": True,
+                "missing": False,
+                "notes": "Origin: unit test missing; a unit test pins it.",
+            }
+        )
+        self.assertFalse(self._carried("test_sd_grepo_r43_1"))
+        unproven = self.env["devops.requirement.test"].create(
+            {
+                "requirement_id": reset.id,
+                "kind": "repo_unittest",
+                "reference": "erplibre:test/test_install_erplibre_home.py"
+                "::TestPoseParRepo::test_a_synced_checkout_follows_main",
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "module": MODULE,
+                "name": "test_sd_grepo_r43_1",
+                "model": unproven._name,
+                "res_id": unproven.id,
+                "noupdate": True,
+            }
+        )
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        name = self._in_file("req_sd_rename_r28", "name", REQUIREMENTS)
+        self.assertEqual(renamed.with_context(lang="en_US").name, name)
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        self.assertEqual(renamed.with_context(lang="fr_CA").name, french[name])
+        self.assertFalse(unproven.exists())
+        self.assertFalse(reset.done)
+        for field in ("missing", "notes"):
+            self.assertEqual(
+                reset[field],
+                self._in_file("req_sd_grepo_r43", field, REQUIREMENTS),
+            )
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

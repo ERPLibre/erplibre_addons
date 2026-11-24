@@ -4247,12 +4247,6 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout</field>
     </record>
-    <record id="test_sd_grepo_r43_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r43" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_synced_checkout_follows_main</field>
-    </record>
     <record id="test_sd_grepo_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r44" />
         <field name="sequence" eval="10" />
