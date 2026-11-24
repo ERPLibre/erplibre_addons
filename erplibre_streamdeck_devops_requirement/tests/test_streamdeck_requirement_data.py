@@ -177,7 +177,7 @@ class TestStreamdeckRequirementData(TransactionCase):
         # helpers importe celui-ci.
         from .test_requirement_inventory import (
             REPO_REFERENCE,
-            assert_repository_proofs_committed,
+            assert_proofs_committed,
             committed_files,
             repository_checkout,
         )
@@ -203,8 +203,8 @@ class TestStreamdeckRequirementData(TransactionCase):
                 lambda line: line.reference.startswith(tuple(moved))
             ).mapped("reference")
         )
-        assert_repository_proofs_committed(
-            self, [REPO_REFERENCE.match(r) for r in lines.mapped("reference")]
+        assert_proofs_committed(
+            self, [("repo_unittest", r) for r in lines.mapped("reference")]
         )
 
     def test_text_with_markup_characters_survives(self):

@@ -85,6 +85,13 @@ boucle ; un nom que la boucle ne produit pas n'est pas un test. Chaque test
 des cinq fichiers de test de l'inventaire d'`erplibre_streamdeck` prouve
 au moins un requis.
 
+Le test `tests/test_requirement_proofs.py` soumet aux mêmes règles toutes
+les preuves du module, de chaque domaine. Les jeux et l'application mobile
+se lisent dans leurs clones, sous `script/stream_deck/games` et
+`mobile/erplibre_home_mobile`. Une preuve de sorte *Test long* nomme la
+commande ou un contrôle d'une étape des `ETAPES` de son fichier, le nom que
+le test long donne à son verdict.
+
 ## Le domaine Surveillance
 
 Le domaine *Surveillance* (`sd_mon`, fichier

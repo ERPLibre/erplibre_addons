@@ -15,10 +15,9 @@ from odoo.tools.translate import TranslationModuleReader
 from .test_requirement_inventory import (
     ANTI_GOAL,
     KINDS,
-    assert_repository_proofs_committed,
+    assert_proofs_committed,
     committed,
     erplibre_root,
-    node_test_names,
 )
 from .test_streamdeck_requirement_data import (
     AUDIT_ALIAS,
@@ -243,6 +242,10 @@ class TestRequirementControl(TransactionCase):
         lines = self.lines.filtered(lambda line: line.kind == kind)
         return [KINDS[kind].match(line.reference) for line in lines]
 
+    def _proofs(self, kind):
+        lines = self.lines.filtered(lambda line: line.kind == kind)
+        return [(kind, reference) for reference in lines.mapped("reference")]
+
     def test_the_control_domain_numbers_its_requirements(self):
         self.assertEqual(len(self.category), 1)
         self.assertEqual(self.category.name, "Control")
@@ -386,24 +389,10 @@ class TestRequirementControl(TransactionCase):
         )
 
     def test_extension_proofs_name_its_committed_tests(self):
-        root = erplibre_root()
-        extension = root and root / "script/gnome-extension/erplibre_home"
-        if not extension or not (extension / ".git").exists():
-            self.skipTest("no clone of the extension in this checkout")
-        names = {}
-        for match in self._references("node_test"):
-            path, name = match.groups()
-            with self.subTest(reference=match.group(0)):
-                if path not in names:
-                    source = committed(extension, path)
-                    self.assertIsNotNone(source, "%s not committed" % path)
-                    names[path] = node_test_names(source)
-                self.assertIn(name, names[path])
+        assert_proofs_committed(self, self._proofs("node_test"))
 
     def test_erplibre_proofs_name_its_committed_tests(self):
-        assert_repository_proofs_committed(
-            self, self._references("repo_unittest")
-        )
+        assert_proofs_committed(self, self._proofs("repo_unittest"))
 
     def test_a_done_requirement_has_a_proof_and_nothing_missing(self):
         for requirement in self.requirements:

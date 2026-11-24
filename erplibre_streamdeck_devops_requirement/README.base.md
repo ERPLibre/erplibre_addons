@@ -89,6 +89,13 @@ a name the loop does not produce is not a test. Each test of the five
 inventory test files of `erplibre_streamdeck` proves at least one
 requirement.
 
+The test `tests/test_requirement_proofs.py` holds every proof of the
+module, of every domain, to the same rules. The games and the mobile
+application are read from their clones under `script/stream_deck/games`
+and `mobile/erplibre_home_mobile`. A proof of kind *Long test* names the
+command or a check of a stage of the `ETAPES` of its file, the name the
+long test gives its verdict.
+
 ## The Monitoring domain
 
 The domain *Monitoring* (`sd_mon`, file `data/requirement_monitoring.xml`)
@@ -240,6 +247,13 @@ un dépôt qui n'y est pas cloné). Un test Node déclaré dans une boucle
 boucle ; un nom que la boucle ne produit pas n'est pas un test. Chaque test
 des cinq fichiers de test de l'inventaire d'`erplibre_streamdeck` prouve
 au moins un requis.
+
+Le test `tests/test_requirement_proofs.py` soumet aux mêmes règles toutes
+les preuves du module, de chaque domaine. Les jeux et l'application mobile
+se lisent dans leurs clones, sous `script/stream_deck/games` et
+`mobile/erplibre_home_mobile`. Une preuve de sorte *Test long* nomme la
+commande ou un contrôle d'une étape des `ETAPES` de son fichier, le nom que
+le test long donne à son verdict.
 
 ## Le domaine Surveillance
 

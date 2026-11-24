@@ -45,13 +45,20 @@ REPO_REFERENCE = re.compile(
     r"^(erplibre(?=:test/)|erplibre_streamdeck(?=:tests/))"
     r":(tests?/test_\w+\.py)::(\w+)::(test_\w+)$"
 )
-# Le clone de chaque dépôt qu'une preuve `repo_unittest` nomme, relatif à
-# la racine du checkout ERPLibre : le programme du deck est un dépôt à
-# lui, cloné sous script/stream_deck/deck, ses tests sous tests/.
+# Le clone de chaque dépôt qu'une preuve nomme, relatif à la racine du
+# checkout ERPLibre : le programme du deck, l'extension GNOME, les jeux du
+# Stream Deck et l'application mobile sont des dépôts à eux, que repo sync
+# clone à ces chemins.
 REPOSITORIES = {
     "erplibre": ".",
     "erplibre_streamdeck": "script/stream_deck/deck",
+    "erplibre-home-gnome-extension": "script/gnome-extension/erplibre_home",
+    "streamdeck_game": "script/stream_deck/games",
+    "erplibre_home_mobile": "mobile/erplibre_home_mobile",
 }
+# Une preuve de dépôt, toutes sortes confondues : `<dépôt>:<chemin>::<nom>`,
+# le nom lu dans le fichier par committed_names.
+PROOF_REFERENCE = re.compile(r"^([\w-]+):([\w./-]+)::(.+)$")
 KINDS = {
     "python": PYTHON_REFERENCE,
     "node_test": NODE_REFERENCE,
@@ -359,29 +366,106 @@ def python_test_methods(source):
     }
 
 
-def assert_repository_proofs_committed(case, matches):
-    """Chaque REPO_REFERENCE de `matches` nomme une méthode de test que
-    porte le HEAD du clone de son dépôt. Un dépôt sans clone dans ce
-    checkout saute ses preuves, et le test entier saute quand aucune n'a
-    pu être lue."""
-    methods = {}
+def long_test_checks(source):
+    """Les noms qu'un test long donne à ses verdicts : la commande et les
+    contrôles de chaque étape de son tuple ETAPES. Chaque étape y est un
+    appel à une fonction du même fichier dont les paramètres `commande`
+    et `controles` portent ces noms ; un nom qui n'est pas un littéral ne
+    compte pas, et un fichier sans ETAPES n'en a aucun."""
+    tree = ast.parse(source)
+    parameters = {
+        node.name: [argument.arg for argument in node.args.args]
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+    }
+    names = set()
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or not any(
+            isinstance(target, ast.Name) and target.id == "ETAPES"
+            for target in node.targets
+        ):
+            continue
+        for call in ast.walk(node.value):
+            if not (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Name)
+                and call.func.id in parameters
+            ):
+                continue
+            arguments = dict(zip(parameters[call.func.id], call.args))
+            arguments.update({k.arg: k.value for k in call.keywords})
+            values = [arguments.get("commande")]
+            checks = arguments.get("controles")
+            if isinstance(checks, (ast.Tuple, ast.List)):
+                values += checks.elts
+            names |= {
+                value.value
+                for value in values
+                if isinstance(value, ast.Constant)
+                and isinstance(value.value, str)
+            }
+    return names
+
+
+def committed_names(kind, source):
+    """Les noms qu'une preuve de sorte `kind` cite dans `source`, le texte
+    d'un fichier de test : `Classe::méthode` d'un test unittest, nom d'un
+    test() node:test, commande ou contrôle d'un test long. Lève KeyError
+    pour une sorte qui ne se lit pas dans un fichier."""
+    return {
+        "repo_unittest": lambda: {
+            "%s::%s" % (class_name, method)
+            for class_name, methods in python_test_methods(source).items()
+            for method in methods
+        },
+        "node_test": lambda: node_test_names(source),
+        "long_test": lambda: long_test_checks(source),
+    }[kind]()
+
+
+def assert_proofs_committed(case, proofs):
+    """Chaque preuve (sorte, référence) de `proofs` est une PROOF_REFERENCE
+    d'un dépôt de REPOSITORIES, et nomme un test que porte le HEAD du
+    clone de ce dépôt. Un dépôt sans clone dans ce checkout saute ses
+    preuves, et le test entier saute quand aucune n'a pu être lue."""
+    names = {}
     read = False
-    for match in matches:
-        repository, path, class_name, method = match.groups()
-        with case.subTest(reference=match.group(0)):
+    for kind, reference in proofs:
+        with case.subTest(reference=reference):
+            match = PROOF_REFERENCE.match(reference)
+            case.assertTrue(match, "not <repository>:<path>::<name>")
+            repository, path, name = match.groups()
+            case.assertIn(repository, REPOSITORIES)
             checkout = repository_checkout(repository)
             if checkout is None:
                 case.skipTest("no clone of %s in this checkout" % repository)
-            if (repository, path) not in methods:
+            if (kind, repository, path) not in names:
                 source = committed(checkout, path)
                 case.assertIsNotNone(source, "%s not committed" % path)
-                methods[repository, path] = python_test_methods(source)
+                names[kind, repository, path] = committed_names(kind, source)
             read = True
-            case.assertIn(
-                method, methods[repository, path].get(class_name, ())
-            )
+            case.assertIn(name, names[kind, repository, path])
     if not read:
         case.skipTest("no repository of these proofs is cloned here")
+
+
+def assert_python_proof(case, reference):
+    """`reference` est une PYTHON_REFERENCE qui nomme une méthode d'un
+    TestCase que `--test-tags /<module>` lance : un test renommé, ou exclu
+    des tests « standard », ne recevrait jamais de verdict."""
+    match = PYTHON_REFERENCE.match(reference)
+    case.assertTrue(match, "not an Odoo test reference")
+    module, test_file, class_name, method = match.groups()
+    tests = importlib.import_module(
+        "odoo.addons.%s.tests.%s" % (module, test_file)
+    )
+    test_class = getattr(tests, class_name, None)
+    case.assertTrue(
+        inspect.isclass(test_class)
+        and issubclass(test_class, unittest.TestCase)
+    )
+    case.assertTrue(callable(getattr(test_class, method, None)))
+    case.assertIn("standard", test_class.test_tags)
 
 
 @tagged("post_install", "-at_install")
@@ -414,6 +498,10 @@ class TestRequirementInventory(TransactionCase):
     def _references(self, kind):
         lines = self.lines.filtered(lambda line: line.kind == kind)
         return [KINDS[kind].match(line.reference) for line in lines]
+
+    def _proofs(self, kind):
+        lines = self.lines.filtered(lambda line: line.kind == kind)
+        return [(kind, reference) for reference in lines.mapped("reference")]
 
     def test_the_inventory_domain_numbers_its_requirements(self):
         self.assertEqual(len(self.category), 1)
@@ -470,19 +558,7 @@ class TestRequirementInventory(TransactionCase):
                     self.assertIn(reference, cited)
 
     def test_extension_proofs_name_its_committed_tests(self):
-        root = erplibre_root()
-        extension = root and root / "script/gnome-extension/erplibre_home"
-        if not extension or not (extension / ".git").exists():
-            self.skipTest("no clone of the extension in this checkout")
-        names = {}
-        for match in self._references("node_test"):
-            path, name = match.groups()
-            with self.subTest(reference=match.group(0)):
-                if path not in names:
-                    source = committed(extension, path)
-                    self.assertIsNotNone(source, "%s not committed" % path)
-                    names[path] = node_test_names(source)
-                self.assertIn(name, names[path])
+        assert_proofs_committed(self, self._proofs("node_test"))
 
     def test_a_loop_names_one_node_test_per_literal_value(self):
         source = (
@@ -548,9 +624,7 @@ class TestRequirementInventory(TransactionCase):
                 self.assertEqual(bool(REPO_REFERENCE.match(reference)), valid)
 
     def test_erplibre_proofs_name_its_committed_tests(self):
-        assert_repository_proofs_committed(
-            self, self._references("repo_unittest")
-        )
+        assert_proofs_committed(self, self._proofs("repo_unittest"))
 
     def test_a_done_requirement_has_a_proof_and_nothing_missing(self):
         for requirement in self.requirements:

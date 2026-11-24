@@ -84,6 +84,13 @@ a name the loop does not produce is not a test. Each test of the five
 inventory test files of `erplibre_streamdeck` proves at least one
 requirement.
 
+The test `tests/test_requirement_proofs.py` holds every proof of the
+module, of every domain, to the same rules. The games and the mobile
+application are read from their clones under `script/stream_deck/games`
+and `mobile/erplibre_home_mobile`. A proof of kind *Long test* names the
+command or a check of a stage of the `ETAPES` of its file, the name the
+long test gives its verdict.
+
 ## The Monitoring domain
 
 The domain *Monitoring* (`sd_mon`, file `data/requirement_monitoring.xml`)
