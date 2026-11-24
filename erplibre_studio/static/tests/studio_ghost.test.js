@@ -234,6 +234,19 @@ describe("an element the draft hides", () => {
         expect(`${GHOST} .o_erplibre_studio_change_tag[data-kind=hidden]`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_fold`).toHaveCount(0);
+        // Its struck value takes the value column of the lines around it,
+        // on one line cut by an ellipsis; its tag and Restore go under it.
+        const value = queryOne(`${GHOST} .o_erplibre_studio_ghost_value`);
+        const valueBox = value.getBoundingClientRect();
+        const emailBox = queryOne(`${line("email")} .o_erplibre_studio_line_value`).getBoundingClientRect();
+        expect(Math.abs(valueBox.left - emailBox.left)).toBeLessThan(1);
+        expect(valueBox.width).toBeGreaterThan(emailBox.width - 1);
+        expect(getComputedStyle(value).whiteSpace).toBe("nowrap");
+        expect(getComputedStyle(value).textOverflow).toBe("ellipsis");
+        expect(value).toHaveAttribute("title", "+1 555 0199");
+        const actions = queryOne(`${GHOST} .o_erplibre_studio_ghost_actions`).getBoundingClientRect();
+        expect(actions.top).toBeGreaterThan(valueBox.bottom - 1);
+        expect(Math.abs(actions.left - valueBox.left)).toBeLessThan(1);
     });
 
     test("Restore undoes the change that removes it, announces and focuses the field", async () => {

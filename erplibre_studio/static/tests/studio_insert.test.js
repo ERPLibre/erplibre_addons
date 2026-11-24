@@ -291,6 +291,11 @@ describe("erplibre_studio insert without dragging", () => {
         expect(".o_erplibre_studio_insert_group[data-group=new] .o_erplibre_studio_insert_group_title").toHaveText(
             /create « loyalty » as…/i
         );
+        // The title shows in capitals; the text typed keeps its case.
+        const typed = queryOne(".o_erplibre_studio_insert_group[data-group=new] .o_erplibre_studio_insert_typed");
+        expect(typed).toHaveText("Loyalty");
+        expect(getComputedStyle(typed).textTransform).toBe("none");
+        expect(getComputedStyle(typed.parentElement).textTransform).toBe("uppercase");
         await contains(`${OPTION}[data-key="new:char"]`).click();
         await animationFrame();
         expect.verifySteps([`add_field x_loyalty Loyalty ${named("email")} before`]);
@@ -322,6 +327,25 @@ describe("erplibre_studio insert without dragging", () => {
         expect(LIST).toHaveCount(1);
         await contains(".o_erplibre_studio_crumbs").click();
         expect(LIST).toHaveCount(0);
+    });
+
+    test("Escape on the « + » after the selection unselects; a click on the block selects it again", async () => {
+        await openEditor();
+        const email = ".o_erplibre_studio_field[data-name=email]";
+        await contains(email).click();
+        expect(email).toHaveClass("o_erplibre_studio_selected");
+        // Tab from the block reaches the « + » right after it.
+        queryOne(pick("email")).focus();
+        await press("Tab");
+        expect(plusOf(named("phone"), "before")).toBeFocused();
+        await press("Escape");
+        await animationFrame();
+        expect(".o_erplibre_studio_selected").toHaveCount(0);
+        expect(LIST).toHaveCount(0);
+        // The click selects: a block still selected would toggle off.
+        await contains(email).click();
+        expect(email).toHaveClass("o_erplibre_studio_selected");
+        expect(".o_erplibre_studio_inspector_title").toHaveText("Email");
     });
 
     test("Escape on the Close button of the list closes it too", async () => {

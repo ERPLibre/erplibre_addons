@@ -25,11 +25,6 @@
                         <span class="text-truncate" t-esc="data.model_name" />
                         <i class="fa fa-angle-right" aria-hidden="true" />
                         <span class="text-body fw-bold" t-esc="viewTypeLabel(viewType)" />
-                        <code
-                            t-if="detailed"
-                            class="o_erplibre_studio_xml_id o_erplibre_studio_tech px-1 rounded bg-200 text-truncate"
-                            t-esc="data.view.xml_id or data.view.name"
-                        />
                     </nav>
                 </div>
                 <div
@@ -264,8 +259,12 @@
                     </t>
                 </Dropdown>
                 <!-- The display level: Simple shows the view as a user sees
-                     it, Detailed adds its technical names. -->
-                <div t-if="!state.loading and !state.error" class="d-flex align-items-center gap-2">
+                     it, Detailed adds its technical names. The note sits
+                     under the switch: the top bar stays on one line. -->
+                <div
+                    t-if="!state.loading and !state.error"
+                    class="o_erplibre_studio_level_box d-flex flex-column align-items-center"
+                >
                     <div
                         role="group"
                         class="o_erplibre_studio_level d-inline-flex gap-1 p-1 rounded bg-200"
@@ -292,7 +291,7 @@
                             Detailed
                         </button>
                     </div>
-                    <span class="small text-muted o_erplibre_studio_level_note">Remembered for your account</span>
+                    <span class="text-muted o_erplibre_studio_level_note">Remembered for your account</span>
                 </div>
                 <div class="ms-auto d-flex flex-wrap align-items-center gap-1">
                     <t t-if="project">
@@ -614,9 +613,13 @@
                                 </t>
                                 <span
                                     t-if="detailed"
-                                    class="o_erplibre_studio_tech o_erplibre_studio_crumbs_tech ms-auto d-inline-flex flex-wrap align-items-center gap-2"
+                                    class="o_erplibre_studio_tech o_erplibre_studio_crumbs_tech ms-auto d-inline-flex flex-wrap align-items-center gap-2 min-w-0"
                                 >
-                                    <code t-esc="data.view.xml_id or data.view.name" />
+                                    <code
+                                        class="o_erplibre_studio_xml_id text-truncate"
+                                        t-att-title="data.view.xml_id or data.view.name"
+                                        t-esc="data.view.xml_id or data.view.name"
+                                    />
                                     <span
                                         t-if="inheritedText"
                                         class="o_erplibre_studio_inherited"

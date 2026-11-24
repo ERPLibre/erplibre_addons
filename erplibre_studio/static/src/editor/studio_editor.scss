@@ -427,12 +427,25 @@
         flex-shrink: 0;
     }
 
+    // The xml id of the view, at the right of the path of the selection:
+    // a long one ends in an ellipsis, its title holds it whole.
     .o_erplibre_studio_xml_id {
         max-width: 22rem;
     }
 
     // The display level of the top bar: a segmented control whose pressed
-    // option stands out; the focus ring shows on the keyboard only.
+    // option stands out, its note in small type under it; the focus ring
+    // shows on the keyboard only.
+    .o_erplibre_studio_level_box {
+        gap: 0.125rem;
+    }
+
+    .o_erplibre_studio_level_note {
+        font-size: 0.6875rem;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
     .o_erplibre_studio_level_option {
         min-height: 1.875rem;
 
@@ -451,7 +464,8 @@
     }
 
     // The xml id and the inherited views of the view on screen, at the
-    // right of the path of the selection (Detailed level).
+    // right of the path of the selection (Detailed level): the top bar
+    // holds no technical name.
     .o_erplibre_studio_crumbs_tech code {
         color: $text-muted;
     }
@@ -838,8 +852,10 @@
     // An element the draft removes from a form or a list: one muted line,
     // « label removed — show »; open, a muted row whose label and value
     // are struck, then Restore and the fold button. A form line keeps the
-    // columns of the lines around it; a list column stays narrow. The two
-    // classes outweigh the grid of the muted line.
+    // columns of the lines around it: its value takes the whole value
+    // column on one line, cut by an ellipsis, and its marks and buttons
+    // go under it, as the marks of a line do. A list column stays narrow.
+    // The two classes outweigh the grid of the muted line.
     .o_erplibre_studio_node.o_erplibre_studio_ghost {
         display: grid;
         grid-template-columns: 14px minmax(0, 1fr) auto;
@@ -875,9 +891,11 @@
         }
 
         .o_erplibre_studio_ghost_value {
+            grid-column: 3;
             min-width: 0;
-            overflow-wrap: anywhere;
-            white-space: pre-line;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .o_erplibre_studio_ghost_actions {
@@ -904,7 +922,12 @@
         }
 
         &.o_erplibre_studio_ghost_open[data-layout="line"] {
-            grid-template-columns: 14px minmax(0, 9rem) minmax(0, 1fr) auto;
+            grid-template-columns: 14px minmax(0, 9rem) minmax(0, 1fr);
+
+            .o_erplibre_studio_ghost_actions {
+                grid-column: 3;
+                justify-self: start;
+            }
         }
 
         &[data-layout="column"] {
@@ -1458,6 +1481,12 @@
         font-weight: $font-weight-bold;
         letter-spacing: 0.05em;
         text-transform: uppercase;
+
+        // The text typed in the search, in « Create « text » as… »: as typed.
+        > .o_erplibre_studio_insert_typed {
+            letter-spacing: normal;
+            text-transform: none;
+        }
     }
 
     .o_erplibre_studio_insert_rows {

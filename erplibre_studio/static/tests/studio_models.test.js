@@ -490,7 +490,8 @@ describe("erplibre_studio models", () => {
         expect(lastCall("project_action").kwargs.fallback).toEqual(["res.partner", 12, "form"]);
         // The new app and its menu reach the web client.
         expect.verifySteps(["menu reload", `get_editor_data ${MODEL} 51 form 3`]);
-        expect(".o_erplibre_studio_title").toHaveText(/Loan item\s*Form\s*studio_loans\.view_x_loan_item_form/);
+        expect(".o_erplibre_studio_title").toHaveText(/^Loan item\s*Form$/);
+        expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveText("studio_loans.view_x_loan_item_form");
         // The chatter stays where the view puts it.
         expect(".o_erplibre_studio_other[data-tag=chatter]").toHaveAttribute("draggable", "false");
         expect(`.o_erplibre_studio_hook[data-target='/form/chatter']`).toHaveCount(0);

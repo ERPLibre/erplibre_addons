@@ -2394,15 +2394,24 @@ export class StudioEditor extends Component {
      * first and the last. Each block stays a tab stop of its own; Enter or
      * Space on its button selects it. The keys of ``onBlockKey`` act on
      * the block itself. Another key with a modifier, or a key on another
-     * element of the canvas, passes through. With the focus on a block,
-     * Escape on any element of the canvas unselects, then turns the focus
-     * off (``escapeFocus``).
+     * element of the canvas, passes through. Escape on any element of the
+     * canvas (a block, a « + » of the margin) closes the insertion list,
+     * else unselects, else turns the focus on a block off
+     * (``escapeFocus``): a click on the block it unselected then selects
+     * it again, where a block still selected would toggle off.
      */
     onCanvasKey(ev) {
         const plain = !ev.altKey && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey;
-        if (ev.key === "Escape" && plain && !ev.defaultPrevented && this.escapeFocus()) {
-            ev.preventDefault();
-            return;
+        if (ev.key === "Escape" && plain && !ev.defaultPrevented) {
+            if (this.escapeFocus()) {
+                ev.preventDefault();
+                return;
+            }
+            if (this.state.selected) {
+                ev.preventDefault();
+                this.state.selected = null;
+                return;
+            }
         }
         if (!ev.target.classList.contains("o_erplibre_studio_pick") || ev.ctrlKey || ev.metaKey) {
             return;
@@ -2433,9 +2442,9 @@ export class StudioEditor extends Component {
     /**
      * The keys that act on the block whose button is ``ev.target``:
      * Alt+Up and Alt+Down move it (``moveByKeyboard``; a key held down
-     * moves it once), Delete removes it (``removeByKeyboard``), Escape
-     * unselects what is selected while the focus stays. Answer whether
-     * the key was one of them.
+     * moves it once), Delete removes it (``removeByKeyboard``). Answer
+     * whether the key was one of them; Escape is read before, by
+     * ``onCanvasKey``.
      */
     onBlockKey(ev) {
         const holder = ev.target.closest("[data-path]");
@@ -2456,11 +2465,6 @@ export class StudioEditor extends Component {
         if (ev.key === "Delete") {
             ev.preventDefault();
             this.removeByKeyboard(path);
-            return true;
-        }
-        if (ev.key === "Escape" && this.state.selected) {
-            ev.preventDefault();
-            this.state.selected = null;
             return true;
         }
         return false;

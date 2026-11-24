@@ -178,20 +178,41 @@ export class StudioInsertList extends Component {
     }
 
     /**
-     * The groups of the listbox: [{key, title, chips, options}], each
-     * option with its ``index`` among all the options and its ``id``.
+     * The title of the group of the new field types once a text is typed,
+     * « Create « text » as… », as [before, after]: the parts of the
+     * translated sentence around the text. The title renders them around
+     * the text itself, which keeps the case it was typed in while the
+     * titles of the groups show in capitals.
+     */
+    get createTitleParts() {
+        const mark = "\u0001";
+        const title = String(_t("Create « %(text)s » as…", {text: mark}));
+        const index = title.indexOf(mark);
+        return index < 0 ? [title, ""] : [title.slice(0, index), title.slice(index + mark.length)];
+    }
+
+    /**
+     * The groups of the listbox: [{key, title, typed, chips, options}],
+     * each option with its ``index`` among all the options and its
+     * ``id``. ``typed`` is the text the title of the new field types
+     * holds, else ""; ``before`` and ``after`` are then the parts of the
+     * title around it (``createTitleParts``).
      */
     get groups() {
         const typed = this.typed;
+        const [before, after] = typed ? this.createTitleParts : ["", ""];
         const groups = [
-            {key: "existing", title: _t("Existing fields"), chips: false, options: this.existingOptions},
+            {key: "existing", title: _t("Existing fields"), typed: "", chips: false, options: this.existingOptions},
             {
                 key: "new",
-                title: typed ? _t("Create « %(text)s » as…", {text: typed}) : _t("New field…"),
+                title: typed ? `${before}${typed}${after}` : _t("New field…"),
+                typed,
+                before,
+                after,
                 chips: true,
                 options: this.newOptions,
             },
-            {key: "layout", title: _t("Layout"), chips: true, options: this.layoutOptions},
+            {key: "layout", title: _t("Layout"), typed: "", chips: true, options: this.layoutOptions},
         ].filter((group) => group.options.length);
         let index = 0;
         for (const group of groups) {

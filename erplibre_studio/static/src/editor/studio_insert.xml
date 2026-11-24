@@ -59,7 +59,12 @@
                     t-att-data-group="group.key"
                     t-att-aria-labelledby="group.id"
                 >
-                    <div class="o_erplibre_studio_insert_group_title" t-att-id="group.id" t-esc="group.title" />
+                    <!-- A typed text keeps its case: no space may come
+                         between it and the parts of the sentence. -->
+                    <div class="o_erplibre_studio_insert_group_title" t-att-id="group.id">
+                        <t t-if="group.typed"><t t-esc="group.before" /><span class="o_erplibre_studio_insert_typed" t-esc="group.typed" /><t t-esc="group.after" /></t>
+                        <t t-else="" t-esc="group.title" />
+                    </div>
                     <div t-att-class="group.chips ? 'o_erplibre_studio_insert_chips' : 'o_erplibre_studio_insert_rows'">
                         <div
                             t-foreach="group.options"

@@ -426,7 +426,7 @@
                 </t>
             </button>
             <t t-if="ghostOpen">
-                <s t-if="ghostValue" class="o_erplibre_studio_ghost_value" t-esc="ghostValue" />
+                <s t-if="ghostValue" class="o_erplibre_studio_ghost_value" t-att-title="ghostValue" t-esc="ghostValue" />
                 <span class="o_erplibre_studio_ghost_actions">
                     <t t-call="erplibre_studio.Block.marks" />
                     <button

@@ -1200,7 +1200,7 @@ describe("erplibre_studio j4", () => {
         await contains(".o_erplibre_studio_apply").click();
         expect.verifySteps(["project_action action_apply"]);
         expect(".o_erplibre_studio_model_preview").toHaveCount(0);
-        expect(".o_erplibre_studio_title").toHaveText(/studio_j4\.view_x_j4_order_form/);
+        expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveText("studio_j4.view_x_j4_order_form");
     });
 
     test("a confirmation refused for a changed report shows the new one and sends its digest", async () => {

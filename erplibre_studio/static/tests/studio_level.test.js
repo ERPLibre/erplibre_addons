@@ -222,6 +222,10 @@ describe("the display level of the editor", () => {
         expect(DETAILED).toHaveAttribute("aria-pressed", "false");
         expect(".o_erplibre_studio_level").toHaveAttribute("aria-label", "Display level of the editor");
         expect(".o_erplibre_studio_level_note").toHaveText("Remembered for your account");
+        // The note sits under the switch, not beside it: the top bar keeps one line.
+        const note = queryOne(".o_erplibre_studio_level_note").getBoundingClientRect();
+        const level = queryOne(".o_erplibre_studio_level").getBoundingClientRect();
+        expect(note.top).toBeGreaterThan(level.bottom - 1);
         expect(".o_erplibre_studio_xml_id").toHaveCount(0);
         expect(".o_erplibre_studio_inherited").toHaveCount(0);
         await contains(".o_erplibre_studio_field[data-name=user_id]").click();
@@ -276,7 +280,14 @@ describe("the display level of the editor", () => {
         expect(".o_erplibre_studio").toHaveAttribute("data-level", "detailed");
         expect(DETAILED).toHaveAttribute("aria-pressed", "true");
         expect(SIMPLE).toHaveAttribute("aria-pressed", "false");
-        expect(".o_erplibre_studio_xml_id").toHaveText("base.view_partner_form");
+        // The xml id and the inherited views sit on the line of the path of
+        // the selection: the top bar holds no technical name.
+        expect(".o_erplibre_studio_topbar code").toHaveCount(0);
+        expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveText("base.view_partner_form");
+        expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveAttribute(
+            "title",
+            "base.view_partner_form"
+        );
         expect(".o_erplibre_studio_crumbs .o_erplibre_studio_inherited").toHaveText(
             "+ 3 inherited view(s) from 2 module(s)"
         );

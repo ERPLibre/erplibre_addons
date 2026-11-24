@@ -619,7 +619,8 @@ describe("erplibre_studio editor", () => {
             edited_views: 1,
         };
         await openEditor();
-        expect(".o_erplibre_studio_title").toHaveText(/Contact\s*List\s*base\.view_partner_tree/);
+        expect(".o_erplibre_studio_title").toHaveText(/^Contact\s*List$/);
+        expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveText("base.view_partner_tree");
         expect(".o_erplibre_studio_view_tab").toHaveCount(2);
         expect(".o_erplibre_studio_view_tab[data-view-type=list]").toHaveAttribute("aria-selected", "true");
         expect(".o_erplibre_studio_view_tab[data-view-type=form]").toHaveAttribute("aria-selected", "false");
