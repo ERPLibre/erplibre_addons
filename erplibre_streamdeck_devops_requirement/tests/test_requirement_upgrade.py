@@ -17,6 +17,7 @@ INVENTORY = "%s/data/requirement_inventory.xml" % MODULE
 CONTROL = "%s/data/requirement_control.xml" % MODULE
 MONITORING = "%s/data/requirement_monitoring.xml" % MODULE
 AUDIT_PROOFS = "%s/data/devops_requirement_test.xml" % MODULE
+REQUIREMENTS = "%s/data/devops_requirement.xml" % MODULE
 # Une référence de preuve à un test qui n'existe pas, comme celle qu'une
 # base du lot 1 garde d'un test renommé depuis.
 GONE = (
@@ -233,6 +234,42 @@ class TestRequirementUpgrade(TransactionCase):
                     self.env.ref("%s.%s" % (MODULE, xmlid)).reference,
                     reference,
                 )
+
+    def test_an_upgrade_to_1_5_follows_the_deck_citations_of_the_texts(self):
+        # Le texte d'un requis cite les tests du deck sous test/
+        # d'ERPLibre sur une base de la version 18.0.1.4.0 : la migration
+        # récrit ces citations sur place, retouche gardée, et laisse celles
+        # des tests qu'ERPLibre garde.
+        cases = (
+            ("req_sd_deploy_r15", "achievement", ""),
+            ("req_sd_plugin_r04", "achievement", " Edited by hand."),
+            ("req_sd_plugin_r94", "missing", ""),
+        )
+        for xmlid, field, edit in cases:
+            text = self._in_file(xmlid, field, REQUIREMENTS)
+            self.assertIn("erplibre_streamdeck:tests/", text)
+            former = text.replace(
+                "erplibre_streamdeck:tests/test_entry_points.py",
+                "erplibre:test/test_streamdeck_entry_points.py",
+            ).replace("erplibre_streamdeck:tests/", "erplibre:test/")
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {field: former + edit}
+            )
+        kept = self.env.ref("%s.req_sd_deploy_r17" % MODULE)
+        self.assertIn(
+            "erplibre:test/test_streamdeck_entry_points.py::TestMakefile",
+            kept.achievement,
+        )
+        before = kept.achievement
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env.invalidate_all()
+        for xmlid, field, edit in cases:
+            with self.subTest(xmlid=xmlid):
+                self.assertEqual(
+                    self.env.ref("%s.%s" % (MODULE, xmlid))[field],
+                    self._in_file(xmlid, field, REQUIREMENTS) + edit,
+                )
+        self.assertEqual(kept.achievement, before)
 
     def test_an_upgrade_to_1_5_follows_the_deck_tests_to_their_repo(self):
         # Les tests du programme du deck ont quitté test/ d'ERPLibre pour

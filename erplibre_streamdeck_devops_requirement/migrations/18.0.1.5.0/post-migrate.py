@@ -11,9 +11,14 @@ repository of MOVED, are loaded again from their file, a hand edit of
 them included; every other record keeps its own. Their translations are
 dropped but for en_US, so that the loading of the catalogs that follows
 this script fills them from the new texts.
+
+The text of a requirement names the deck tests too. Its citations of
+them are rewritten in place, by DECK_CITATION: the rest of the text, a
+hand edit included, stays.
 """
 
 import copy
+import re
 
 from lxml import etree
 
@@ -45,6 +50,20 @@ MOVED = {
     ),
 }
 
+# A citation, in the text of a requirement, of a deck test file under
+# test/ of ERPLibre: the test files of the deck program, its stubs and
+# its fixtures. Of test_streamdeck_entry_points.py, only the classes that
+# read the deck program left, for its test_entry_points.py.
+DECK_CITATION = re.compile(
+    r"(?<![\w-])erplibre:test/("
+    r"test_deck_lock\.py|test_erplibre_streamdeck_\w+\.py"
+    r"|streamdeck_stubs\.py|fixtures/erplibre_streamdeck/"
+    r"|test_streamdeck_entry_points\.py(?=::(?:TestRequirements"
+    r"|TestTilerCommandLine|TestControllerCommandLine)\b))"
+)
+# The text fields of a requirement that cite tests; neither is translated.
+CITING_FIELDS = ("achievement", "missing")
+
 
 def migrate(cr, version):
     if not version:
@@ -65,6 +84,7 @@ def migrate(cr, version):
         ).parse(kept)
         for record in kept.iter("record"):
             _keep_english_only(env.ref("%s.%s" % (MODULE, record.get("id"))))
+    _follow_deck_citations(env)
 
 
 def _cites(record, prefixes):
@@ -74,6 +94,36 @@ def _cites(record, prefixes):
         return False
     reference = record.xpath("string(field[@name='reference'])")
     return reference.startswith(prefixes)
+
+
+def _deck_path(match):
+    """The citation of DECK_CITATION `match` in the deck repository."""
+    path = match.group(1)
+    if path == "test_streamdeck_entry_points.py":
+        path = "test_entry_points.py"
+    return "erplibre_streamdeck:tests/%s" % path
+
+
+def _follow_deck_citations(env):
+    """Rewrite each DECK_CITATION in the CITING_FIELDS of the requirements
+    of this module; a text without one is not written."""
+    ids = (
+        env["ir.model.data"]
+        .search(
+            [("module", "=", MODULE), ("model", "=", "devops.requirement")]
+        )
+        .mapped("res_id")
+    )
+    for requirement in env["devops.requirement"].browse(ids).exists():
+        values = {}
+        for name in CITING_FIELDS:
+            text = requirement[name]
+            if text:
+                rewritten = DECK_CITATION.sub(_deck_path, text)
+                if rewritten != text:
+                    values[name] = rewritten
+        if values:
+            requirement.write(values)
 
 
 def _keep_english_only(record):
