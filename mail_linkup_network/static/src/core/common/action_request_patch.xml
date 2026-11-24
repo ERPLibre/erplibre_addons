@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupRefletActions" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-linkup-RefletActions')]" position="attributes">
+            <attribute name="t-if">mode or state.error or linkupActionRequest or linkupActionReplyLabel</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o-linkup-RefletActions')]" position="inside">
+            <div
+                t-if="linkupActionRequest"
+                class="o-linkup-ActionRequest d-flex flex-column gap-2 order-first"
+                role="group"
+                aria-labelledby="o-linkup-ActionRequest-question"
+                t-att-id="'o-linkup-ActionRequest-' + reflet.id"
+            >
+                <p id="o-linkup-ActionRequest-question" class="o-linkup-ActionRequest-question fw-bold mb-0">
+                    A request for action: answer as you wish, or not at all.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-ActionRequest-agree btn btn-outline-primary btn-sm"
+                        data-linkup-guide="action-agree"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.answerActionRequest('agree')"
+                    >
+                        Agreed
+                    </button>
+                    <button
+                        t-if="linkupProposeForm"
+                        type="button"
+                        class="o-linkup-ActionRequest-propose btn btn-outline-primary btn-sm"
+                        data-linkup-guide="action-propose"
+                        t-att-disabled="state.busy"
+                        t-on-click="proposeOther"
+                    >
+                        Let's propose something else
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-ActionRequest-notNow btn btn-outline-secondary btn-sm"
+                        data-linkup-guide="action-not-now"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.answerActionRequest('not_now')"
+                    >
+                        Not for now
+                    </button>
+                </div>
+            </div>
+            <p
+                t-if="linkupActionReplyLabel"
+                class="o-linkup-ActionRequest-reply small mb-0 order-first"
+                t-att-data-reply="reflet.action_reply"
+                t-esc="linkupActionReplyLabel"
+            />
+        </xpath>
+    </t>
+</templates>

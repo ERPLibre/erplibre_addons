@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupRefletView" t-inherit-mode="extension">
+        <xpath expr="//header[hasclass('o-linkup-RefletView-header')]" position="inside">
+            <button
+                type="button"
+                class="o-linkup-RefletView-networkView btn btn-outline-primary btn-sm d-flex align-items-center gap-2 ms-auto"
+                data-linkup-guide="reflet-view-network"
+                t-on-click="openNetworkView"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true" />
+                <span>Network view</span>
+            </button>
+        </xpath>
+    </t>
+</templates>

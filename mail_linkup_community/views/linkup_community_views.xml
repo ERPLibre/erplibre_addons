@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- The profile of the member (static/src/views/profile), opened from
+         the menu of their avatar and from the LinkUp menu of Discuss. -->
+    <record id="action_linkup_profile" model="ir.actions.client">
+        <field name="name">My profile</field>
+        <field name="tag">linkup.profile</field>
+        <field name="path">linkup-profile</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_profile"
+        name="My profile"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_profile"
+        groups="mail_linkup_reflet.group_linkup_member"
+        sequence="80"
+    />
+
+    <!-- The proofs of consent, read by the LinkUp administrators only. -->
+    <record id="linkup_consent_view_list" model="ir.ui.view">
+        <field name="name">linkup.consent.list</field>
+        <field name="model">linkup.consent</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="date" />
+                <field name="user_id" />
+                <field name="purpose" />
+                <field name="granted" />
+                <field name="version" />
+            </list>
+        </field>
+    </record>
+
+    <record id="linkup_consent_view_search" model="ir.ui.view">
+        <field name="name">linkup.consent.search</field>
+        <field name="model">linkup.consent</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id" />
+                <field name="purpose" />
+                <filter name="granted" string="Granted" domain="[('granted', '=', True)]" />
+                <filter name="withdrawn" string="Withdrawn" domain="[('granted', '=', False)]" />
+                <group>
+                    <filter name="group_purpose" string="Purpose" context="{'group_by': 'purpose'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_linkup_consent" model="ir.actions.act_window">
+        <field name="name">Consents</field>
+        <field name="res_model">linkup.consent</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_consent"
+        name="Consents"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_consent"
+        groups="mail_linkup_reflet.group_linkup_admin"
+        sequence="95"
+    />
+
+    <!-- The console of the moderation (static/src/views/moderation,
+         LU-F-116), for the moderators. -->
+    <record id="action_linkup_moderation" model="ir.actions.client">
+        <field name="name">Moderation</field>
+        <field name="tag">linkup.moderation</field>
+        <field name="path">linkup-moderation</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_moderation"
+        name="Moderation"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_moderation"
+        groups="mail_linkup_reflet.group_linkup_moderator"
+        sequence="92"
+    />
+
+    <!-- The audit log of the moderation (LU-NF-040), read only: a moderator
+         reads the rows of the reports they may process. -->
+    <record id="linkup_audit_log_view_list" model="ir.ui.view">
+        <field name="name">linkup.audit.log.list</field>
+        <field name="model">linkup.audit.log</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="date" />
+                <field name="actor_id" />
+                <field name="action" />
+                <field name="report_id" />
+                <field name="reason" />
+            </list>
+        </field>
+    </record>
+
+    <record id="linkup_audit_log_view_search" model="ir.ui.view">
+        <field name="name">linkup.audit.log.search</field>
+        <field name="model">linkup.audit.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="actor_id" />
+                <field name="report_id" />
+                <field name="action" />
+                <filter name="content_read" string="Readings of content" domain="[('action', '=', 'content_read')]" />
+                <group>
+                    <filter name="group_actor" string="Who" context="{'group_by': 'actor_id'}" />
+                    <filter name="group_action" string="What" context="{'group_by': 'action'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_linkup_audit_log" model="ir.actions.act_window">
+        <field name="name">Moderation audit log</field>
+        <field name="res_model">linkup.audit.log</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_audit_log"
+        name="Moderation audit log"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_audit_log"
+        groups="mail_linkup_reflet.group_linkup_moderator"
+        sequence="93"
+    />
+</odoo>

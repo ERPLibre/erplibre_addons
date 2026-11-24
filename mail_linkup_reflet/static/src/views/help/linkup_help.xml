@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupHelpCategory">
+        <li class="o-linkup-Help-category border rounded-3 p-3 d-flex flex-column gap-1" t-att-data-code="category.code">
+            <h4 class="h6 d-flex align-items-center gap-2 mb-0">
+                <LinkupCategoryIcon code="category.code" />
+                <span t-esc="category.name" />
+            </h4>
+            <div t-if="category.definition" class="o-linkup-Help-definition small" t-out="definition(category)" />
+            <p t-if="category.example_do" class="small mb-0">
+                <span class="fw-bold" t-esc="doLabel" />
+                <span t-esc="category.example_do" />
+            </p>
+            <p t-if="category.example_dont" class="small mb-0">
+                <span class="fw-bold" t-esc="dontLabel" />
+                <span t-esc="category.example_dont" />
+            </p>
+            <p t-if="category.starter_self" class="small mb-0">
+                <span class="fw-bold" t-esc="starterLabel" />
+                <span t-esc="category.starter_self" />
+            </p>
+        </li>
+    </t>
+
+    <t t-name="mail_linkup_reflet.LinkupHelp">
+        <div class="o-linkup-Help o_action h-100 overflow-auto p-3 d-flex flex-column gap-4" t-ref="root">
+            <header>
+                <h1 class="h4 mb-1">LinkUp help</h1>
+                <p class="mb-0" t-esc="intro" />
+            </header>
+            <p t-if="state.loadError" class="o-linkup-Help-error" role="alert">LinkUp could not be loaded, try again.</p>
+            <p t-elif="!state.loaded" role="status">Loading…</p>
+            <t t-else="">
+                <section class="o-linkup-Help-categories d-flex flex-column gap-3" aria-labelledby="o-linkup-Help-categoriesTitle">
+                    <h2 id="o-linkup-Help-categoriesTitle" class="h5 mb-0">The twelve categories</h2>
+                    <h3 class="h6 mb-0">Non-violent communication</h3>
+                    <ul class="o-linkup-Help-cnv list-unstyled d-flex flex-column gap-2 mb-0">
+                        <t t-foreach="cnvCategories" t-as="category" t-key="category.id">
+                            <t t-call="mail_linkup_reflet.LinkupHelpCategory" />
+                        </t>
+                    </ul>
+                    <h3 class="h6 mb-0">The other categories</h3>
+                    <ul class="o-linkup-Help-others list-unstyled d-flex flex-column gap-2 mb-0">
+                        <t t-foreach="otherCategories" t-as="category" t-key="category.id">
+                            <t t-call="mail_linkup_reflet.LinkupHelpCategory" />
+                        </t>
+                    </ul>
+                </section>
+            </t>
+            <section class="o-linkup-Help-settings d-flex flex-column gap-2" aria-labelledby="o-linkup-Help-settingsTitle">
+                <h2 id="o-linkup-Help-settingsTitle" class="h5 mb-0" tabindex="-1">Sounds and notifications</h2>
+                <p class="small mb-0">A sound always comes with a visible change; the reward sounds are off by default.</p>
+                <div t-foreach="settings" t-as="setting" t-key="setting.field" class="form-check form-switch mb-0">
+                    <input
+                        type="checkbox"
+                        role="switch"
+                        class="form-check-input"
+                        t-att-id="'o-linkup-Help-' + setting.field"
+                        t-att-name="setting.field"
+                        t-att-checked="setting.checked"
+                        t-att-disabled="state.saving"
+                        t-on-change="(ev) => this.toggleSetting(setting.field, ev.target.checked)"
+                    />
+                    <label class="form-check-label" t-att-for="'o-linkup-Help-' + setting.field" t-esc="setting.label" />
+                </div>
+            </section>
+            <section
+                t-if="state.loaded"
+                class="o-linkup-Help-blocked d-flex flex-column gap-2"
+                aria-labelledby="o-linkup-Help-blockedTitle"
+            >
+                <h2 id="o-linkup-Help-blockedTitle" class="h5 mb-0" tabindex="-1">Blocked members</h2>
+                <p t-if="!state.blocked.length" class="small mb-0">You block nobody.</p>
+                <ul t-else="" class="list-unstyled d-flex flex-column gap-2 mb-0">
+                    <li
+                        t-foreach="state.blocked"
+                        t-as="member"
+                        t-key="member.id"
+                        class="o-linkup-Help-blockedMember d-flex align-items-center gap-2"
+                    >
+                        <span class="flex-grow-1" t-esc="member.name" />
+                        <button
+                            type="button"
+                            class="o-linkup-Help-unblock btn btn-secondary btn-sm"
+                            t-att-disabled="state.blockedBusy"
+                            t-on-click="() => this.unblock(member)"
+                            t-esc="unblockLabel(member)"
+                        />
+                    </li>
+                </ul>
+                <p
+                    t-if="state.blockedError"
+                    class="o-linkup-Help-blockedError alert alert-danger small py-1 px-2 mb-0"
+                    role="alert"
+                    t-esc="state.blockedError"
+                />
+            </section>
+            <section class="o-linkup-Help-tour d-flex flex-column gap-2 align-items-start" aria-labelledby="o-linkup-Help-tourTitle">
+                <h2 id="o-linkup-Help-tourTitle" class="h5 mb-0">Tour</h2>
+                <p class="small mb-0">The five steps shown the first time you opened Discuss.</p>
+                <button type="button" class="o-linkup-Help-replay btn btn-secondary btn-sm" t-on-click="replayTour">
+                    Replay the tour
+                </button>
+            </section>
+        </div>
+    </t>
+</templates>

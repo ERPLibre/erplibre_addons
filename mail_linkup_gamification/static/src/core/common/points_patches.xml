@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupRefletView" t-inherit-mode="extension">
+        <xpath expr="//LinkupProfileMenu" position="after">
+            <LinkupEnergy variant="'bubble'" />
+        </xpath>
+    </t>
+
+    <t t-inherit="mail_linkup_reflet.LinkupPanel" t-inherit-mode="extension">
+        <xpath expr="//section[hasclass('o-linkup-Panel-link')]" position="before">
+            <LinkupEnergy variant="'card'" />
+        </xpath>
+        <xpath expr="//span[hasclass('o-linkup-Panel-count')]" position="after">
+            <span
+                t-if="!linkupPointsHidden and state.info.link_energy !== undefined"
+                class="o-linkup-Panel-linkEnergy small fw-bold"
+                t-esc="linkEnergyLabel"
+            />
+        </xpath>
+    </t>
+</templates>

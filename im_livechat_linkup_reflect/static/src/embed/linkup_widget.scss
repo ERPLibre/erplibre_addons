@@ -1,0 +1,300 @@
+// The views of LinkUp in the widget of the visitors: the card, the form,
+// the actions and the guide, with the variables of Bootstrap and of the
+// primary variables of web only, which the website and the external
+// loader both compile. The stylesheets of the web client of the members
+// read variables of the backend that the website lacks, hence these rules.
+// The widget keeps the light theme (LU-NF-054): no dark variant.
+
+// The text on a filled $primary.
+$o-linkup-widget-on-primary: color-contrast($primary);
+$o-linkup-widget-tint: mix($o-view-background-color, $info, 87.5%);
+$o-linkup-widget-tint-border: darken($o-linkup-widget-tint, 10%);
+// Outlines of the fields: 3:1 at least against the background (WCAG 1.4.11).
+$o-linkup-widget-field-border: $gray-600;
+// The text of an outlined danger button: $danger one step darker, 4.5:1 on
+// a white background (AA).
+$o-linkup-widget-danger-text: darken($danger, 10%);
+// Touch target of every control of LinkUp in the widget (WCAG 2.5.5).
+$o-linkup-widget-target: 2.75rem;
+
+.o-linkup-RefletCard {
+    max-width: 36rem;
+    background-color: $o-view-background-color;
+    border-color: $o-linkup-widget-tint-border !important;
+
+    .o-linkup-RefletCard-header {
+        background-color: $o-linkup-widget-tint;
+    }
+
+    .o-linkup-RefletCard-badge {
+        background-color: $o-view-background-color;
+        border: $border-width solid $o-linkup-widget-tint-border;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .o-linkup-RefletCard-label {
+        font-weight: 500;
+    }
+
+    .o-linkup-RefletCard-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .o-linkup-RefletCard-footer {
+        border-top: $border-width solid $o-linkup-widget-tint-border;
+    }
+
+    &.o-linkup-RefletCard-isMuted .o-linkup-RefletCard-header {
+        background-color: mix($o-view-background-color, $o-gray-400, 75%);
+    }
+
+    &.o-linkup-RefletCard-isPreview {
+        border-style: dashed !important;
+    }
+
+    &:focus-visible {
+        outline: $border-width * 2 solid $primary;
+        outline-offset: $border-width * 2;
+    }
+}
+
+.o-linkup-Message-card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.o-linkup-RefletActions {
+    border-top: $border-width solid $o-linkup-widget-tint-border;
+
+    .o-linkup-RefletActions-choice {
+        text-align: start;
+        max-width: 20rem;
+    }
+
+    .o-linkup-RefletActions-hint {
+        font-weight: normal;
+    }
+}
+
+.o-linkup-HelpBar {
+    .o-linkup-HelpBar-category,
+    .o-linkup-HelpBar-toggle {
+        width: $o-linkup-widget-target;
+        height: $o-linkup-widget-target;
+        padding: 0;
+        border: $border-width solid $o-linkup-widget-field-border;
+        border-radius: $border-radius-lg;
+        background-color: $o-view-background-color;
+        color: inherit;
+
+        &:hover {
+            border-color: $primary;
+        }
+    }
+
+    .o-linkup-HelpBar-category.o-isSelected {
+        border-color: $primary;
+        background-color: $primary;
+        color: $o-linkup-widget-on-primary;
+    }
+}
+
+.o-linkup-CategoryPicker {
+    .o-linkup-CategoryPicker-option {
+        width: 4.5rem;
+        min-height: $o-linkup-widget-target;
+        padding: map-get($spacers, 1);
+        border: $border-width solid $o-linkup-widget-field-border;
+        border-radius: $border-radius-lg;
+        background-color: $o-view-background-color;
+        color: inherit;
+
+        &.o-isSelected {
+            border-color: $primary;
+            background-color: $primary;
+            color: $o-linkup-widget-on-primary;
+        }
+    }
+}
+
+.o-linkup-RefletForm {
+    background-color: mix($o-view-background-color, $info, 95%);
+    border-color: $o-linkup-widget-tint-border !important;
+
+    .o-linkup-RefletForm-hint {
+        font-style: italic;
+    }
+
+    .o-linkup-RefletForm-example {
+        padding: map-get($spacers, 1) map-get($spacers, 2);
+        border-radius: $border-radius;
+
+        &.o-linkup-isDo {
+            background-color: mix($o-view-background-color, $success, 90%);
+        }
+
+        &.o-linkup-isDont {
+            background-color: mix($o-view-background-color, $danger, 90%);
+        }
+    }
+}
+
+// The reflection above the composer of the widget scrolls on its own: the
+// thread keeps its height.
+.o-mail-ChatWindow .o-linkup-RefletComposer {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.o-linkup-StartRule {
+    background-color: $o-linkup-widget-tint;
+    border-color: $o-linkup-widget-tint-border !important;
+}
+
+// The answers of the chatbot: a column, or a grid of two for the
+// categories of the guide.
+.o-linkup-ChatbotAnswers {
+    display: flex;
+    flex-direction: column;
+    gap: map-get($spacers, 2);
+
+    &.o-linkup-ChatbotAnswers-isGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .o-linkup-ChatbotAnswer {
+        min-height: $o-linkup-widget-target;
+        line-height: 1.2;
+    }
+}
+
+.o-linkup-LivechatHelp {
+    background-color: $o-view-background-color;
+}
+
+.o-linkup-GuideButton {
+    width: $o-linkup-widget-target;
+    height: $o-linkup-widget-target;
+    padding: 0;
+    border: $border-width solid $primary;
+    background-color: $o-view-background-color;
+    color: $primary;
+
+    &[aria-pressed="true"] {
+        background-color: $primary;
+        color: $o-linkup-widget-on-primary;
+    }
+}
+
+// The number of each element of the guide follows the order of the
+// document, through a counter. The widget lives in a shadow root, which
+// the class of the body does not reach: its host carries the class too.
+@mixin o-linkup-widget-guide-numbers {
+    counter-reset: linkup-guide;
+
+    [data-linkup-guide] {
+        position: relative;
+        counter-increment: linkup-guide;
+        outline: $border-width * 2 dashed $primary;
+        outline-offset: $border-width;
+
+        &::after {
+            content: counter(linkup-guide);
+            position: absolute;
+            top: -0.6rem;
+            right: -0.6rem;
+            z-index: 1;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            padding: 0 0.25rem;
+            border-radius: 0.625rem;
+            background-color: $primary;
+            color: $o-linkup-widget-on-primary;
+            font-size: $font-size-sm * 0.85;
+            font-weight: $font-weight-bold;
+            line-height: 1.25rem;
+            text-align: center;
+            pointer-events: none;
+        }
+    }
+}
+
+body.o-linkup-guideActive {
+    @include o-linkup-widget-guide-numbers;
+}
+
+:host(.o-linkup-guideActive) {
+    @include o-linkup-widget-guide-numbers;
+}
+
+.o-linkup-GuideSheet {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: $zindex-modal;
+    width: 22rem;
+    max-width: calc(100vw - 2rem);
+    max-height: 60vh;
+    overflow-y: auto;
+    background-color: $o-view-background-color;
+    border-color: $primary !important;
+
+    .o-linkup-GuideSheet-cnv {
+        background-color: $o-view-background-color;
+        border: $border-width solid $primary;
+        color: inherit;
+    }
+
+    .o-linkup-GuideSheet-definition p:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// Keyboard focus of every control of LinkUp: a ring of 3:1 at least
+// against the background (WCAG 2.4.7, 1.4.11).
+[class*="o-linkup-"]:where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):focus {
+    outline: $border-width * 2 solid $primary;
+    outline-offset: $border-width;
+}
+
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):not(:focus) {
+    border-color: $o-linkup-widget-field-border;
+}
+
+[class*="o-linkup-"]:where(.btn-outline-danger),
+[class*="o-linkup-"] :where(.btn-outline-danger) {
+    --btn-color: #{$o-linkup-widget-danger-text};
+}
+
+// Touch targets of 44 px: the widget is used on a phone as much as on a
+// desktop. A box is reached through its label too: the row of the label is
+// the target, centred on the box.
+[class*="o-linkup-"]:where(button, summary, .btn, .form-control, .form-select),
+[class*="o-linkup-"] :where(button, summary, .btn, .form-control, .form-select) {
+    min-width: $o-linkup-widget-target;
+    min-height: $o-linkup-widget-target;
+}
+
+[class*="o-linkup-"] .form-check {
+    display: flex;
+    align-items: center;
+    gap: map-get($spacers, 2);
+    min-height: $o-linkup-widget-target;
+
+    .form-check-input {
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+
+    .form-check-label {
+        flex-grow: 1;
+        min-height: $o-linkup-widget-target;
+        display: flex;
+        align-items: center;
+    }
+}

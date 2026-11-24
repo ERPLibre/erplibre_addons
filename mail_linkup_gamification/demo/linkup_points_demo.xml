@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The points of the reflections of the demonstration of the core,
+         paid by their scoring events: the confirmation of Sam and France
+         (1000 each, and the 100 of Sam's sending), France's precision
+         (1000 each) and the rejection (-150 for Sam). An answered call
+         pays 250 to both members of the pairs Sam-Jean, Sam-Mathieu,
+         Sam-Joanna and France-Luce. Sam holds 2700 points, the rank
+         Flame; France 2250, the rank Spark. The pair Sam-Jacques holds no
+         line: its first confirmation, precision and call pay in full. -->
+    <function model="linkup.reflet" name="_linkup_demo_points">
+        <value
+            eval="[
+                ref('mail_linkup_reflet.demo_user_sam'),
+                ref('mail_linkup_reflet.demo_user_france'),
+                ref('mail_linkup_reflet.demo_user_jacques'),
+                ref('mail_linkup_reflet.demo_user_jean'),
+                ref('mail_linkup_reflet.demo_user_mathieu'),
+                ref('mail_linkup_reflet.demo_user_nicolas'),
+                ref('mail_linkup_reflet.demo_user_joanna'),
+                ref('mail_linkup_reflet.demo_user_luce'),
+                ref('mail_linkup_reflet.demo_user_thomas'),
+                ref('mail_linkup_reflet.demo_user_jonathan'),
+                ref('mail_linkup_reflet.demo_user_henri'),
+            ]"
+        />
+        <value
+            eval="[
+                (ref('mail_linkup_reflet.demo_reflet_confirmed'), 'reflect_confirmed'),
+                (ref('mail_linkup_reflet.demo_reflet_precision'), 'precision_sent'),
+                (ref('mail_linkup_reflet.demo_reflet_rejected'), 'reflect_rejected'),
+            ]"
+        />
+        <value
+            eval="[
+                ref('mail_linkup_reflet.demo_link_sam_jean'),
+                ref('mail_linkup_reflet.demo_link_sam_mathieu'),
+                ref('mail_linkup_reflet.demo_link_sam_joanna'),
+                ref('mail_linkup_reflet.demo_link_france_luce'),
+            ]"
+        />
+    </function>
+</odoo>

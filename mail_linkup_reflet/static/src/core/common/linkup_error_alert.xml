@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupErrorAlert">
+        <div
+            class="o-linkup-ErrorAlert alert alert-danger small py-1 px-2 mb-0 d-flex flex-wrap align-items-center gap-2"
+            t-att-class="props.className"
+            role="alert"
+            t-att-data-code="props.error.code"
+        >
+            <span class="o-linkup-ErrorAlert-message flex-grow-1" t-esc="props.error.message" />
+            <button
+                t-if="canRetry"
+                type="button"
+                class="o-linkup-ErrorAlert-retry btn btn-link btn-sm p-0"
+                t-on-click="retry"
+            >
+                Try again
+            </button>
+            <button
+                t-if="needsLogin"
+                type="button"
+                class="o-linkup-ErrorAlert-login btn btn-link btn-sm p-0"
+                t-on-click="login"
+            >
+                Log in
+            </button>
+        </div>
+    </t>
+</templates>

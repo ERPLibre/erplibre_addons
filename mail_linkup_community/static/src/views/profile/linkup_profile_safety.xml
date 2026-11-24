@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupProfileSafety">
+        <section
+            class="o-linkup-Profile-safety d-flex flex-column gap-3"
+            aria-labelledby="o-linkup-Profile-safetyTitle"
+        >
+            <h2 id="o-linkup-Profile-safetyTitle" class="h5 mb-0" tabindex="-1">Safety</h2>
+            <div class="o-linkup-Profile-decisions d-flex flex-column gap-2" data-linkup-guide="profile-notices">
+                <h3 class="h6 mb-0">Decisions of the moderation about me</h3>
+                <p t-if="!state.notices.length" class="small mb-0">None.</p>
+                <ul t-else="" class="list-unstyled d-flex flex-column gap-2 mb-0">
+                    <li
+                        t-foreach="state.notices"
+                        t-as="notice"
+                        t-key="notice.id"
+                        class="o-linkup-Profile-decision border rounded-3 p-2 d-flex flex-column gap-1"
+                        t-att-data-decision="notice.decision"
+                    >
+                        <span class="fw-bold" t-esc="noticeText(notice)" />
+                        <span class="small" t-esc="noticeDetail(notice)" />
+                        <span
+                            t-if="appealText(notice)"
+                            class="o-linkup-Profile-appealState small"
+                            t-esc="appealText(notice)"
+                        />
+                        <t t-if="notice.can_appeal">
+                            <button
+                                t-if="state.appealFor !== notice.id"
+                                type="button"
+                                class="o-linkup-Profile-contest btn btn-link btn-sm p-0 align-self-start"
+                                t-on-click="() => this.openAppeal(notice)"
+                            >
+                                Contest this decision
+                            </button>
+                            <form
+                                t-else=""
+                                class="d-flex flex-column gap-1"
+                                t-on-submit.prevent="() => this.sendAppeal(notice)"
+                            >
+                                <label class="small" t-att-for="'o-linkup-Profile-appeal-' + notice.id">
+                                    Why do you contest it? Another moderator reads it.
+                                </label>
+                                <textarea
+                                    t-att-id="'o-linkup-Profile-appeal-' + notice.id"
+                                    class="o-linkup-Profile-appealText form-control form-control-sm"
+                                    rows="2"
+                                    maxlength="2000"
+                                    required="required"
+                                    t-model="state.appealText"
+                                />
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button type="button" class="btn btn-secondary btn-sm" t-on-click="cancelAppeal">
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        class="o-linkup-Profile-sendAppeal btn btn-primary btn-sm"
+                                        t-att-disabled="state.busy"
+                                    >
+                                        Send the appeal
+                                    </button>
+                                </div>
+                            </form>
+                        </t>
+                    </li>
+                </ul>
+            </div>
+            <div class="o-linkup-Profile-reports d-flex flex-column gap-2" data-linkup-guide="profile-reports">
+                <h3 class="h6 mb-0">My reports</h3>
+                <p class="small mb-0">The member you reported does not know who reported them.</p>
+                <p t-if="!state.reports.length" class="small mb-0">None.</p>
+                <ul t-else="" class="list-unstyled d-flex flex-column gap-1 mb-0">
+                    <li
+                        t-foreach="state.reports"
+                        t-as="report"
+                        t-key="report.id"
+                        class="o-linkup-Profile-report small d-flex flex-wrap gap-2"
+                    >
+                        <span t-esc="reportText(report)" />
+                        <span
+                            class="badge rounded-pill bg-body-secondary text-body border"
+                            t-esc="progressText(report)"
+                        />
+                    </li>
+                </ul>
+            </div>
+            <div class="o-linkup-Profile-blocked d-flex flex-column gap-2" data-linkup-guide="profile-blocked">
+                <h3 class="h6 mb-0">Blocked members</h3>
+                <p t-if="!state.blocked.length" class="small mb-0">You block nobody.</p>
+                <ul t-else="" class="list-unstyled d-flex flex-column gap-1 mb-0">
+                    <li
+                        t-foreach="state.blocked"
+                        t-as="member"
+                        t-key="member.id"
+                        class="o-linkup-Profile-blockedMember d-flex align-items-center gap-2"
+                    >
+                        <span t-esc="member.name" />
+                        <button
+                            type="button"
+                            class="o-linkup-Profile-unblock btn btn-link btn-sm p-0"
+                            t-att-disabled="state.busy"
+                            t-on-click="() => this.unblock(member)"
+                            t-esc="unblockLabel(member)"
+                        />
+                    </li>
+                </ul>
+            </div>
+            <p
+                t-if="state.notice"
+                class="o-linkup-Profile-safetyNotice small mb-0"
+                role="status"
+                t-esc="state.notice"
+            />
+            <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-Profile-safetyError'" />
+        </section>
+    </t>
+</templates>

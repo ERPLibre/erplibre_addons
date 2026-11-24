@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_network.LinkupNetworkView">
+        <div class="o-linkup-NetworkView o_action d-flex flex-column h-100 overflow-auto" t-ref="root">
+            <header class="o-linkup-NetworkView-header d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom">
+                <button
+                    type="button"
+                    class="o-linkup-NetworkView-back btn btn-link px-1"
+                    data-linkup-guide="network-back"
+                    aria-label="Back"
+                    title="Back (Escape)"
+                    aria-keyshortcuts="Escape"
+                    t-on-click="goBack"
+                >
+                    <i class="fa fa-arrow-left" aria-hidden="true" />
+                </button>
+                <h1 class="h4 mb-0">Network view</h1>
+                <button
+                    type="button"
+                    class="o-linkup-NetworkView-energy btn rounded-pill d-inline-flex align-items-center gap-2 px-3 py-1"
+                    data-linkup-guide="network-energy"
+                    data-linkup-points-anchor=""
+                    t-att-aria-label="energyLabel"
+                    t-att-title="energyLabel"
+                    t-on-click="backToGraph"
+                >
+                    <i class="fa fa-bolt" aria-hidden="true" />
+                    <span t-if="!pointsHidden" class="d-flex flex-column align-items-start lh-sm">
+                        <span class="o-linkup-NetworkView-energyTitle small">My energy</span>
+                        <span class="o-linkup-NetworkView-energyValue fw-bold" t-esc="energy" />
+                    </span>
+                    <span t-else="" class="small">Graph</span>
+                </button>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <div
+                        class="o-linkup-NetworkView-levels btn-group d-none d-md-inline-flex"
+                        role="group"
+                        aria-label="Density of the graph"
+                    >
+                        <button
+                            t-foreach="['x1', 'x2', 'x3']"
+                            t-as="level"
+                            t-key="level"
+                            type="button"
+                            class="o-linkup-NetworkView-level btn btn-sm"
+                            t-att-class="state.level === level ? 'btn-primary' : 'btn-outline-primary'"
+                            t-att-data-level="level"
+                            t-att-data-linkup-guide="'network-' + level"
+                            t-att-aria-pressed="state.level === level ? 'true' : 'false'"
+                            t-att-title="levelHint(level)"
+                            t-on-click="() => this.setLevel(level)"
+                            t-esc="levelName(level)"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-cycle btn btn-primary rounded-circle d-md-none"
+                        data-linkup-guide="network-cycle"
+                        t-att-data-level="state.level"
+                        t-att-aria-label="cycleLabel"
+                        t-att-title="cycleLabel"
+                        t-on-click="cycleLevel"
+                        t-esc="levelName(state.level)"
+                    />
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-listButton btn btn-outline-secondary rounded-circle d-md-none"
+                        data-linkup-guide="network-list"
+                        t-att-aria-label="listLabel"
+                        t-att-title="listLabel"
+                        aria-controls="o-linkup-NetworkView-side"
+                        t-att-aria-expanded="state.rankingOpen ? 'true' : 'false'"
+                        t-on-click="toggleRanking"
+                    >
+                        <i class="fa fa-list-ol" aria-hidden="true" />
+                    </button>
+                    <LinkupGuideButton />
+                </div>
+            </header>
+            <p class="visually-hidden" aria-live="polite" t-esc="state.announcement" />
+            <div t-if="state.loadError" class="m-3">
+                <LinkupErrorAlert
+                    error="state.loadError"
+                    onRetry.bind="load"
+                    className="'o-linkup-NetworkView-loadError'"
+                />
+            </div>
+            <p t-elif="!state.loaded" class="o-linkup-NetworkView-loading m-3" role="status">Loading…</p>
+            <div t-else="" class="o-linkup-NetworkView-body d-flex flex-column flex-md-row gap-3 p-3 flex-grow-1">
+                <section
+                    class="o-linkup-NetworkView-main d-flex flex-column gap-2 flex-grow-1"
+                    t-att-class="{ 'd-none': ui.isSmall and state.rankingOpen }"
+                    aria-labelledby="o-linkup-NetworkView-graphTitle"
+                >
+                    <h2 id="o-linkup-NetworkView-graphTitle" class="visually-hidden">Graph of my links</h2>
+                    <p id="o-linkup-NetworkView-graphSummary" class="o-linkup-NetworkView-summary small mb-0" t-esc="graphSummary" />
+                    <LinkupErrorAlert
+                        t-if="state.graphError"
+                        error="state.graphError"
+                        onRetry="() => this.loadGraph()"
+                        className="'o-linkup-NetworkView-graphError'"
+                    />
+                    <div
+                        class="o-linkup-NetworkView-canvas position-relative w-100 mx-auto"
+                        t-att-style="canvasStyle"
+                        t-att-data-level="state.level"
+                        t-att-data-grey-count="greyEdges.length"
+                        role="group"
+                        aria-labelledby="o-linkup-NetworkView-graphTitle"
+                        aria-describedby="o-linkup-NetworkView-graphSummary"
+                        t-on-keydown="onGraphKeydown"
+                    >
+                        <svg
+                            class="o-linkup-NetworkView-svg position-absolute top-0 start-0 w-100 h-100"
+                            t-att-viewBox="viewBox"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <line
+                                t-foreach="greyEdges"
+                                t-as="edge"
+                                t-key="edge.key"
+                                class="o-linkup-NetworkView-greyEdge"
+                                t-att-x1="edge.x1"
+                                t-att-y1="edge.y1"
+                                t-att-x2="edge.x2"
+                                t-att-y2="edge.y2"
+                            />
+                            <line
+                                t-foreach="layoutNodes"
+                                t-as="node"
+                                t-key="node.user_id"
+                                class="o-linkup-NetworkView-edge"
+                                t-att-class="{ 'o-isSelected': state.cardUserId === node.user_id }"
+                                t-att-data-user-id="node.user_id"
+                                t-att-x1="centre.x"
+                                t-att-y1="centre.y"
+                                t-att-x2="node.x"
+                                t-att-y2="node.y"
+                                t-att-stroke-width="node.width"
+                            />
+                        </svg>
+                        <!-- The middle of each line opens the card with a pointer; the
+                             keyboard reaches the same card through the node. -->
+                        <button
+                            t-foreach="layoutNodes"
+                            t-as="node"
+                            t-key="node.user_id"
+                            type="button"
+                            tabindex="-1"
+                            class="o-linkup-NetworkView-lineHit position-absolute rounded-circle border-0 p-0"
+                            t-att-style="node.hitStyle"
+                            t-att-data-user-id="node.user_id"
+                            t-att-data-linkup-guide="node_first ? 'network-line' : undefined"
+                            t-att-aria-label="lineLabel(node)"
+                            t-att-title="lineLabel(node)"
+                            t-on-click="(ev) => this.openCard(node, ev)"
+                        />
+                        <span
+                            class="o-linkup-NetworkView-me position-absolute d-flex flex-column align-items-center"
+                            t-att-style="centreStyle"
+                            data-linkup-guide="network-center"
+                        >
+                            <img class="o-linkup-NetworkView-meAvatar rounded-circle" t-att-src="selfAvatarUrl" alt="" />
+                            <span class="o-linkup-NetworkView-name small fw-bold text-truncate" t-esc="selfName" />
+                        </span>
+                        <button
+                            t-foreach="layoutNodes"
+                            t-as="node"
+                            t-key="node.user_id"
+                            type="button"
+                            class="o-linkup-NetworkView-node position-absolute d-flex flex-column align-items-center border-0 p-0 bg-transparent"
+                            t-att-class="{ 'o-isSelected': state.cardUserId === node.user_id }"
+                            t-att-style="node.style"
+                            t-att-tabindex="node.index === state.focusIndex ? 0 : -1"
+                            t-att-data-index="node.index"
+                            t-att-data-user-id="node.user_id"
+                            t-att-data-highlight="node.highlight ? 'true' : 'false'"
+                            t-att-data-linkup-guide="node_first ? 'network-node' : undefined"
+                            t-att-aria-label="nodeLabel(node)"
+                            t-att-aria-pressed="state.cardUserId === node.user_id ? 'true' : 'false'"
+                            t-on-click="(ev) => this.openCard(node, ev)"
+                        >
+                            <img
+                                class="o-linkup-NetworkView-avatar rounded-circle"
+                                t-att-class="{ 'o-linkup-isHighlighted': node.highlight }"
+                                t-att-src="avatarUrl(node)"
+                                alt=""
+                            />
+                            <span class="o-linkup-NetworkView-name small text-truncate" t-esc="node.name" />
+                        </button>
+                    </div>
+                    <p t-if="state.graph.more" class="o-linkup-NetworkView-more small mb-0" t-esc="moreLabel" />
+                    <ul class="o-linkup-NetworkView-legend list-unstyled d-flex flex-wrap gap-3 small mb-0">
+                        <li t-if="!pointsHidden" data-linkup-guide="network-thickness">
+                            <span class="o-linkup-NetworkView-legendLine" aria-hidden="true" />
+                            Width of the line: the points received in the link
+                        </li>
+                        <li data-linkup-guide="network-halo">
+                            <span class="o-linkup-NetworkView-legendHalo o-linkup-isHighlighted rounded-circle" aria-hidden="true" />
+                            Golden halo: “You add to my happiness” received
+                        </li>
+                        <li t-if="state.level === 'x1'" data-linkup-guide="network-grey">
+                            <span class="o-linkup-NetworkView-legendGrey" aria-hidden="true" />
+                            Grey line: two of your contacts linked, who both agree to show it
+                        </li>
+                    </ul>
+                    <details class="o-linkup-NetworkView-list border rounded-3 p-2">
+                        <summary class="fw-bold" data-linkup-guide="network-text-list" t-esc="listSummary" />
+                        <p t-if="!nodes.length" class="small mb-0 mt-2">Nobody yet.</p>
+                        <ul t-else="" class="list-unstyled d-flex flex-column gap-1 mt-2 mb-0">
+                            <li t-foreach="nodes" t-as="node" t-key="node.user_id">
+                                <button
+                                    type="button"
+                                    class="o-linkup-NetworkView-listEntry btn btn-link text-start p-0"
+                                    t-att-data-user-id="node.user_id"
+                                    t-on-click="(ev) => this.openCard(node, ev)"
+                                    t-esc="listEntry(node)"
+                                />
+                            </li>
+                        </ul>
+                    </details>
+                </section>
+                <aside
+                    id="o-linkup-NetworkView-side"
+                    class="o-linkup-NetworkView-side d-flex flex-column gap-3"
+                    t-att-class="{ 'd-none': ui.isSmall and !state.rankingOpen and !state.card }"
+                >
+                    <section
+                        t-if="!ui.isSmall or state.rankingOpen"
+                        class="o-linkup-NetworkView-ranking border rounded-3 p-3 d-flex flex-column gap-2"
+                        aria-labelledby="o-linkup-NetworkView-rankingTitle"
+                    >
+                        <h2 id="o-linkup-NetworkView-rankingTitle" class="visually-hidden">Rankings</h2>
+                        <div
+                            class="o-linkup-NetworkView-tabs nav nav-pills nav-fill gap-1"
+                            role="tablist"
+                            aria-label="Rankings"
+                            t-on-keydown="onTabsKeydown"
+                        >
+                            <button
+                                t-foreach="tabs"
+                                t-as="tab"
+                                t-key="tab.kind"
+                                type="button"
+                                role="tab"
+                                class="o-linkup-NetworkView-tab nav-link"
+                                t-att-class="{ active: currentTab === tab.kind }"
+                                t-att-id="'o-linkup-NetworkView-tab-' + tab.kind"
+                                t-att-data-kind="tab.kind"
+                                t-att-data-linkup-guide="tab.guide"
+                                t-att-aria-selected="currentTab === tab.kind ? 'true' : 'false'"
+                                aria-controls="o-linkup-NetworkView-rows"
+                                t-att-tabindex="currentTab === tab.kind ? 0 : -1"
+                                t-on-click="() => this.selectTab(tab.kind)"
+                                t-esc="tab.label"
+                            />
+                        </div>
+                        <label t-if="!pointsHidden and currentTab === 'active'" class="d-flex align-items-center gap-2 small">
+                            <span>Period</span>
+                            <select
+                                class="o-linkup-NetworkView-period form-select form-select-sm w-auto"
+                                data-linkup-guide="network-period"
+                                t-on-change="onChangePeriod"
+                            >
+                                <option value="all" t-att-selected="state.period === 'all'">All</option>
+                                <option value="30d" t-att-selected="state.period === '30d'">30 days</option>
+                            </select>
+                        </label>
+                        <p class="o-linkup-NetworkView-rankingHint small mb-0" t-esc="rankingHint" />
+                        <LinkupErrorAlert
+                            t-if="state.rankingError"
+                            error="state.rankingError"
+                            onRetry="() => this.loadRankings()"
+                            className="'o-linkup-NetworkView-rankingError'"
+                        />
+                        <div
+                            id="o-linkup-NetworkView-rows"
+                            role="tabpanel"
+                            t-att-aria-labelledby="'o-linkup-NetworkView-tab-' + currentTab"
+                        >
+                            <p t-if="!rows.length" class="o-linkup-NetworkView-rankingEmpty small mb-0" t-esc="rankingEmpty" />
+                            <ol t-else="" class="list-unstyled d-flex flex-column gap-1 mb-0">
+                                <li t-foreach="rows" t-as="row" t-key="row.user_id">
+                                    <button
+                                        type="button"
+                                        class="o-linkup-NetworkView-row btn d-flex align-items-center gap-2 w-100 text-start p-1"
+                                        t-att-class="{ 'o-isSelected': state.cardUserId === row.user_id }"
+                                        t-att-data-user-id="row.user_id"
+                                        t-att-data-linkup-guide="row_first ? 'network-row' : undefined"
+                                        t-att-aria-label="rowLabel(row)"
+                                        t-on-click="(ev) => this.openCard(row, ev)"
+                                    >
+                                        <span
+                                            t-if="!pointsHidden"
+                                            class="o-linkup-NetworkView-position small text-end"
+                                            t-esc="row.position"
+                                        />
+                                        <img
+                                            class="o-linkup-NetworkView-rowAvatar rounded-circle"
+                                            t-att-class="{ 'o-linkup-isHighlighted': row.highlight }"
+                                            t-att-src="avatarUrl(row)"
+                                            alt=""
+                                        />
+                                        <span class="o-linkup-NetworkView-rowName flex-grow-1 text-truncate" t-esc="row.name" />
+                                        <span
+                                            t-if="!pointsHidden"
+                                            class="o-linkup-NetworkView-rowValue fw-bold"
+                                            t-esc="formatPoints(row.value)"
+                                        />
+                                    </button>
+                                </li>
+                            </ol>
+                        </div>
+                    </section>
+                    <details
+                        t-if="!ui.isSmall or state.rankingOpen"
+                        class="o-linkup-NetworkView-privacy border rounded-3 p-3"
+                    >
+                        <summary class="fw-bold" data-linkup-guide="network-privacy">What my links see</summary>
+                        <div class="d-flex flex-column gap-2 mt-2">
+                            <div t-foreach="preferences" t-as="preference" t-key="preference.field" class="form-check mb-0">
+                                <input
+                                    type="checkbox"
+                                    class="o-linkup-NetworkView-preference form-check-input"
+                                    t-att-id="'o-linkup-NetworkView-' + preference.field"
+                                    t-att-data-field="preference.field"
+                                    t-att-checked="preference.checked"
+                                    t-att-aria-describedby="'o-linkup-NetworkView-' + preference.field + '-help'"
+                                    t-on-change="(ev) => this.onChangePreference(preference.field, ev)"
+                                />
+                                <label class="form-check-label" t-att-for="'o-linkup-NetworkView-' + preference.field" t-esc="preference.label" />
+                                <span
+                                    t-att-id="'o-linkup-NetworkView-' + preference.field + '-help'"
+                                    class="d-block small"
+                                    t-esc="preference.help"
+                                />
+                            </div>
+                            <LinkupErrorAlert
+                                t-if="state.preferenceError"
+                                error="state.preferenceError"
+                                className="'o-linkup-NetworkView-preferenceError'"
+                            />
+                        </div>
+                    </details>
+                    <t t-call="mail_linkup_network.LinkupNetworkCard" />
+                </aside>
+            </div>
+            <footer
+                t-if="state.loaded"
+                class="o-linkup-NetworkView-footer d-flex flex-wrap align-items-end gap-2 px-3 pb-3"
+            >
+                <div class="d-flex flex-column align-items-start gap-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            class="o-linkup-NetworkView-happiness btn btn-outline-secondary d-flex align-items-center gap-2"
+                            data-linkup-guide="network-happiness"
+                            aria-haspopup="listbox"
+                            t-att-aria-expanded="state.happinessOpen ? 'true' : 'false'"
+                            t-att-disabled="!contacts.length or state.happinessBusy"
+                            t-att-title="happinessHint"
+                            t-on-click="() => state.happinessOpen ? this.closeHappiness() : this.openHappiness()"
+                            t-ref="happiness"
+                        >
+                            <i class="fa fa-sun-o" aria-hidden="true" />
+                            <span>You add to my happiness</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="o-linkup-NetworkView-refletView btn btn-outline-secondary d-flex align-items-center gap-2"
+                            data-linkup-guide="network-reflet-view"
+                            t-on-click="openRefletView"
+                        >
+                            <i class="fa fa-clone" aria-hidden="true" />
+                            <span>Reflet view</span>
+                        </button>
+                    </div>
+                    <ul
+                        t-if="state.happinessOpen"
+                        class="o-linkup-NetworkView-happinessList list-unstyled border rounded-3 p-1 mb-0"
+                        role="listbox"
+                        tabindex="0"
+                        aria-label="Put someone in the light"
+                        t-att-aria-activedescendant="happinessActiveId"
+                        t-on-keydown="onHappinessKeydown"
+                        t-ref="happinessList"
+                    >
+                        <li
+                            t-foreach="contacts"
+                            t-as="contact"
+                            t-key="contact.user_id"
+                            class="o-linkup-NetworkView-option d-flex align-items-center gap-2 rounded-2 px-2 py-1"
+                            t-att-class="{ 'o-isActive': contact_index === state.happinessIndex }"
+                            role="option"
+                            t-att-id="happinessOptionId(contact)"
+                            t-att-aria-selected="contact_index === state.happinessIndex ? 'true' : 'false'"
+                            t-att-data-user-id="contact.user_id"
+                            t-on-click="() => this.highlightContact(contact)"
+                        >
+                            <img class="o-linkup-NetworkView-rowAvatar rounded-circle" t-att-src="avatarUrl(contact)" alt="" />
+                            <span t-esc="contact.name" />
+                        </li>
+                    </ul>
+                    <p
+                        t-if="state.happinessNotice"
+                        class="o-linkup-NetworkView-happinessNotice small mb-0"
+                        role="status"
+                        t-esc="state.happinessNotice"
+                    />
+                    <LinkupErrorAlert
+                        t-if="state.happinessError"
+                        error="state.happinessError"
+                        className="'o-linkup-NetworkView-happinessError'"
+                    />
+                </div>
+                <button
+                    type="button"
+                    class="o-linkup-NetworkView-newlink btn btn-outline-primary d-flex align-items-center gap-2 ms-auto"
+                    data-linkup-guide="network-newlink"
+                    t-on-click="openNewlink"
+                >
+                    <i class="fa fa-user-plus" aria-hidden="true" />
+                    <span>+ NewLink</span>
+                </button>
+            </footer>
+        </div>
+    </t>
+
+    <!-- The card of a link (LU-F-075): beside the graph on a large screen,
+         rising from the bottom on a small one. -->
+    <t t-name="mail_linkup_network.LinkupNetworkCard">
+        <section
+            t-if="state.cardUserId"
+            class="o-linkup-NetworkView-card border rounded-3 p-3 d-flex flex-column gap-2"
+            t-att-data-user-id="state.cardUserId"
+            t-att-data-available="card ? (card.available ? 'true' : 'false') : undefined"
+            role="region"
+            tabindex="-1"
+            t-att-aria-label="cardTitle"
+            t-att-aria-busy="state.cardLoading ? 'true' : undefined"
+            t-ref="card"
+        >
+            <div class="d-flex align-items-center gap-2">
+                <span class="o-linkup-NetworkView-pair d-flex align-items-center">
+                    <img class="o-linkup-NetworkView-cardAvatar rounded-circle" t-att-src="selfAvatarUrl" alt="" />
+                    <img
+                        t-if="card?.available"
+                        class="o-linkup-NetworkView-cardAvatar rounded-circle"
+                        t-att-class="{ 'o-linkup-isHighlighted': card.highlight_received }"
+                        t-att-src="avatarUrl(card)"
+                        alt=""
+                    />
+                </span>
+                <h2 class="o-linkup-NetworkView-cardTitle h6 mb-0 text-truncate" t-esc="card?.available ? card.name : ''" />
+                <button
+                    type="button"
+                    class="o-linkup-NetworkView-cardClose btn btn-link p-1 ms-auto"
+                    aria-label="Close the card"
+                    title="Close the card (Escape)"
+                    t-on-click="closeCard"
+                >
+                    <i class="fa fa-times" aria-hidden="true" />
+                </button>
+            </div>
+            <p t-if="!card" class="small mb-0" role="status">Loading…</p>
+            <p t-elif="!card.available" class="o-linkup-NetworkView-unavailable small mb-0" role="status">
+                This link is not available.
+            </p>
+            <t t-else="">
+                <div
+                    t-if="!pointsHidden"
+                    class="o-linkup-NetworkView-cardEnergy d-flex flex-column"
+                    data-linkup-guide="network-card-energy"
+                >
+                    <span class="small">Energy of the link</span>
+                    <span class="o-linkup-NetworkView-cardEnergyValue fs-4 fw-bold" t-esc="formatPoints(card.energy)" />
+                    <span class="visually-hidden" t-esc="cardEnergyLabel" />
+                </div>
+                <span t-if="firstLinkLabel" class="o-linkup-NetworkView-firstLink small" t-esc="firstLinkLabel" />
+                <span
+                    t-if="card.highlight_received"
+                    class="o-linkup-NetworkView-cardHalo small"
+                    t-esc="highlightLabel(card)"
+                />
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-call btn btn-success btn-sm d-flex align-items-center gap-1"
+                        data-linkup-guide="network-call"
+                        t-att-aria-label="callLabel"
+                        t-on-click="() => this.startCall()"
+                    >
+                        <i class="fa fa-phone" aria-hidden="true" />
+                        <span>Call</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-video btn btn-primary btn-sm d-flex align-items-center gap-1"
+                        data-linkup-guide="network-video"
+                        t-att-aria-label="videoLabel"
+                        t-on-click="() => this.startCall({ camera: true })"
+                    >
+                        <i class="fa fa-video-camera" aria-hidden="true" />
+                        <span>Video</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-openChat btn btn-secondary btn-sm"
+                        data-linkup-guide="network-chat"
+                        t-on-click="openConversation"
+                    >
+                        Open the conversation
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-highlight btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                        data-linkup-guide="network-highlight"
+                        t-att-aria-pressed="card.highlight_sent ? 'true' : 'false'"
+                        t-att-disabled="card.highlight_sent"
+                        t-on-click="highlightCard"
+                    >
+                        <i class="fa fa-sun-o" aria-hidden="true" />
+                        <span t-esc="highlightActionLabel" />
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-newReflet btn btn-outline-primary btn-sm"
+                        data-linkup-guide="network-new-reflet"
+                        t-on-click="newReflet"
+                    >
+                        New reflection
+                    </button>
+                </div>
+                <p
+                    t-if="state.cardNotice"
+                    class="o-linkup-NetworkView-cardNotice small mb-0"
+                    role="status"
+                    t-esc="state.cardNotice"
+                />
+                <div class="d-flex flex-wrap align-items-center gap-2 border-top pt-2">
+                    <h3 class="h6 mb-0 me-auto" data-linkup-guide="network-thread">Your exchanges</h3>
+                    <button
+                        type="button"
+                        class="o-linkup-NetworkView-refletsOnly btn btn-outline-secondary btn-sm"
+                        data-linkup-guide="network-reflets-only"
+                        t-att-aria-pressed="state.refletsOnly ? 'true' : 'false'"
+                        t-on-click="toggleRefletsOnly"
+                    >
+                        Reflections only
+                    </button>
+                </div>
+                <p t-if="!card.entries.length" class="o-linkup-NetworkView-noEntry small mb-0">
+                    Nothing to show here yet.
+                </p>
+                <ol t-else="" class="o-linkup-NetworkView-thread list-unstyled d-flex flex-column gap-2 mb-0">
+                    <li
+                        t-foreach="card.entries"
+                        t-as="entry"
+                        t-key="entry.message_id"
+                        class="o-linkup-NetworkView-entry rounded-3 px-2 py-1"
+                        t-att-class="entry.mine ? 'o-isMine align-self-end' : 'align-self-start'"
+                        t-att-data-reflet="entry.reflet_id ? 'true' : 'false'"
+                    >
+                        <span class="d-flex align-items-center gap-1 small">
+                            <t t-set="reflet" t-value="entryReflet(entry)" />
+                            <LinkupCategoryIcon
+                                t-if="reflet?.category_id"
+                                code="reflet.category_id.code"
+                                label="reflet.category_id.name"
+                            />
+                            <span class="fw-bold" t-esc="entryAuthor(entry)" />
+                            <span t-esc="entryDate(entry)" />
+                        </span>
+                        <span class="o-linkup-NetworkView-entryText d-block text-break" t-esc="entry.text" />
+                    </li>
+                </ol>
+            </t>
+            <LinkupErrorAlert
+                t-if="state.cardError"
+                error="state.cardError"
+                onRetry.bind="loadCard"
+                className="'o-linkup-NetworkView-cardError'"
+            />
+        </section>
+    </t>
+</templates>

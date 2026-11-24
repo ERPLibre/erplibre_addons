@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupHelpNow">
+        <div class="o-linkup-HelpNow alert alert-warning d-flex flex-column gap-1 mb-0" data-linkup-guide="help-now">
+            <p class="mb-0">
+                LinkUp is not an emergency service. If a person is in danger, contact a help resource right away:
+            </p>
+            <ul class="o-linkup-HelpNow-resources mb-0">
+                <li t-foreach="resources" t-as="resource" t-key="resource_index" class="fw-bold" t-esc="resource" />
+            </ul>
+            <p t-if="hoursText" class="o-linkup-HelpNow-hours small mb-0" t-esc="hoursText" />
+            <p t-if="!props.fromHelp" class="small mb-0">
+                These resources stay available at all times from the LinkUp help.
+            </p>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_gamification.LinkupPointsOverlay">
+        <div class="o-linkup-PointsOverlay">
+            <div
+                class="o-linkup-PointsOverlay-live visually-hidden"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                t-esc="points.announcement"
+            />
+            <div
+                t-foreach="points.bursts"
+                t-as="burst"
+                t-key="burst.id"
+                class="o-linkup-PointsBurst position-fixed"
+                t-att-class="{ 'o-isAnchored': burst.anchored }"
+                t-att-data-kind="burst.kind"
+                t-att-data-points="burst.points"
+                t-att-style="burst.style"
+                aria-hidden="true"
+            >
+                <span
+                    class="o-linkup-PointsBurst-chip d-inline-flex align-items-center gap-2 bg-view border rounded-pill shadow-sm px-2 py-1"
+                >
+                    <span
+                        t-if="burst.value"
+                        class="o-linkup-PointsBurst-value badge rounded-pill fs-6"
+                        t-att-class="burst.kind === 'loss' ? 'text-bg-danger' : 'text-bg-warning'"
+                        t-esc="burst.value"
+                    />
+                    <i t-elif="burst.kind === 'badge'" class="fa fa-certificate" aria-hidden="true" />
+                    <i t-else="" class="fa fa-level-up" aria-hidden="true" />
+                    <span class="o-linkup-PointsBurst-text small fw-bold text-nowrap" t-esc="burst.text" />
+                </span>
+            </div>
+        </div>
+    </t>
+</templates>

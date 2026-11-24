@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- Copied for each signup through an invitation (LU-F-020 RM2): an
+         internal user of the member group only, whose home action is the
+         Reflet view. Inactive, so that it never logs in nor shows among the
+         members. -->
+    <record
+        id="user_linkup_member_template"
+        model="res.users"
+        context="{'no_reset_password': True}"
+    >
+        <field name="name">LinkUp member template</field>
+        <field name="login">linkup_member_template</field>
+        <field name="active" eval="False" />
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+        <field name="action_id" ref="action_linkup_home" />
+    </record>
+
+    <!-- The email of a NewLink invitation (LU-F-020 RM7, RM8): generic,
+         without the texts of the reflection, in the language of the
+         inviter. linkup.invitation._linkup_send_mail gives the links in the
+         context: the token exists nowhere else in clear. -->
+    <record id="mail_template_linkup_invitation" model="mail.template">
+        <field name="name">LinkUp: NewLink invitation</field>
+        <field name="model_id" ref="model_linkup_invitation" />
+        <field
+            name="subject"
+        >{{ object.inviter_id.partner_id.name }} would like to make you a reflection on LinkUp</field>
+        <field
+            name="email_from"
+        >{{ object.inviter_id.company_id.email_formatted }}</field>
+        <field name="email_to">{{ object.email }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="auto_delete" eval="True" />
+        <field
+            name="description"
+        >Sent to a person invited to read a reflection on LinkUp.</field>
+        <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <p>Hello,</p>
+    <p>
+        A person you met, <strong t-out="object.inviter_id.partner_id.name or ''">Sam</strong>, would like to make you a reflection on LinkUp.
+    </p>
+    <p>
+        A reflection puts into words what this person understood of your exchange in person. Its text is not in this email: you will read it in LinkUp once signed up through this link.
+    </p>
+    <p style="margin: 16px 0px;">
+        <a t-att-href="ctx.get('linkup_invite_url')" style="background-color: #2B5C9E; padding: 8px 16px; text-decoration: none; color: #FFFFFF; border-radius: 6px;">See the reflection and sign up</a>
+    </p>
+    <p style="font-size: 12px;">
+        Personal link, valid <t t-out="ctx.get('linkup_expiry_days') or ''">14</t> days, for a single signup.
+    </p>
+    <p style="font-size: 12px;">
+        <t t-if="ctx.get('linkup_privacy_url')">
+            <a t-att-href="ctx.get('linkup_privacy_url')">Privacy policy</a> ·
+        </t>
+        <a t-att-href="ctx.get('linkup_optout_url')">Never receive a LinkUp invitation again</a> ·
+        <a t-att-href="ctx.get('linkup_other_lang_url')">Version française</a>
+    </p>
+</div>
+        </field>
+    </record>
+</odoo>

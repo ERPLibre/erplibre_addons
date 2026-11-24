@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- A member reads their own ledger lines only (LU-F-103); group rules
+         are joined by OR, so the LinkUp administrators read them all. -->
+    <record id="rule_linkup_points_ledger_member" model="ir.rule">
+        <field name="name">LinkUp member: own points</field>
+        <field name="model_id" ref="model_linkup_points_ledger" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_member'))]" />
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_linkup_points_ledger_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all points</field>
+        <field name="model_id" ref="model_linkup_points_ledger" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Badges: a member reads their own and grants none, the badges of
+         LinkUp being granted by the server. Without these rules every
+         internal user reads who holds which badge, a member included, and
+         grants the native badges to any user. -->
+    <record id="rule_badge_user_linkup_member_read" model="ir.rule">
+        <field name="name">LinkUp member: own badges</field>
+        <field name="model_id" ref="gamification.model_gamification_badge_user" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_member'))]" />
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_create" eval="False" />
+        <field name="perm_unlink" eval="False" />
+    </record>
+    <record id="rule_badge_user_linkup_member_grant" model="ir.rule">
+        <field name="name">LinkUp member: no badge granted</field>
+        <field name="model_id" ref="gamification.model_gamification_badge_user" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_member'))]" />
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="False" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_unlink" eval="True" />
+    </record>
+    <record id="rule_badge_user_linkup_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all badges</field>
+        <field name="model_id" ref="gamification.model_gamification_badge_user" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

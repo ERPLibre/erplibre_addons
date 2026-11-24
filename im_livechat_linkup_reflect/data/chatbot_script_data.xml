@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The partner the chatbots of LinkUp post as: archived, without
+         user, named the same in every language. -->
+    <record id="partner_linkup_bot" model="res.partner">
+        <field name="name">LinkUp</field>
+        <field name="active" eval="False" />
+    </record>
+
+    <!-- Welcome of the visitors (LU-F-124): six choices, each followed by
+         the steps it triggers. No step asks for an address, a phone or a
+         token (RM3); the answer about an invitation is the same text for
+         everybody. -->
+    <record id="chatbot_script_welcome" model="chatbot.script">
+        <field name="title">LinkUp welcome</field>
+        <field name="operator_partner_id" ref="partner_linkup_bot" />
+    </record>
+    <record id="welcome_step_hello" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">1</field>
+        <field name="step_type">text</field>
+        <field name="message">Hello! On LinkUp, a conversation starts with an exchange lived in person: you reformulate what a person told you, a reflection. Once they confirm it, the chat opens between you.</field>
+    </record>
+    <record id="welcome_step_choice" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">2</field>
+        <field name="step_type">question_selection</field>
+        <field name="message">What would you like to do?</field>
+    </record>
+    <record id="welcome_answer_discover" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">1</field>
+        <field name="name">Discover LinkUp</field>
+    </record>
+    <record id="welcome_answer_signup" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">2</field>
+        <field name="name">Sign up</field>
+        <field name="redirect_link">/web/signup</field>
+    </record>
+    <record id="welcome_answer_invitation" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">3</field>
+        <field name="name">I received an invitation</field>
+    </record>
+    <record id="welcome_answer_guide" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">4</field>
+        <field name="name">Try a guided reflection</field>
+    </record>
+    <record id="welcome_answer_member" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">5</field>
+        <field name="name">Talk to a member</field>
+    </record>
+    <record id="welcome_answer_help" model="chatbot.script.answer">
+        <field name="script_step_id" ref="welcome_step_choice" />
+        <field name="sequence">6</field>
+        <field name="name">Need help now</field>
+    </record>
+
+    <record id="welcome_step_discover" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">10</field>
+        <field name="step_type">text</field>
+        <field name="message">A reflection holds two parts: “You told me…”, what the person said, and “I understood that…”, what you understood of it. A category names the exchange: an observation, an emotion, a need…</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_discover'))]" />
+    </record>
+    <record id="welcome_step_discover_next" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">11</field>
+        <field name="step_type">text</field>
+        <field name="message">The person confirms that the exchange took place: “That's a link!”. You both earn points, and the free text opens between you. To join, sign up; to try, make your first reflection here.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_discover'))]" />
+    </record>
+
+    <record id="welcome_step_invitation" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">20</field>
+        <field name="step_type">text</field>
+        <field name="message">Open the link of the email you received: it leads you to the signup, then to the reflection that waits for you. Nobody here asks you for that link, a code or your address.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_invitation'))]" />
+    </record>
+
+    <record id="welcome_step_guide_category" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">30</field>
+        <field name="step_type">linkup_category</field>
+        <field name="message">Which category names the exchange?</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_guide'))]" />
+    </record>
+    <record id="welcome_step_guide_you_said" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">31</field>
+        <field name="step_type">linkup_you_said</field>
+        <field name="message">You told me: write what the person told you, in their words.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_guide'))]" />
+    </record>
+    <record id="welcome_step_guide_understood" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">32</field>
+        <field name="step_type">linkup_understood</field>
+        <field name="message">I understood that: write what you understood of it.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_guide'))]" />
+    </record>
+    <record id="welcome_step_guide_review" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">33</field>
+        <field name="step_type">linkup_reflet_review</field>
+        <field name="message">Here is your reflection.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_guide'))]" />
+    </record>
+
+    <record id="welcome_step_member" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">40</field>
+        <field name="step_type">forward_operator</field>
+        <field name="message">A member joins you. Here too, the conversation starts with a reflection.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_member'))]" />
+    </record>
+    <record id="welcome_step_member_none" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">41</field>
+        <field name="step_type">text</field>
+        <field name="message">No member is available right now. Come back a little later, or make your first reflection in the meantime.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_member'))]" />
+    </record>
+
+    <record id="welcome_step_help" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_welcome" />
+        <field name="sequence">50</field>
+        <field name="step_type">linkup_forward_moderator</field>
+        <field name="message">LinkUp is not an emergency service: in an immediate danger, call 9-1-1. A person of the moderation joins you.</field>
+        <field name="triggering_answer_ids" eval="[Command.link(ref('welcome_answer_help'))]" />
+    </record>
+
+    <!-- Guide of the first reflection of a member (LU-F-125), opened by
+         linkup.reflet.linkup_start_guide. -->
+    <record id="chatbot_script_guide" model="chatbot.script">
+        <field name="title">Reflection guide</field>
+        <field name="operator_partner_id" ref="partner_linkup_bot" />
+    </record>
+    <record id="guide_step_intro" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_guide" />
+        <field name="sequence">1</field>
+        <field name="step_type">text</field>
+        <field name="message">I guide you through a reflection, one question at a time. Nothing is sent: the reflection waits as a draft in the Reflet view.</field>
+    </record>
+    <record id="guide_step_category" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_guide" />
+        <field name="sequence">2</field>
+        <field name="step_type">linkup_category</field>
+        <field name="message">Which category names the exchange?</field>
+    </record>
+    <record id="guide_step_you_said" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_guide" />
+        <field name="sequence">3</field>
+        <field name="step_type">linkup_you_said</field>
+        <field name="message">You told me: write what the person told you, in their words.</field>
+    </record>
+    <record id="guide_step_understood" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_guide" />
+        <field name="sequence">4</field>
+        <field name="step_type">linkup_understood</field>
+        <field name="message">I understood that: write what you understood of it.</field>
+    </record>
+    <record id="guide_step_review" model="chatbot.script.step">
+        <field name="chatbot_script_id" ref="chatbot_script_guide" />
+        <field name="sequence">5</field>
+        <field name="step_type">linkup_reflet_review</field>
+        <field name="message">Here is your reflection.</field>
+    </record>
+
+    <!-- The answers of the category steps: the active categories. -->
+    <function model="chatbot.script.step" name="_linkup_sync_category_answers" />
+</odoo>

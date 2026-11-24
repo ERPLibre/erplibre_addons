@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <!-- The card of a reflection follows the text block of its carrier
+         message, which stays empty: message_model_patch.js reports no
+         text content for a carrier. -->
+    <t t-inherit="mail.Message" t-inherit-mode="extension">
+        <xpath expr="//*[hasclass('o-mail-Message-textContent')]" position="after">
+            <div
+                t-if="message.linkup_reflet_id"
+                class="o-linkup-Message-card py-1"
+                t-att-class="{ 'w-100': env.inChatWindow }"
+            >
+                <LinkupRefletCard reflet="message.linkup_reflet_id" thread="message.thread" interactive="true" />
+            </div>
+        </xpath>
+    </t>
+</templates>

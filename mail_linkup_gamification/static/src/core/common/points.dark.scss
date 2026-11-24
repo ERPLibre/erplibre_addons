@@ -1,0 +1,17 @@
+// Tint of the energy in the dark theme, after the light rules of
+// points.scss: mixed with $gray-100 as the core does for its cards.
+
+$o-linkup-energy-tint-dark: mix($gray-100, $warning, 82%);
+
+.o-linkup-Energy-bubble,
+.o-linkup-Energy-card {
+    background-color: $o-linkup-energy-tint-dark;
+    border-color: mix($gray-100, $warning, 60%) !important;
+}
+
+.o-linkup-Energy-bubble {
+    &:hover,
+    &:focus-visible {
+        background-color: mix($gray-100, $warning, 70%);
+    }
+}

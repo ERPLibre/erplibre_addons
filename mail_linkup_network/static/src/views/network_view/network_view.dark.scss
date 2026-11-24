@@ -1,0 +1,44 @@
+// Tints of the Network view in the dark theme, after the light rules of
+// network_view.scss: mixed with $gray-100 as the core does for its cards.
+
+.o-linkup-NetworkView {
+    .o-linkup-NetworkView-energy {
+        background-color: mix($gray-100, $warning, 82%);
+        border-color: mix($gray-100, $warning, 60%);
+
+        &:hover,
+        &:focus-visible {
+            background-color: mix($gray-100, $warning, 70%);
+        }
+    }
+
+    // The lines carry the graph: lighter than $primary, which keeps 3:1
+    // only just on a dark background; the selected line lighter still.
+    .o-linkup-NetworkView-edge {
+        stroke: lighten($primary, 10%);
+
+        &.o-isSelected {
+            stroke: lighten($primary, 25%);
+        }
+    }
+
+    .o-linkup-NetworkView-legendLine {
+        background-color: lighten($primary, 10%);
+    }
+
+    .o-linkup-NetworkView-greyEdge {
+        stroke: $gray-500;
+    }
+
+    .o-linkup-NetworkView-legendGrey {
+        border-top-color: $gray-500;
+    }
+
+    .o-linkup-NetworkView-me .o-linkup-NetworkView-meAvatar {
+        box-shadow: 0 0 0 0.3rem mix($gray-100, $primary, 75%);
+    }
+
+    .o-linkup-NetworkView-card .o-linkup-NetworkView-entry.o-isMine {
+        background-color: mix($gray-100, $primary, 80%);
+    }
+}

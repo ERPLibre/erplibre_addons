@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupCategoryIcon">
+        <svg
+            class="o-linkup-CategoryIcon flex-shrink-0"
+            t-att-width="props.size"
+            t-att-height="props.size"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            t-att-role="props.label ? 'img' : undefined"
+            t-att-aria-label="props.label or undefined"
+            t-att-aria-hidden="props.label ? undefined : 'true'"
+            t-att-data-code="props.hidden ? 'hidden' : props.code"
+            focusable="false"
+        >
+            <title t-if="props.label" t-esc="props.label" />
+            <t t-foreach="paths" t-as="path" t-key="path_index">
+                <path t-att-d="path" />
+            </t>
+        </svg>
+    </t>
+</templates>

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkup_consent_member,linkup.consent member,model_linkup_consent,mail_linkup_reflet.group_linkup_member,1,0,0,0
+access_linkup_consent_admin,linkup.consent admin,model_linkup_consent,mail_linkup_reflet.group_linkup_admin,1,0,0,0
+access_linkup_rate_event_none,linkup.rate.event server only,model_linkup_rate_event,mail_linkup_reflet.group_linkup_admin,0,0,0,0
+access_linkup_audit_log_moderator,linkup.audit.log moderator,model_linkup_audit_log,mail_linkup_reflet.group_linkup_moderator,1,0,0,0
+access_linkup_hidden_content_none,linkup.hidden.content server only,model_linkup_hidden_content,mail_linkup_reflet.group_linkup_admin,0,0,0,0
+access_linkup_moderation_notice_member,linkup.moderation.notice member,model_linkup_moderation_notice,mail_linkup_reflet.group_linkup_member,1,0,0,0

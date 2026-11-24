@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupSidebarSection" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-SidebarSection-refletView')]" position="after">
+            <button
+                type="button"
+                class="o-linkup-SidebarSection-networkView o-mail-DiscussSidebar-item btn d-flex align-items-center gap-2 px-2 mx-2 border-0 rounded-2 fw-normal text-reset bg-inherit"
+                t-att-class="{ 'justify-content-center o-compact': store.discuss.isSidebarCompact }"
+                t-att-title="networkLabel"
+                t-on-click="openNetworkView"
+            >
+                <i class="fa fa-fw fa-share-alt" aria-hidden="true" />
+                <span t-if="!store.discuss.isSidebarCompact" class="small text-truncate" t-esc="networkLabel" />
+                <span t-else="" class="visually-hidden" t-esc="networkLabel" />
+            </button>
+        </xpath>
+    </t>
+</templates>

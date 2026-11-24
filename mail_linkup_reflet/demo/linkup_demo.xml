@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Members of the demonstration: first names of the presentation
+         deck, addresses under example.com, password equal to the
+         login. -->
+    <record id="demo_user_sam" model="res.users">
+        <field name="name">Sam</field>
+        <field name="login">sam</field>
+        <field name="password">sam</field>
+        <field name="email">sam@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_france" model="res.users">
+        <field name="name">France</field>
+        <field name="login">france</field>
+        <field name="password">france</field>
+        <field name="email">france@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_jacques" model="res.users">
+        <field name="name">Jacques</field>
+        <field name="login">jacques</field>
+        <field name="password">jacques</field>
+        <field name="email">jacques@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_jean" model="res.users">
+        <field name="name">Jean</field>
+        <field name="login">jean</field>
+        <field name="password">jean</field>
+        <field name="email">jean@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_mathieu" model="res.users">
+        <field name="name">Mathieu</field>
+        <field name="login">mathieu</field>
+        <field name="password">mathieu</field>
+        <field name="email">mathieu@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_nicolas" model="res.users">
+        <field name="name">Nicolas</field>
+        <field name="login">nicolas</field>
+        <field name="password">nicolas</field>
+        <field name="email">nicolas@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_joanna" model="res.users">
+        <field name="name">Joanna</field>
+        <field name="login">joanna</field>
+        <field name="password">joanna</field>
+        <field name="email">joanna@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_luce" model="res.users">
+        <field name="name">Luce</field>
+        <field name="login">luce</field>
+        <field name="password">luce</field>
+        <field name="email">luce@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_thomas" model="res.users">
+        <field name="name">Thomas</field>
+        <field name="login">thomas</field>
+        <field name="password">thomas</field>
+        <field name="email">thomas@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_jonathan" model="res.users">
+        <field name="name">Jonathan</field>
+        <field name="login">jonathan</field>
+        <field name="password">jonathan</field>
+        <field name="email">jonathan@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+    <record id="demo_user_henri" model="res.users">
+        <field name="name">Henri</field>
+        <field name="login">henri</field>
+        <field name="password">henri</field>
+        <field name="email">henri@example.com</field>
+        <field name="groups_id" eval="[Command.set([ref('group_linkup_member')])]" />
+    </record>
+
+    <!-- Links of Sam and of France, as drawn on their Reflet views. -->
+    <record id="demo_link_sam_jacques" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_jacques" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_jean" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_jean" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_france" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_france" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_mathieu" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_mathieu" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_nicolas" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_nicolas" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_joanna" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_sam" />
+        <field name="user_b_id" ref="demo_user_joanna" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_france_luce" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_france" />
+        <field name="user_b_id" ref="demo_user_luce" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_france_thomas" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_france" />
+        <field name="user_b_id" ref="demo_user_thomas" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_france_jonathan" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_france" />
+        <field name="user_b_id" ref="demo_user_jonathan" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_france_henri" model="linkup.link">
+        <field name="user_a_id" ref="demo_user_france" />
+        <field name="user_b_id" ref="demo_user_henri" />
+        <field name="state">active</field>
+        <field name="first_link_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="last_interaction_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+
+    <!-- One reflection of Sam to France in each state. The confirmed one
+         carries a precision of France hiding the Goals theme, which Sam
+         has still to guess. -->
+    <record id="demo_reflet_draft" model="linkup.reflet">
+        <field name="author_id" ref="demo_user_sam" />
+        <field name="category_id" ref="linkup_category_vulnerability" />
+        <field name="you_said">Que tu hésites à reprendre le projet seule.</field>
+        <field name="state">draft</field>
+    </record>
+    <record id="demo_reflet_sent" model="linkup.reflet">
+        <field name="author_id" ref="demo_user_sam" />
+        <field name="recipient_id" ref="demo_user_france" />
+        <field name="link_id" ref="demo_link_sam_france" />
+        <field name="category_id" ref="linkup_category_emotions" />
+        <field name="you_said">Que la réunion d'hier t'a fatiguée.</field>
+        <field name="understood">Que tu as besoin d'une pause avant la suite.</field>
+        <field name="real_world_declared" eval="True" />
+        <field name="real_world_date" eval="(DateTime.today() - timedelta(days=1)).strftime('%Y-%m-%d')" />
+        <field name="state">sent</field>
+        <field name="sent_date" eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_reflet_confirmed" model="linkup.reflet">
+        <field name="author_id" ref="demo_user_sam" />
+        <field name="recipient_id" ref="demo_user_france" />
+        <field name="link_id" ref="demo_link_sam_france" />
+        <field name="category_id" ref="linkup_category_needs" />
+        <field name="you_said">Que tu cherches du temps pour ton jardin.</field>
+        <field name="understood">Que tu as besoin de calme cette saison.</field>
+        <field name="real_world_declared" eval="True" />
+        <field name="real_world_date" eval="(DateTime.today() - timedelta(days=21)).strftime('%Y-%m-%d')" />
+        <field name="state">confirmed</field>
+        <field name="response_state">precision</field>
+        <field name="sent_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="read_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="answered_date" eval="(DateTime.now() - timedelta(days=20)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_reflet_precision" model="linkup.reflet">
+        <field name="kind">precision</field>
+        <field name="author_id" ref="demo_user_france" />
+        <field name="recipient_id" ref="demo_user_sam" />
+        <field name="link_id" ref="demo_link_sam_france" />
+        <field name="parent_id" ref="demo_reflet_confirmed" />
+        <field name="body_text">Je voudrais trouver quelqu'un pour faire avancer le potager du quartier.</field>
+        <field name="state">sent</field>
+        <field name="guess_state">pending</field>
+        <field name="round_index">1</field>
+        <field name="sent_date" eval="(DateTime.now() - timedelta(days=19)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_reflet_precision_secret" model="linkup.reflet.secret">
+        <field name="reflet_id" ref="demo_reflet_precision" />
+        <field name="category_ids" eval="[Command.set([ref('linkup_category_goals')])]" />
+        <field name="primary_category_id" ref="linkup_category_goals" />
+    </record>
+    <record id="demo_reflet_rejected" model="linkup.reflet">
+        <field name="author_id" ref="demo_user_sam" />
+        <field name="recipient_id" ref="demo_user_france" />
+        <field name="link_id" ref="demo_link_sam_france" />
+        <field name="category_id" ref="linkup_category_observation" />
+        <field name="you_said">Que tu étais au marché samedi.</field>
+        <field name="understood">Que tu y vas chaque semaine.</field>
+        <field name="real_world_declared" eval="True" />
+        <field name="state">rejected</field>
+        <field name="sent_date" eval="(DateTime.now() - timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="answered_date" eval="(DateTime.now() - timedelta(days=9)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="demo_link_sam_france" model="linkup.link">
+        <field name="turn_reflet_id" ref="demo_reflet_precision" />
+    </record>
+
+    <!-- The carrier messages of the reflections above, in the direct
+         conversation of Sam and France, in the order of the exchange. -->
+    <function model="linkup.reflet" name="_linkup_demo_post_carriers">
+        <value
+            eval="[ref('demo_reflet_confirmed'), ref('demo_reflet_precision'), ref('demo_reflet_rejected'), ref('demo_reflet_sent')]"
+        />
+    </function>
+</odoo>

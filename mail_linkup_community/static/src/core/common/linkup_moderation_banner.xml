@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupModerationBanner">
+        <div t-if="unseen or urgent" class="o-linkup-ModerationBanner d-flex flex-column gap-2 px-3 pt-3">
+            <div
+                t-if="unseen"
+                class="o-linkup-ModerationBanner-notice alert alert-info d-flex flex-wrap align-items-center gap-2 mb-0"
+                role="status"
+            >
+                <span class="flex-grow-1">A decision of the moderation concerns you.</span>
+                <button
+                    type="button"
+                    class="o-linkup-ModerationBanner-read btn btn-primary btn-sm"
+                    t-on-click="openSafety"
+                >
+                    Read it
+                </button>
+            </div>
+            <div
+                t-if="urgent"
+                class="o-linkup-ModerationBanner-urgent alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-0"
+                role="status"
+            >
+                <span class="flex-grow-1">Urgent reports wait in your moderation queue.</span>
+                <button
+                    type="button"
+                    class="o-linkup-ModerationBanner-open btn btn-primary btn-sm"
+                    t-on-click="openModeration"
+                >
+                    Open the moderation
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

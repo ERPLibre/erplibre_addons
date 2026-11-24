@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+    <!-- The twelve categories of communication. sequence orders the
+         full band, reflet_bar_sequence the reduced bar of the Reflet
+         view, which shows the categories marked in_reflet_bar. The
+         texts are translatable: the French ones live in
+         i18n/fr_CA.po. -->
+    <record id="linkup_category_observation" model="linkup.category">
+        <field name="code">observation</field>
+        <field name="name">Observation</field>
+        <field name="definition" type="html"><p>What we see or perceive, described without judgement or evaluation; the rest comes from our own representations and pollutes the connection.</p></field>
+        <field name="example_do">“I notice that Jean is not here.”</field>
+        <field name="example_dont">“Jean is late again, like every day! We can never count on him!”</field>
+        <field name="reflet_title">You told me about what you observed</field>
+        <field name="starter_self">I notice that:</field>
+        <field name="starter_reflect">You noticed that:</field>
+        <field name="sequence">10</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">1</field>
+        <field name="is_cnv" eval="True" />
+    </record>
+    <record id="linkup_category_emotions" model="linkup.category">
+        <field name="code">emotions</field>
+        <field name="name">Emotions</field>
+        <field name="definition" type="html"><p>Five basic categories (joy, fear, disgust, anger, sadness), natural, which belong to us and express a fundamental need. Anger is not violence, unless it is directed against a person.</p></field>
+        <field name="example_do">“I feel anger when I see that the rule is not respected.”</field>
+        <field name="example_dont">“You really are stupid not to respect the rules, where is your head?”</field>
+        <field name="reflet_title">You told me about your emotions</field>
+        <field name="starter_self">I feel:</field>
+        <field name="starter_reflect">You feel:</field>
+        <field name="sequence">20</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">2</field>
+        <field name="is_cnv" eval="True" />
+    </record>
+    <record id="linkup_category_needs" model="linkup.category">
+        <field name="code">needs</field>
+        <field name="name">Needs</field>
+        <field name="definition" type="html"><p>Fundamental elements to be heard (hunger, thirst, rest, silence, connection with others). Expressing them belongs to us, clearly and without judgement; the other person is not responsible for needs left unexpressed.</p></field>
+        <field name="example_do">“I need to eat, I feel weak.”</field>
+        <field name="example_dont">“You never want me to eat, or what?”</field>
+        <field name="reflet_title">You told me about your needs</field>
+        <field name="starter_self">I need:</field>
+        <field name="starter_reflect">You need:</field>
+        <field name="sequence">30</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">3</field>
+        <field name="is_cnv" eval="True" />
+    </record>
+    <record id="linkup_category_action" model="linkup.category">
+        <field name="code">action</field>
+        <field name="name">Action request</field>
+        <field name="definition" type="html"><p>A negotiable request, made for our own benefit and needs; a way of influencing that does not lock the other person in; without judgement.</p></field>
+        <field name="example_do">“I would like you to put on the winter tyres.”</field>
+        <field name="example_dont">“Once again it is up to me to remind you to put on the winter tyres!”</field>
+        <field name="reflet_title">You told me about a request</field>
+        <field name="starter_self">I would like you to:</field>
+        <field name="starter_reflect">Your action request is that:</field>
+        <field name="sequence">40</field>
+        <field name="in_reflet_bar" eval="False" />
+        <field name="reflet_bar_sequence">100</field>
+        <field name="is_cnv" eval="True" />
+    </record>
+    <record id="linkup_category_inhibition" model="linkup.category">
+        <field name="code">inhibition</field>
+        <field name="name">Inhibition</field>
+        <field name="definition" type="html"><p>A request to stop or not to do something, made like an action request: negotiable and without judgement.</p></field>
+        <field name="reflet_title">You told me about what you no longer want</field>
+        <field name="starter_self">I would like you to stop:</field>
+        <field name="starter_reflect">Your request is that I stop:</field>
+        <field name="sequence">50</field>
+        <field name="in_reflet_bar" eval="False" />
+        <field name="reflet_bar_sequence">100</field>
+        <field name="is_cnv" eval="True" />
+    </record>
+    <record id="linkup_category_go_listen" model="linkup.category">
+        <field name="code">go_listen</field>
+        <field name="name">Go listen</field>
+        <field name="definition" type="html"><p>Facing a long silence, a frozen attitude or a call for help: signalling that we are ready to receive what the other person is about to say, even if it stirs strong emotions.</p></field>
+        <field name="reflet_title">You told me you need to be listened to</field>
+        <field name="starter_self">I am ready to listen to you:</field>
+        <field name="starter_reflect">You are ready to listen to me:</field>
+        <field name="sequence">60</field>
+        <field name="in_reflet_bar" eval="False" />
+        <field name="reflet_bar_sequence">100</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_go_speak" model="linkup.category">
+        <field name="code">go_speak</field>
+        <field name="name">Go speak</field>
+        <field name="definition" type="html"><p>When the other person wants to listen, it is our turn. Vector expression in five steps: context, trigger, realisation, goal, clear action request.</p></field>
+        <field name="reflet_title">You told me about what you wanted to tell me</field>
+        <field name="starter_self">Context: / Trigger: / Realisation: / Where I am heading: / My request:</field>
+        <field name="starter_reflect">You wanted to tell me:</field>
+        <field name="sequence">70</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">5</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_goals" model="linkup.category">
+        <field name="code">goals</field>
+        <field name="name">Goals</field>
+        <field name="definition" type="html"><p>Expressing our goals clearly gives the exchange its meaning and lets us choose whom to team up with: the key to a lasting bond.</p></field>
+        <field name="example_do">“My goal really is to find someone to move this situation forward…”</field>
+        <field name="reflet_title">You told me about your goal</field>
+        <field name="starter_self">My goal is:</field>
+        <field name="starter_reflect">Your goal is:</field>
+        <field name="sequence">80</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">6</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_vulnerability" model="linkup.category">
+        <field name="code">vulnerability</field>
+        <field name="name">Vulnerability</field>
+        <field name="definition" type="html"><p>A disclosure that starts on the surface, then grows progressively and slowly; sincere, it strengthens the bond; too fast, it drives people away. It marks a sensitive point, expressed or understood. What was not said is not reformulated.</p></field>
+        <field name="reflet_title">You told me about your vulnerability</field>
+        <field name="starter_self">What is sensitive for me:</field>
+        <field name="starter_reflect">What is sensitive for you:</field>
+        <field name="sequence">90</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">7</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_reflection" model="linkup.category">
+        <field name="code">reflection</field>
+        <field name="name">Reflection</field>
+        <field name="definition" type="html"><p>Showing the other person that we listened and understood: saying it is not enough, it has to be shown. It announces a reformulation to come or the wish to be better understood.</p></field>
+        <field name="reflet_title">You told me you want to be better understood</field>
+        <field name="starter_self">What I would like you to understand:</field>
+        <field name="starter_reflect">What you would like me to understand:</field>
+        <field name="sequence">100</field>
+        <field name="in_reflet_bar" eval="False" />
+        <field name="reflet_bar_sequence">100</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_focus" model="linkup.category">
+        <field name="code">focus</field>
+        <field name="name">Focused attention</field>
+        <field name="definition" type="html"><p>The main tool to perceive, learn and imagine courses of action; without focused attention, one should not speak; giving the other person feedback on our attention.</p></field>
+        <field name="reflet_title">You told me about what holds your attention</field>
+        <field name="starter_self">What holds my attention:</field>
+        <field name="starter_reflect">What holds your attention:</field>
+        <field name="sequence">110</field>
+        <field name="in_reflet_bar" eval="False" />
+        <field name="reflet_bar_sequence">100</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+    <record id="linkup_category_team" model="linkup.category">
+        <field name="code">team</field>
+        <field name="name">Team</field>
+        <field name="definition" type="html"><p>We are fragile and the team lets us survive; talking about how the team is built, how it works and how it performs.</p></field>
+        <field name="reflet_title">You told me about the team</field>
+        <field name="starter_self">For our team:</field>
+        <field name="starter_reflect">For our team, you suggest:</field>
+        <field name="sequence">120</field>
+        <field name="in_reflet_bar" eval="True" />
+        <field name="reflet_bar_sequence">4</field>
+        <field name="is_cnv" eval="False" />
+    </record>
+</odoo>

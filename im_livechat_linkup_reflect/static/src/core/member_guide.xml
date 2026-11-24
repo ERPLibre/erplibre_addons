@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="im_livechat_linkup_reflect.LinkupGuideAnswers">
+        <div class="o-linkup-GuideAnswers d-flex flex-column gap-2 mx-3 mb-2" t-att-data-step="guide.step_type">
+            <span t-if="hint" class="o-linkup-GuideAnswers-hint small" t-esc="hint" />
+            <div
+                t-if="guide.expects === 'choice'"
+                class="o-linkup-GuideAnswers-choices d-flex flex-wrap gap-2"
+                role="group"
+                t-att-aria-label="hint"
+            >
+                <button
+                    t-foreach="guide.answers"
+                    t-as="answer"
+                    t-key="answer.id"
+                    type="button"
+                    class="o-linkup-GuideAnswers-answer btn btn-outline-primary btn-sm"
+                    t-att-data-answer-id="answer.id"
+                    t-on-click="() => this.choose(answer)"
+                    t-esc="answer.name"
+                />
+            </div>
+            <div
+                t-if="props.thread.linkup_guide_error"
+                class="o-linkup-GuideAnswers-error alert alert-warning small mb-0 py-1"
+                role="alert"
+                t-esc="props.thread.linkup_guide_error"
+            />
+        </div>
+    </t>
+
+    <t t-inherit="mail.Composer" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-mail-Composer')]" position="before">
+            <LinkupGuideAnswers t-if="hasLinkupGuide" thread="thread" />
+        </xpath>
+    </t>
+
+    <t t-inherit="mail_linkup_reflet.LinkupTour" t-inherit-mode="extension">
+        <xpath expr="//p[@id='o-linkup-Tour-text']" position="after">
+            <button
+                t-if="isLast"
+                type="button"
+                class="o-linkup-Tour-guide btn btn-outline-primary btn-sm align-self-start"
+                t-on-click="linkupStartGuide"
+            >
+                Write my first reflection with the guide
+            </button>
+        </xpath>
+    </t>
+</templates>

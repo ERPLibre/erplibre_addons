@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- The screen "My points" of a member (static/src/views/my_points). -->
+    <record id="action_linkup_my_points" model="ir.actions.client">
+        <field name="name">My points</field>
+        <field name="tag">linkup.my_points</field>
+        <field name="path">linkup-points</field>
+    </record>
+
+    <menuitem
+        id="menu_linkup_my_points"
+        name="My points"
+        parent="mail_linkup_reflet.menu_linkup_root"
+        action="action_linkup_my_points"
+        groups="mail_linkup_reflet.group_linkup_member"
+        sequence="20"
+    />
+</odoo>

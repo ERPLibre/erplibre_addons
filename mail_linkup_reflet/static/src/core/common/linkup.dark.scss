@@ -1,0 +1,71 @@
+// Tints of the LinkUp views in the dark theme, after the light rules of
+// linkup.scss: mixed with $gray-100 as mail does for its bubbles, so the
+// cards stay distinct from the background of the thread. The focus ring is
+// lighter, for 3:1 on a dark background.
+
+$o-linkup-tint-dark: mix($gray-100, $info, 87.5%);
+
+.o-linkup-RefletCard {
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+
+    .o-linkup-RefletCard-header {
+        background-color: $o-linkup-tint-dark;
+    }
+
+    .o-linkup-RefletCard-badge,
+    .o-linkup-RefletCard-footer {
+        border-color: lighten($o-linkup-tint-dark, 5%);
+    }
+
+    &.o-linkup-RefletCard-isMuted .o-linkup-RefletCard-header {
+        background-color: mix($gray-100, $gray-400, 75%);
+    }
+}
+
+.o-linkup-RefletForm {
+    background-color: mix($gray-100, $info, 95%);
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+
+    .o-linkup-RefletForm-example {
+        &.o-linkup-isDo {
+            background-color: mix($gray-100, $success, 85%);
+        }
+
+        &.o-linkup-isDont {
+            background-color: mix($gray-100, $danger, 85%);
+        }
+    }
+}
+
+.o-linkup-RefletActions {
+    border-top-color: lighten($o-linkup-tint-dark, 5%);
+}
+
+.o-linkup-StartRule {
+    background-color: $o-linkup-tint-dark;
+    border-color: lighten($o-linkup-tint-dark, 5%) !important;
+}
+
+[class*="o-linkup-"]:where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(button, a, summary, .btn, [tabindex]):focus-visible,
+[class*="o-linkup-"] :where(.form-control, .form-select, .form-check-input):focus {
+    outline-color: lighten($primary, 15%);
+}
+
+.o-mail-DiscussSidebar-item[class*="o-linkup-"]:focus-visible {
+    outline-color: lighten($primary, 15%) !important;
+}
+
+// The "?" of the guide button, $primary on the dark background of a view
+// under 4.5:1, takes the tint of the focus ring; pressed, it is the text
+// on a filled $primary of linkup_guide.scss.
+.o-linkup-GuideButton:not([aria-pressed="true"]) {
+    color: lighten($primary, 15%);
+}
+
+// The text of an outlined danger button, one step lighter than the text
+// token of web, for 4.5:1 on a dark background.
+[class*="o-linkup-"]:where(.btn-outline-danger),
+[class*="o-linkup-"] :where(.btn-outline-danger) {
+    --btn-color: #{lighten(map-get($o-theme-text-colors, "danger"), 10%)};
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupSidebarSection">
+        <nav
+            t-if="store.linkup_is_member"
+            class="o-linkup-SidebarSection d-flex flex-column o-gap-0_5 mt-2"
+            aria-label="LinkUp"
+        >
+            <span
+                t-if="!store.discuss.isSidebarCompact"
+                class="o-linkup-SidebarSection-title small fw-bold text-uppercase mx-3"
+            >
+                LinkUp
+            </span>
+            <button
+                type="button"
+                class="o-linkup-SidebarSection-refletView o-mail-DiscussSidebar-item btn d-flex align-items-center gap-2 px-2 mx-2 border-0 rounded-2 fw-normal text-reset bg-inherit"
+                t-att-class="{ 'justify-content-center o-compact': store.discuss.isSidebarCompact }"
+                title="Reflet view"
+                t-on-click="openRefletView"
+            >
+                <i class="fa fa-fw fa-clone" aria-hidden="true" />
+                <span t-if="!store.discuss.isSidebarCompact" class="small text-truncate">Reflet view</span>
+                <span t-else="" class="visually-hidden">Reflet view</span>
+            </button>
+            <button
+                type="button"
+                class="o-linkup-SidebarSection-newlink o-mail-DiscussSidebar-item btn d-flex align-items-center gap-2 px-2 mx-2 border-0 rounded-2 fw-normal text-reset bg-inherit"
+                t-att-class="{ 'justify-content-center o-compact': store.discuss.isSidebarCompact }"
+                title="+ NewLink"
+                t-on-click="openNewlink"
+            >
+                <i class="fa fa-fw fa-user-plus" aria-hidden="true" />
+                <span t-if="!store.discuss.isSidebarCompact" class="small text-truncate">+ NewLink</span>
+                <span t-else="" class="visually-hidden">+ NewLink</span>
+            </button>
+            <button
+                type="button"
+                class="o-linkup-SidebarSection-help o-mail-DiscussSidebar-item btn d-flex align-items-center gap-2 px-2 mx-2 border-0 rounded-2 fw-normal text-reset bg-inherit"
+                t-att-class="{ 'justify-content-center o-compact': store.discuss.isSidebarCompact }"
+                title="LinkUp help"
+                t-on-click="openHelp"
+            >
+                <i class="fa fa-fw fa-question-circle-o" aria-hidden="true" />
+                <span t-if="!store.discuss.isSidebarCompact" class="small text-truncate">LinkUp help</span>
+                <span t-else="" class="visually-hidden">LinkUp help</span>
+            </button>
+        </nav>
+    </t>
+</templates>

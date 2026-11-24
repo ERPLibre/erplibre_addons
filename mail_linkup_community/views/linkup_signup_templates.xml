@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- The fields of auth_signup, on the public signup and on the page of
+         an invitation link (linkup_signup_form): the name is a pseudonym,
+         then come the consents, the age and the residence. The page of a
+         partner token (only_passwords) keeps the native form. -->
+    <template id="linkup_signup_fields" inherit_id="auth_signup.fields" name="LinkUp signup fields">
+        <xpath expr="//label[@for='name']" position="replace">
+            <label for="name">
+                <t t-if="linkup_signup_form">Pseudonym</t>
+                <t t-else="">Your Name</t>
+            </label>
+        </xpath>
+        <xpath expr="//input[@name='name']" position="after">
+            <small t-if="linkup_signup_form and not only_passwords" id="o-linkup-Signup-nameHelp" class="form-text">
+                The name the other members see. Your legal name is not asked.
+            </small>
+        </xpath>
+        <xpath expr="//div[hasclass('field-confirm_password')]" position="after">
+            <t t-if="linkup_signup_form and not only_passwords" t-call="mail_linkup_community.linkup_signup_consents" />
+        </xpath>
+    </template>
+
+    <!-- One checkbox per consent, none checked in advance (LU-F-111 RM1);
+         the attestation of age and its range, never a date of birth
+         (Q-22); the residence in Canada (Q-32). linkup_website is a trap
+         field, out of the screen and of the keyboard order. -->
+    <template id="linkup_signup_consents" name="LinkUp signup consents">
+        <t t-set="posted" t-value="linkup_posted or {}" />
+        <div t-if="linkup_phone_required" class="mb-3 field-linkup_phone">
+            <label for="linkup_phone">The phone number this link was sent to</label>
+            <input
+                type="tel"
+                name="linkup_phone"
+                id="linkup_phone"
+                class="form-control form-control-sm"
+                autocomplete="tel"
+                aria-describedby="o-linkup-Signup-phoneHelp"
+                t-att-value="posted.get('linkup_phone')"
+            />
+            <small id="o-linkup-Signup-phoneHelp" class="form-text">
+                The reflection reaches you when it is the number the person who invited you typed.
+            </small>
+        </div>
+        <fieldset class="o-linkup-Signup-consents mb-3">
+            <legend class="h6 mb-1">My consents</legend>
+            <p class="small mb-2">Each consent is separate; none is checked in advance.</p>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_terms"
+                    id="linkup_terms"
+                    required="required"
+                    t-att-checked="posted.get('linkup_terms') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_terms">I accept the terms of use.</label>
+                <a
+                    t-if="linkup_terms_url"
+                    class="ms-1 small"
+                    t-att-href="linkup_terms_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Read the terms of use
+                </a>
+            </div>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_privacy"
+                    id="linkup_privacy"
+                    required="required"
+                    t-att-checked="posted.get('linkup_privacy') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_privacy">I accept the privacy policy.</label>
+                <a
+                    t-if="linkup_privacy_url"
+                    class="ms-1 small"
+                    t-att-href="linkup_privacy_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Read the privacy policy
+                </a>
+            </div>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_sensitive_data"
+                    id="linkup_sensitive_data"
+                    required="required"
+                    aria-describedby="o-linkup-Signup-sensitiveHelp"
+                    t-att-checked="posted.get('linkup_sensitive_data') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_sensitive_data">
+                    I agree that LinkUp processes the sensitive information my reflections may hold.
+                </label>
+                <small id="o-linkup-Signup-sensitiveHelp" class="form-text d-block">
+                    A reflection may tell emotions, needs, health or private life. I can withdraw this consent at any
+                    time from my profile; I then send no reflection.
+                </small>
+            </div>
+            <p class="small fw-bold mt-2 mb-1">Optional</p>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_link_visibility"
+                    id="linkup_link_visibility"
+                    t-att-checked="posted.get('linkup_link_visibility') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_link_visibility">My links are visible to my links.</label>
+            </div>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_energy_visibility"
+                    id="linkup_energy_visibility"
+                    t-att-checked="posted.get('linkup_energy_visibility') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_energy_visibility">My energy is visible to my links.</label>
+            </div>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_notifications"
+                    id="linkup_notifications"
+                    t-att-checked="posted.get('linkup_notifications') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_notifications">
+                    LinkUp notifies me of my reflections and invitations.
+                </label>
+            </div>
+        </fieldset>
+        <fieldset class="o-linkup-Signup-age mb-3">
+            <legend class="h6 mb-1">Age and residence</legend>
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_adult"
+                    id="linkup_adult"
+                    required="required"
+                    t-att-checked="posted.get('linkup_adult') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_adult">I am 18 or older.</label>
+            </div>
+            <div class="mt-2">
+                <label for="linkup_age_bracket">My age range</label>
+                <select
+                    name="linkup_age_bracket"
+                    id="linkup_age_bracket"
+                    class="form-select form-select-sm"
+                    required="required"
+                >
+                    <option value="">Choose…</option>
+                    <option
+                        t-foreach="linkup_age_brackets or []"
+                        t-as="bracket"
+                        t-att-value="bracket[0]"
+                        t-att-selected="posted.get('linkup_age_bracket') == bracket[0] and 'selected'"
+                        t-esc="bracket[1]"
+                    />
+                </select>
+                <small class="form-text">Only the range is kept, never your date of birth.</small>
+            </div>
+            <div class="form-check mt-2">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="linkup_resides_canada"
+                    id="linkup_resides_canada"
+                    required="required"
+                    aria-describedby="o-linkup-Signup-canadaHelp"
+                    t-att-checked="posted.get('linkup_resides_canada') and 'checked'"
+                />
+                <label class="form-check-label" for="linkup_resides_canada">I live in Canada.</label>
+                <small id="o-linkup-Signup-canadaHelp" class="form-text d-block">
+                    LinkUp is open to people living in Canada for now.
+                </small>
+            </div>
+        </fieldset>
+        <div class="visually-hidden" aria-hidden="true">
+            <label for="linkup_website">Leave this field empty</label>
+            <input type="text" name="linkup_website" id="linkup_website" tabindex="-1" autocomplete="off" />
+        </div>
+    </template>
+
+    <!-- A logged-in member opens a share link (LU-F-020 RM4): the number of
+         the invitation, typed, attaches the reflection to their account. -->
+    <template id="linkup_invite_phone_page" name="LinkUp share link">
+        <t t-call="web.login_layout">
+            <div class="o-linkup-InvitePage" t-att-data-code="code or None">
+                <h1 class="h5">LinkUp</h1>
+                <p t-if="code" class="o-linkup-InvitePage-status alert alert-info" role="status" t-out="message" />
+                <form t-else="" class="o-linkup-InvitePage-phone" role="form" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <p class="o-linkup-InvitePage-intro" t-out="intro" />
+                    <div class="mb-3">
+                        <label for="linkup_phone">The phone number this link was sent to</label>
+                        <input
+                            type="tel"
+                            name="linkup_phone"
+                            id="linkup_phone"
+                            class="form-control form-control-sm"
+                            autocomplete="tel"
+                            required="required"
+                        />
+                    </div>
+                    <p class="alert alert-danger" t-if="error" role="alert" t-out="error" />
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Read the reflection</button>
+                    </div>
+                </form>
+                <t t-call="mail_linkup_reflet.linkup_invite_links" />
+            </div>
+        </t>
+    </template>
+
+    <!-- The answer of a public signup while addresses are verified: the
+         same whether the address was free, already used or banned, so that
+         the page tells nobody which addresses have an account. -->
+    <template id="linkup_signup_sent_page" name="LinkUp signup sent">
+        <t t-call="web.login_layout">
+            <div class="o-linkup-SignupSentPage">
+                <h1 class="h5">Check your mailbox</h1>
+                <p class="alert alert-info" role="status">
+                    We sent an email to the address you entered. If it can open an account, the email holds a link that
+                    confirms it; the link lasts
+                    <t t-out="verify_hours">24</t>
+                    hours and serves once. If an account already uses this address, the email tells how to log in.
+                </p>
+                <p>Nothing arrived? Look in the spam folder, then sign up again in a few minutes.</p>
+                <div class="d-grid">
+                    <a class="btn btn-primary" href="/web/login">Log in</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- /linkup/verify/<token>: the address is verified, or the link no
+         longer serves. -->
+    <template id="linkup_verify_page" name="LinkUp email verification">
+        <t t-call="web.login_layout">
+            <div class="o-linkup-VerifyPage" t-att-data-verified="verified and '1' or '0'">
+                <h1 class="h5">LinkUp</h1>
+                <p t-if="verified" class="alert alert-success" role="status">
+                    Your email address is confirmed: you can now send reflections and invite people.
+                </p>
+                <p t-else="" class="alert alert-info" role="status">
+                    This link no longer works: it lasts 24 hours and serves once. Ask for a new one from LinkUp.
+                </p>
+                <div class="d-grid">
+                    <a t-if="logged_in" class="btn btn-primary" t-att-href="home_url">Open LinkUp</a>
+                    <a t-else="" class="btn btn-primary" href="/web/login">Log in</a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

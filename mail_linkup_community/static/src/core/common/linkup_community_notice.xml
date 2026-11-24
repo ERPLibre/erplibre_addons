@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_community.LinkupCommunityNotice">
+        <div
+            t-if="missing.length or unverified or state.notice"
+            class="o-linkup-CommunityNotice d-flex flex-column gap-2 px-3 pt-3"
+        >
+            <form
+                t-if="missing.length"
+                class="o-linkup-ConsentNotice border rounded-3 p-3 d-flex flex-column gap-2"
+                aria-labelledby="o-linkup-ConsentNotice-title"
+                t-on-submit.prevent="accept"
+            >
+                <h2 id="o-linkup-ConsentNotice-title" class="h6 mb-0">Before your first reflection</h2>
+                <p class="small mb-0">Each consent is separate; none is checked in advance.</p>
+                <div t-foreach="missing" t-as="purpose" t-key="purpose" class="form-check mb-0">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        t-att-id="'o-linkup-ConsentNotice-' + purpose"
+                        t-att-name="purpose"
+                        t-att-checked="state.checked[purpose]"
+                        t-att-aria-describedby="purpose === 'sensitive_data' ? 'o-linkup-ConsentNotice-sensitiveHelp' : undefined"
+                        t-on-change="(ev) => this.toggle(purpose, ev.target.checked)"
+                    />
+                    <label
+                        class="form-check-label"
+                        t-att-for="'o-linkup-ConsentNotice-' + purpose"
+                        t-esc="consentLabel(purpose)"
+                    />
+                    <small
+                        t-if="purpose === 'sensitive_data'"
+                        id="o-linkup-ConsentNotice-sensitiveHelp"
+                        class="form-text d-block"
+                        t-esc="sensitiveHelp"
+                    />
+                </div>
+                <div>
+                    <button
+                        type="submit"
+                        class="o-linkup-ConsentNotice-accept btn btn-primary btn-sm"
+                        data-linkup-guide="community-consent"
+                        t-att-disabled="!canAccept or state.busy"
+                    >
+                        Accept
+                    </button>
+                </div>
+            </form>
+            <section
+                t-if="unverified"
+                class="o-linkup-VerifyNotice alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-0"
+                aria-labelledby="o-linkup-VerifyNotice-title"
+            >
+                <h2 id="o-linkup-VerifyNotice-title" class="h6 mb-0">Confirm your email address</h2>
+                <span class="small flex-grow-1">
+                    Click the link LinkUp sent you: until then, you send no reflection and invite nobody.
+                </span>
+                <button
+                    type="button"
+                    class="o-linkup-VerifyNotice-resend btn btn-secondary btn-sm"
+                    data-linkup-guide="community-verify"
+                    t-att-disabled="state.busy"
+                    t-on-click="resend"
+                >
+                    Send the link again
+                </button>
+            </section>
+            <p
+                t-if="state.notice"
+                class="o-linkup-CommunityNotice-notice small mb-0"
+                role="status"
+                t-esc="state.notice"
+            />
+            <LinkupErrorAlert t-if="state.error" error="state.error" className="'o-linkup-CommunityNotice-error'" />
+        </div>
+    </t>
+</templates>

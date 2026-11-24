@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+    <!-- Consents: a member reads their own; the moderators, who imply the
+         member group, read theirs only too; a LinkUp administrator reads
+         them all (§9.4). Nobody writes one: the server records them. -->
+    <record id="rule_linkup_consent_member" model="ir.rule">
+        <field name="name">LinkUp member: own consents</field>
+        <field name="model_id" ref="model_linkup_consent" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_member'))]" />
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_linkup_consent_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: all consents</field>
+        <field name="model_id" ref="model_linkup_consent" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_admin'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Audit log of the moderation (LU-NF-040): a moderator reads the rows
+         of the reports they may process, so that each one sees what the
+         others did, and never those of a report in a conflict of interest
+         with them; an administrator neither; members have no access right
+         on it. Nobody writes nor deletes a row. -->
+    <record id="rule_linkup_audit_log_moderator" model="ir.rule">
+        <field name="name">LinkUp moderator: audit of the reports without a conflict of interest</field>
+        <field name="model_id" ref="model_linkup_audit_log" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_moderator'))]" />
+        <field name="domain_force">[('report_id.linkup_moderator_conflict', '=', False)]</field>
+    </record>
+
+    <record id="rule_linkup_audit_log_admin" model="ir.rule">
+        <field name="name">LinkUp administrator: audit of the reports without a conflict of interest</field>
+        <field name="model_id" ref="model_linkup_audit_log" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_admin'))]" />
+        <field name="domain_force">[('report_id.linkup_moderator_conflict', '=', False)]</field>
+    </record>
+
+    <!-- Decisions of the moderation: a member reads those about them,
+         moderators and administrators included; the server writes them. -->
+    <record id="rule_linkup_moderation_notice_member" model="ir.rule">
+        <field name="name">LinkUp member: own moderation decisions</field>
+        <field name="model_id" ref="model_linkup_moderation_notice" />
+        <field name="groups" eval="[Command.link(ref('mail_linkup_reflet.group_linkup_member'))]" />
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+</odoo>

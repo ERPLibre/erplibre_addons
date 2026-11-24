@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupRefletActions">
+        <div
+            t-if="mode or state.error"
+            class="o-linkup-RefletActions d-flex flex-column gap-2 px-3 py-2"
+            t-att-data-mode="mode"
+            t-att-aria-busy="state.busy ? 'true' : undefined"
+            t-on-keydown="onKeydown"
+        >
+            <!-- A sent reflection its recipient has not read, to its author. -->
+            <div t-if="mode === 'withdraw'" class="d-flex flex-wrap align-items-center gap-2">
+                <button
+                    type="button"
+                    class="o-linkup-RefletActions-withdraw btn btn-outline-secondary btn-sm"
+                    t-att-disabled="state.busy"
+                    t-on-click="askWithdraw"
+                >
+                    Withdraw this reflection
+                </button>
+                <span class="o-linkup-RefletActions-hint small" t-esc="withdrawHint" />
+            </div>
+            <!-- An initial reflection waiting for its recipient. -->
+            <t t-if="mode === 'validate' and !state.form">
+                <div class="d-flex align-items-center gap-2">
+                    <p class="o-linkup-RefletActions-question fw-bold mb-0 me-auto">Did this exchange really take place?</p>
+                    <LinkupGuideButton />
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-confirm o-linkup-RefletActions-choice btn btn-primary"
+                        data-linkup-guide="reflet-confirm"
+                        aria-keyshortcuts="ArrowRight"
+                        t-att-disabled="state.busy"
+                        t-on-click="confirm"
+                    >
+                        <span class="d-block fw-bold">That's a link!</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">
+                            The exchange took place and the reformulation is right. Key →
+                        </span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-reject o-linkup-RefletActions-choice btn btn-outline-danger"
+                        data-linkup-guide="reflet-reject"
+                        aria-keyshortcuts="ArrowLeft"
+                        t-att-disabled="state.busy"
+                        t-on-click="askReject"
+                    >
+                        <span class="d-block fw-bold">This exchange did not take place</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">
+                            Only for a false reflection. Key ←
+                        </span>
+                    </button>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-inaccurate o-linkup-RefletActions-choice btn btn-outline-secondary btn-sm"
+                        data-linkup-guide="reflet-inaccurate"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('inaccurate')"
+                    >
+                        <span class="d-block fw-bold">That is not what I said</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">
+                            The exchange took place; no link, a correction if you wish.
+                        </span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-ignore o-linkup-RefletActions-choice btn btn-outline-secondary btn-sm"
+                        data-linkup-guide="reflet-ignore"
+                        t-att-disabled="state.busy"
+                        t-on-click="ignore"
+                    >
+                        <span class="d-block fw-bold">Ignore</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">
+                            The reflection disappears for you; nobody is told.
+                        </span>
+                    </button>
+                </div>
+            </t>
+
+            <!-- The recipient of a confirmed or continued reflection answers. -->
+            <t t-elif="mode === 'answer' and !state.form">
+                <p class="o-linkup-RefletActions-question fw-bold mb-0" t-esc="answerQuestion" />
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-exact o-linkup-RefletActions-choice btn btn-primary"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('exact')"
+                    >
+                        <span class="d-block fw-bold">Yes, that's exactly it!</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">A word to add if you wish.</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-precise o-linkup-RefletActions-choice btn btn-outline-primary"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('precision')"
+                    >
+                        <span class="d-block fw-bold">I would like to clarify…</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">Add your nuance, hide a theme.</span>
+                    </button>
+                </div>
+            </t>
+
+            <!-- The recipient of a precision guesses its hidden theme. -->
+            <t t-elif="mode === 'guess'">
+                <p class="o-linkup-RefletActions-question fw-bold mb-0" t-esc="guessQuestion" />
+                <LinkupCategoryPicker
+                    categories="categories"
+                    selectedIds="state.guessIds"
+                    onChange.bind="onChangeGuess"
+                    label.translate="Guess the hidden theme"
+                    disabled="state.busy"
+                    guideContext="'guess'"
+                />
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="o-linkup-RefletActions-hint small me-auto">One try only.</span>
+                    <LinkupGuideButton />
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-guess btn btn-primary btn-sm"
+                        data-linkup-guide="guess-submit"
+                        t-att-disabled="state.busy or !state.guessIds.length"
+                        t-on-click="guess"
+                    >
+                        Propose this theme
+                    </button>
+                </div>
+            </t>
+
+            <!-- The member whose turn it is chooses how to go on. -->
+            <t t-elif="mode === 'options' and !state.form">
+                <p class="o-linkup-RefletActions-question fw-bold text-uppercase small mb-0">And now?</p>
+                <div class="d-flex flex-wrap gap-2" role="group" aria-label="And now?">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-continue o-linkup-RefletActions-choice btn btn-primary"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('continue')"
+                    >
+                        <span class="d-block fw-bold">Continue the reflection</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">“So if I understand correctly…”</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-self o-linkup-RefletActions-choice btn btn-outline-primary"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('self')"
+                    >
+                        <span class="d-block fw-bold">Talk about yourself</span>
+                        <span class="o-linkup-RefletActions-hint d-block small">What matters to you.</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-end o-linkup-RefletActions-choice btn btn-outline-secondary"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('close')"
+                    >
+                        <span class="d-block fw-bold">End it here</span>
+                        <span class="o-linkup-RefletActions-hint d-block small" t-esc="'“' + closingSentence + '”'" />
+                    </button>
+                </div>
+            </t>
+
+            <!-- The recipient of a disclosure reformulates it. -->
+            <t t-elif="mode === 'rephrase' and !state.form">
+                <p class="o-linkup-RefletActions-question mb-0" t-esc="rephraseText" />
+                <div>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-rephrase btn btn-primary btn-sm"
+                        t-att-disabled="state.busy"
+                        t-on-click="() => this.open('continue')"
+                    >
+                        Write a reflection
+                    </button>
+                </div>
+            </t>
+
+            <form
+                t-if="state.form"
+                class="o-linkup-RefletActions-form d-flex flex-column gap-2"
+                t-att-data-form="state.form"
+                t-att-aria-label="formTitle"
+                t-on-submit.prevent="submit"
+            >
+                <p class="o-linkup-RefletActions-formTitle fw-bold mb-0" t-esc="formTitle" />
+                <div t-if="state.form === 'self' and canCall" class="d-flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-call btn btn-success btn-sm"
+                        t-on-click="() => this.startCall()"
+                    >
+                        <i class="fa fa-phone me-1" aria-hidden="true" />
+                        <t t-esc="callLabel" />
+                    </button>
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-video btn btn-info btn-sm"
+                        t-on-click="() => this.startCall({camera: true})"
+                    >
+                        <i class="fa fa-video-camera me-1" aria-hidden="true" />
+                        <t t-esc="videoLabel" />
+                    </button>
+                </div>
+                <t t-if="state.form === 'precision'">
+                    <span class="o-linkup-RefletActions-hint small" t-esc="hiddenThemeLabel" />
+                    <LinkupCategoryPicker
+                        categories="categories"
+                        selectedIds="state.categoryIds"
+                        onChange.bind="onChangeThemes"
+                        label="hiddenThemeLabel"
+                        max="maxHiddenThemes"
+                        disabled="state.busy"
+                    />
+                </t>
+                <LinkupCategoryPicker
+                    t-elif="state.form === 'continue'"
+                    categories="categories"
+                    selectedIds="state.categoryIds"
+                    onChange.bind="onChangeCategories"
+                    label.translate="Category of the starter"
+                    disabled="state.busy"
+                />
+                <LinkupCategoryPicker
+                    t-elif="state.form === 'self'"
+                    categories="categories"
+                    selectedIds="state.categoryIds"
+                    onChange.bind="onChangeCategories"
+                    label.translate="Theme, optional"
+                    disabled="state.busy"
+                />
+                <label class="d-flex flex-column gap-1 small">
+                    <span t-esc="textLabel" />
+                    <textarea
+                        name="text"
+                        class="o-linkup-RefletActions-text form-control"
+                        rows="3"
+                        t-att-aria-required="textRequired ? 'true' : undefined"
+                        t-att-aria-invalid="state.error?.field === 'body_text' ? 'true' : undefined"
+                        t-model="state.text"
+                        t-ref="text"
+                    />
+                </label>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="o-linkup-RefletActions-back btn btn-secondary btn-sm"
+                        t-att-disabled="state.busy"
+                        t-on-click="closeForm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="o-linkup-RefletActions-send btn btn-primary btn-sm"
+                        t-att-disabled="state.busy"
+                        t-esc="sendLabel"
+                    />
+                </div>
+            </form>
+
+            <LinkupErrorAlert
+                t-if="state.error"
+                error="state.error"
+                className="'o-linkup-RefletActions-error'"
+                onRetry.bind="retry"
+            />
+        </div>
+    </t>
+</templates>

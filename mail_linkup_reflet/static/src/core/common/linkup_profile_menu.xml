@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="mail_linkup_reflet.LinkupProfileMenu">
+        <div class="o-linkup-ProfileMenu position-relative d-flex align-items-center gap-2" t-ref="root">
+            <img
+                t-if="props.avatarUrl"
+                class="o-linkup-RefletView-selfAvatar o-linkup-ProfileMenu-avatar rounded-circle"
+                t-att-class="{ 'o-linkup-isHighlighted': props.highlighted }"
+                t-att-src="props.avatarUrl"
+                t-att-title="avatarTitle"
+                alt=""
+                t-on-dblclick="open"
+            />
+            <button
+                type="button"
+                class="o-linkup-ProfileMenu-toggle btn btn-link btn-sm p-0"
+                aria-haspopup="menu"
+                t-att-aria-expanded="state.open ? 'true' : 'false'"
+                t-on-click="toggle"
+                t-ref="toggle"
+            >
+                My profile
+            </button>
+            <ul
+                t-if="state.open"
+                class="o-linkup-ProfileMenu-menu position-absolute list-unstyled d-flex flex-column bg-view border rounded-3 shadow-sm p-1 mb-0"
+                role="menu"
+                aria-label="My settings"
+                t-on-keydown="onMenuKeydown"
+                t-ref="menu"
+            >
+                <li t-foreach="entries" t-as="entry" t-key="entry.id" role="none">
+                    <button
+                        type="button"
+                        class="o-linkup-ProfileMenu-entry btn btn-light w-100 border-0 d-flex align-items-start gap-2 text-start rounded-2 px-2 py-1"
+                        role="menuitem"
+                        tabindex="-1"
+                        t-att-data-entry="entry.id"
+                        t-att-aria-disabled="entry.hint ? 'true' : undefined"
+                        t-att-aria-describedby="entry.hint ? 'o-linkup-ProfileMenu-hint-' + entry.id : undefined"
+                        t-on-click="() => this.choose(entry)"
+                    >
+                        <i t-att-class="'fa fa-fw mt-1 ' + entry.icon" aria-hidden="true" />
+                        <span class="d-flex flex-column">
+                            <span class="o-linkup-ProfileMenu-label" t-esc="entry.label" />
+                            <span
+                                t-if="entry.hint"
+                                t-att-id="'o-linkup-ProfileMenu-hint-' + entry.id"
+                                class="o-linkup-ProfileMenu-hint small text-wrap"
+                                t-esc="entry.hint"
+                            />
+                        </span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </t>
+</templates>

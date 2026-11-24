@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.ChatWindow" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='chatbotService.inputEnabled']" position="before">
+            <p
+                t-if="linkupChatbotError"
+                class="o-linkup-ChatbotError alert alert-warning small mx-2 mb-1 py-1 px-2"
+                role="alert"
+                t-esc="linkupChatbotError"
+            />
+        </xpath>
+        <xpath expr="//span[@t-esc='chatbotService.inputDisabledText']/.." position="after">
+            <LinkupLivechatHelp t-if="linkupShowHelp" thread="thread" />
+        </xpath>
+        <xpath expr="//div[hasclass('o-mail-ChatWindow')]" position="inside">
+            <div
+                t-if="thread?.channel_type === 'livechat'"
+                class="o-linkup-LivechatAnnouncer visually-hidden"
+                aria-live="polite"
+                aria-atomic="true"
+                t-esc="linkupAnnouncement"
+            />
+        </xpath>
+    </t>
+</templates>

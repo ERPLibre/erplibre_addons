@@ -1,0 +1,1179 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mail_linkup_gamification
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 12:08+0000\n"
+"PO-Revision-Date: 2026-11-06 12:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.js:0
+msgid "%(points)s points to %(rank)s."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.js:0
+msgid "%(shown)s of %(total)s lines"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_res_config_settings__linkup_call_min_duration
+msgid ""
+"0 pays an answered call at once; above, the call is paid at its end, if it "
+"lasted that long."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description_motivational:mail_linkup_gamification.rank_fire
+msgid "A call says more than a long text."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.constraint,message:mail_linkup_gamification.constraint_linkup_points_call_event_unique
+msgid "A call waits once."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.constraint,message:mail_linkup_gamification.constraint_linkup_points_rule_caps_positive
+msgid "A cap is a number of lines, 0 meaning no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.constraint,message:mail_linkup_gamification.constraint_linkup_points_rule_code_unique
+msgid "A code names a single rule."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.badge,description:mail_linkup_gamification.badge_first_call
+msgid "A first call with another member was answered."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.badge,description:mail_linkup_gamification.badge_first_reflection
+msgid "A first reflection of yours was confirmed."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__resets_decay
+msgid "A line of this rule starts the decreasing sequences of the pair again."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "A new rank is announced on the screen, never by email."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "A right guess earns %(points)s points to each of you."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.constraint,message:mail_linkup_gamification.constraint_linkup_points_ledger_event_unique
+msgid "A rule pays a member once per event."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__unverified
+msgid "Account not verified"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__new_account
+msgid "Account too recent"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__active
+msgid "Active"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_collusion_new_account_hours
+msgid "Age of a new account (hours)"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_points_min_account_hours
+msgid "Age of an account before its points (hours)"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "All events"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__active
+msgid "An archived rule pays nothing and writes no ledger line."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__answered_date
+msgid "Answered on"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_link__linkup_round_user_id
+msgid ""
+"Author of the free text that opened the current round of the pair; the other"
+" member closes it by posting free text in turn."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_rule__beneficiaries__author
+msgid "Author of the reflection"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Badges"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__beneficiaries
+msgid "Beneficiaries"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__user_id
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.linkup_points_ledger_view_search
+msgid "Beneficiary"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.karma.rank,name:mail_linkup_gamification.rank_blaze
+msgid "Blaze"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_rule__beneficiaries__both
+msgid "Both parties"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_call_answered
+msgid "Call answered"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__cap_group
+msgid "Cap group"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__pair_lifetime_cap
+msgid "Cap of the pair"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__cap_reason
+msgid "Cap reason"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__capped
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.linkup_points_ledger_view_search
+msgid "Capped"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__code
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__code
+msgid "Code"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__code
+msgid "Code of the event of LinkUp that applies the rule."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.res_config_settings_view_form
+msgid "Collusion alerts"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description_motivational:mail_linkup_gamification.rank_spark
+msgid "Confirm a first reflection to light the spark."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_report__reason__confirmation_loop
+msgid "Confirmations in a loop"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_collusion_pair_confirmations
+msgid "Confirmations of a pair before an alert"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_report__reason__new_account_confirmations
+msgid "Confirmations of new accounts"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_collusion_new_account_confirmations
+msgid "Confirmations of new accounts before an alert"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Continuation confirmed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_continue_confirmed
+msgid "Continued reflection confirmed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__channel_id
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__channel_id
+msgid "Conversation"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__partner_user_id
+msgid "Counterpart"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__create_uid
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__create_date
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__create_date
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__daily_cap
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__daily_cap
+msgid "Daily cap"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__pair_daily_cap
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__pair_daily_cap
+msgid "Daily cap of the pair"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__date
+msgid "Date"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__decay_day
+msgid "Day of the sequence"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_collusion_days
+msgid "Days of the collusion alerts"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__decay
+msgid "Decay"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.res_config_settings_view_form
+msgid "Decreasing sequences, calls and age of the accounts that earn points."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__display_name
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__display_name
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid ""
+"Each line: its date, its event, the person it was shared with and its "
+"points. A line at 0 tells why it paid nothing."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid ""
+"Each of you earns %(confirmed)s points, and the author %(sent)s more for the"
+" reflection."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Each of you earns %(confirmed)s points."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__decay
+msgid ""
+"Each repetition within a pair pays half of the previous one, until midnight "
+"of the member or a reset of the pair."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_link__energy_a
+msgid "Energy A"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_link__energy_b
+msgid "Energy B"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Energy of the link: %(points)s points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Event"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__event_key
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__event_key
+msgid "Event key"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Everybody"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_close
+msgid "Exchange closed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Filters"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.karma.rank,name:mail_linkup_gamification.rank_fire
+msgid "Fire"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.badge,name:mail_linkup_gamification.badge_first_call
+msgid "First call"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.badge,name:mail_linkup_gamification.badge_first_guess
+msgid "First guess"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.badge,name:mail_linkup_gamification.badge_first_link
+msgid "First link"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.badge,name:mail_linkup_gamification.badge_first_reflection
+msgid "First reflection"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "First reflection, first link, ten links, first guess, first call."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.karma.rank,name:mail_linkup_gamification.rank_flame
+msgid "Flame"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_gamification_challenge
+msgid "Gamification Challenge"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_gamification_badge_user
+msgid "Gamification User Badge"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Hidden theme found"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_theme_guessed
+msgid "Hidden theme guessed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_theme_missed
+msgid "Hidden theme missed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_users_settings__linkup_hide_gamification
+msgid "Hide the points and their animations"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.js:0
+msgid "Highest rank reached."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "History"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "History of my points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__id
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__id
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__id
+msgid "ID"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_res_config_settings__linkup_virtual_round_points
+msgid ""
+"Integers separated by commas, such as 100,50,25,12,6,3,1,0; empty, each "
+"round pays half of the previous one."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid ""
+"It rises with each confirmed exchange and falls with a rejected reflection."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__karma_tracking_id
+msgid "Karma change"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_ledger__karma_tracking_id
+msgid ""
+"Karma change of the event; consolidating the karma history deletes it, which"
+" leaves the line as it is."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description_motivational:mail_linkup_gamification.rank_flame
+msgid "Keep reflecting what the others tell you."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Keep the lines of one event, or those shared with one person."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__write_uid
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__write_date
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__write_date
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__pair_lifetime_cap
+msgid "Lifetime cap of the pair"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__link_id
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__link_id
+msgid "Link"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_points_call
+msgid "LinkUp answered call waiting for its end"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "LinkUp could not be loaded, try again."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "LinkUp gives them by itself, once each."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_link
+msgid "LinkUp link between two members"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_points_ledger
+msgid "LinkUp points ledger"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_points_rule
+msgid "LinkUp points rule"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_reflet
+msgid "LinkUp reflection"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_linkup_report
+msgid "LinkUp report"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_timezone
+msgid "LinkUp time zone"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-python
+#: code:addons/mail_linkup_gamification/models/linkup_points_ledger.py:0
+msgid "LinkUp: %(rules)s"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.actions.server,name:mail_linkup_gamification.ir_cron_linkup_points_check_ir_actions_server
+msgid "LinkUp: check the karma against the points ledger"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-python
+#: code:addons/mail_linkup_gamification/models/linkup_points_ledger.py:0
+msgid "LinkUp: check the karma of the members %(ids)s"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-python
+#: code:addons/mail_linkup_gamification/models/linkup_points_ledger.py:0
+msgid "LinkUp: points of the removed ledger"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Loading…"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_discuss_channel_rtc_session
+msgid "Mail RTC session"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description_motivational:mail_linkup_gamification.rank_blaze
+msgid "Meet your links in person."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-python
+#: code:addons/mail_linkup_gamification/models/linkup_points_ledger.py:0
+msgid ""
+"Members whose karma differs from the sum of their LinkUp points ledger lines"
+" (LU-NF-043): %(count)s. Their ids: %(ids)s."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__message_id
+msgid "Message"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_ledger__decay_day
+msgid ""
+"Midnight, in UTC, of the day of the decreasing sequence the line belongs to."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_call_min_duration
+msgid "Minimum duration of a call (seconds)"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/linkup_energy.xml:0
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "My energy"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/linkup_energy.js:0
+msgid "My energy: %(points)s points. %(rank)s. Open my points."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/linkup_energy.xml:0
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/core/public_web/linkup_sidebar_patch.xml:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+#: model:ir.actions.client,name:mail_linkup_gamification.action_linkup_my_points
+#: model:ir.ui.menu,name:mail_linkup_gamification.menu_linkup_my_points
+msgid "My points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__name
+msgid "Name"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "New badge: %(name)s"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "New rank: %(name)s"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "No badge yet."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "No line matches these filters."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "No points yet. Your first confirmed reflection brings some."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/linkup_energy.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.js:0
+msgid "No rank yet"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_rule__beneficiaries__none
+msgid "Nobody"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Only your own lines show here, never those of another member."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Outside the guide, choosing a value reads the history again."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Outside the guide, this button opens “My points”."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Outside the guide, this button unfolds the scale."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__pair_daily_cap
+msgid "Paid lines per member of a pair over 24 hours; 0 for no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__pair_weekly_cap
+msgid "Paid lines per member of a pair over 7 days; 0 for no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__pair_lifetime_cap
+msgid "Paid lines per member of a pair, ever; 0 for no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__daily_cap
+msgid "Paid lines per member over 24 hours; 0 for no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__weekly_cap
+msgid "Paid lines per member over 7 days; 0 for no cap."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.actions.act_window,name:mail_linkup_gamification.linkup_points_rule_action
+#: model:ir.ui.menu,name:mail_linkup_gamification.menu_linkup_points_rule
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.res_config_settings_view_form
+msgid "Point rules"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Point scale"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__points
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__points
+#: model:ir.ui.menu,name:mail_linkup_gamification.menu_linkup_points
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.res_config_settings_view_form
+msgid "Points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_ledger__points
+msgid "Points actually paid, 0 for a capped line."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.actions.act_window,name:mail_linkup_gamification.linkup_points_ledger_action
+#: model:ir.ui.menu,name:mail_linkup_gamification.menu_linkup_points_ledger
+msgid "Points ledger"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__points
+msgid "Points of each beneficiary; a negative value is a penalty."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_res_config_settings__linkup_virtual_round_points
+msgid "Points of the rounds of free text"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_link__energy_a
+msgid "Points received by the first member in the events of the pair."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_link__energy_b
+msgid "Points received by the second member in the events of the pair."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_precision_sent
+msgid "Precision sent"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Rank"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_gamification_karma_rank
+msgid "Rank based on karma"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/linkup_energy.js:0
+msgid "Rank: %(name)s"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_report__reason
+msgid "Reason"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_call__reflet_id
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__reflet_id
+msgid "Reflection"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_reflect_confirmed
+msgid "Reflection confirmed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_continue_sent
+msgid "Reflection continued"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_reflect_rejected
+msgid "Reflection rejected"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_reflect_sent
+msgid "Reflection sent, paid at its confirmation"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Reformulation confirmed"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.res_config_settings_view_form
+msgid ""
+"Reports created for the moderators when confirmations look like a loop."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__resets_decay
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__resets_decay
+msgid "Resets the decay"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Round of exchange"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_virtual_round
+msgid "Round of free text"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_link__linkup_round_user_id
+msgid "Round opened by"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_ledger__rule_id
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.linkup_points_ledger_view_search
+msgid "Rule"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_rule__cap_group
+msgid "Rules of the same group count their lines together against the caps."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Sent. No more points today for this action."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__decay
+msgid "Sequence exhausted"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "Show more"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.karma.rank,name:mail_linkup_gamification.rank_spark
+msgid "Spark"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.karma.rank,name:mail_linkup_gamification.rank_sun
+msgid "Sun"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:gamification.badge,name:mail_linkup_gamification.badge_ten_links
+msgid "Ten links"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.badge,description:mail_linkup_gamification.badge_ten_links
+msgid "Ten members are linked to you by a confirmed reflection."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "That's a link!"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_answer_exact
+msgid "That's exactly it"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "The author loses %(points)s points."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_res_users_settings__linkup_hide_gamification
+msgid ""
+"The energy, the “+N” of the points, their sound and the ranks and badges no "
+"longer show on the LinkUp screens."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "The exchange did not take place"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_linkup_points_ledger__resets_decay
+msgid "The line starts the decreasing sequences of the pair again."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-python
+#: code:addons/mail_linkup_gamification/models/linkup_points_ledger.py:0
+msgid "The points ledger cannot be modified."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid ""
+"The total of the points your links earned you: confirmed reflections, exact "
+"reformulations, calls. It is neither a number of friends nor a number of "
+"messages."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model.fields,help:mail_linkup_gamification.field_res_config_settings__linkup_timezone
+msgid ""
+"Time zone of the members who set none: their decreasing sequences of points "
+"start again at its midnight."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:ir.ui.view,arch_db:mail_linkup_gamification.linkup_points_ledger_view_list
+msgid "Total"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_gamification_karma_tracking
+msgid "Track Karma Changes"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:ir.model,name:mail_linkup_gamification.model_res_users_settings
+msgid "User Settings"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__weekly_cap
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__weekly_cap
+msgid "Weekly cap"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+#: model:ir.model.fields,field_description:mail_linkup_gamification.field_linkup_points_rule__pair_weekly_cap
+#: model:ir.model.fields.selection,name:mail_linkup_gamification.selection__linkup_points_ledger__cap_reason__pair_weekly_cap
+msgid "Weekly cap of the pair"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "What each event earns, as the LinkUp administrator set it."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/views/my_points/my_points.xml:0
+msgid "With"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model:linkup.points.rule,name:mail_linkup_gamification.rule_highlight
+msgid "You add to my happiness"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.badge,description:mail_linkup_gamification.badge_first_link
+msgid "You confirmed a first link with another member."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "You earn %(count)s points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.badge,description:mail_linkup_gamification.badge_first_guess
+msgid "You guessed a hidden theme for the first time."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "You lose %(count)s points"
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description:mail_linkup_gamification.rank_sun
+#: model_terms:gamification.karma.rank,description_motivational:mail_linkup_gamification.rank_sun
+msgid "Your energy lights up the whole network."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description:mail_linkup_gamification.rank_flame
+msgid "Your exchanges keep the flame alive."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description:mail_linkup_gamification.rank_spark
+msgid "Your first points: the link begins."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Your karma: the sum of every line of your history."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description:mail_linkup_gamification.rank_blaze
+msgid "Your links carry the community."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#: model_terms:gamification.karma.rank,description:mail_linkup_gamification.rank_fire
+msgid "Your network warms up around you."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_patches.js:0
+msgid "Your rank follows your energy; the bar shows the way to the next one."
+msgstr ""
+
+#. module: mail_linkup_gamification
+#. odoo-javascript
+#: code:addons/mail_linkup_gamification/static/src/core/common/points_service.js:0
+msgid "Your reflection is confirmed"
+msgstr ""

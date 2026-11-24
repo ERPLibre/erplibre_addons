@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupNewlink" t-inherit-mode="extension">
+        <xpath expr="//input[@name='email']/.." position="before">
+            <fieldset
+                class="o-linkup-Newlink-channel d-flex flex-column gap-1 small"
+                data-linkup-guide="newlink-channel"
+            >
+                <legend class="visually-hidden">How to reach this person</legend>
+                <div class="form-check mb-0">
+                    <input
+                        type="radio"
+                        class="form-check-input"
+                        name="linkup_channel"
+                        id="o-linkup-Newlink-channelEmail"
+                        value="email"
+                        t-att-checked="newlinkChannel === 'email'"
+                        t-on-change="() => this.setNewlinkChannel('email')"
+                    />
+                    <label class="form-check-label" for="o-linkup-Newlink-channelEmail">
+                        Email · LinkUp sends a signup link
+                    </label>
+                </div>
+                <div class="form-check mb-0">
+                    <input
+                        type="radio"
+                        class="form-check-input"
+                        name="linkup_channel"
+                        id="o-linkup-Newlink-channelPhone"
+                        value="phone"
+                        t-att-checked="newlinkChannel === 'phone'"
+                        t-on-change="() => this.setNewlinkChannel('phone')"
+                    />
+                    <label class="form-check-label" for="o-linkup-Newlink-channelPhone">
+                        Phone · a share link you send yourself
+                    </label>
+                </div>
+                <div class="form-check mb-0">
+                    <input
+                        type="radio"
+                        class="form-check-input"
+                        name="linkup_channel"
+                        id="o-linkup-Newlink-channelCode"
+                        value="code"
+                        t-att-checked="newlinkChannel === 'code'"
+                        t-on-change="() => this.setNewlinkChannel('code')"
+                    />
+                    <label class="form-check-label" for="o-linkup-Newlink-channelCode">
+                        Personal code · the code a member gave you
+                    </label>
+                </div>
+            </fieldset>
+            <label t-if="newlinkChannel === 'phone'" class="d-flex flex-column gap-1 small">
+                <span>Phone</span>
+                <input
+                    type="tel"
+                    name="phone"
+                    class="o-linkup-Newlink-phone form-control"
+                    autocomplete="off"
+                    t-model="state.newlink.phone"
+                    t-att-aria-invalid="state.error?.field === 'phone' ? 'true' : undefined"
+                />
+                <span>
+                    You copy the link and send it by text message; the reflection is attached once this person types
+                    this number.
+                </span>
+            </label>
+            <label t-if="newlinkChannel === 'code'" class="d-flex flex-column gap-1 small">
+                <span>Personal code</span>
+                <input
+                    type="text"
+                    name="code"
+                    class="o-linkup-Newlink-code form-control"
+                    autocomplete="off"
+                    placeholder="ABCDE-FGHJK"
+                    t-model="state.newlink.code"
+                    t-att-aria-invalid="state.error?.field === 'code' ? 'true' : undefined"
+                />
+                <span>The code shown in the profile of this member.</span>
+            </label>
+        </xpath>
+        <xpath expr="//input[@name='email']/.." position="attributes">
+            <attribute name="t-if">newlinkChannel === 'email'</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o-linkup-Newlink-mail')]" position="attributes">
+            <attribute name="t-if">newlinkChannel === 'email'</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o-linkup-Newlink-mail')]" position="after">
+            <div
+                t-if="newlinkChannel === 'phone'"
+                class="o-linkup-Newlink-share border rounded-3 p-3 small d-flex flex-column gap-1"
+            >
+                <p class="mb-0" t-esc="newlinkShareMessage" />
+                <p class="mb-0">
+                    LinkUp sends nothing: once the invitation is ready, copy the link and send it yourself.
+                </p>
+            </div>
+            <p
+                t-if="newlinkChannel === 'code'"
+                class="o-linkup-Newlink-codeText border rounded-3 p-3 small mb-0"
+                t-esc="newlinkCodeText"
+            />
+        </xpath>
+        <xpath expr="//p[hasclass('o-linkup-Newlink-sentTo')]" position="after">
+            <div
+                t-if="state.newlink.invitation?.share_url"
+                class="o-linkup-Newlink-shareLink d-flex flex-column gap-1 border rounded-3 p-3"
+            >
+                <label class="small fw-bold" for="o-linkup-Newlink-shareUrl">Share link</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <input
+                        type="text"
+                        readonly="readonly"
+                        id="o-linkup-Newlink-shareUrl"
+                        class="o-linkup-Newlink-shareUrl form-control form-control-sm flex-grow-1"
+                        t-att-value="state.newlink.invitation.share_url"
+                        t-on-focus="(ev) => ev.target.select()"
+                    />
+                    <button
+                        type="button"
+                        class="o-linkup-Newlink-copy btn btn-primary btn-sm"
+                        data-linkup-guide="newlink-copy"
+                        t-on-click="copyShareLink"
+                    >
+                        Copy the link
+                    </button>
+                </div>
+                <p class="small mb-0">
+                    Send it yourself by text message. It is shown once: "Send the link again" makes a new one.
+                </p>
+            </div>
+        </xpath>
+    </t>
+</templates>

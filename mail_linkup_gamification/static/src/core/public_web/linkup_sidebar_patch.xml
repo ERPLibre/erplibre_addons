@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail_linkup_reflet.LinkupSidebarSection" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-linkup-SidebarSection-help')]" position="before">
+            <button
+                type="button"
+                class="o-linkup-SidebarSection-myPoints o-mail-DiscussSidebar-item btn d-flex align-items-center gap-2 px-2 mx-2 border-0 rounded-2 fw-normal text-reset bg-inherit"
+                t-att-class="{ 'justify-content-center o-compact': store.discuss.isSidebarCompact }"
+                title="My points"
+                t-on-click="openMyPoints"
+            >
+                <i class="fa fa-fw fa-bolt" aria-hidden="true" />
+                <span t-if="!store.discuss.isSidebarCompact" class="small text-truncate">My points</span>
+                <span t-else="" class="visually-hidden">My points</span>
+            </button>
+        </xpath>
+    </t>
+</templates>
