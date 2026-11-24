@@ -4,7 +4,6 @@
 
 import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
-import {outlineLabel} from "./studio_outline";
 import {fieldTypeFits} from "./studio_relations";
 import {GEO_TYPES, RIBBON_COLORS, newFieldLabel, searchText, typeGlyph, valueLabel} from "./studio_utils";
 
@@ -211,9 +210,9 @@ export class StudioPalette extends Component {
      * else « at the end of the block »; null when the focus is off.
      */
     get focusTarget() {
-        // Read through the state of the palette: a change of the focus or
-        // of the selection renders the palette again.
-        const {focus, selected} = this.editorState;
+        // Read through the state of the palette: a change of the focus, of
+        // the selection or of the level renders the palette again.
+        const {focus, selected, level} = this.editorState;
         if (!focus.on || !focus.path) {
             return null;
         }
@@ -224,7 +223,9 @@ export class StudioPalette extends Component {
         const leaf = selected ? this.editor.focusSelectedLeaf : null;
         return {
             block: entry.label,
-            where: leaf ? _t("after « %(label)s »", {label: outlineLabel(leaf)}) : _t("at the end of the block"),
+            where: leaf
+                ? _t("after « %(label)s »", {label: this.editor.blockLabel(leaf, level === "detailed")})
+                : _t("at the end of the block"),
         };
     }
 

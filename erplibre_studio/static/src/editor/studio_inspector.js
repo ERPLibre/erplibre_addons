@@ -168,19 +168,17 @@ export class StudioInspector extends Component {
         this.editorState = useState(this.props.editor.state);
         onWillUpdateProps((next) => {
             // A rename gives the selected field another path: « More
-            // options » stays as it was on the field.
+            // options » stays as it was on the field. The selection of
+            // another block starts from the choice of the account
+            // (``advancedOpen``); an operation that unselects then
+            // selects the same block again keeps it as it was.
             const local = this.local.advanced;
-            const before = this.props.selected;
-            if (
-                local &&
-                before &&
-                local.path === before &&
-                next.selected &&
-                next.selected !== before &&
-                !findBlock(next.data.blocks, (b) => b.path === before)
-            ) {
-                this.local.advanced = {path: next.selected, open: local.open};
+            if (!local || !next.selected || next.selected === local.path) {
+                return;
             }
+            const before = this.props.selected;
+            const renamed = before === local.path && !findBlock(next.data.blocks, (b) => b.path === before);
+            this.local.advanced = renamed ? {path: next.selected, open: local.open} : null;
         });
     }
 
@@ -298,7 +296,7 @@ export class StudioInspector extends Component {
         const attribute = this.hideAttribute === "remove" ? "invisible" : this.hideAttribute;
         const name = block.name ? ` name="${block.name}"` : "";
         return {
-            heading: outlineLabel(block),
+            heading: this.editor.blockLabel(block),
             kind: _t("Hidden in this view"),
             note:
                 block.kind === "field"
@@ -379,8 +377,9 @@ export class StudioInspector extends Component {
 
     /**
      * Whether « More options » shows for ``block``: always while its
-     * technical name does not apply, else as toggled on this block, else
-     * open when the block has one of its attributes.
+     * technical name does not apply, else as toggled since the block was
+     * selected, else as the account chose it (« Always show these
+     * options »): closed at each new selection unless that choice is on.
      */
     advancedOpen(block) {
         if (this.nameBlocked(block)) {
@@ -390,7 +389,17 @@ export class StudioInspector extends Component {
         if (local && local.path === block.path) {
             return local.open;
         }
-        return this.advancedEntries(block).some((entry) => entry.value);
+        return this.editorState.alwaysMoreOptions;
+    }
+
+    /**
+     * Remember « Always show these options » (``always``) for the account
+     * (``StudioEditor.setAlwaysMoreOptions``); « More options » of
+     * ``block`` stays open while it is shown.
+     */
+    setAlwaysMoreOptions(block, always) {
+        this.local.advanced = {path: block.path, open: true};
+        return this.editor.setAlwaysMoreOptions(always);
     }
 
     toggleAdvanced(block) {
@@ -602,7 +611,7 @@ export class StudioInspector extends Component {
         if (block.kind === "field") {
             return (block.attrs && block.attrs.string) || block.label || block.name;
         }
-        return outlineLabel(block);
+        return this.editor.blockLabel(block);
     }
 
     /**
@@ -649,9 +658,9 @@ export class StudioInspector extends Component {
         return _t("%(count)s field(s)", {count});
     }
 
-    /** The labels of the blocks right under ``block``, in their order. */
+    /** The labels of the blocks right under ``block``, in their order, as the level names them. */
     contents(block) {
-        return (block.children || []).map((child) => outlineLabel(child));
+        return (block.children || []).map((child) => this.editor.blockLabel(child));
     }
 
     /**

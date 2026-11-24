@@ -6,11 +6,13 @@ import {Component, useState} from "@odoo/owl";
 import {_t} from "@web/core/l10n/translation";
 import {
     CHANGE_TAGS,
-    allBlocks,
     canDragBlock,
     changeKeysInside,
     changeKindLabel,
+    contentName,
+    isButtonBox,
     isGhost,
+    ownLabel,
     marginDot,
     searchText,
     typeGlyph,
@@ -36,6 +38,7 @@ export function tagLabel(tag) {
             page: _t("Tab"),
             header: _t("Header"),
             footer: _t("Footer"),
+            chatter: _t("Chatter"),
             templates: _t("Templates"),
         }[tag] || tag
     );
@@ -57,6 +60,71 @@ export function outlineLabel(block) {
         return _t("Group « %(label)s »", {label: block.label});
     }
     return own ? block.label : tagLabel(block.tag);
+}
+
+// The tags of a form a user sees as parts of the form: the other
+// containers without a « string » (div, span, h1…) only lay out what they
+// hold.
+const STRUCTURE_TAGS = new Set(["form", "sheet", "header", "footer", "group", "notebook", "page", "chatter"]);
+
+/**
+ * The text a reader of the form sees for ``block``, the Simple level of
+ * ``outlineLabel``: a field its label, a group or a page without
+ * « string » its readable name (``contentName``), the button box « Smart
+ * buttons », a button its « string », a label the label of its field
+ * (``fields``: the fields of the payload), a widget its title, another
+ * element its label of its own (``ownLabel``). A leaf whose only text is
+ * its tag or its technical name answers "" (an empty layout element); a
+ * container with such a name answers its readable name. A technical name
+ * never shows.
+ */
+export function simpleLabel(block, fields = {}) {
+    const attrs = block.attrs || {};
+    if (block.kind === "field") {
+        return block.label || block.name;
+    }
+    if (block.kind === "separator") {
+        return _t("Separator");
+    }
+    if (isButtonBox(block)) {
+        return _t("Smart buttons");
+    }
+    if (block.kind === "widget") {
+        return attrs.title || (block.label !== block.name && block.label) || _t("Widget");
+    }
+    if (isOutlineContainer(block) || STRUCTURE_TAGS.has(block.tag)) {
+        if (ownLabel(block)) {
+            return outlineLabel(block);
+        }
+        if (STRUCTURE_TAGS.has(block.tag) && !["group", "page"].includes(block.tag)) {
+            return tagLabel(block.tag);
+        }
+        return contentName(block);
+    }
+    if (block.tag === "button") {
+        return attrs.string || attrs.title || _t("Button");
+    }
+    if (block.tag === "label") {
+        return attrs.string || (fields[block.label] || {}).string || _t("Label");
+    }
+    return ownLabel(block);
+}
+
+/**
+ * Whether the Plan of a form shows the children of ``block`` in its place
+ * at the Simple level: an element that only lays out what it holds (no
+ * part of STRUCTURE_TAGS, no label of its own (``ownLabel``), not the
+ * button box), or a leaf without text of its own (``simpleLabel`` ""),
+ * unless a change of the draft touches it.
+ */
+export function isLayoutOnly(block, fields = {}) {
+    if (block.changed || isButtonBox(block) || ownLabel(block)) {
+        return false;
+    }
+    if (isOutlineContainer(block)) {
+        return !STRUCTURE_TAGS.has(block.tag);
+    }
+    return block.kind === "other" && !simpleLabel(block, fields);
 }
 
 /**
@@ -93,7 +161,11 @@ export function outlineCount(block, viewType = null) {
 
 /**
  * The rows of the outline of the tree ``root``, the view itself left out:
- * [{block, depth, context, open}], depth first. ``filter`` keeps the blocks
+ * [{block, depth, context, open}], depth first. With ``simple`` (the
+ * Simple level), a row shows the text a reader sees (``simpleLabel``,
+ * ``fields``: the fields of the payload) and, with ``flatten`` too (a
+ * form), an element that only lays out (``isLayoutOnly``) has no row: its
+ * children take its place, at its depth. ``filter`` keeps the blocks
  * whose label or technical name holds it, accents and case aside;
  * ``changedOnly`` keeps the blocks a draft change touches (``changed``).
  * While one of them filters, a kept block shows with the containers above
@@ -103,19 +175,36 @@ export function outlineCount(block, viewType = null) {
  * Answer {rows, matches, total}: the rows, how many blocks match, how many
  * blocks the tree has.
  */
-export function outlineRows(root, {filter = "", changedOnly = false, collapsed = {}} = {}) {
+export function outlineRows(
+    root,
+    {filter = "", changedOnly = false, collapsed = {}, simple = false, flatten = false, fields = {}} = {}
+) {
     const query = searchText(filter.trim());
     const filtering = Boolean(query) || changedOnly;
-    const textHit = (block) => !query || searchText(`${outlineLabel(block)} ${block.name || ""}`).includes(query);
-    const selfMatch = (block, force) => (changedOnly && !block.changed ? false : force || textHit(block));
+    const label = (block) => (simple ? simpleLabel(block, fields) : outlineLabel(block));
+    const flat = (block) => simple && flatten && isLayoutOnly(block, fields);
+    const textHit = (block) => !query || searchText(`${label(block)} ${block.name || ""}`).includes(query);
+    const selfMatch = (block, force) =>
+        flat(block) || (changedOnly && !block.changed) ? false : force || textHit(block);
     // A container the text matches keeps the blocks under it.
     const forceOf = (block, force) =>
-        force || (isOutlineContainer(block) && Boolean(query) && !changedOnly && textHit(block));
+        force || (!flat(block) && isOutlineContainer(block) && Boolean(query) && !changedOnly && textHit(block));
     const hasMatch = (block, force) =>
         selfMatch(block, force) || (block.children || []).some((child) => hasMatch(child, forceOf(block, force)));
     const rows = [];
     let matches = 0;
+    let total = 0;
+    const count = (block) => {
+        total += flat(block) ? 0 : 1;
+        (block.children || []).forEach(count);
+    };
     const walk = (block, depth, force) => {
+        if (flat(block)) {
+            for (const child of block.children || []) {
+                walk(child, depth, force);
+            }
+            return;
+        }
         if (filtering && !hasMatch(block, force)) {
             return;
         }
@@ -133,8 +222,8 @@ export function outlineRows(root, {filter = "", changedOnly = false, collapsed =
     };
     for (const child of (root && root.children) || []) {
         walk(child, 0, false);
+        count(child);
     }
-    const total = allBlocks(root).length - (root ? 1 : 0);
     return {rows, matches, total};
 }
 
@@ -211,8 +300,17 @@ export class StudioOutline extends Component {
         return this.props.data.blocks;
     }
 
+    /**
+     * The rows of the plan (``outlineRows``): at the Simple level, the text
+     * a reader sees, and a form without its layout-only elements.
+     */
     get result() {
-        return outlineRows(this.root, this.outline);
+        return outlineRows(this.root, {
+            ...this.outline,
+            simple: !this.detailed,
+            flatten: this.props.viewType === "form",
+            fields: this.props.data.fields || {},
+        });
     }
 
     get filtering() {
@@ -246,8 +344,9 @@ export class StudioOutline extends Component {
         return _t("Structure of the view");
     }
 
+    /** The text of the row of ``block`` (``StudioEditor.blockLabel``). */
     label(block) {
-        return outlineLabel(block);
+        return this.editor.blockLabel(block);
     }
 
     isContainer(block) {

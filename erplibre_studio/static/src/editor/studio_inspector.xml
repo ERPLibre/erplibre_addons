@@ -1012,9 +1012,23 @@
                         <t t-call="erplibre_studio.Inspector.SettableEntry" />
                     </t>
                 </fieldset>
-                <p class="small text-muted mt-1 mb-0 o_erplibre_studio_level_hint">
-                    <t t-if="isAdvancedOpen">Always see these options:</t>
-                    <t t-else="">Technical name, widget and visibility: Detailed level.</t>
+                <!-- Open: the choice to open them on every selection,
+                     remembered for the account. Closed: where they always
+                     show. -->
+                <label
+                    t-if="isAdvancedOpen"
+                    class="form-check d-flex align-items-center gap-2 small text-muted mt-1 mb-0 ps-0 o_erplibre_studio_more_always"
+                >
+                    <input
+                        type="checkbox"
+                        class="form-check-input m-0 o_erplibre_studio_more_always_input"
+                        t-att-checked="editorState.alwaysMoreOptions"
+                        t-on-change="(ev) => this.setAlwaysMoreOptions(block, ev.target.checked)"
+                    />
+                    Always show these options
+                </label>
+                <p t-else="" class="small text-muted mt-1 mb-0 o_erplibre_studio_level_hint">
+                    Technical name, widget and visibility: Detailed level.
                     <button
                         type="button"
                         class="btn btn-link btn-sm p-0 ms-1 align-baseline o_erplibre_studio_level_switch"

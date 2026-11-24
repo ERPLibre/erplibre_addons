@@ -259,7 +259,9 @@ describe("the display level of the editor", () => {
                 ".o_erplibre_studio_field_advanced > label, .o_erplibre_studio_field_advanced > *[data-attribute]"
             ).map((el) => (el.querySelector(".o_erplibre_studio_prop_name") ? "name" : el.dataset.attribute))
         ).toEqual(["name", "widget"]);
-        expect(".o_erplibre_studio_level_hint").toHaveText(/^Always see these options:\s*Switch to Detailed$/);
+        // Open: the choice to always show them, in place of the hint.
+        expect(".o_erplibre_studio_level_hint").toHaveCount(0);
+        expect(".o_erplibre_studio_more_always").toHaveText("Always show these options");
         expect(".o_erplibre_studio_inspector_tech").toHaveCount(0);
     });
 

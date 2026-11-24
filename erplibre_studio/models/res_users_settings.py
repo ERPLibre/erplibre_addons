@@ -10,7 +10,8 @@ DISPLAY_LEVELS = [("simple", "Simple"), ("detailed", "Detailed")]
 
 
 class ResUsersSettings(models.Model):
-    """The display level of the studio editor, one per user account. The
+    """The display level of the studio editor and whether its « More
+    options » always open at the Simple level, one per user account. The
     base rule on res.users.settings lets each user read and write his own
     row."""
 
@@ -21,4 +22,9 @@ class ResUsersSettings(models.Model):
         string="Studio display level",
         default="simple",
         required=True,
+    )
+    erplibre_studio_always_more_options = fields.Boolean(
+        string="Studio: always show more options",
+        help="At the Simple level, the « More options » of the studio "
+        "inspector open on every selection instead of closed.",
     )

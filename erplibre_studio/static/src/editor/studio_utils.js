@@ -772,11 +772,92 @@ export function isFocusContext(page) {
     return page.tag === "page" && children.length > 0 && children.every(isGroup);
 }
 
-/** The label of the page ``page``: its « string », else its label, else « Tab ». */
-export function pageLabel(page) {
+// ── readable names, for the Simple level ───────────────────────────────
+
+/**
+ * Whether ``block`` is the box of the smart buttons of a form: the element
+ * named « button_box », with its buttons or empty.
+ */
+export function isButtonBox(block) {
+    return Boolean(block) && ((block.attrs || {}).name === "button_box" || block.label === "button_box");
+}
+
+/**
+ * The text of its own that names ``block`` for a reader: its « string »,
+ * else its label unless that label is only its tag or its technical name
+ * (« name »); "" for none.
+ */
+export function ownLabel(block) {
+    const attrs = block.attrs || {};
+    if (attrs.string) {
+        return attrs.string;
+    }
+    return block.label && ![block.tag, attrs.name].includes(block.label) ? block.label : "";
+}
+
+/**
+ * The labels of the fields ``block`` holds, at any depth in the order of
+ * the arch, ``limit`` at most.
+ */
+export function fieldLabelsIn(block, limit) {
+    const labels = [];
+    const walk = (parent) => {
+        for (const child of parent.children || []) {
+            if (labels.length >= limit) {
+                return;
+            }
+            if (child.kind === "field") {
+                labels.push(child.label || child.name);
+            } else {
+                walk(child);
+            }
+        }
+    };
+    walk(block);
+    return labels;
+}
+
+/**
+ * The fields ``block`` holds, as a reader sees them: the labels of the
+ * first two, then « … » when it holds more; "" when it holds none.
+ */
+export function fieldsSummary(block) {
+    const labels = fieldLabelsIn(block, 3);
+    const shown = labels.slice(0, 2).join(", ");
+    return labels.length > 2 ? `${shown}…` : shown;
+}
+
+/**
+ * The readable name of the container ``block`` that has no « string »:
+ * « Group: A, B… » for a group, « Tab: A, B… » for a page, « Block: A,
+ * B… » for another element, from the first fields it holds
+ * (``fieldsSummary``); the bare word when it holds no field. Its
+ * technical name (« name ») never shows.
+ */
+export function contentName(block) {
+    const fields = fieldsSummary(block);
+    if (block.tag === "group") {
+        return fields ? _t("Group: %(fields)s", {fields}) : _t("Group");
+    }
+    if (block.tag === "page") {
+        return fields ? _t("Tab: %(fields)s", {fields}) : _t("Tab");
+    }
+    return fields ? _t("Block: %(fields)s", {fields}) : _t("Block");
+}
+
+/**
+ * The label of the page ``page``: its « string », else its label, else
+ * « Tab ». With ``simple``, a page without a label of its own
+ * (``ownLabel``) shows the first fields it holds (``fieldsSummary``)
+ * rather than its technical name.
+ */
+export function pageLabel(page, {simple = false} = {}) {
     const attrs = page.attrs || {};
     if (attrs.string) {
         return attrs.string;
+    }
+    if (simple) {
+        return ownLabel(page) || fieldsSummary(page) || _t("Tab");
     }
     return page.label && page.label !== page.tag ? page.label : _t("Tab");
 }
@@ -791,10 +872,12 @@ export function pageLabel(page) {
  * blocks and the page their context (``page``). ``kind`` is « group » or
  * « page », ``parent`` the block that holds the focus block. The label of
  * a group is its « string »; the first group of the sheet without one is
- * « General information », another one « Group » or « Group « name » ».
- * A group nested in a group is no focus block.
+ * « General information », another one « Group » or « Group « name » »,
+ * or with ``simple`` « Group « label » » for a label of its own
+ * (``ownLabel``), else its readable name (``contentName``): the technical
+ * name never shows. A group nested in a group is no focus block.
  */
-export function focusBlocks(root) {
+export function focusBlocks(root, {simple = false} = {}) {
     const entries = [];
     if (!root) {
         return entries;
@@ -810,6 +893,10 @@ export function focusBlocks(root) {
             general = false;
             return _t("General information");
         }
+        if (simple) {
+            const own = ownLabel(group);
+            return own ? _t("Group « %(label)s »", {label: own}) : contentName(group);
+        }
         const own = group.label && group.label !== group.tag;
         return own ? _t("Group « %(label)s »", {label: group.label}) : _t("Group");
     };
@@ -823,14 +910,14 @@ export function focusBlocks(root) {
                     label: groupLabel(child, !page),
                     parent: container,
                     page,
-                    pageLabel: page ? pageLabel(page) : "",
+                    pageLabel: page ? pageLabel(page, {simple}) : "",
                 });
             } else if (!page && child.tag === "notebook") {
                 for (const tab of (child.children || []).filter((b) => b.tag === "page")) {
                     if (isFocusContext(tab)) {
                         groups(tab, tab);
                     } else {
-                        const label = pageLabel(tab);
+                        const label = pageLabel(tab, {simple});
                         entries.push({
                             path: tab.path,
                             block: tab,

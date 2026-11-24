@@ -875,6 +875,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                 "inherited": self._inherited_payload(view),
             },
             "display_level": self._display_level(),
+            "always_more_options": self._always_more_options(),
             "blocks": blocks,
             "layout": {
                 **self._layout(view.type, arch, fields_info),
@@ -1131,6 +1132,34 @@ class ErplibreStudioEditor(models.AbstractModel):
         settings = Settings._find_or_create_for_user(self.env.user).sudo(False)
         settings.write({"erplibre_studio_display_level": level})
         return level
+
+    @api.model
+    def _always_more_options(self):
+        """Whether the « More options » of the inspector open on every
+        selection at the Simple level for the user; False until he chooses
+        it. A read creates no settings row."""
+        settings = self.env.user.res_users_settings_ids[:1]
+        return bool(settings and settings.erplibre_studio_always_more_options)
+
+    @api.model
+    def set_always_more_options(self, always):
+        """Remember ``always`` (a boolean) as the choice « Always show these
+        options » of the user, on his own settings row (created when he
+        has none); answer it."""
+        self._check_studio_access()
+        if not isinstance(always, bool):
+            raise UserError(
+                self.env._("« Always show these options » takes true or false.")
+            )
+        # The finder answers in sudo; the write goes through the rule that
+        # lets a user write his own row.
+        settings = (
+            self.env["res.users.settings"]
+            ._find_or_create_for_user(self.env.user)
+            .sudo(False)
+        )
+        settings.write({"erplibre_studio_always_more_options": always})
+        return always
 
     @api.model
     def _inherited_payload(self, view):

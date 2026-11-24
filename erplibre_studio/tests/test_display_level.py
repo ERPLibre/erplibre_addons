@@ -11,8 +11,9 @@ ITEM = "x_studio_test_level_item"
 
 @tagged("post_install", "-at_install")
 class TestDisplayLevel(StudioCase):
-    """The display level of the editor, remembered per user account, and
-    the inherited views and field modules the Detailed level shows."""
+    """The display level of the editor and the choice « Always show these
+    options », remembered per user account, and the inherited views and
+    field modules the Detailed level shows."""
 
     def setUp(self):
         super().setUp()
@@ -65,6 +66,40 @@ class TestDisplayLevel(StudioCase):
         self._debug = False
         with self.assertRaises(UserError):
             Editor.set_display_level("detailed")
+
+    def test_always_more_options_is_remembered_for_the_account(self):
+        # Closed by default, without a settings row created by the read.
+        self.settings_of(self.editor_user).unlink()
+        self.assertIs(self.data(self.editor_user)["always_more_options"], False)
+        self.assertFalse(self.settings_of(self.editor_user))
+        Editor = self.Editor.with_user(self.editor_user)
+        self.assertIs(Editor.set_always_more_options(True), True)
+        self.assertTrue(
+            self.settings_of(self.editor_user).erplibre_studio_always_more_options
+        )
+        self.assertIs(self.data(self.editor_user)["always_more_options"], True)
+        # The level of the account stays as it was.
+        self.assertEqual(self.data(self.editor_user)["display_level"], "simple")
+        # Another account keeps its own choice.
+        self.assertIs(self.data(self.other_user)["always_more_options"], False)
+        Editor.set_always_more_options(False)
+        self.assertIs(self.data(self.editor_user)["always_more_options"], False)
+
+    def test_always_more_options_refused_values_and_users(self):
+        Editor = self.Editor.with_user(self.editor_user)
+        for value in ("yes", 1, None):
+            with self.subTest(value=value), self.assertRaises(UserError):
+                Editor.set_always_more_options(value)
+        employee = new_test_user(
+            self.env,
+            login="studio_test_more_options_employee",
+            groups="base.group_user",
+        )
+        with self.assertRaises(AccessError):
+            self.Editor.with_user(employee).set_always_more_options(True)
+        self.assertFalse(
+            self.settings_of(employee)[:1].erplibre_studio_always_more_options
+        )
 
     def extend(self, parent, xml_id=None):
         """An extension view of ``parent``; ``xml_id`` « module.name »

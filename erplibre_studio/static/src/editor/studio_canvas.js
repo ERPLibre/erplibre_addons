@@ -7,7 +7,7 @@ import {_t} from "@web/core/l10n/translation";
 import {deserializeDate, deserializeDateTime, formatDate, formatDateTime} from "@web/core/l10n/dates";
 import {X2MANY_TYPES} from "./studio_relations";
 import {StudioInsertList} from "./studio_insert";
-import {outlineCount, outlineLabel, tagLabel} from "./studio_outline";
+import {outlineCount, tagLabel} from "./studio_outline";
 import {LEAFLET_LANES} from "./studio_leaflet";
 import {
     CALENDAR_LANES,
@@ -895,6 +895,9 @@ export class StudioCanvas extends Component {
         // The path of the block of a form in focus (StudioEditor.focusEntry),
         // or null when the focus is off.
         focus: {type: [String, {value: null}], optional: true},
+        // The display level of the editor: the folded lines of the focus
+        // name their blocks as it does (StudioEditor.blockLabel).
+        level: {type: String, optional: true},
     };
 
     get editor() {
@@ -962,6 +965,7 @@ export class StudioCanvas extends Component {
         if (!focused || this.viewType !== "form") {
             return null;
         }
+        const simple = this.props.level !== "detailed";
         const viewType = this.viewType;
         const entries = new Map(editor.focusEntries.map((entry) => [entry.path, entry]));
         const rows = [];
@@ -1008,7 +1012,7 @@ export class StudioCanvas extends Component {
                         if (entries.has(page.path)) {
                             blockRow(entries.get(page.path), false);
                         } else if (isFocusContext(page)) {
-                            const label = _t("Tab %(label)s", {label: pageLabel(page)});
+                            const label = _t("Tab %(label)s", {label: pageLabel(page, {simple})});
                             rows.push({kind: "context", key: page.path, label});
                             for (const group of page.children) {
                                 if (entries.has(group.path)) {
@@ -1037,7 +1041,7 @@ export class StudioCanvas extends Component {
                     rows.push({
                         kind: "static",
                         key: child.path,
-                        label: outlineLabel(child),
+                        label: editor.blockLabel(child),
                         meta: count ? _t("%(count)s field(s)", {count}) : "",
                     });
                 }

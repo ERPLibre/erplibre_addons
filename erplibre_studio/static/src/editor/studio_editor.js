@@ -21,7 +21,7 @@ import {parseGroupValue} from "./studio_groups";
 import {PERMS, StudioModelDialog, accessGroup, accessRows} from "./studio_models";
 import {StudioSecuritySpace, pickModel, securityModels} from "./studio_security";
 import {INSPECTOR_TABS, StudioInspector} from "./studio_inspector";
-import {StudioOutline, blockGlyph, outlineLabel} from "./studio_outline";
+import {StudioOutline, blockGlyph, isLayoutOnly, outlineLabel, simpleLabel} from "./studio_outline";
 import {StudioPalette} from "./studio_palette";
 import {StudioModelsSpace} from "./studio_models_space";
 import {StudioModelPreview} from "./studio_preview";
@@ -75,6 +75,7 @@ export {
     changeKeysInside,
     changeSentence,
     conditionValue,
+    contentName,
     fieldTypeLabel,
     fieldWidgets,
     findBlock,
@@ -101,7 +102,7 @@ export {
     valueLabel,
 } from "./studio_utils";
 export {StudioBlock} from "./studio_canvas";
-export {outlineRows} from "./studio_outline";
+export {isLayoutOnly, outlineRows, simpleLabel} from "./studio_outline";
 export {INSPECTOR_TABS} from "./studio_inspector";
 
 // The class of the body while a tab is dragged: the « + » tab of a
@@ -311,6 +312,9 @@ export class StudioEditor extends Component {
             // The display level (DISPLAY_LEVELS): « simple » shows the view
             // as a user sees it, « detailed » adds its technical names.
             level: "simple",
+            // Whether « More options » of the inspector opens on every
+            // selection at the Simple level, as the account chose it.
+            alwaysMoreOptions: false,
             // The hook of a form whose insertion list is open (``openInsert``):
             // {target, position, zone, key, where, container}; null for none.
             insert: null,
@@ -323,7 +327,8 @@ export class StudioEditor extends Component {
             focus: {on: false, path: null, last: null},
         });
         this.previewCount = 0;
-        // How many times the user chose a level (``setLevel``).
+        // How many times the user chose a level or « Always show these
+        // options » (``setLevel``, ``setAlwaysMoreOptions``).
         this.levelStamp = 0;
         // The menus of the top bar, closed by their items once chosen.
         this.menus = {
@@ -397,18 +402,46 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * The level of the payload ``data`` when it carries one; else the level
-     * stays. ``stamp`` is the ``levelStamp`` read when the request of that
-     * payload started: once the user chose a level since, the payload may
-     * carry the level from before, read before that choice was saved, and
-     * the level on screen stays.
+     * The level of the payload ``data`` and its « always_more_options »
+     * when it carries them; else they stay. ``stamp`` is the
+     * ``levelStamp`` read when the request of that payload started: once
+     * the user chose a level or that option since, the payload may carry
+     * the values from before, read before that choice was saved, and the
+     * values on screen stay.
      */
     takeLevel(data, stamp) {
-        if (stamp !== this.levelStamp) {
+        if (stamp !== this.levelStamp || !data) {
             return;
         }
-        if (data && DISPLAY_LEVELS.includes(data.display_level)) {
+        if (DISPLAY_LEVELS.includes(data.display_level)) {
             this.state.level = data.display_level;
+        }
+        if (typeof data.always_more_options === "boolean") {
+            this.state.alwaysMoreOptions = data.always_more_options;
+        }
+    }
+
+    /**
+     * Open « More options » of the inspector on every selection at the
+     * Simple level (``always`` true), or close it on each new selection,
+     * at once, and remember it for the account of the user, as
+     * ``setLevel`` does with the level; a refusal puts the former choice
+     * back.
+     */
+    async setAlwaysMoreOptions(always) {
+        const before = this.state.alwaysMoreOptions;
+        if (Boolean(always) === before) {
+            return;
+        }
+        this.levelStamp++;
+        this.state.alwaysMoreOptions = Boolean(always);
+        try {
+            await this.orm.call(MODEL, "set_always_more_options", [Boolean(always)]);
+        } catch (error) {
+            if (this.state.alwaysMoreOptions === Boolean(always)) {
+                this.state.alwaysMoreOptions = before;
+            }
+            this.notification.add(this.errorMessage(error), {type: "danger"});
         }
     }
 
@@ -434,6 +467,20 @@ export class StudioEditor extends Component {
             }
             this.notification.add(this.errorMessage(error), {type: "danger"});
         }
+    }
+
+    /**
+     * The name of ``block`` as the level shows it: its label with the
+     * technical names at the Detailed level (``outlineLabel``), the text
+     * a reader sees at the Simple one (``simpleLabel``), « Element » for
+     * an element without text of its own. ``detailed``: the level to name
+     * it at, the one on screen by default.
+     */
+    blockLabel(block, detailed = this.detailed) {
+        if (detailed) {
+            return outlineLabel(block);
+        }
+        return simpleLabel(block, (this.data && this.data.fields) || {}) || _t("Element");
     }
 
     /** The text of the inherited views of the view on screen, for the Detailed level. */
@@ -1312,7 +1359,7 @@ export class StudioEditor extends Component {
         if (item.kind === "node") {
             const block = findBlock(this.root, (b) => b.path === item.path);
             if (block) {
-                return {glyph: blockGlyph(block, this.data.fields), label: outlineLabel(block)};
+                return {glyph: blockGlyph(block, this.data.fields), label: this.blockLabel(block)};
             }
             return {glyph: "•", label: item.name || ""};
         }
@@ -2099,9 +2146,12 @@ export class StudioEditor extends Component {
 
     // ── focus on a block ────────────────────────────────────────────────
 
-    /** The focus blocks of the form on screen (``focusBlocks``); none for another view type. */
+    /**
+     * The focus blocks of the form on screen (``focusBlocks``), named as
+     * the level shows them; none for another view type.
+     */
     get focusEntries() {
-        return this.viewType === "form" ? focusBlocks(this.root) : [];
+        return this.viewType === "form" ? focusBlocks(this.root, {simple: !this.detailed}) : [];
     }
 
     /** The focus block at ``path``, or null. */
@@ -2771,12 +2821,18 @@ export class StudioEditor extends Component {
 
     /**
      * The trail of the selection above the canvas: [{path, label}], from
-     * the first block under the view down to the selected one.
+     * the first block under the view down to the selected one, named as
+     * the level names them (``blockLabel``). At the Simple level, a form
+     * leaves out the elements above the selection that only lay out
+     * (``isLayoutOnly``), as its plan does.
      */
     get selectionTrail() {
-        return blockTrail(this.root, this.state.selected)
-            .slice(1)
-            .map((block) => ({path: block.path, label: outlineLabel(block)}));
+        const simple = !this.detailed && this.viewType === "form";
+        const fields = this.data.fields || {};
+        const trail = blockTrail(this.root, this.state.selected).slice(1);
+        return trail
+            .filter((block, index) => !simple || index === trail.length - 1 || !isLayoutOnly(block, fields))
+            .map((block) => ({path: block.path, label: this.blockLabel(block)}));
     }
 
     /**

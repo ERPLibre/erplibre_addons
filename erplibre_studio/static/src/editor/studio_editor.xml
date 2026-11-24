@@ -639,6 +639,7 @@
                                 lane="state.timelineLane"
                                 geoLayer="state.geoLayer"
                                 focus="focusEntry ? focusEntry.path : null"
+                                level="state.level"
                             />
                         </t>
                     </main>

@@ -3145,6 +3145,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__chatter
 msgid "Chatter"
 msgstr ""
@@ -4553,6 +4554,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__name
 msgid "Label"
 msgstr ""
@@ -6616,6 +6618,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Smart buttons"
 msgstr ""
 
@@ -8896,6 +8899,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Widget"
 msgstr ""
 
@@ -10234,12 +10238,6 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Always see these options:"
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__res_users_settings__erplibre_studio_display_level__detailed
 msgid "Detailed"
@@ -10309,4 +10307,64 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "from the view %(xml_id)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Always show these options"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Block"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Block: %(fields)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "Button"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Element"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Group: %(fields)s"
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_res_users_settings__erplibre_studio_always_more_options
+msgid ""
+"At the Simple level, the « More options » of the studio inspector open on "
+"every selection instead of closed."
+msgstr ""
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_res_users_settings__erplibre_studio_always_more_options
+msgid "Studio: always show more options"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Tab: %(fields)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "« Always show these options » takes true or false."
 msgstr ""

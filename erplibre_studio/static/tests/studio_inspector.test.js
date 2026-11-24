@@ -1458,8 +1458,11 @@ describe("erplibre_studio editor, inspector", () => {
         afterOperation = () => advanced(attrs);
         await openEditor();
 
-        // A selection shown as radio buttons: the options of radio.
+        // A selection shown as radio buttons: the options of radio. « More
+        // options » start closed at each new selection, attributes or not.
         await contains(".o_erplibre_studio_field[data-name=x_level]").click();
+        expect(".o_erplibre_studio_field_advanced").toHaveCount(0);
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
         expect(".o_erplibre_studio_field_advanced").toHaveCount(1);
         expect(`${OPTION("horizontal")} input[type=checkbox]`).toHaveCount(1);
         expect(`${OPTION("horizontal")} input`).not.toBeChecked();
@@ -1536,6 +1539,7 @@ describe("erplibre_studio editor, inspector", () => {
 
         // Options that hold an expression: the text only.
         await contains(".o_erplibre_studio_field[data-name=city]").click();
+        await contains(".o_erplibre_studio_field_advanced_toggle").click();
         expect(".o_erplibre_studio_field_advanced").toHaveCount(1);
         expect(".o_erplibre_studio_prop_options").toHaveValue("{'no_create': context.get('x')}");
         expect(".o_erplibre_studio_options_raw_toggle").toHaveCount(0);

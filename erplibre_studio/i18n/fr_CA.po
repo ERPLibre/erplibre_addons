@@ -3135,6 +3135,7 @@ msgstr "Des changements attendent Appliquer"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__chatter
 msgid "Chatter"
 msgstr "Discussion"
@@ -4573,6 +4574,7 @@ msgstr "Sorte"
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_properties.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__name
 msgid "Label"
 msgstr "Libellé"
@@ -6659,6 +6661,7 @@ msgstr "Parts"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Smart buttons"
 msgstr "Boutons intelligents"
 
@@ -9067,6 +9070,7 @@ msgstr "Pourquoi la désinstallation est refusée"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 msgid "Widget"
 msgstr "Widget"
 
@@ -10671,12 +10675,6 @@ msgstr "+ %(views)s vue(s) héritée(s) de %(modules)s module(s)"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
-msgid "Always see these options:"
-msgstr "Toujours voir ces options :"
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__res_users_settings__erplibre_studio_display_level__detailed
 msgid "Detailed"
@@ -10747,3 +10745,65 @@ msgstr "créé par ce projet"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "from the view %(xml_id)s"
 msgstr "de la vue %(xml_id)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Always show these options"
+msgstr "Toujours voir ces options"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Block"
+msgstr "Bloc"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Block: %(fields)s"
+msgstr "Bloc : %(fields)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "Button"
+msgstr "Bouton"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "Element"
+msgstr "Élément"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Group: %(fields)s"
+msgstr "Groupe : %(fields)s"
+
+#. module: erplibre_studio
+#: model:ir.model.fields,help:erplibre_studio.field_res_users_settings__erplibre_studio_always_more_options
+msgid ""
+"At the Simple level, the « More options » of the studio inspector open on "
+"every selection instead of closed."
+msgstr ""
+"Au niveau Simple, « Plus d'options » de l'inspecteur du studio s'ouvre à "
+"chaque sélection au lieu de rester fermé."
+
+#. module: erplibre_studio
+#: model:ir.model.fields,field_description:erplibre_studio.field_res_users_settings__erplibre_studio_always_more_options
+msgid "Studio: always show more options"
+msgstr "Studio : toujours voir plus d'options"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Tab: %(fields)s"
+msgstr "Onglet : %(fields)s"
+
+#. module: erplibre_studio
+#. odoo-python
+#: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
+msgid "« Always show these options » takes true or false."
+msgstr "« Toujours voir ces options » prend vrai ou faux."
