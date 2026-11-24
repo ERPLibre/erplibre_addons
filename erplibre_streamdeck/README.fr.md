@@ -87,7 +87,8 @@ poste et de son employé, si bien que le prêteur n'a pas besoin de la fiche
 de l'autre poste, et ne la reçoit pas. L'emprunteur ne lit rien d'avant
 son arrivée. Un poste qui envoie seulement un événement portant le numéro
 de série d'un deck tenu ailleurs lit cet événement et le nom du deck qu'il
-porte, jamais la fiche du deck ni son historique.
+porte, jamais la fiche du deck ni son historique : l'événement montre ce
+nom sans lien vers le deck, qui reste un lien pour qui lit le deck.
 
 Quand un poste remonte un deck que tient un autre poste, le deck passe à ce
 poste sans confirmation, et Odoo ajoute un événement *Changé de poste*

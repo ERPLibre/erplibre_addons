@@ -639,6 +639,11 @@ msgid "Deck program"
 msgstr ""
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__device_readable
+msgid "Deck readable"
+msgstr ""
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Deck serial number"
 msgstr ""
@@ -2228,6 +2233,11 @@ msgstr ""
 #: model:ir.ui.menu,name:erplibre_streamdeck.menu_streamdeck_fleet_workstations
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
 msgid "Workstations"
+msgstr ""
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__device_readable
+msgid "You read the record of this event's deck."
 msgstr ""
 
 #. module: erplibre_streamdeck

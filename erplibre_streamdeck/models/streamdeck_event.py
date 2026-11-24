@@ -51,6 +51,11 @@ class StreamdeckEvent(models.Model):
     they hold or held, dated from their first holding on
     (`streamdeck.device.holding`); the record rule of the employees
     opens these, besides the events of their own workstations.
+
+    `device_readable` is true for the current user when they read the
+    event's deck: an event read through its workstation alone names a
+    deck held elsewhere, whose record stays closed, so the form shows
+    that deck without a link to it.
     """
 
     _name = "streamdeck.event"
@@ -115,6 +120,12 @@ class StreamdeckEvent(models.Model):
         " moment one of your workstations held it.",
     )
 
+    device_readable = fields.Boolean(
+        string="Deck readable",
+        compute="_compute_device_readable",
+        help="You read the record of this event's deck.",
+    )
+
     _sql_constraints = [
         ("uuid_unique", "UNIQUE(uuid)", "An event uuid is unique."),
     ]
@@ -134,6 +145,15 @@ class StreamdeckEvent(models.Model):
             if event.kind == "service_changed":
                 label = services.get(event.service_state)
             event.label = label or kinds.get(event.kind, False)
+
+    @api.depends("device_id")
+    @api.depends_context("uid")
+    def _compute_device_readable(self):
+        readable = self.device_id._filtered_access("read")
+        for event in self:
+            event.device_readable = (
+                bool(event.device_id) and event.device_id in readable
+            )
 
     def _held_by_me_sql(self):
         """The ids of the events that `visible_to_me` selects, for the

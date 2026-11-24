@@ -556,6 +556,60 @@ class TestStreamdeckMonitor(TransactionCase):
             self._activities(self._device(), "moved").user_id, self.user_c
         )
 
+    def test_a_deck_activity_links_only_to_who_reads_the_deck(self):
+        # Le deck de A reçoit un événement « débranché » du poste de C, qui
+        # ne le déclare pas, puis passe chez B. Chaque activité du deck, son
+        # avis par courriel et le fil où elle abonne mènent à la fiche du
+        # deck : elles vont à A, B et M, qui la lisent, jamais à C, qui ne
+        # lit ni la fiche, ni une activité, ni un message du deck.
+        self._enable(recipient="both")
+        unplugged_at = self._unplug(self.token_a, T0)
+        self._report(
+            self.token_c,
+            unplugged_at + 5 * MIN,
+            events=[self._event("unplugged", unplugged_at + 5 * MIN)],
+        )
+        self._cron(unplugged_at + 73 * HOUR)
+        device = self._device()
+        self.assertEqual(
+            self._activities(device, "unplugged").user_id,
+            self.user_a | self.manager,
+        )
+        self._report(self.token_b, unplugged_at + 74 * HOUR, decks=[DECK])
+        self.assertEqual(
+            self._activities(device, "moved").user_id,
+            self.user_b | self.manager,
+        )
+        activities = self._activities(device, active=None)
+        followers = self.env["mail.followers"].search(
+            [("res_model", "=", device._name), ("res_id", "=", device.id)]
+        )
+        notified = (
+            self.env["mail.message"]
+            .search([("model", "=", device._name), ("res_id", "=", device.id)])
+            .partner_ids
+        )
+        readers = activities.user_id | followers.partner_id.user_ids
+        readers |= notified.user_ids
+        self.assertEqual(readers, self.user_a | self.user_b | self.manager)
+        for user in readers:
+            with self.subTest(user=user.name):
+                self.env.invalidate_all()
+                self.assertTrue(device.with_user(user).read(["serial"]))
+        self.env.invalidate_all()
+        with self.assertRaises(AccessError):
+            device.with_user(self.user_c).read(["serial"])
+        self.assertFalse(
+            self.Activity.with_user(self.user_c).search(
+                [("res_model", "=", device._name), ("res_id", "=", device.id)]
+            )
+        )
+        self.assertFalse(
+            self.env["mail.message"]
+            .with_user(self.user_c)
+            .search([("model", "=", device._name), ("res_id", "=", device.id)])
+        )
+
     def test_an_archived_manager_gets_nothing_and_breaks_nothing(self):
         self._enable(recipient="both")
         self.manager.active = False

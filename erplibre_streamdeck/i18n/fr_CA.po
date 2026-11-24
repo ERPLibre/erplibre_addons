@@ -681,6 +681,11 @@ msgid "Deck program"
 msgstr "Programme du deck"
 
 #. module: erplibre_streamdeck
+#: model:ir.model.fields,field_description:erplibre_streamdeck.field_streamdeck_event__device_readable
+msgid "Deck readable"
+msgstr "Fiche du deck lisible"
+
+#. module: erplibre_streamdeck
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_workstation_search
 msgid "Deck serial number"
 msgstr "Numéro de série du deck"
@@ -2387,6 +2392,11 @@ msgstr "Poste muet"
 #: model_terms:ir.ui.view,arch_db:erplibre_streamdeck.view_streamdeck_config_profile_form
 msgid "Workstations"
 msgstr "Postes"
+
+#. module: erplibre_streamdeck
+#: model:ir.model.fields,help:erplibre_streamdeck.field_streamdeck_event__device_readable
+msgid "You read the record of this event's deck."
+msgstr "Vous lisez la fiche du deck de cet événement."
 
 #. module: erplibre_streamdeck
 #. odoo-python

@@ -315,6 +315,69 @@ class TestStreamdeckHolding(TransactionCase):
             [(device.id, device.display_name)],
         )
 
+    def _deck_links(self, user, event):
+        """Le deck tel que le formulaire de `event` le montre à `user` :
+        un booléen par champ `device_id` visible, vrai quand ce champ est
+        un lien vers la fiche du deck (sans `no_open`). Le formulaire est
+        celui que le client web reçoit, que l'événement s'ouvre de
+        l'historique ou d'une ligne de l'onglet Événements d'un poste."""
+        Event = self.Event.with_user(user)
+        arch = etree.fromstring(
+            Event.get_views([(False, "form")])["views"]["form"]["arch"]
+        )
+        names = sorted({node.get("name") for node in arch.iter("field")})
+        values = event.with_user(user).read(names)[0]
+        links = []
+        for node in arch.xpath("//field[@name='device_id']"):
+            if safe_eval(node.get("invisible") or "False", values):
+                continue
+            options = safe_eval(node.get("options") or "{}")
+            links.append(not options.get("no_open"))
+        return links
+
+    def test_an_event_links_its_deck_only_to_who_reads_it(self):
+        # C envoie un événement du deck que B a pris à A, sans le déclarer
+        # dans son état. Tous quatre lisent cet événement ; A, le prêteur,
+        # B, le détenteur, et M suivent le lien vers la fiche du deck. C
+        # lit le nom du deck sans lien : un lien le mènerait à une erreur
+        # d'accès.
+        self._lend_to_b()
+        self._report(self.token_c, DAY_BACK, kinds=["plugged"], decks=False)
+        device = self._device()
+        at_c = device.event_ids.filtered(
+            lambda e: e.workstation_id.user_id == self.user_c
+        )
+        self.assertEqual(len(at_c), 1)
+        workstation_form = etree.fromstring(
+            self.env["streamdeck.workstation"]
+            .with_user(self.user_c)
+            .get_views([(False, "form")])["views"]["form"]["arch"]
+        )
+        [events_tab] = workstation_form.xpath("//field[@name='event_ids']")
+        self.assertFalse(events_tab.xpath("form"), "a row opens the form")
+        for user, reads in (
+            (self.user_a, True),
+            (self.user_b, True),
+            (self.manager, True),
+            (self.user_c, False),
+        ):
+            with self.subTest(user=user.name):
+                self.env.invalidate_all()
+                self.assertEqual(self._deck_links(user, at_c), [reads])
+                if reads:
+                    self.assertEqual(
+                        device.with_user(user).read(["serial"])[0]["serial"],
+                        "SN-HOLD",
+                    )
+                else:
+                    with self.assertRaises(AccessError):
+                        device.with_user(user).read(["serial"])
+        # Un événement de son propre deck garde le lien pour l'employé.
+        at_a = device.event_ids.filtered(
+            lambda e: e.workstation_id.user_id == self.user_a
+        )
+        self.assertEqual(self._deck_links(self.user_a, at_a[:1]), [True])
+
     def test_a_late_lender_event_dated_before_the_move_stays_hidden(self):
         # A remonte après le déplacement un événement qu'il a gardé hors
         # ligne, daté d'avant l'arrivée du deck chez B : la visibilité
