@@ -271,6 +271,38 @@ class TestRequirementUpgrade(TransactionCase):
                 )
         self.assertEqual(kept.achievement, before)
 
+    def test_an_upgrade_to_1_5_names_the_deck_link_of_an_event(self):
+        # SD-INV-R09 dit depuis la version 18.0.1.5.0 comment un événement
+        # lie son deck : une base de la version 18.0.1.4.0 reçoit le texte
+        # du fichier, son nom traduit rechargé du catalogue, et un autre
+        # requis garde sa retouche.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        requirement = self.env.ref("%s.req_sd_inv_r09" % MODULE)
+        achievement = self._in_file("req_sd_inv_r09", "achievement")
+        self.assertIn("device_readable", achievement)
+        requirement.write(
+            {"achievement": achievement.split("; the event form")[0] + "."}
+        )
+        edited = self.env.ref("%s.req_sd_inv_r10" % MODULE)
+        edited.write({"achievement": "Edited by hand"})
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        self.assertEqual(requirement.achievement, achievement)
+        name = self._in_file("req_sd_inv_r09", "name")
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        self.assertEqual(
+            requirement.with_context(lang="fr_CA").name, french[name]
+        )
+        self.assertEqual(edited.achievement, "Edited by hand")
+        self.assertIn(
+            "test_an_event_links_its_deck_only_to_who_reads_it",
+            " ".join(requirement.test_ids.mapped("reference")),
+        )
+
     def test_an_upgrade_to_1_5_follows_the_deck_tests_to_their_repo(self):
         # Les tests du programme du deck ont quitté test/ d'ERPLibre pour
         # tests/ de leur dépôt : une base qui cite encore l'ancien chemin

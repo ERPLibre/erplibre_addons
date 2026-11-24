@@ -1055,6 +1055,12 @@
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor_thread.TestStreamdeckMonitorThread.test_a_new_holder_reads_no_closing_of_an_earlier_activity</field>
     </record>
+    <record id="test_sd_mon_r23_7" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r23" />
+        <field name="sequence" eval="70" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_deck_activity_links_only_to_who_reads_the_deck</field>
+    </record>
     <record id="test_sd_mon_r24_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r24" />
         <field name="sequence" eval="10" />

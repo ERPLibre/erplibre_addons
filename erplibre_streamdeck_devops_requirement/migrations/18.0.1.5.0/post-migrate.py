@@ -1,9 +1,11 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-"""Load again, from the data files, the proofs whose reference changed
-in this version: the contract test the extension renamed, the tests of
-the deck program, which live in their own repository, and the tests
-ERPLibre renamed or moved since the proofs were written.
+"""Load again, from the data files, the records whose text changed in
+this version: the proofs of the contract test the extension renamed, of
+the tests of the deck program, which live in their own repository, and of
+the tests ERPLibre renamed or moved since the proofs were written, with
+the requirements that cite them; and the requirement on lent decks, whose
+achievement names how an event links its deck.
 
 The data files are noupdate: an upgrade creates the records it does not
 find and leaves the others as they are, so a proof would keep its former
@@ -35,9 +37,12 @@ MODULE = "erplibre_streamdeck_devops_requirement"
 
 # Data file -> XML ids of its records rewritten in this version: the
 # extension's contract 1.5 renamed the test of its version, which these
-# proofs cite.
+# proofs cite, and SD-INV-R09 names the deck link of an event.
 REWRITTEN = {
-    "data/requirement_inventory.xml": ("test_sd_inv_r24_1",),
+    "data/requirement_inventory.xml": (
+        "test_sd_inv_r24_1",
+        "req_sd_inv_r09",
+    ),
     "data/requirement_control.xml": (
         "test_sd_ctl_r27_1",
         "test_sd_ctl_r66_1",
