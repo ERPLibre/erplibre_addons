@@ -270,7 +270,7 @@
     </record>
     <record id="req_sd_mon_r19" model="devops.requirement">
         <field name="code">SD-MON-R19</field>
-        <field name="name">Enabling the activities for the manager or for both needs a named manager, chosen among the Stream Deck managers; a manager archived since gets nothing, a warning without name is logged, and the employee part is still created</field>
+        <field name="name">Enabling the activities for the manager or for both needs a named manager, chosen among the Stream Deck managers; a manager archived or out of the Stream Deck manager group since gets nothing, a warning without name is logged, and the employee part is still created</field>
         <field name="category_id" ref="cat_sd_mon" />
         <field name="sequence" eval="190" />
         <field name="moscow">must</field>
@@ -279,7 +279,7 @@
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">_check_streamdeck_settings of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py refuses the save, and the field's domain lists the internal users of the manager group; streamdeck.monitor._named_manager drops an archived or deleted manager with a warning, logged only while the activities are enabled.</field>
+        <field name="achievement">_check_streamdeck_settings of ERPLibre_erplibre_addons:erplibre_streamdeck/models/res_config_settings.py refuses the save, and the field's domain lists the internal users of the manager group; streamdeck.monitor._named_manager drops a manager archived, deleted or out of the manager group, the field's domain read again, with a warning, logged only while the activities are enabled.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_mon_r20" model="devops.requirement">
@@ -940,6 +940,12 @@
         <field name="sequence" eval="50" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_disabled_activities_never_warn_about_the_manager</field>
+    </record>
+    <record id="test_sd_mon_r19_6" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r19" />
+        <field name="sequence" eval="60" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_manager_out_of_the_group_gets_nothing_and_breaks_nothing</field>
     </record>
     <record id="test_sd_mon_r20_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_mon_r20" />

@@ -40,6 +40,7 @@ from .res_config_settings import (
     DELAY_FLOORS,
     PARAM_PREFIX,
     RECIPIENTS,
+    _manager_domain,
 )
 
 _logger = logging.getLogger(__name__)
@@ -83,8 +84,9 @@ class StreamdeckMonitor(models.AbstractModel):
         """The Settings › Stream Deck as a dict: `enabled`, `recipient`
         (one of RECIPIENTS), `manager` (a res.users, empty when the
         activities are disabled, when the recipient leaves the manager
-        out, when none is named, or when the one named is archived or
-        deleted, with a warning; so no warning while nothing can open),
+        out, when none is named, or when the one named is archived,
+        deleted or out of the manager group, with a warning; so no warning
+        while nothing can open),
         `alerts` (kind -> bool, a missing box meaning checked) and the
         three delays, an unreadable delay taking its default and none
         going below its floor."""
@@ -118,9 +120,13 @@ class StreamdeckMonitor(models.AbstractModel):
         return settings
 
     def _named_manager(self, stored):
-        """The active user whose id is `stored`, or an empty recordset;
-        a stored id of a user archived or deleted is logged, without any
-        name, as a manager who gets nothing."""
+        """The active user whose id is `stored`, still one the Settings
+        offer as manager (_manager_domain), or an empty recordset. A
+        stored id of a user archived, deleted or out of the Stream Deck
+        manager group is logged, without any name, as a manager who gets
+        nothing: out of the group, the user no longer reads the
+        workstations and decks of the others, and an activity on one of
+        them would be one they cannot open."""
         Users = self.env["res.users"].sudo().with_context(active_test=False)
         if not stored:
             return self.env["res.users"]
@@ -128,11 +134,14 @@ class StreamdeckMonitor(models.AbstractModel):
             manager = Users.browse(int(stored)).exists()
         except ValueError:
             manager = Users
-        if not manager.active:
+        manager = manager.filtered_domain(
+            [("active", "=", True)] + _manager_domain(self)
+        )
+        if not manager:
             _logger.warning(
                 "The Stream Deck activity manager named in the Settings is"
-                " archived or deleted: only the employee part of the"
-                " activities is created."
+                " archived, deleted or out of the Stream Deck manager group:"
+                " only the employee part of the activities is created."
             )
             return self.env["res.users"]
         return self.env["res.users"].browse(manager.id)

@@ -182,9 +182,10 @@ beyond the delay goes silent, then is heard again at its next report.
   included, with « the assigned user is archived », where Odoo would
   delete them. Closing does not depend on the Settings: an activity opened
   before they were disabled still closes.
-- **Archived manager.** When the named manager is archived later, only
-  the employee part opens, and each run of the cron writes a warning to
-  the log, which names nobody.
+- **Archived manager.** When the named manager is archived later, or
+  leaves the Stream Deck manager group and so no longer reads the
+  workstations of the others, only the employee part opens, and each run
+  of the cron writes a warning to the log, which names nobody.
 - **Access.** An activity is read with its record. An employee reads the
   activities of their workstations, the manager's included, and those of
   the decks they hold or held, from their first holding on, plus those

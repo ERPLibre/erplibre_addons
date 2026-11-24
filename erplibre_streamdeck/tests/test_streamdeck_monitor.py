@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
+from odoo import Command
 from odoo.exceptions import AccessError
 from odoo.sql_db import Cursor
 from odoo.tests.common import TransactionCase, new_test_user, tagged
@@ -626,6 +627,37 @@ class TestStreamdeckMonitor(TransactionCase):
         # activité, aucune erreur.
         self._enable(recipient="manager")
         self.manager.active = False
+        self._report(self.token_b, T0)
+        with self.assertLogs(LOGGER, "WARNING"):
+            self._cron(T0 + 2 * HOUR)
+        self.assertEqual(len(self._events(self.workstation_b, "silent")), 1)
+        self.assertFalse(self._activities(self.workstation_b))
+
+    def test_a_manager_out_of_the_group_gets_nothing_and_breaks_nothing(
+        self,
+    ):
+        # Hors du groupe des gestionnaires, le gestionnaire nommé ne lit
+        # plus les postes des autres : une activité sur l'un d'eux lui
+        # serait illisible. Il est traité comme un gestionnaire archivé.
+        self._enable(recipient="both")
+        self.manager.groups_id = [
+            Command.unlink(self.env.ref(MANAGER_GROUP).id)
+        ]
+        with self.assertRaises(AccessError):
+            self.workstation_a.with_user(self.manager).read(["name"])
+        self._report(self.token_a, T0)
+        with self.assertLogs(LOGGER, "WARNING") as logs:
+            self._cron(T0 + 61 * MIN)
+        self.assertIn("manager group", "\n".join(logs.output))
+        self.assertNotIn("Manager M", "\n".join(logs.output))
+        self.assertEqual(
+            self._activities(self.workstation_a, "silent").user_id,
+            self.user_a,
+        )
+        self.assertFalse(self.Monitor._settings()["manager"])
+        # Destinataire « gestionnaire » seul : l'historique s'écrit, aucune
+        # activité, aucune erreur.
+        self._enable(recipient="manager")
         self._report(self.token_b, T0)
         with self.assertLogs(LOGGER, "WARNING"):
             self._cron(T0 + 2 * HOUR)

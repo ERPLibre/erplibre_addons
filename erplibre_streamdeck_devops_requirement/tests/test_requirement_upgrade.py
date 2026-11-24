@@ -680,6 +680,39 @@ class TestRequirementUpgrade(TransactionCase):
                 self.assertFalse(requirement.missing)
                 self.assertFalse(requirement.test_ids)
 
+    def test_an_upgrade_to_1_5_names_the_manager_out_of_the_group(self):
+        # Un gestionnaire nommé sorti du groupe des gestionnaires ne reçoit
+        # rien, comme un gestionnaire archivé : une base de la version
+        # 18.0.1.4.0 reçoit le requis qui le dit, dans les deux langues.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        requirement = self.env.ref("%s.req_sd_mon_r19" % MODULE)
+        requirement.with_context(lang="en_US").write(
+            {
+                "name": "A manager archived since gets nothing",
+                "achievement": "_named_manager drops an archived manager.",
+            }
+        )
+        requirement.with_context(lang="fr_CA").write(
+            {"name": "Un gestionnaire archivé depuis ne reçoit rien"}
+        )
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        name = self._in_file("req_sd_mon_r19", "name", MONITORING)
+        self.assertIn("manager group", name)
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        self.assertEqual(requirement.with_context(lang="en_US").name, name)
+        self.assertEqual(
+            requirement.with_context(lang="fr_CA").name, french[name]
+        )
+        self.assertEqual(
+            requirement.achievement,
+            self._in_file("req_sd_mon_r19", "achievement", MONITORING),
+        )
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

@@ -2296,9 +2296,9 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mon_r19
 msgid ""
 "Enabling the activities for the manager or for both needs a named manager, "
-"chosen among the Stream Deck managers; a manager archived since gets "
-"nothing, a warning without name is logged, and the employee part is still "
-"created"
+"chosen among the Stream Deck managers; a manager archived or out of the "
+"Stream Deck manager group since gets nothing, a warning without name is "
+"logged, and the employee part is still created"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement

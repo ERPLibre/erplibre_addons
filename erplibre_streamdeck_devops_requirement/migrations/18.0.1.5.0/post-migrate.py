@@ -4,8 +4,9 @@
 this version: the proofs of the contract test the extension renamed, of
 the tests of the deck program, which live in their own repository, and of
 the tests ERPLibre renamed or moved since the proofs were written, with
-the requirements that cite them; and the requirement on lent decks, whose
-achievement names how an event links its deck.
+the requirements that cite them; the requirement on lent decks, whose
+achievement names how an event links its deck; and the requirement on
+the named manager, who gets nothing out of the manager group.
 
 The data files are noupdate: an upgrade creates the records it does not
 find and leaves the others as they are, so a proof would keep its former
@@ -37,7 +38,8 @@ MODULE = "erplibre_streamdeck_devops_requirement"
 
 # Data file -> XML ids of its records rewritten in this version: the
 # extension's contract 1.5 renamed the test of its version, which these
-# proofs cite, and SD-INV-R09 names the deck link of an event.
+# proofs cite, SD-INV-R09 names the deck link of an event, and SD-MON-R19
+# the manager out of the manager group.
 REWRITTEN = {
     "data/requirement_inventory.xml": (
         "test_sd_inv_r24_1",
@@ -47,6 +49,9 @@ REWRITTEN = {
         "test_sd_ctl_r27_1",
         "test_sd_ctl_r66_1",
     ),
+    # A manager out of the Stream Deck manager group gets nothing, as an
+    # archived one does.
+    "data/requirement_monitoring.xml": ("req_sd_mon_r19",),
     # The proofs whose test ERPLibre or the extension renamed or moved,
     # and the requirements whose proof is gone: those are to do again,
     # their missing work named. A requirement whose name cites a constant

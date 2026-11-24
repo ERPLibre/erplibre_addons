@@ -191,8 +191,9 @@ suivante.
   des Paramètres : une activité ouverte avant leur désactivation se ferme
   encore.
 - **Gestionnaire archivé.** Si le gestionnaire nommé est archivé ensuite,
-  seule la part de l'employé s'ouvre, et chaque passage du cron écrit au
-  journal un avertissement qui ne nomme personne.
+  ou quitte le groupe des gestionnaires Stream Deck et ne lit donc plus
+  les postes des autres, seule la part de l'employé s'ouvre, et chaque
+  passage du cron écrit au journal un avertissement qui ne nomme personne.
 - **Accès.** Une activité se lit avec son enregistrement. Un employé lit
   les activités de ses postes, celles du gestionnaire comprises, et celles
   des decks qu'il détient ou a détenus, à partir de sa première détention,
