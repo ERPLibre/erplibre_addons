@@ -1892,7 +1892,7 @@
         <field name="requirement_id" ref="req_sd_ctl_r27" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
-        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.4 since Odoo lays out the home keys</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.5 since the deck has its own directory</field>
     </record>
     <record id="test_sd_ctl_r27_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r27" />
@@ -3218,7 +3218,7 @@
         <field name="requirement_id" ref="req_sd_ctl_r66" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
-        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.4 since Odoo lays out the home keys</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/contract.test.js::the contract is at 1.5 since the deck has its own directory</field>
     </record>
     <record id="test_sd_ctl_r66_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r66" />

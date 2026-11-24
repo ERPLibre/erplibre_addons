@@ -34,6 +34,11 @@ CONTRACT_1_3 = (
     "erplibre-home-gnome-extension:test/unit/contract.test.js::"
     "the contract is at 1.3 since Odoo pilots the deck settings"
 )
+# Le nom qu'il portait jusqu'au contrat 1.5.
+CONTRACT_1_4 = (
+    "erplibre-home-gnome-extension:test/unit/contract.test.js::"
+    "the contract is at 1.4 since Odoo lays out the home keys"
+)
 
 
 @tagged("post_install", "-at_install")
@@ -135,17 +140,19 @@ class TestRequirementUpgrade(TransactionCase):
         )
 
     def test_an_upgrade_to_1_4_follows_the_renamed_contract_test(self):
-        # Le contrat 1.4 renomme le test qui prouve SD-INV-R24 et
-        # SD-CTL-R27 ; la disposition des touches fait mentir ce que
-        # SD-CTL-R27 et SD-CTL-R43 disent de la version et des fichiers,
-        # et SD-CTL-R47 gagne la règle des actions plugin du catalogue.
+        # Les contrats 1.4 puis 1.5 renomment le test qui prouve
+        # SD-INV-R24, SD-CTL-R27 et SD-CTL-R66 ; la disposition des
+        # touches fait mentir ce que SD-CTL-R27 et SD-CTL-R43 disent de la
+        # version et des fichiers, et SD-CTL-R47 gagne la règle des
+        # actions plugin du catalogue.
         proofs = {
-            "test_sd_inv_r24_1": INVENTORY,
-            "test_sd_ctl_r27_1": CONTROL,
+            "test_sd_inv_r24_1": (INVENTORY, CONTRACT_1_3),
+            "test_sd_ctl_r27_1": (CONTROL, CONTRACT_1_3),
+            "test_sd_ctl_r66_1": (CONTROL, CONTRACT_1_4),
         }
-        for xmlid in proofs:
+        for xmlid, (_data, former) in proofs.items():
             self.env.ref("%s.%s" % (MODULE, xmlid)).write(
-                {"reference": CONTRACT_1_3}
+                {"reference": former}
             )
         requirements = ("req_sd_ctl_r27", "req_sd_ctl_r43", "req_sd_ctl_r47")
         for xmlid in requirements:
@@ -156,10 +163,10 @@ class TestRequirementUpgrade(TransactionCase):
         renamed.write({"name": "An outdated name"})
         self._migrate("18.0.1.3.0", MIGRATION_1_4)
         self.env.invalidate_all()
-        for xmlid, data in proofs.items():
+        for xmlid, (data, former) in proofs.items():
             with self.subTest(xmlid=xmlid):
                 reference = self._in_file(xmlid, "reference", data)
-                self.assertNotEqual(reference, CONTRACT_1_3)
+                self.assertNotEqual(reference, former)
                 self.assertEqual(
                     self.env.ref("%s.%s" % (MODULE, xmlid)).reference,
                     reference,

@@ -35,6 +35,7 @@ REWRITTEN = {
         "test_sd_ctl_r27_1",
         "req_sd_ctl_r43",
         "req_sd_ctl_r47",
+        "test_sd_ctl_r66_1",
     ),
     "data/requirement_monitoring.xml": ("req_sd_mon_r38",),
 }
