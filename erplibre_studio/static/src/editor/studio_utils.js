@@ -1086,6 +1086,16 @@ export function fieldNamesIn(block) {
  * « name »); "" when unknown. ``string`` is its « string » or "";
  * ``fields`` the names of the fields it holds; ``label`` what the editor
  * shows of it, for a message once it is gone.
+ *
+ * Two more parts name a block that has neither a name, a « string » nor
+ * a field, which the parts above leave anonymous: ``added``, the keys of
+ * the draft changes that touch a block a change added (``change_kinds``
+ * holds « new »), which stay its own until that change goes; and
+ * ``place``: {context, before, after, rank}, where it sits — ``context``
+ * the « string » or « name » of its page, else the tag of its parent;
+ * ``before`` and ``after`` the fields of the nearest sibling that holds
+ * some, on each side; ``rank`` its order among the anonymous empty
+ * siblings of its tag.
  */
 export function focusIdentity(entry) {
     const block = entry.block;
@@ -1095,7 +1105,53 @@ export function focusIdentity(entry) {
     if (!name && !string && block.label && block.label !== block.tag) {
         name = block.label;
     }
-    return {path: entry.path, tag: block.tag, name, string, fields: fieldNamesIn(block), label: String(entry.label)};
+    const added = (block.change_kinds || []).includes("new") ? [...(block.changes || [])] : [];
+    return {
+        path: entry.path,
+        tag: block.tag,
+        name,
+        string,
+        fields: fieldNamesIn(block),
+        label: String(entry.label),
+        added,
+        place: focusPlace(entry),
+    };
+}
+
+/** Whether ``block`` has no « string », no own label and no field: nothing but its place names it. */
+function isAnonymousEmpty(block) {
+    const own = block.label && block.label !== block.tag;
+    return !(block.attrs || {}).string && !own && !fieldNamesIn(block).length;
+}
+
+/** The ``place`` part of ``focusIdentity``: where the block of ``entry`` sits in its parent. */
+function focusPlace(entry) {
+    const parent = entry.parent;
+    const siblings = (parent && parent.children) || [];
+    const index = siblings.indexOf(entry.block);
+    const page = entry.page;
+    const pageAttrs = (page && page.attrs) || {};
+    const context = page
+        ? pageAttrs.string || pageAttrs.name || page.label || page.tag
+        : parent
+        ? parent.tag
+        : "";
+    const nearest = (step) => {
+        for (let i = index + step; i >= 0 && i < siblings.length; i += step) {
+            const names = fieldNamesIn(siblings[i]);
+            if (siblings[i].kind === "field" && siblings[i].name) {
+                return [siblings[i].name];
+            }
+            if (names.length) {
+                return names;
+            }
+        }
+        return [];
+    };
+    const rank = siblings
+        .slice(0, Math.max(index, 0))
+        .filter((sibling) => sibling.tag === entry.block.tag && isAnonymousEmpty(sibling)).length;
+    return {context, before: index < 0 ? [] : nearest(-1), after: index < 0 ? [] : nearest(1), rank};
 }
 
 /**
@@ -1110,6 +1166,14 @@ export function focusIdentity(entry) {
  * only when one of the two holds no field: a change inside the block in
  * focus keeps most of its fields, a block that only took its path shares
  * none. The best score wins; a tie keeps the order of the arch.
+ *
+ * A block a draft change added is the block that still carries one of
+ * the keys of ``added``, whatever its path; an empty one that no block
+ * carries is gone (null). A block with no name, no
+ * « string » and no field matches only a block alike in the same
+ * ``place.context``: by the fields of its neighbours (2 per field shared
+ * on each side) and its ``rank`` (1), never by its path alone, so an
+ * empty group that took the path of another is not taken for it.
  */
 export function resolveFocusBlock(entries, identity) {
     if (!identity) {
@@ -1117,6 +1181,20 @@ export function resolveFocusBlock(entries, identity) {
     }
     if (!identity.tag) {
         return entries.find((entry) => entry.path === identity.path) || null;
+    }
+    if ((identity.added || []).length) {
+        const keys = new Set(identity.added);
+        const carrier = entries.find(
+            (entry) => entry.block.tag === identity.tag && (entry.block.changes || []).some((key) => keys.has(key))
+        );
+        if (carrier) {
+            return carrier;
+        }
+    }
+    if (identity.place && !identity.name && !identity.string && !identity.fields.length) {
+        // An empty block a change added, which no block carries any more,
+        // left with that change: its place would only find a look-alike.
+        return (identity.added || []).length ? null : resolveAnonymousBlock(entries, identity);
     }
     const fields = new Set(identity.fields);
     let best = null;
@@ -1144,6 +1222,43 @@ export function resolveFocusBlock(entries, identity) {
             continue;
         }
         const score = (sameName ? 8 : 0) + (sameString ? 4 : 0) + 2 * shared + (samePath ? 1 : 0);
+        if (score > bestScore) {
+            best = entry;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
+/**
+ * The focus block of ``entries`` that the anonymous empty block of
+ * ``identity`` became (``resolveFocusBlock``), or null.
+ */
+function resolveAnonymousBlock(entries, identity) {
+    const place = identity.place;
+    const shared = (a, b) => {
+        const set = new Set(a);
+        return b.filter((name) => set.has(name)).length;
+    };
+    let best = null;
+    let bestScore = 0;
+    for (const entry of entries) {
+        // A block a draft change added is that change's block, never this one.
+        const added = (entry.block.change_kinds || []).includes("new");
+        if (entry.block.tag !== identity.tag || added || !isAnonymousEmpty(entry.block)) {
+            continue;
+        }
+        const other = focusPlace(entry);
+        if (other.context !== place.context) {
+            continue;
+        }
+        const neighbours = shared(place.before, other.before) + shared(place.after, other.after);
+        const sameRank = other.rank === place.rank;
+        const bare = !place.before.length && !place.after.length;
+        if (!neighbours && !(sameRank && bare)) {
+            continue;
+        }
+        const score = 2 * neighbours + (sameRank ? 1 : 0);
         if (score > bestScore) {
             best = entry;
             bestScore = score;

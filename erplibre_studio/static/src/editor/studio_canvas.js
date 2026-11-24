@@ -1101,6 +1101,14 @@ export class StudioCanvas extends Component {
                     rows.push({kind: "static", key: child.path, label: _t("Chatter"), meta: _t("collapsed")});
                 } else if (child.label === "button_box") {
                     const count = (child.children || []).filter((b) => !isGhost(b, viewType)).length;
+                    // At Simple, a box with no button drawn takes no line,
+                    // as it takes no height on the canvas at rest.
+                    const drawn = (child.children || []).some(
+                        (b) => !isGhost(b, viewType) && editor.isDrawnChild(b)
+                    );
+                    if (simple && !drawn) {
+                        continue;
+                    }
                     rows.push({
                         kind: "static",
                         key: child.path,

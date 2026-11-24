@@ -562,6 +562,64 @@ describe("erplibre_studio focus on a block", () => {
         expect(resolveFocusBlock(after, {path: `${SHEET}/group[2]`, tag: null}).path).toBe(`${SHEET}/group[2]`);
     });
 
+    test("resolveFocusBlock: an empty block without a name by the change that added it, else by its place", () => {
+        patchTranslations();
+        // Two empty groups without « string » between the address and the
+        // contact; ``lead``: a group « Extra » first, which shifts every path.
+        const sheetOf = ({lead = false, addedKey = null} = {}) => {
+            const groups = [];
+            if (lead) {
+                groups.push(container("", "group", "Extra", [field("barcode")], {attrs: {string: "Extra"}}));
+            }
+            groups.push(container("", "group", "group", [field("street"), field("city")]));
+            groups.push(container("", "group", "group", []));
+            const added = addedKey ? {changes: [addedKey], change_kinds: ["new"], changed: true} : {};
+            groups.push(container("", "group", "group", [], added));
+            groups.push(container("", "group", "group", [field("phone"), field("email")]));
+            groups.forEach((group, index) => (group.path = `${SHEET}/group[${index + 1}]`));
+            return focusBlocks(container("/form", "form", "form", [container(SHEET, "sheet", "sheet", groups)]));
+        };
+        // The second empty group of the base arch: its place names it.
+        const before = sheetOf({lead: true});
+        const second = focusIdentity(before[3]);
+        expect([second.name, second.string, second.fields]).toEqual(["", "", []]);
+        expect(second.place.before).toEqual(["street", "city"]);
+        expect(second.place.after).toEqual(["phone", "email"]);
+        expect(second.place.rank).toBe(1);
+        // The group « Extra » leaves: the path of the second empty group goes
+        // to the contact group, its own place to the group before it.
+        const after = sheetOf();
+        expect(resolveFocusBlock(after, second).path).toBe(`${SHEET}/group[3]`);
+        expect(resolveFocusBlock(after, focusIdentity(before[2])).path).toBe(`${SHEET}/group[2]`);
+        // A group a change added follows that change, wherever it lands, and
+        // no other empty group is taken for it once the change goes.
+        const draft = sheetOf({lead: true, addedKey: 7});
+        const addedOne = focusIdentity(draft[3]);
+        expect(addedOne.added).toEqual([7]);
+        expect(resolveFocusBlock(sheetOf({addedKey: 7}), addedOne).path).toBe(`${SHEET}/group[3]`);
+        const undone = sheetOf({lead: true}).filter((entry) => entry !== before[3]);
+        expect(resolveFocusBlock(undone, addedOne)).toBe(null);
+        // An empty group of another page is another block.
+        const elsewhere = sheetOf();
+        elsewhere.forEach((entry) => (entry.page = {tag: "page", attrs: {string: "Other"}, label: "Other"}));
+        expect(resolveFocusBlock(elsewhere, second)).toBe(null);
+    });
+
+    test("in focus at Simple, a box of smart buttons with no button takes no line; Detailed says empty", async () => {
+        const blocks = formBlocks();
+        blocks.children[0].children[0].children = [];
+        answer = payload({blocks});
+        await openEditor();
+        await clickFocus(MAIN);
+        expect(OPEN).toHaveAttribute("data-focus-path", MAIN);
+        expect(`.o_erplibre_studio_folded_static[data-key="${BOX}"]`).toHaveCount(0);
+        expect('.o_erplibre_studio_folded_static[data-key="header"]').toHaveCount(1);
+        answer = payload({blocks, display_level: "detailed"});
+        await contains(".o_erplibre_studio_level_option:eq(1)").click();
+        await animationFrame();
+        expect(`.o_erplibre_studio_folded_static[data-key="${BOX}"]`).toHaveText(/Smart buttons\s*· empty$/);
+    });
+
     test("Undo of a change outside the block in focus keeps the focus on that block at its new path", async () => {
         answer = payload({blocks: positionalBlocks({extra: true})});
         onRpc("erplibre.studio.editor", "project_action", (args) => {
