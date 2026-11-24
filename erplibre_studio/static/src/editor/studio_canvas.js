@@ -448,16 +448,30 @@ export class StudioBlock extends Component {
     /**
      * The dot of the margin of the block: {dot, label}, « filled » for a
      * block the draft adds or changes, « ring » for one it hides; the label
-     * joins the kinds of its changes (``changeKindLabel``). Null for a
-     * block no change touches.
+     * joins the kinds of its changes (``changeKindLabel``) at the Detailed
+     * level, their plain sentences at the Simple one (``dotOf``). Null for
+     * a block no change touches.
      */
     get marginDot() {
-        return this.dotOf(this.block.change_kinds || []);
+        return this.dotOf(this.block.change_kinds || [], [this.block]);
     }
 
-    /** The margin dot of the change kinds ``kinds``, or null (``marginDot`` of studio_utils). */
-    dotOf(kinds) {
-        return marginDot(kinds);
+    /**
+     * The margin dot of the change kinds ``kinds``, or null (``marginDot``
+     * of studio_utils). At the Simple level its label is the plain
+     * sentences of the changes on ``blocks`` (StudioEditor.blockChangesText),
+     * joined by « ; »; the kinds stay when the payload lists none of them.
+     */
+    dotOf(kinds, blocks = []) {
+        const dot = marginDot(kinds);
+        if (!dot || this.detailed) {
+            return dot;
+        }
+        const plain = blocks
+            .map((block) => this.editor.blockChangesText(block))
+            .filter(Boolean)
+            .join("; ");
+        return plain ? {...dot, label: plain} : dot;
     }
 
     /**
@@ -472,7 +486,7 @@ export class StudioBlock extends Component {
                 kinds.add(kind);
             }
         }
-        return this.dotOf([...kinds]);
+        return this.dotOf([...kinds], [this.block, ...this.pages]);
     }
 
     /**
@@ -502,6 +516,11 @@ export class StudioBlock extends Component {
         return this.props.viewType === "form" && this.block.tag !== "page" && this.editor.hiddenOnSample(this.block);
     }
 
+    /** Whether the groups of the block leave the user out (StudioEditor.hiddenForUser). */
+    get userHidden() {
+        return this.editor.hiddenForUser(this.block);
+    }
+
     /** Whether the selection is a block under the block, itself left out. */
     get selectionInside() {
         const selected = this.editorState.selected;
@@ -515,7 +534,8 @@ export class StudioBlock extends Component {
     /**
      * Whether the block draws as one muted line. At the Simple level: a
      * block the draft hides, or the selection when the form does not show
-     * it (always, or on the sample record). At the Detailed level: a block
+     * it (always, on the sample record, or to the user its groups leave
+     * out). At the Detailed level: a block
      * the form hides on the sample record, folded with its condition
      * (``shownWhenText``) while the selection is not under it. In a form or
      * a list, an element the draft hides draws as its hidden line instead
@@ -528,7 +548,7 @@ export class StudioBlock extends Component {
         if (this.detailed) {
             return this.sampleHidden && !this.selectionInside;
         }
-        return this.isHiddenChange || ((this.baseInvisible || this.sampleHidden) && this.isSelected);
+        return this.isHiddenChange || ((this.baseInvisible || this.sampleHidden || this.userHidden) && this.isSelected);
     }
 
     /**
@@ -659,17 +679,18 @@ export class StudioBlock extends Component {
 
     /**
      * Whether the child ``child`` draws on the canvas: at the Simple level
-     * a form does not draw a node its arch always hides (isBaseInvisible)
-     * nor one it hides on the sample record (hiddenOnSample), as the web
-     * client does, unless it holds the selection. The plan lists it all
-     * the same. StudioEditor.isDrawnChild decides the same; this one reads
-     * the state through the block, which renders again when it changes.
+     * a form does not draw a node its arch always hides (isBaseInvisible),
+     * one it hides on the sample record nor one whose groups leave the
+     * user out (StudioEditor.shownOnSample), as the web client does,
+     * unless it holds the selection. The plan lists it all the same.
+     * StudioEditor.isDrawnChild decides the same; this one reads the state
+     * through the block, which renders again when it changes.
      */
     isDrawn(child) {
         if (this.detailed || this.props.viewType !== "form") {
             return true;
         }
-        if (!isBaseInvisible(child) && !this.editor.hiddenOnSample(child)) {
+        if (this.editor.shownOnSample(child)) {
             return true;
         }
         const selected = this.editorState.selected;

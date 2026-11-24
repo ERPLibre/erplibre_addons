@@ -94,6 +94,16 @@ class TestChangeRemoval(StudioCase):
         self.assertEqual(
             [item["id"] for item in removal["items"]], [required.id, move.id]
         )
+        first = removal["items"][0]
+        self.assertEqual(
+            first["model_name"], self.env["ir.model"]._get("res.partner").name
+        )
+        self.assertEqual(
+            (first["type"], first["kind"], first["attribute"]),
+            ("required", "attribute", False),
+        )
+        self.assertEqual(first["subject"]["label"], "Studio nickname")
+        self.assertIs(first["subject"]["value"], True)
         expected = [added.id, required.id, move.id]
         data = self.remove(added, expected)
         self.assertEqual(sorted(data["removed"]), sorted(expected))
@@ -142,7 +152,15 @@ class TestChangeRemoval(StudioCase):
         )
         removal = self.removal(added)
         self.assertEqual([item["id"] for item in removal["items"]], [shown.id])
-        self.assertEqual(removal["items"][0]["view_type"], "list")
+        item = removal["items"][0]
+        self.assertEqual(item["view_type"], "list")
+        # What the editor builds the plain sentence of a change of another
+        # view from, and the name of its model for a reader.
+        self.assertEqual(item["model_name"], "Studio test item")
+        self.assertEqual(item["type"], "add_existing_field")
+        self.assertEqual(item["kind"], "new")
+        self.assertEqual(item["subject"]["label"], "Studio code")
+        self.assertEqual(removal["change"]["subject"]["label"], "Studio code")
         data = self.remove(added, [added.id, shown.id], view=form, model=ITEM)
         self.assertEqual(sorted(data["removed"]), sorted([added.id, shown.id]))
         self.assertFalse(self.project.change_ids)

@@ -1037,15 +1037,19 @@ describe("erplibre_studio editor, inspector", () => {
         await contains(`.o_erplibre_studio_outline_row[data-path="${ADDRESS}"] .o_erplibre_studio_outline_pick`).click();
         expect(".o_erplibre_studio_properties").toHaveAttribute("data-kind", "container");
         expect(".o_erplibre_studio_inspector_title").toHaveText("Group « Address »");
-        expect(".o_erplibre_studio_inspector_kind").toHaveText("Group · 3 field(s)");
+        expect(".o_erplibre_studio_inspector_kind").toHaveText("Group · 3 fields");
         expect(".o_erplibre_studio_contents").toHaveText("Contents · Street, Town, Level");
         expect(".o_erplibre_studio_field_props").toHaveCount(0);
         // Nothing to edit in it but its visibility.
         expect(".o_erplibre_studio_container_props input").toHaveCount(0);
 
         await contains(`.o_erplibre_studio_outline_row[data-path="${NOTEBOOK}"] .o_erplibre_studio_outline_pick`).click();
-        expect(".o_erplibre_studio_inspector_kind").toHaveText("Tabs · 2 tab(s)");
+        expect(".o_erplibre_studio_inspector_kind").toHaveText("Tabs · 2 tabs");
         expect(".o_erplibre_studio_contents").toHaveText("Contents · Notes, Sales");
+
+        // One field takes the singular.
+        await contains(`.o_erplibre_studio_outline_row[data-path="${NOTES}"] .o_erplibre_studio_outline_pick`).click();
+        expect(".o_erplibre_studio_inspector_kind").toHaveText(/· 1 field$/);
     });
 
     test("the changes of the view: a count, the errors, a click reveals the block", async () => {

@@ -1,10 +1,24 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import re
+
 import polib
 
 from odoo.tests import BaseCase, tagged
 from odoo.tools.misc import file_path
+
+# A French participle or adjective that agrees with the element named by
+# its label (« %(label)s » then the word, or the word opening the sentence):
+# the editor does not know the gender of a label, so each of them is wrong
+# for half the labels. A word that agrees with a noun of the sentence
+# (« un réglage modifié ») stays out.
+AGREEING = re.compile(
+    r"(^|%\(label\)s[ ,:]*(devient |n'est plus )?)"
+    r"(masqué|affiché|déplacé|retiré|renommé|modifié|inséré|ajouté|rétabli"
+    r"|requis|optionnel)\b",
+    re.IGNORECASE,
+)
 
 
 @tagged("post_install", "-at_install")
@@ -14,9 +28,7 @@ class TestTranslations(BaseCase):
     terms the .pot marks as used by JavaScript."""
 
     def _catalogues(self):
-        pot = polib.pofile(
-            file_path("erplibre_studio/i18n/erplibre_studio.pot")
-        )
+        pot = polib.pofile(file_path("erplibre_studio/i18n/erplibre_studio.pot"))
         french = polib.pofile(file_path("erplibre_studio/i18n/fr_CA.po"))
         return pot, {entry.msgid: entry for entry in french}
 
@@ -44,3 +56,16 @@ class TestTranslations(BaseCase):
             and "odoo-javascript" not in french[entry.msgid].comment
         ]
         self.assertFalse(lost, "Terms used by JavaScript without the flag")
+
+    def test_sentences_on_a_label_do_not_agree(self):
+        # A sentence whose subject is the label of an element (« %(label)s
+        # moved ») reads « Adresse déplacé » for a feminine label: its
+        # French says it without a participle that agrees.
+        _pot, french = self._catalogues()
+        agreeing = [
+            (entry.msgid, entry.msgstr)
+            for entry in french.values()
+            if entry.msgid.startswith(("%(label)s", "Inserted %(where)s"))
+            and AGREEING.search(entry.msgstr)
+        ]
+        self.assertFalse(agreeing, "Sentences whose participle agrees")

@@ -1865,15 +1865,16 @@ export class StudioEditor extends Component {
 
     /**
      * Whether the canvas draws ``child``, for StudioBlock.isDrawn: at the
-     * Simple level a form leaves out a node its arch always hides and one
-     * the real form hides on the sample record (``hiddenOnSample``), unless
-     * it holds the selection.
+     * Simple level a form leaves out a node its arch always hides, one the
+     * real form hides on the sample record (``hiddenOnSample``) and one
+     * whose groups leave the user out (``hiddenForUser``), unless it holds
+     * the selection.
      */
     isDrawnChild(child) {
         if (this.detailed || this.viewType !== "form") {
             return true;
         }
-        if (!isBaseInvisible(child) && !this.hiddenOnSample(child)) {
+        if (this.shownOnSample(child)) {
             return true;
         }
         const selected = this.state.selected;
@@ -1882,13 +1883,29 @@ export class StudioEditor extends Component {
 
     /**
      * Whether the real form shows ``block`` on the sample record: its arch
-     * does not always hide it (``isBaseInvisible``) and its condition does
-     * not hide it there (``hiddenOnSample``). Unlike ``isDrawnChild``, it
-     * reads neither the level nor the selection: a name built from it
-     * stays the same while the selection moves.
+     * does not always hide it (``isBaseInvisible``), its condition does
+     * not hide it there (``hiddenOnSample``) and its groups let the user
+     * in (``hiddenForUser``). Unlike ``isDrawnChild``, it reads neither
+     * the level nor the selection: a name built from it stays the same
+     * while the selection moves.
      */
     shownOnSample(block) {
-        return !isBaseInvisible(block) && !this.hiddenOnSample(block);
+        return !isBaseInvisible(block) && !this.hiddenOnSample(block) && !this.hiddenForUser(block);
+    }
+
+    /**
+     * Whether the real form leaves ``block`` out for the current user: its
+     * « groups » is an expression the payload says the user does not pass
+     * (``groups_access`` of the server, read with res.users.has_groups);
+     * false for a view other than a form and for an expression the payload
+     * does not answer.
+     */
+    hiddenForUser(block) {
+        const groups = block && block.attrs && block.attrs.groups;
+        if (!groups || this.viewType !== "form") {
+            return false;
+        }
+        return ((this.data && this.data.groups_access) || {})[groups] === false;
     }
 
     /**
@@ -3447,17 +3464,37 @@ export class StudioEditor extends Component {
 
     /**
      * ``removal`` (``get_change_removal``) as the dialog shows it at the
-     * level shown: at the Simple level, each change of this view gets its
-     * plain text (``changeText``) as ``sentence``, which the dialog shows
-     * instead of its summary; a change of another view keeps its summary.
+     * level shown: at the Simple level (``plain``), each change gets its
+     * plain text as ``sentence``, which the dialog shows instead of its
+     * summary: ``changeText`` for a change of this view, ``changeSentence``
+     * of the subject the server read for one of another view, which also
+     * gets ``place``, the name of its model and of its view type for a
+     * reader instead of the code of the view (the code when the server
+     * names no model). A change of another view without subject keeps its
+     * summary.
      */
     plainRemoval(removal) {
         if (this.detailed) {
             return removal;
         }
         const known = new Map((this.data.changes || []).map((change) => [change.id, change]));
-        const plain = (item) => (known.has(item.id) ? {...item, sentence: this.changeText(known.get(item.id))} : item);
-        return {...removal, change: plain(removal.change), items: (removal.items || []).map(plain)};
+        // The kinds of the attributes of this view type: those of another
+        // type stay unknown, its attributes keep their names.
+        const settableOf = (viewType) => (viewType === this.viewType ? this.data.settable || {} : {});
+        const plain = (item) => {
+            if (known.has(item.id)) {
+                return {...item, sentence: this.changeText(known.get(item.id))};
+            }
+            const place = item.model_name
+                ? _t("%(model)s (%(view)s)", {model: item.model_name, view: this.viewTypeLabel(item.view_type)})
+                : item.view;
+            if (!item.subject) {
+                return {...item, place};
+            }
+            const sentence = changeSentence(item, {viewType: item.view_type, settable: settableOf(item.view_type)});
+            return {...item, place, sentence};
+        };
+        return {...removal, plain: true, change: plain(removal.change), items: (removal.items || []).map(plain)};
     }
 
     /**

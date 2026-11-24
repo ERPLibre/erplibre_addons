@@ -351,6 +351,33 @@ describe("the calm canvas of a form", () => {
         expect(line("code")).toHaveCount(0);
     });
 
+    test("Simple leaves out what the groups hide from the user, as the form does", async () => {
+        answer = payload({
+            groups_access: {"studio_invented.group_vendor_desk": false, "studio_invented.group_open_desk": true},
+        });
+        const right = answer.blocks.children[0].children[1].children[1];
+        right.children[2].attrs = {groups: "studio_invented.group_vendor_desk"};
+        right.children[0].attrs = {groups: "studio_invented.group_open_desk"};
+        await openEditor();
+        // The user is not in the group of the vendor flag: not drawn, not
+        // in the plan; the group the user passes keeps the email.
+        expect(line("is_vendor")).toHaveCount(0);
+        expect(line("email")).toHaveCount(1);
+        await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        expect(`.o_erplibre_studio_outline_row[data-path="${named("is_vendor")}"]`).toHaveCount(0);
+        // Selected from the filter of the plan: a muted line.
+        await contains(".o_erplibre_studio_outline_filter").edit("Vendor");
+        await contains(
+            `.o_erplibre_studio_outline_row[data-path="${named("is_vendor")}"] .o_erplibre_studio_outline_pick`
+        ).click();
+        expect(line("is_vendor")).toHaveClass(["o_erplibre_studio_muted_line", "o_erplibre_studio_selected"]);
+        await contains(line("street")).click();
+        expect(line("is_vendor")).toHaveCount(0);
+        // Detailed draws it, with its flag.
+        await contains(DETAILED).click();
+        expect(`${line("is_vendor")} .o_erplibre_studio_flag[data-flag=groups]`).toHaveCount(1);
+    });
+
     test("Detailed brings back the tags, the flags, the names and the base-invisible fields", async () => {
         await openEditor();
         await contains(DETAILED).click();

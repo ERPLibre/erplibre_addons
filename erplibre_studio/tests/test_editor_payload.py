@@ -620,6 +620,34 @@ class TestEditorPayload(StudioCase):
         report = self.project._studio_apply_report()["report"]["members"]
         self.assertEqual([item["users"] for item in report], [loss["count"]])
 
+    # ── groups of the nodes ─────────────────────────────────────────────
+
+    def test_groups_access_answers_each_expression(self):
+        """Each « groups » of the arch, with whether the user passes it; a
+        group the database does not hold passes, the editor draws its node."""
+        view = self.make_view(
+            "form",
+            """<form><sheet><group>
+                <field name="name" groups="base.group_portal"/>
+                <field name="email" groups="!base.group_portal"/>
+                <field name="phone" groups="base.group_public,base.group_portal"/>
+                <field name="vat" groups="studio_invented.group_desk"/>
+                <field name="website"/>
+            </group></sheet></form>""",
+        )
+        data = self.Editor.get_editor_data(
+            "res.partner", view.id, "form", self.project.id
+        )
+        self.assertEqual(
+            data["groups_access"],
+            {
+                "base.group_portal": False,
+                "!base.group_portal": True,
+                "base.group_public,base.group_portal": False,
+                "studio_invented.group_desk": True,
+            },
+        )
+
     # ── sample values ───────────────────────────────────────────────────
 
     SAMPLE_FORM = """<form>

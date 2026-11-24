@@ -78,7 +78,12 @@
                     class="o_erplibre_studio_change_removal_item"
                     t-att-data-id="item.id"
                 >
-                    <t t-esc="item.sentence or item.summary" /> · <code class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.view" />
+                    <t t-esc="item.sentence or item.summary" />
+                    <!-- At the Simple level (removal.plain), the name of
+                         the view of another view for a reader, nothing for
+                         this one; else the code of the view. -->
+                    <t t-if="!props.removal.plain"> · <code class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.view" /></t>
+                    <t t-elif="item.place"> · <span class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.place" /></t>
                     <t t-if="item.applied"> · <span class="badge text-bg-secondary">applied</span></t>
                 </li>
             </ul>

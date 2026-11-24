@@ -1,10 +1,16 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
+
 from odoo import api, models
 from odoo.exceptions import UserError
 
+from .. import arch as studio_arch
 from .erplibre_studio_review import _Review
+from .studio_pending import is_pending_view
+
+_logger = logging.getLogger(__name__)
 
 
 class ErplibreStudioEditor(models.AbstractModel):
@@ -25,14 +31,54 @@ class ErplibreStudioEditor(models.AbstractModel):
         return change
 
     @api.model
+    def _removal_model_name(self, view):
+        """The name of the model of ``view`` for a reader: the one of its
+        model line for a model the project has not created yet, else the
+        one of ir.model."""
+        if is_pending_view(view):
+            return view.line.name or view.model
+        return self.env["ir.model"]._get(view.model).name or view.model
+
+    @api.model
+    def _removal_subjects(self, project, changes):
+        """{change id: ``arch.change_subject``} of ``changes`` of
+        ``project``, read in the draft arch of each of their views
+        (``_subject_observer``). A view whose draft cannot be read gives
+        no subject: the editor then shows the summary of its changes."""
+        subjects = {}
+        views = {}
+        for change in changes:
+            key = (
+                change.view_id.id,
+                change.view_line_id.id,
+                change.model_line_id.id,
+                change.view_type,
+            )
+            views.setdefault(key, change)
+        for change in views.values():
+            view = project._change_view(change)
+            try:
+                fields_info = self._fields_payload(view.model, project)
+                observe = self._subject_observer(subjects, view.type, fields_info)
+                project._draft_arch(view, observe=observe)
+            except Exception:  # noqa: BLE001 - a sentence never blocks the undo
+                _logger.debug("No subject for the changes of %s", view.name)
+        found = set(changes.ids)
+        return {key: value for key, value in subjects.items() if key in found}
+
+    @api.model
     def get_change_removal(self, project_id, change_id):
         """What undoing the change ``change_id`` of the project
         ``project_id`` removes (``_studio_change_removal``): {revision,
         change, items, refused, applied}. ``change`` and each of ``items``
         (the other changes that leave, in the order they apply): {id,
-        summary, view, view_type, applied}, ``applied`` when the last Apply
-        wrote it as it is. ``refused``: why the undo is refused, or False.
-        ``applied``: whether one of them is applied. A read."""
+        summary, view, view_type, model_name, type, kind, attribute,
+        subject, applied}, ``applied`` when the last Apply wrote it as it
+        is; ``type`` to ``subject`` as ``get_editor_data`` lists a change,
+        from which the editor builds its plain sentence, and
+        ``model_name`` the name of its model for a reader. ``refused``: why
+        the undo is refused, or False. ``applied``: whether one of them is
+        applied. A read."""
         self._check_studio_access()
         project = self._read_project(project_id)
         change = self._draft_change(project, change_id)
@@ -43,13 +89,28 @@ class ErplibreStudioEditor(models.AbstractModel):
         except UserError as exc:
             refused = exc.args[0]
         review = _Review(self, project)
+        subjects = self._removal_subjects(project, closure)
+        names = {}
 
         def item(record):
+            spec = record._as_dict()
+            if record.model not in names:
+                view = project._change_view(record)
+                names[record.model] = self._removal_model_name(view)
             return {
                 "id": record.id,
                 "summary": record.summary,
                 "view": record._studio_view_label(),
                 "view_type": record.view_type,
+                "model_name": names[record.model],
+                "type": record.change_type,
+                "kind": studio_arch.change_kind(spec),
+                "attribute": (
+                    record.change_type == "set_attribute"
+                    and spec["payload"].get("attribute")
+                )
+                or False,
+                "subject": subjects.get(record.id) or False,
                 "applied": review.is_applied("changes", record),
             }
 

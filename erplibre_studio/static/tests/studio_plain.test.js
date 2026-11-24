@@ -363,6 +363,17 @@ describe("plain changes at the Simple level", () => {
         expect(`${planRow("phone")} .o_erplibre_studio_outline_dot_text`).toHaveText("edited");
     });
 
+    test("the margin dot of the canvas: the sentence at Simple, the kind at Detailed", async () => {
+        await openEditor();
+        const dot = (name) => `.o_erplibre_studio_field[data-name=${name}] .o_erplibre_studio_margin_dot`;
+        expect(dot("phone")).toHaveAttribute("title", "Phone becomes required");
+        expect(dot("phone")).toHaveAttribute("aria-label", "Phone becomes required");
+        expect(dot("mobile")).toHaveAttribute("title", "Mobile moved after Phone");
+        await contains(DETAILED).click();
+        expect(dot("phone")).toHaveAttribute("title", "edited");
+        expect(dot("mobile")).toHaveAttribute("aria-label", "moved");
+    });
+
     test("a view that hides by removing calls the ring « removed »", async () => {
         answer = payload({hide_mode: "remove"});
         await openEditor();
@@ -389,6 +400,23 @@ describe("plain changes at the Simple level", () => {
                     summary: "Relabel: //field[@name='phone'] = Tel",
                     view: "x_supplier.list",
                     view_type: "list",
+                    model_name: "Supplier",
+                    type: "relabel",
+                    kind: "renamed",
+                    attribute: false,
+                    subject: subject({label: "Phone", value: "Tel"}),
+                    applied: false,
+                },
+                {
+                    id: 98,
+                    summary: "Required: //field[@name='mobile'] = True",
+                    view: "x_supplier.list",
+                    view_type: "list",
+                    model_name: "Supplier",
+                    type: "required",
+                    kind: "attribute",
+                    attribute: false,
+                    subject: false,
                     applied: false,
                 },
             ],
@@ -400,11 +428,25 @@ describe("plain changes at the Simple level", () => {
         expect(".o_erplibre_studio_change_removal_dialog p:first").toHaveText(
             "Undoing « Phone becomes required » also removes the changes that depend on it:"
         );
-        // A change of this view gets its sentence; one of another view
-        // keeps its summary.
+        // A change of this view gets its sentence and no view; one of
+        // another view, the sentence of the subject the server read and
+        // the name of its view for a reader, never its code; without a
+        // subject, its summary.
         expect(queryAllTexts(".o_erplibre_studio_change_removal_item")).toEqual([
-            "Mobile moved after Phone · x_supplier.form",
+            "Mobile moved after Phone",
+            "Phone renamed Tel · Supplier (List)",
+            "Required: //field[@name='mobile'] = True · Supplier (List)",
+        ]);
+        expect(".o_erplibre_studio_change_removal_dialog code").toHaveCount(0);
+        await contains(".o_erplibre_studio_change_removal_cancel").click();
+
+        // The Detailed level: the summaries and the codes of the views.
+        await contains(DETAILED).click();
+        await contains(`.o_erplibre_studio_changes li[data-type=required] .o_erplibre_studio_change_remove`).click();
+        expect(queryAllTexts(".o_erplibre_studio_change_removal_item")).toEqual([
+            `${CHANGES[4].summary} · x_supplier.form`,
             "Relabel: //field[@name='phone'] = Tel · x_supplier.list",
+            "Required: //field[@name='mobile'] = True · x_supplier.list",
         ]);
     });
 });

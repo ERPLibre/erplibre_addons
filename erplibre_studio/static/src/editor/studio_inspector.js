@@ -661,13 +661,19 @@ export class StudioInspector extends Component {
         return Boolean(entry && entry.path === block.path);
     }
 
-    /** How many fields ``block`` holds, or tabs for a notebook. */
+    /**
+     * How many fields ``block`` holds, or tabs for a notebook, with the
+     * plural the count takes: « 1 field », « 3 fields », « empty » for 0.
+     */
     contentsCount(block) {
         const count = outlineCount(block);
-        if (block.tag === "notebook") {
-            return _t("%(count)s tab(s)", {count});
+        if (!count) {
+            return _t("empty");
         }
-        return _t("%(count)s field(s)", {count});
+        if (block.tag === "notebook") {
+            return count === 1 ? _t("1 tab") : _t("%(count)s tabs", {count});
+        }
+        return count === 1 ? _t("1 field") : _t("%(count)s fields", {count});
     }
 
     /** The labels of the blocks right under ``block``, in their order, as the level names them. */

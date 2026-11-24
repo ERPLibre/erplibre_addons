@@ -103,13 +103,8 @@ msgstr "%(count)s changements"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
-msgid "%(count)s field(s)"
-msgstr "%(count)s champ(s)"
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "%(count)s fields"
 msgstr "%(count)s champs"
 
@@ -164,8 +159,8 @@ msgstr "%(count)s règle(s) : %(names)s"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
-msgid "%(count)s tab(s)"
-msgstr "%(count)s onglet(s)"
+msgid "%(count)s tabs"
+msgstr "%(count)s onglets"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -250,7 +245,7 @@ msgstr "%(label)s (%(model)s.%(name)s) : %(filled)s valeur(s)"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(label)s added."
-msgstr "%(label)s ajouté."
+msgstr "Ajout : %(label)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -262,49 +257,49 @@ msgstr "%(label)s passe en lecture seule"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s becomes required"
-msgstr "%(label)s devient requis"
+msgstr "%(label)s devient obligatoire"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s changed"
-msgstr "%(label)s modifié"
+msgstr "%(label)s a changé"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "%(label)s hidden"
-msgstr "%(label)s masqué"
+msgstr "%(label)s, invisible"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s hidden in this form"
-msgstr "%(label)s masqué dans ce formulaire"
+msgstr "%(label)s n'apparaît plus dans ce formulaire"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s hidden in this list"
-msgstr "%(label)s masqué dans cette liste"
+msgstr "%(label)s n'apparaît plus dans cette liste"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s hidden in this view"
-msgstr "%(label)s masqué dans cette vue"
+msgstr "%(label)s n'apparaît plus dans cette vue"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(label)s inserted %(where)s."
-msgstr "%(label)s inséré %(where)s."
+msgstr "%(label)s prend place %(where)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s is no longer optional"
-msgstr "%(label)s n'est plus optionnel"
+msgstr "%(label)s n'est plus en option"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -316,73 +311,73 @@ msgstr "%(label)s n'est plus en lecture seule"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s is no longer required"
-msgstr "%(label)s n'est plus requis"
+msgstr "%(label)s n'est plus obligatoire"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s moved"
-msgstr "%(label)s déplacé"
+msgstr "%(label)s change de place"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s moved after %(anchor)s"
-msgstr "%(label)s déplacé après %(anchor)s"
+msgstr "%(label)s passe après %(anchor)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s moved before %(anchor)s"
-msgstr "%(label)s déplacé avant %(anchor)s"
+msgstr "%(label)s passe avant %(anchor)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s moved into %(anchor)s"
-msgstr "%(label)s déplacé dans %(anchor)s"
+msgstr "%(label)s passe dans %(anchor)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s optional, hidden by default"
-msgstr "%(label)s optionnel, masqué par défaut"
+msgstr "%(label)s en option, invisible par défaut"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s optional, shown by default"
-msgstr "%(label)s optionnel, affiché par défaut"
+msgstr "%(label)s en option, visible par défaut"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s removed from this view"
-msgstr "%(label)s retiré de cette vue"
+msgstr "%(label)s ne fait plus partie de cette vue"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s renamed"
-msgstr "%(label)s renommé"
+msgstr "%(label)s change de libellé"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s renamed %(value)s"
-msgstr "%(label)s renommé %(value)s"
+msgstr "%(label)s s'appelle désormais %(value)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(label)s restored."
-msgstr "%(label)s rétabli."
+msgstr "%(label)s est de retour."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s shown again"
-msgstr "%(label)s affiché de nouveau"
+msgstr "%(label)s apparaît de nouveau"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -425,6 +420,12 @@ msgstr "%(model)s a déjà un champ %(field)s."
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(model)s cannot be the comodel."
 msgstr "%(model)s ne peut pas être le comodèle."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(model)s (%(view)s)"
+msgstr "%(model)s (%(view)s)"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -790,8 +791,15 @@ msgstr "1 changement"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "1 field"
 msgstr "1 champ"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "1 tab"
+msgstr "1 onglet"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2452,7 +2460,7 @@ msgstr "Insérer dans %(container)s, %(where)s"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Inserted %(where)s in %(container)s."
-msgstr "Inséré %(where)s dans %(container)s."
+msgstr "Insertion %(where)s dans %(container)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9357,6 +9365,7 @@ msgstr "modifié"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "empty"
 msgstr "vide"
 
@@ -9823,7 +9832,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "%(label)s: changed in this draft"
-msgstr "%(label)s : modifié dans ce brouillon"
+msgstr "%(label)s : modification dans ce brouillon"
 
 #. module: erplibre_studio
 #. odoo-javascript

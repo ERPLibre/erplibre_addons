@@ -780,6 +780,44 @@ class ErplibreStudioEditor(models.AbstractModel):
         return False
 
     @api.model
+    def _groups_access(self, arch):
+        """{expression: bool} for each « groups » of ``arch``: whether the
+        current user passes it (res.users.has_groups), as the web client
+        decides whether the view keeps the node. An expression that names
+        a group the database does not hold yet (one a project creates on
+        Apply) passes: the editor draws its node."""
+        user = self.env.user
+        access = {}
+        for expression in {node.get("groups") for node in arch.xpath("//*[@groups]")}:
+            names = [part.strip().lstrip("!") for part in expression.split(",")]
+            if not all(
+                "." in name and self.env.ref(name, raise_if_not_found=False)
+                for name in names
+            ):
+                access[expression] = True
+                continue
+            access[expression] = user.has_groups(expression)
+        return access
+
+    @api.model
+    def _subject_observer(self, subjects, view_type, fields_info):
+        """The ``observe`` of ``arch.apply_changes`` that fills ``subjects``
+        (change id: ``arch.change_subject``) with what each change names,
+        read in the arch right before it: the editor builds its plain
+        sentence from it. A subject that cannot be read stays out: the
+        editor then says the kind of the change."""
+
+        def observe(before, spec):
+            try:
+                subjects[spec["key"]] = studio_arch.change_subject(
+                    before, spec, view_type, fields_info
+                )
+            except Exception:  # noqa: BLE001 - a sentence never blocks the editor
+                subjects.pop(spec["key"], None)
+
+        return observe
+
+    @api.model
     def get_editor_data(
         self, model, view_id, view_type, project_id=False, pick_project=True
     ):
@@ -792,19 +830,8 @@ class ErplibreStudioEditor(models.AbstractModel):
         project = self._project(project_id, pick_project, model)
         view = self._resolve_view(model, view_id, view_type, project)
         fields_info = self._fields_payload(model, project)
-        # What each change names, read in the arch right before it: the
-        # editor builds its plain sentence from it. A subject that cannot be
-        # read stays out: the editor then says the kind of the change.
         subjects = {}
-
-        def observe(before, spec):
-            try:
-                subjects[spec["key"]] = studio_arch.change_subject(
-                    before, spec, view.type, fields_info
-                )
-            except Exception:  # noqa: BLE001 - a sentence never blocks the editor
-                subjects.pop(spec["key"], None)
-
+        observe = self._subject_observer(subjects, view.type, fields_info)
         if project:
             arch, errors = project._draft_arch(view, track=True, observe=observe)
         else:
@@ -877,6 +904,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "display_level": self._display_level(),
             "always_more_options": self._always_more_options(),
             "blocks": blocks,
+            "groups_access": self._groups_access(arch),
             "layout": {
                 **self._layout(view.type, arch, fields_info),
                 **(self._dms_layout(model, fields_info) if view.type == "form" else {}),
