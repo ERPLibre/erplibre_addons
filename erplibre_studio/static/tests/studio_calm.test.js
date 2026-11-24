@@ -334,8 +334,11 @@ describe("the calm canvas of a form", () => {
         expect(line("fax")).toHaveClass("o_erplibre_studio_selected");
         // The field the arch always hides is not drawn…
         expect(line("code")).toHaveCount(0);
-        // …unless it is the selection: then a muted line.
+        // …unless it is the selection: then a muted line. The plan does not
+        // list it either; its filter finds it.
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
+        expect(`.o_erplibre_studio_outline_row[data-path="${named("code")}"]`).toHaveCount(0);
+        await contains(".o_erplibre_studio_outline_filter").edit("Internal");
         await contains(
             `.o_erplibre_studio_outline_row[data-path="${named("code")}"] .o_erplibre_studio_outline_pick`
         ).click();

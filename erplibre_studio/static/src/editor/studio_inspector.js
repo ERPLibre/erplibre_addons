@@ -842,6 +842,17 @@ export class StudioInspector extends Component {
         return this.editor.changeText(change, label);
     }
 
+    /**
+     * The XPath of ``change`` on a line of its own at the Detailed level,
+     * or "": none at the Simple level, nor when its text already holds it.
+     */
+    changeXpath(change) {
+        if (!this.detailed || !change.xpath) {
+            return "";
+        }
+        return String(this.changeText(change)).includes(change.xpath) ? "" : change.xpath;
+    }
+
     undoLabel(change) {
         return _t("Undo this change: %(change)s", {change: this.changeText(change)});
     }

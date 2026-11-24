@@ -52,14 +52,8 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(count)s button(s)"
-msgstr "%(count)s bouton(s)"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(count)s change(s)"
-msgstr "%(count)s changement(s)"
+msgid "%(count)s buttons"
+msgstr "%(count)s boutons"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -106,21 +100,32 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s changes"
+msgstr "%(count)s changements"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "%(count)s field(s)"
 msgstr "%(count)s champ(s)"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "%(count)s item(s)"
-msgstr "%(count)s élément(s)"
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s fields"
+msgstr "%(count)s champs"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "%(count)s item(s) unchanged since the last Apply"
 msgstr "%(count)s élément(s) inchangé(s) depuis le dernier Apply"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "%(count)s items"
+msgstr "%(count)s éléments"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -149,8 +154,8 @@ msgstr "%(count)s enregistrement(s)"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "%(count)s result(s)"
-msgstr "%(count)s résultat(s)"
+msgid "%(count)s results"
+msgstr "%(count)s résultats"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -198,6 +203,12 @@ msgstr "%(field)s, croissant"
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "%(field)s, descending"
 msgstr "%(field)s, décroissant"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(fields)s in %(count)s groups"
+msgstr "%(fields)s en %(count)s groupes"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -767,6 +778,36 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "+%(count)s"
 msgstr "+%(count)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 button"
+msgstr "1 bouton"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 change"
+msgstr "1 changement"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 field"
+msgstr "1 champ"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "1 item"
+msgstr "1 élément"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "1 result"
+msgstr "1 résultat"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2029,6 +2070,12 @@ msgstr "Vue du code (mode débogage)"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Column %(number)s"
+msgstr "Colonne %(number)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Container %(tag)s"
 msgstr "Conteneur %(tag)s"
@@ -2498,6 +2545,12 @@ msgstr "Mise en page"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Leave focus"
 msgstr "Quitter le focus"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Left column"
+msgstr "Colonne gauche"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6344,6 +6397,12 @@ msgstr "Droit"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Right column"
+msgstr "Colonne droite"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Right-aligned"
 msgstr "Alignée à droite"
 
@@ -9385,6 +9444,7 @@ msgstr "modifié"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "empty"
 msgstr "vide"
 

@@ -258,6 +258,13 @@ class TestArch(BaseCase):
             (name["kind"], name["name"], name["label"]),
             ("field", "name", "Name"),
         )
+        # The groups of a group of groups know their place among them.
+        main = sheet["children"][0]
+        self.assertNotIn("column", main)
+        self.assertEqual(
+            [(g["column"], g["columns"]) for g in main["children"]], [(1, 2), (2, 2)]
+        )
+        self.assertNotIn("column", sheet)
         notebook = sheet["children"][1]
         self.assertFalse(notebook["drop"])
         child_ids = notebook["children"][0]["children"][0]

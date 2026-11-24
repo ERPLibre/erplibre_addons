@@ -199,18 +199,22 @@ describe("an element the draft hides", () => {
         expect(PICK).toHaveAttribute("aria-expanded", "false");
         // Neither moves nor leaves again: Escape is its only key.
         expect(PICK).toHaveAttribute("aria-keyshortcuts", "Escape");
-        expect(`${PICK} s.o_erplibre_studio_ghost_label`).toHaveText("Fax");
+        // Hidden, not removed: its label is muted, not struck.
+        expect(`${PICK} .o_erplibre_studio_ghost_label`).toHaveText("Fax");
+        expect(`${PICK} s`).toHaveCount(0);
+        expect(getComputedStyle(queryOne(`${PICK} .o_erplibre_studio_ghost_label`)).textDecorationLine).toBe("none");
         expect(`${GHOST} .o_erplibre_studio_margin_dot[data-dot=ring]`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveCount(0);
         // The drops beside it target its node, which stays in the arch.
         expect(`.o_erplibre_studio_hook[data-target="${named("is_vendor")}"]`).toHaveCount(1);
-        // « show »: the row, its value struck, Restore, the fold button.
+        // « show »: the row, its value muted, Restore, the fold button.
         await contains(GHOST).click();
         expect(GHOST).toHaveClass(["o_erplibre_studio_ghost_open", "o_erplibre_studio_selected"]);
         expect(PICK).toHaveAttribute("aria-expanded", "true");
         expect(PICK).toHaveAttribute("aria-label", "Fax hidden in this form");
         expect(PICK).toHaveText("Fax");
-        expect(`${GHOST} s.o_erplibre_studio_ghost_value`).toHaveText("+1 555 0199");
+        expect(`${GHOST} .o_erplibre_studio_ghost_value`).toHaveText("+1 555 0199");
+        expect(`${GHOST} s`).toHaveCount(0);
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveText("Restore");
         expect(`${GHOST} .o_erplibre_studio_ghost_fold`).toHaveAttribute("aria-label", "Fold the line Fax");
         // The fold button folds the line; its button keeps the focus.
@@ -234,7 +238,7 @@ describe("an element the draft hides", () => {
         expect(`${GHOST} .o_erplibre_studio_change_tag[data-kind=hidden]`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_fold`).toHaveCount(0);
-        // Its struck value takes the value column of the lines around it,
+        // Its muted value takes the value column of the lines around it,
         // on one line cut by an ellipsis; its tag and Restore go under it.
         const value = queryOne(`${GHOST} .o_erplibre_studio_ghost_value`);
         const valueBox = value.getBoundingClientRect();
@@ -319,11 +323,11 @@ describe("an element the draft hides", () => {
         expect(props).toHaveCount(0);
     });
 
-    test("the plan: a struck row with a ring, not draggable, out of the count", async () => {
+    test("the plan: a muted row with a ring, not draggable, out of the count", async () => {
         await openEditor();
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
         const row = `.o_erplibre_studio_outline_row[data-name=fax]`;
-        expect(row).toHaveClass("o_erplibre_studio_outline_removed");
+        expect(row).toHaveClass("o_erplibre_studio_outline_hidden");
         expect(`${row} .o_erplibre_studio_margin_dot[data-dot=ring]`).toHaveCount(1);
         expect(`${row} .o_erplibre_studio_change_dot`).toHaveCount(0);
         // The Simple level shows the ring alone; the sentence of its
@@ -336,10 +340,13 @@ describe("an element the draft hides", () => {
         expect(`${row} .o_erplibre_studio_outline_tag`).toHaveText("hidden");
         expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("hidden");
         expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("draggable", "false");
-        // The group counts the three fields left.
-        expect(`.o_erplibre_studio_outline_row[data-path="${MAIN}"] .o_erplibre_studio_outline_pick`).toHaveText(
-            /3$/
-        );
+        expect(getComputedStyle(queryOne(`${row} .o_erplibre_studio_outline_label`)).textDecorationLine).toBe("none");
+        // The group, closed, counts the three fields left.
+        const main = `.o_erplibre_studio_outline_row[data-path="${MAIN}"]`;
+        expect(`${main} .o_erplibre_studio_outline_size`).toHaveCount(0);
+        await contains(`${main} .o_erplibre_studio_outline_toggle`).click();
+        expect(`${main} .o_erplibre_studio_outline_size`).toHaveText("3");
+        await contains(`${main} .o_erplibre_studio_outline_toggle`).click();
         // A click on the row selects the removed line.
         await contains(`${row} .o_erplibre_studio_outline_pick`).click();
         expect(GHOST).toHaveClass("o_erplibre_studio_selected");

@@ -50,13 +50,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(count)s button(s)"
-msgstr ""
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(count)s change(s)"
+msgid "%(count)s buttons"
 msgstr ""
 
 #. module: erplibre_studio
@@ -100,20 +94,31 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s changes"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "%(count)s field(s)"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "%(count)s item(s)"
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(count)s fields"
 msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "%(count)s item(s) unchanged since the last Apply"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "%(count)s items"
 msgstr ""
 
 #. module: erplibre_studio
@@ -141,7 +146,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "%(count)s result(s)"
+msgid "%(count)s results"
 msgstr ""
 
 #. module: erplibre_studio
@@ -187,6 +192,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "%(field)s, descending"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(fields)s in %(count)s groups"
 msgstr ""
 
 #. module: erplibre_studio
@@ -723,6 +734,36 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "+%(count)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 button"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 change"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "1 field"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "1 item"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid "1 result"
 msgstr ""
 
 #. module: erplibre_studio
@@ -2009,6 +2050,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Column %(number)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "Container %(tag)s"
 msgstr ""
@@ -2485,6 +2532,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Leave focus"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Left column"
 msgstr ""
 
 #. module: erplibre_studio
@@ -6291,6 +6344,12 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Right column"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Right-aligned"
 msgstr ""
 
@@ -9210,6 +9269,7 @@ msgstr ""
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "empty"
 msgstr ""
 

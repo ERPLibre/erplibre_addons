@@ -103,11 +103,15 @@ function formBlocks() {
         attrs: {name: "origin_line"},
     });
     const address = container(ADDRESS, "div", "div", [field("street"), field("city")]);
-    const left = container(LEFT, "group", "group", [line, address]);
-    const right = container(RIGHT, "group", "group", [
-        field("phone", {attrs: {widget: "phone"}}),
-        field("email", {attrs: {widget: "email"}}),
-    ]);
+    // The payload gives the groups of a group of groups their place.
+    const left = container(LEFT, "group", "group", [line, address], {column: 1, columns: 2});
+    const right = container(
+        RIGHT,
+        "group",
+        "group",
+        [field("phone", {attrs: {widget: "phone"}}), field("email", {attrs: {widget: "email"}})],
+        {column: 2, columns: 2}
+    );
     const main = container(MAIN, "group", "group", [left, right]);
     const sale = container(SALE, "group", "Sales", [field("grower")], {attrs: {name: "sale", string: "Sales"}});
     const row = container(ROW, "group", "container_row_9", [field("terms"), field("vendor_terms"), field("barcode")], {
@@ -229,8 +233,10 @@ describe("erplibre_studio readable names at the Simple level", () => {
             return walk(root);
         };
         const label = (path) => String(simpleLabel(find(path), FIELDS));
-        expect(label(MAIN)).toBe("Group: Seed type, Street…");
-        expect(label(RIGHT)).toBe("Group: Phone, Email");
+        // A group of groups and its groups: named by their place.
+        expect(label(MAIN)).toBe("Columns");
+        expect(label(LEFT)).toBe("Left column");
+        expect(label(RIGHT)).toBe("Right column");
         expect(label(ROW)).toBe("Group: Terms, Vendor terms…");
         expect(label(SALE)).toBe("Group « Sales »");
         expect(label(BOX)).toBe("Smart buttons");
@@ -256,15 +262,14 @@ describe("erplibre_studio readable names at the Simple level", () => {
             ["Smart buttons", 1],
             ["Orders", 2],
             ["Seed name", 1],
-            ["Group: Seed type, Street…", 1],
-            ["Group: Seed type, Street…", 2],
-            ["Seed type", 3],
-            ["Origin", 3],
-            ["Street", 3],
-            ["City", 3],
-            ["Group: Phone, Email", 2],
-            ["Phone", 3],
-            ["Email", 3],
+            ["Left column", 1],
+            ["Seed type", 2],
+            ["Origin", 2],
+            ["Street", 2],
+            ["City", 2],
+            ["Right column", 1],
+            ["Phone", 2],
+            ["Email", 2],
             ["Tabs", 1],
             ["Trade", 2],
             ["Group « Sales »", 3],
@@ -280,7 +285,7 @@ describe("erplibre_studio readable names at the Simple level", () => {
         expect(simple.total).toBe(shown.length);
         // A filter finds a field through the elements that have no row.
         const city = outlineRows(root, {simple: true, flatten: true, fields: FIELDS, filter: "city"});
-        expect(city.rows.map((r) => r.block.path)).toEqual([SHEET, MAIN, LEFT, named("city")]);
+        expect(city.rows.map((r) => r.block.path)).toEqual([SHEET, LEFT, named("city")]);
         expect(city.matches).toBe(1);
         // A technical name still finds its block.
         expect(outlineRows(root, {simple: true, flatten: true, filter: "vendor_terms"}).matches).toBe(1);
@@ -318,7 +323,7 @@ describe("erplibre_studio readable names at the Simple level", () => {
         expect(rows).toInclude(["Seed name", 1]);
         expect(rows).toInclude(["Smart buttons", 1]);
         expect(rows).toInclude(["Group: Terms, Vendor terms…", 3]);
-        expect(".o_erplibre_studio_outline_count").toHaveText("25 item(s)");
+        expect(".o_erplibre_studio_outline_count").toHaveText("24 items");
         expect(`${row(ROW)} .o_erplibre_studio_outline_toggle`).toHaveAttribute(
             "aria-label",
             "Collapse Group: Terms, Vendor terms…"
@@ -328,14 +333,14 @@ describe("erplibre_studio readable names at the Simple level", () => {
         expect(row(TITLE_H1)).toHaveCount(1);
         expect(`${row(ROW)} .o_erplibre_studio_outline_label`).toHaveText("Group « container_row_9 »");
         expect(`${row(BOX)} .o_erplibre_studio_outline_label`).toHaveText("button_box");
-        expect(".o_erplibre_studio_outline_count").toHaveText("32 item(s)");
+        expect(".o_erplibre_studio_outline_count").toHaveText("32 items");
         // The path of the selection: the technical names at Detailed, the
         // readable names without the layout elements at Simple.
         await contains(pick("street")).click();
         const crumbs = () => queryAll(".o_erplibre_studio_crumb").map((el) => el.textContent.trim());
-        expect(crumbs()).toEqual(["Sheet", "Group", "Group", "div", "Street"]);
+        expect(crumbs()).toEqual(["Sheet", "Columns", "Left column", "div", "Street"]);
         await contains(SIMPLE).click();
-        expect(crumbs()).toEqual(["Sheet", "Group: Seed type, Street…", "Group: Seed type, Street…", "Street"]);
+        expect(crumbs()).toEqual(["Sheet", "Left column", "Street"]);
     });
 
     test("the folded lines of the focus and the « Additions go into » hint name a group from its fields", async () => {
@@ -343,7 +348,7 @@ describe("erplibre_studio readable names at the Simple level", () => {
         await contains(`.o_erplibre_studio_page_tab[data-path="${TRADE}"]`).click();
         await contains(`.o_erplibre_studio_focus_btn[data-focus-path="${SALE}"]`, {visible: false}).click();
         expect(`${folded(ROW)} .o_erplibre_studio_folded_label`).toHaveText("Group: Terms, Vendor terms…");
-        expect(folded(ROW)).toHaveAttribute("aria-label", /^Focus on Group: Terms, Vendor terms…, 3 field\(s\)/);
+        expect(folded(ROW)).toHaveAttribute("aria-label", /^Focus on Group: Terms, Vendor terms…, 3 fields/);
         await contains(folded(ROW)).click();
         expect(".o_erplibre_studio_palette_target_block").toHaveText("Group: Terms, Vendor terms…");
         expect(".o_erplibre_studio_status_focus").toHaveText("Focus: Trade › Group: Terms, Vendor terms…");

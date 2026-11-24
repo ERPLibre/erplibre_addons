@@ -12,8 +12,10 @@ import {
     contentName,
     isButtonBox,
     isGhost,
+    isGroupRow,
     ownLabel,
     marginDot,
+    placeName,
     searchText,
     typeGlyph,
 } from "./studio_utils";
@@ -44,7 +46,11 @@ export function tagLabel(tag) {
     );
 }
 
-/** The text a row of the outline shows for ``block``. */
+/**
+ * The text a row of the outline shows for ``block``: a group without a
+ * label of its own is named by its place (``placeName``), « Group »
+ * without one.
+ */
 export function outlineLabel(block) {
     if (block.kind === "separator") {
         return _t("Separator");
@@ -59,6 +65,9 @@ export function outlineLabel(block) {
     if (block.tag === "group" && own) {
         return _t("Group « %(label)s »", {label: block.label});
     }
+    if (block.tag === "group") {
+        return placeName(block) || tagLabel(block.tag);
+    }
     return own ? block.label : tagLabel(block.tag);
 }
 
@@ -69,8 +78,10 @@ const STRUCTURE_TAGS = new Set(["form", "sheet", "header", "footer", "group", "n
 
 /**
  * The text a reader of the form sees for ``block``, the Simple level of
- * ``outlineLabel``: a field its label, a group or a page without
- * « string » its readable name (``contentName``), the button box « Smart
+ * ``outlineLabel``: a field its label, a group without « string » the
+ * name of its place (``placeName``: « Left column »), else, as a page
+ * without « string », its readable name (``contentName`` of the fields
+ * ``drawn`` keeps, a function of a block), the button box « Smart
  * buttons », a button its « string », a label the label of its field
  * (``fields``: the fields of the payload), a widget its title, another
  * element its label of its own (``ownLabel``). A leaf whose only text is
@@ -78,7 +89,7 @@ const STRUCTURE_TAGS = new Set(["form", "sheet", "header", "footer", "group", "n
  * container with such a name answers its readable name. A technical name
  * never shows.
  */
-export function simpleLabel(block, fields = {}) {
+export function simpleLabel(block, fields = {}, drawn = null) {
     const attrs = block.attrs || {};
     if (block.kind === "field") {
         return block.label || block.name;
@@ -99,7 +110,7 @@ export function simpleLabel(block, fields = {}) {
         if (STRUCTURE_TAGS.has(block.tag) && !["group", "page"].includes(block.tag)) {
             return tagLabel(block.tag);
         }
-        return contentName(block);
+        return placeName(block) || contentName(block, drawn);
     }
     if (block.tag === "button") {
         return attrs.string || attrs.title || _t("Button");
@@ -114,15 +125,16 @@ export function simpleLabel(block, fields = {}) {
  * Whether the Plan of a form shows the children of ``block`` in its place
  * at the Simple level: an element that only lays out what it holds (no
  * part of STRUCTURE_TAGS, no label of its own (``ownLabel``), not the
- * button box), or a leaf without text of its own (``simpleLabel`` ""),
- * unless a change of the draft touches it.
+ * button box), a group of groups without label of its own (its groups
+ * are the columns a reader sees), or a leaf without text of its own
+ * (``simpleLabel`` ""), unless a change of the draft touches it.
  */
 export function isLayoutOnly(block, fields = {}) {
     if (block.changed || isButtonBox(block) || ownLabel(block)) {
         return false;
     }
     if (isOutlineContainer(block)) {
-        return !STRUCTURE_TAGS.has(block.tag);
+        return !STRUCTURE_TAGS.has(block.tag) || isGroupRow(block);
     }
     return block.kind === "other" && !simpleLabel(block, fields);
 }
@@ -144,10 +156,11 @@ export function blockGlyph(block, fields = {}) {
 /**
  * How many fields ``block`` holds, at any depth; a notebook counts its
  * pages. In a view of ``viewType``, an element the draft hides
- * (``isGhost``) does not count, nor what it holds.
+ * (``isGhost``) does not count, nor what it holds; with ``drawn``, a
+ * function of a block, neither does a block it answers false for.
  */
-export function outlineCount(block, viewType = null) {
-    const ghost = (b) => isGhost(b, viewType);
+export function outlineCount(block, viewType = null, drawn = null) {
+    const ghost = (b) => isGhost(b, viewType) || (Boolean(drawn) && !drawn(b));
     if (block.tag === "notebook") {
         return (block.children || []).filter((child) => child.tag === "page" && !ghost(child)).length;
     }
@@ -172,16 +185,30 @@ export function outlineCount(block, viewType = null) {
  * it, marked ``context`` when they do not match themselves, and every
  * container shows open; a container the text matches keeps all its blocks.
  * Else a container shows open unless ``collapsed`` (path -> true) closes it.
+ * With ``drawn``, a function of a block, a block it answers false for has
+ * no row, nor what it holds, and does not count, unless a filter runs:
+ * the Simple level of a form lists what its canvas draws.
  * Answer {rows, matches, total}: the rows, how many blocks match, how many
  * blocks the tree has.
  */
 export function outlineRows(
     root,
-    {filter = "", changedOnly = false, collapsed = {}, simple = false, flatten = false, fields = {}} = {}
+    {
+        filter = "",
+        changedOnly = false,
+        collapsed = {},
+        simple = false,
+        flatten = false,
+        fields = {},
+        drawn = null,
+    } = {}
 ) {
     const query = searchText(filter.trim());
     const filtering = Boolean(query) || changedOnly;
-    const label = (block) => (simple ? simpleLabel(block, fields) : outlineLabel(block));
+    // A filter searches every block: a node the canvas does not draw is
+    // found, and selected, through it.
+    const left = (block) => Boolean(drawn) && !filtering && !drawn(block);
+    const label = (block) => (simple ? simpleLabel(block, fields, drawn) : outlineLabel(block));
     const flat = (block) => simple && flatten && isLayoutOnly(block, fields);
     const textHit = (block) => !query || searchText(`${label(block)} ${block.name || ""}`).includes(query);
     const selfMatch = (block, force) =>
@@ -190,15 +217,22 @@ export function outlineRows(
     const forceOf = (block, force) =>
         force || (!flat(block) && isOutlineContainer(block) && Boolean(query) && !changedOnly && textHit(block));
     const hasMatch = (block, force) =>
-        selfMatch(block, force) || (block.children || []).some((child) => hasMatch(child, forceOf(block, force)));
+        !left(block) &&
+        (selfMatch(block, force) || (block.children || []).some((child) => hasMatch(child, forceOf(block, force))));
     const rows = [];
     let matches = 0;
     let total = 0;
     const count = (block) => {
+        if (left(block)) {
+            return;
+        }
         total += flat(block) ? 0 : 1;
         (block.children || []).forEach(count);
     };
     const walk = (block, depth, force) => {
+        if (left(block)) {
+            return;
+        }
         if (flat(block)) {
             for (const child of block.children || []) {
                 walk(child, depth, force);
@@ -284,11 +318,10 @@ export class StudioOutline extends Component {
     /**
      * The technical name a row shows under its label at the Detailed
      * level: the name of a field, a widget or a filter, the tag of a
-     * container with a label of its own; "" when it would repeat the label.
+     * container; "" when it would repeat the label.
      */
     technicalName(block) {
-        const own = block.label && block.label !== block.tag;
-        const name = block.name || (isOutlineContainer(block) && own ? block.tag : "");
+        const name = block.name || (isOutlineContainer(block) ? block.tag : "");
         return name && name !== this.label(block) ? name : "";
     }
 
@@ -310,7 +343,25 @@ export class StudioOutline extends Component {
             simple: !this.detailed,
             flatten: this.props.viewType === "form",
             fields: this.props.data.fields || {},
+            drawn: this.drawn,
         });
+    }
+
+    /**
+     * What the canvas draws, at the Simple level of a form
+     * (``StudioEditor.isDrawnChild``), the box of the smart buttons only
+     * with a button drawn: a function of a block, else null.
+     */
+    get drawn() {
+        if (this.props.viewType !== "form" || this.detailed) {
+            return null;
+        }
+        const editor = this.editor;
+        return (block) =>
+            editor.isDrawnChild(block) &&
+            (!isButtonBox(block) ||
+                block.path === this.props.selected ||
+                (block.children || []).some((child) => editor.isDrawnChild(child)));
     }
 
     get filtering() {
@@ -327,9 +378,11 @@ export class StudioOutline extends Component {
 
     countLabel(result) {
         if (this.filtering) {
-            return _t("%(count)s result(s)", {count: result.matches});
+            const count = result.matches;
+            return count === 1 ? _t("1 result") : _t("%(count)s results", {count});
         }
-        return _t("%(count)s item(s)", {count: result.total});
+        const count = result.total;
+        return count === 1 ? _t("1 item") : _t("%(count)s items", {count});
     }
 
     get emptyLabel() {
@@ -353,11 +406,12 @@ export class StudioOutline extends Component {
         return isOutlineContainer(block);
     }
 
+    /** How many fields the row of ``block`` holds, of those the canvas draws (``drawn``). */
     count(block) {
-        return outlineCount(block, this.props.viewType);
+        return outlineCount(block, this.props.viewType, this.drawn);
     }
 
-    /** Whether ``block`` is an element the draft hides (``isGhost``): a struck row with a ring. */
+    /** Whether ``block`` is an element the draft hides (``isGhost``): a muted row with a ring. */
     isGhost(block) {
         return isGhost(block, this.props.viewType);
     }

@@ -320,7 +320,12 @@ describe("plain changes at the Simple level", () => {
         );
         await contains(DETAILED).click();
         expect(queryAllTexts(SUMMARIES)).toEqual(CHANGES.map((change) => change.summary));
-        expect(".o_erplibre_studio_change_xpath").toHaveCount(5);
+        // The XPath on a line of its own only when the summary does not
+        // already hold it: the new field names its anchor, no other.
+        expect(".o_erplibre_studio_change_xpath").toHaveCount(1);
+        expect(`.o_erplibre_studio_changes li[data-type=add_field] .o_erplibre_studio_change_xpath`).toHaveText(
+            named("email")
+        );
         expect(`.o_erplibre_studio_changes li[data-type=required] .o_erplibre_studio_change_remove`).toHaveAttribute(
             "aria-label",
             `Undo this change: Required: ${named("phone")} = True`

@@ -251,8 +251,9 @@
     </t>
 
     <!-- The title of a container or of another node: its tag, then its
-         label when it has one of its own. Its tag is a technical bit: with
-         a label of its own, it shows at the Detailed level only. -->
+         label when it has one of its own (otherText). Its tag is a
+         technical bit: with a label of its own, it shows at the Detailed
+         level only. -->
     <t t-name="erplibre_studio.Block.tagLabel">
         <t t-if="block.label === block.tag or !block.label" t-esc="block.tag" />
         <t t-else="">
@@ -260,7 +261,7 @@
                 <t t-esc="block.tag" />
                 ·
             </span>
-            <t t-esc="block.label" />
+            <t t-esc="otherText" />
         </t>
     </t>
 
@@ -389,7 +390,8 @@
     <t t-name="erplibre_studio.Block">
         <!-- An element the draft hides from a form or a list (isGhost):
              one muted line whose button opens it, « label hidden — show »;
-             open, its label struck, the value of a form line struck,
+             open, its label and the value of a form line muted (a hidden
+             element is not struck: a strike stands for a removed one),
              Restore and, at the Simple level, the fold button. The same
              button stays the tab stop in both states. A list draws it as a
              narrow column header. -->
@@ -401,6 +403,8 @@
                 'o_erplibre_studio_muted_line': !detailed,
                 'o_erplibre_studio_ghost_open': ghostOpen,
                 'o_erplibre_studio_selected': isSelected,
+                'o_erplibre_studio_pair_label': pairRole === 'label',
+                'o_erplibre_studio_pair_value': pairRole === 'value',
             }"
             t-att-data-path="block.path"
             t-att-data-name="block.name"
@@ -419,14 +423,14 @@
                 t-att-aria-label="ghostText.pick"
                 t-att-aria-keyshortcuts="pickShortcuts"
             >
-                <s class="o_erplibre_studio_label o_erplibre_studio_ghost_label" t-esc="titleLabel" />
+                <span class="o_erplibre_studio_label o_erplibre_studio_ghost_label" t-esc="titleLabel" />
                 <t t-if="!ghostOpen">
                     <span class="o_erplibre_studio_ghost_removed" t-esc="' ' + ghostText.hidden + ' — '" />
                     <span class="o_erplibre_studio_ghost_show" t-esc="ghostText.show" />
                 </t>
             </button>
             <t t-if="ghostOpen">
-                <s t-if="ghostValue" class="o_erplibre_studio_ghost_value" t-att-title="ghostValue" t-esc="ghostValue" />
+                <span t-if="ghostValue" class="o_erplibre_studio_ghost_value" t-att-title="ghostValue" t-esc="ghostValue" />
                 <span class="o_erplibre_studio_ghost_actions">
                     <t t-call="erplibre_studio.Block.marks" />
                     <button
@@ -467,6 +471,10 @@
                 'o_erplibre_studio_fixed': !canDrag,
                 'o_erplibre_studio_changed': block.changed,
                 'o_erplibre_studio_changed_hidden': isHiddenChange,
+                'o_erplibre_studio_pair_label': pairRole === 'label',
+                'o_erplibre_studio_pair_value': pairRole === 'value',
+                'o_erplibre_studio_address_inline': isAddressInline,
+                'o_erplibre_studio_avatar': isAvatar,
             }"
             t-att-data-path="block.path"
             t-att-data-name="block.name"
@@ -644,10 +652,13 @@
                 'o_erplibre_studio_row': isRow,
                 'o_erplibre_studio_button_row': isButtonRow,
                 'o_erplibre_studio_empty_box': isEmptyButtonBox,
+                'o_erplibre_studio_address': isAddress,
                 'o_erplibre_studio_muted_line': mutedLine,
                 'o_erplibre_studio_base_invisible': baseInvisible,
                 'o_erplibre_studio_selected': isSelected,
                 'o_erplibre_studio_changed_hidden': isHiddenChange,
+                'o_erplibre_studio_pair_label': pairRole === 'label',
+                'o_erplibre_studio_pair_value': pairRole === 'value',
             }"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"
@@ -688,7 +699,10 @@
             <div
                 t-if="!mutedLine"
                 class="o_erplibre_studio_children"
-                t-att-class="{'o_erplibre_studio_drop_scope': showHooks and dropScope === block.path}"
+                t-att-class="{
+                    'o_erplibre_studio_drop_scope': showHooks and dropScope === block.path,
+                    'o_erplibre_studio_paired': hasPairs,
+                }"
                 t-att-data-drop-scope="showHooks ? block.path : false"
                 t-on-dragenter="(ev) => showHooks and editor.overScope(ev, block.path)"
                 t-on-dragover="(ev) => showHooks and editor.overScope(ev, block.path)"
@@ -728,6 +742,8 @@
                 'o_erplibre_studio_base_invisible': baseInvisible,
                 'o_erplibre_studio_selected': isSelected,
                 'o_erplibre_studio_changed_hidden': isHiddenChange,
+                'o_erplibre_studio_pair_label': pairRole === 'label',
+                'o_erplibre_studio_pair_value': pairRole === 'value',
             }"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"

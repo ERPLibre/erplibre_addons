@@ -26,6 +26,7 @@ import {
     NUMBER_TYPES,
     TAG_WIDGETS,
     TEMPLATED_TYPES,
+    addressPart,
     attributeLabel,
     canDragBlock,
     canRemoveBlock,
@@ -39,10 +40,13 @@ import {
     isFocusContext,
     graphLanes,
     hiddenSentence,
+    isAddressFormat,
+    isAvatar,
     isBaseInvisible,
     isGhost,
     isTrue,
     marginDot,
+    pairRole,
     pageLabel,
     pivotLanes,
     searchColumns,
@@ -71,8 +75,13 @@ import {
  *
  * The canvas of a form draws the form as the web client does: a field of a
  * group is a line « gutter | label | value », a field elsewhere its value
- * only. A change of the draft is one dot in the gutter; its tags and the
- * flags of the block show at the Detailed level. The outline, the drag
+ * only. In a group, a label cell (a <label>, an element of class
+ * « o_td_label ») and the block after it share one line (``pairRole``):
+ * the address of a contact draws its parts in the value column, city,
+ * state and zip on one line (``isAddressFormat``, ``addressPart``). The
+ * picture of the record (``isAvatar``) floats at the right of the title.
+ * A change of the draft is one dot in the gutter; its tags and the flags
+ * of the block show at the Detailed level. The outline, the drag
  * handle and the label chip of a block show on hover, on focus, on the
  * selection and during a drag (CSS).
  *
@@ -86,7 +95,7 @@ import {
  * An element the draft hides from a form or a list (``isGhost``) is one
  * muted line at its place, « label hidden — show », that neither moves
  * nor leaves again; a drop beside it targets its node, which stays in the
- * arch. « show » opens its row, struck, with Restore and a fold button;
+ * arch. « show » opens its row, muted, with Restore and a fold button;
  * the Detailed level always shows the row, and draws nothing under it.
  */
 export class StudioBlock extends Component {
@@ -256,15 +265,57 @@ export class StudioBlock extends Component {
     /**
      * How a field block draws: « line » for a field of a group of a form
      * (gutter, label, value), « bare » for another node of a form (its
-     * value only), « column » for a column of a list (its header, a cell
+     * value only), a field of a group without its label (« nolabel »)
+     * included, « column » for a column of a list (its header, a cell
      * under it), « chip » for the others (a card, a search view, an axis).
      */
     get layout() {
         const kind = this.block.kind;
         if (this.props.viewType === "form") {
-            return kind === "field" && this.parentTag === "group" ? "line" : "bare";
+            const own = !isTrue((this.block.attrs || {}).nolabel);
+            return kind === "field" && this.parentTag === "group" && own ? "line" : "bare";
         }
         return this.props.viewType === "list" && kind === "field" ? "column" : "chip";
+    }
+
+    /**
+     * The part the block takes in a line « label | value » of the group
+     * that holds it in a form (``pairRole``): « label », « value » or "".
+     */
+    get pairRole() {
+        return this.props.viewType === "form" ? pairRole(this.props.parent, this.block) : "";
+    }
+
+    /**
+     * Whether the children of the block draw on the grid of the lines of a
+     * group: a group of a form that holds a label cell (``pairRole``).
+     */
+    get hasPairs() {
+        return this.props.viewType === "form" && (this.block.children || []).some((child) => pairRole(this.block, child));
+    }
+
+    /** Whether the block is the address of a form, laid out by its parts (``isAddressFormat``). */
+    get isAddress() {
+        return this.props.viewType === "form" && isAddressFormat(this.block);
+    }
+
+    /**
+     * The part of an address the block is (``addressPart``), in the address
+     * of a form (``isAddressFormat``); "" otherwise.
+     */
+    get addressPart() {
+        const parent = this.props.parent;
+        return this.props.viewType === "form" && parent && isAddressFormat(parent) ? addressPart(this.block) : "";
+    }
+
+    /** Whether the block is the city, the state or the zip of an address: they share a line. */
+    get isAddressInline() {
+        return ["city", "state", "zip"].includes(this.addressPart);
+    }
+
+    /** Whether the block is the picture of the record (``isAvatar``), at the right of the title. */
+    get isAvatar() {
+        return this.props.viewType === "form" && isAvatar(this.block);
     }
 
     /** Whether the field is the title of a form: the field of an <h1>. */
@@ -500,7 +551,7 @@ export class StudioBlock extends Component {
     }
 
     /**
-     * Whether the hidden line shows its row (struck label, Restore): at
+     * Whether the hidden line shows its row (muted label, Restore): at
      * the Detailed level always, at the Simple level once « show » opens
      * it.
      */
@@ -525,7 +576,7 @@ export class StudioBlock extends Component {
     }
 
     /**
-     * The value of the sample record a removed form line shows struck, or
+     * The value of the sample record a hidden form line shows muted, or
      * "": a text or a date as the line would show it.
      */
     get ghostValue() {
@@ -580,6 +631,18 @@ export class StudioBlock extends Component {
             return _t("%(label)s, %(condition)s", {label: this.titleLabel, condition});
         }
         return _t("%(label)s hidden", {label: this.titleLabel});
+    }
+
+    /**
+     * The text of an element other than a field or a container: a <label>
+     * at the Simple level shows the label of its field (``blockLabel``),
+     * never the technical name of its « for »; else its label.
+     */
+    get otherText() {
+        if (this.block.tag === "label" && !this.detailed) {
+            return this.editor.blockLabel(this.block);
+        }
+        return this.block.label;
     }
 
     /** The label a block shows: a widget its title, another node its label or tag. */
@@ -658,10 +721,14 @@ export class StudioBlock extends Component {
 
     /**
      * Whether a hook goes before ``child``: never inside a t-if chain,
-     * whose nodes must stay next to each other.
+     * whose nodes must stay next to each other, nor between a label cell
+     * and its value (``pairRole``), which share a line.
      */
     hookBefore(child) {
-        return this.showHooks && !["elif", "else"].includes(child.chain);
+        if (!this.showHooks || ["elif", "else"].includes(child.chain)) {
+            return false;
+        }
+        return this.props.viewType !== "form" || pairRole(this.block, child) !== "value";
     }
 
     get pages() {
@@ -954,10 +1021,14 @@ export class StudioCanvas extends Component {
      * it, under a title line when nothing else names it (``title``).
      * « folded »: another focus block, one line that puts the focus on it:
      * {label, meta, changes, aria}. « context »: a page that holds groups
-     * only, above their rows. « static »: a summary of one line, {label,
-     * meta}: the header of the form with the top of its sheet (« Header »),
-     * the smart buttons, the chatter, another node of the sheet. The tabs
-     * of a notebook are not drawn. ``indent`` marks the groups of a page.
+     * only and the block in focus, above the rows of its groups; such a
+     * page without the focus is one folded line, « Tab X · N fields in M
+     * groups », that puts the focus on its first group. « static »: a
+     * summary of one line, {label, meta}: the header of the form with the
+     * top of its sheet (« Header »), the smart buttons, the chatter,
+     * another node of the sheet. The tabs of a notebook are not drawn.
+     * ``indent`` marks the groups of a page. The counts read « 1 field »,
+     * « 3 fields », « empty » (``fieldsText``).
      */
     get focusRows() {
         const editor = this.editor;
@@ -985,8 +1056,8 @@ export class StudioCanvas extends Component {
             }
             const keys = new Set([...(entry.block.changes || []), ...changeKeysInside(entry.block)]);
             const label = entry.kind === "page" ? _t("Tab %(label)s", {label: entry.label}) : entry.label;
-            const meta = _t("%(count)s field(s)", {count: outlineCount(entry.block, viewType)});
-            const changes = keys.size ? _t("%(count)s change(s)", {count: keys.size}) : "";
+            const meta = this.fieldsText(outlineCount(entry.block, viewType));
+            const changes = this.changesText(keys.size);
             rows.push({
                 kind: "folded",
                 key: entry.path,
@@ -1013,11 +1084,14 @@ export class StudioCanvas extends Component {
                             blockRow(entries.get(page.path), false);
                         } else if (isFocusContext(page)) {
                             const label = _t("Tab %(label)s", {label: pageLabel(page, {simple})});
-                            rows.push({kind: "context", key: page.path, label});
-                            for (const group of page.children) {
-                                if (entries.has(group.path)) {
+                            const groups = page.children.filter((group) => entries.has(group.path));
+                            if (groups.some((group) => group.path === focused.path)) {
+                                rows.push({kind: "context", key: page.path, label});
+                                for (const group of groups) {
                                     blockRow(entries.get(group.path), true);
                                 }
+                            } else if (groups.length) {
+                                rows.push(this.pageRow(page, label, groups));
                             }
                         }
                     }
@@ -1031,7 +1105,7 @@ export class StudioCanvas extends Component {
                         kind: "static",
                         key: child.path,
                         label: _t("Smart buttons"),
-                        meta: _t("%(count)s button(s)", {count}),
+                        meta: count === 1 ? _t("1 button") : count ? _t("%(count)s buttons", {count}) : _t("empty"),
                     });
                 } else if (!seen) {
                     // The top of the sheet before its first block: its title.
@@ -1042,13 +1116,57 @@ export class StudioCanvas extends Component {
                         kind: "static",
                         key: child.path,
                         label: editor.blockLabel(child),
-                        meta: count ? _t("%(count)s field(s)", {count}) : "",
+                        meta: count ? this.fieldsText(count) : "",
                     });
                 }
             }
         };
         visit(this.root);
         return rows;
+    }
+
+    /** The count of fields ``count`` as a folded line reads it: « 1 field », « 3 fields », « empty ». */
+    fieldsText(count) {
+        if (!count) {
+            return _t("empty");
+        }
+        return count === 1 ? _t("1 field") : _t("%(count)s fields", {count});
+    }
+
+    /** The count of changes ``count`` of a folded line: « 1 change », « 3 changes », "" for none. */
+    changesText(count) {
+        if (!count) {
+            return "";
+        }
+        return count === 1 ? _t("1 change") : _t("%(count)s changes", {count});
+    }
+
+    /**
+     * The folded line of the page ``page`` that holds groups only and not
+     * the focus: « Tab X · N fields in M groups » (``label``: « Tab X »),
+     * the changes of its groups ``groups``; it puts the focus on the first
+     * one.
+     */
+    pageRow(page, label, groups) {
+        const viewType = this.viewType;
+        const fields = groups.reduce((total, group) => total + outlineCount(group, viewType), 0);
+        const keys = new Set(groups.flatMap((group) => [...(group.changes || []), ...changeKeysInside(group)]));
+        const meta =
+            groups.length === 1
+                ? this.fieldsText(fields)
+                : _t("%(fields)s in %(count)s groups", {fields: this.fieldsText(fields), count: groups.length});
+        const changes = this.changesText(keys.size);
+        const first = this.editor.focusEntries.find((entry) => entry.path === groups[0].path);
+        return {
+            kind: "folded",
+            key: page.path,
+            entry: first,
+            indent: false,
+            label,
+            meta,
+            changes,
+            aria: [this.editor.focusLabel(label), meta, changes].filter(Boolean).join(", "),
+        };
     }
 
     /** Put the focus on the block at ``path`` (a folded line); its first button takes the keyboard focus. */

@@ -162,6 +162,9 @@ SHOWN_ATTRS = (
     "bg_color",
     # The greyed text a label-less field of a form shows while it is empty.
     "placeholder",
+    # A field of a group of a form without its label: the value cell of
+    # the label before it.
+    "nolabel",
     "t-name",
     "t-if",
     "t-elif",
@@ -2085,6 +2088,20 @@ def _node_kind(node, view_type):
     return "other"
 
 
+def _mark_columns(block, view_type):
+    """Give each group of a form group that holds groups only its place:
+    ``column`` (from 1) and ``columns``, the count of its groups. The
+    editor names a group without « string » after it (« Left column »)."""
+    children = block["children"]
+    if view_type != "form" or block["tag"] != "group" or not children:
+        return
+    if any(child["tag"] != "group" for child in children):
+        return
+    for index, child in enumerate(children, 1):
+        child["column"] = index
+        child["columns"] = len(children)
+
+
 def arch_blocks(root, view_type, fields):
     """The editor tree of ``root``: nested dicts {path, tag, kind, label,
     attrs, movable, children, drop, name, ...}, the ``blocks`` of the
@@ -2097,7 +2114,8 @@ def arch_blocks(root, view_type, fields):
     gives the ``changes`` (keys, an int when the key is one) that touch
     its node and their ``change_kinds`` (CHANGE_KINDS order), ``changed``
     when there is one, and ``changed_inside`` when a block under it is
-    ``changed``."""
+    ``changed``. A group of a form that is one of the groups of a group
+    gives ``column`` and ``columns`` (``_mark_columns``)."""
 
     def walk(node, depth):
         keys = []
@@ -2126,6 +2144,7 @@ def arch_blocks(root, view_type, fields):
                 child["changed"] or child["changed_inside"]
                 for child in block["children"]
             )
+            _mark_columns(block, view_type)
         else:
             block["kind"] = _node_kind(node, view_type)
         if block["kind"] == "field":

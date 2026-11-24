@@ -338,18 +338,18 @@ describe("erplibre_studio focus on a block", () => {
         expect(`${OPEN} .o_erplibre_studio_hook`).not.toHaveCount(0);
         // The others: one line each, a ring and a count where changes are.
         expect(FOLDED).toHaveCount(4);
-        expect(folded(MAIN)).toHaveText(/General information\s*· 4 field\(s\)\s*1 change\(s\)/);
+        expect(folded(MAIN)).toHaveText(/General information\s*· 4 fields\s*1 change$/);
         expect(`${folded(MAIN)} .o_erplibre_studio_folded_ring`).toHaveCount(1);
         expect(`${folded(SALE)} .o_erplibre_studio_folded_ring`).toHaveCount(1);
         expect(`${folded(MISC)} .o_erplibre_studio_folded_ring`).toHaveCount(0);
-        expect(folded(MISC)).toHaveText(/Misc\s*· 1 field\(s\)/);
+        expect(folded(MISC)).toHaveText(/Misc\s*· 1 field$/);
         expect(folded(NOTES)).toHaveText(/Tab Notes/);
-        expect(folded(MISC)).toHaveAttribute("aria-label", "Focus on Misc, 1 field(s)");
+        expect(folded(MISC)).toHaveAttribute("aria-label", "Focus on Misc, 1 field");
         expect(folded(SALE)).toHaveClass("o_erplibre_studio_focus_indent");
         // The summaries: the smart buttons, the header, the chatter; the page
         // of groups as a context line; no tab drawn.
         expect(".o_erplibre_studio_folded_static").toHaveCount(3);
-        expect(`.o_erplibre_studio_folded_static[data-key="${BOX}"]`).toHaveText(/Smart buttons\s*· 1 button\(s\)/);
+        expect(`.o_erplibre_studio_folded_static[data-key="${BOX}"]`).toHaveText(/Smart buttons\s*· 1 button$/);
         expect('.o_erplibre_studio_folded_static[data-key="header"]').toHaveText("Header");
         expect(`.o_erplibre_studio_folded_static[data-key="${CHATTER}"]`).toHaveText(/Chatter\s*· collapsed/);
         // An upper-case caption: innerText follows the CSS.
@@ -369,7 +369,13 @@ describe("erplibre_studio focus on a block", () => {
         expect(OPEN).toHaveAttribute("data-focus-path", MAIN);
         expect(`${OPEN} .o_erplibre_studio_focus_open_title`).toHaveText("General information");
         expect(`${OPEN} .o_erplibre_studio_container[data-path="${RIGHT}"]`).toHaveCount(1);
-        expect(folded(PURCHASE)).toHaveCount(1);
+        // The page of groups without the focus: one folded line, as the
+        // other tabs, that puts the focus on its first group.
+        expect(".o_erplibre_studio_focus_context").toHaveCount(0);
+        expect(folded(PURCHASE)).toHaveCount(0);
+        expect(folded(SALE)).toHaveText(/^Tab Trade\s*· 5 fields in 3 groups\s*1 change$/);
+        expect(folded(SALE)).not.toHaveClass("o_erplibre_studio_focus_indent");
+        expect(folded(SALE)).toHaveAttribute("aria-label", "Focus on Tab Trade, 5 fields in 3 groups, 1 change");
         expect(".o_erplibre_studio_status_focus").toHaveText("Focus: General information");
     });
 

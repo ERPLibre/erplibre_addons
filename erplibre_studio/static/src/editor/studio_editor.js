@@ -58,6 +58,7 @@ import {
     isHiddenOnRecord,
     namedKeys,
     newFieldLabel,
+    pairRole,
     pivotLanes,
     resolveFocusBlock,
     sampleContext,
@@ -77,6 +78,7 @@ export {
     changeKeysInside,
     changeSentence,
     conditionValue,
+    columnName,
     contentName,
     fieldTypeLabel,
     fieldWidgets,
@@ -95,6 +97,7 @@ export {
     kindSentence,
     marginDot,
     namedKeys,
+    pairRole,
     pivotAxes,
     pivotLanes,
     resolveFocusBlock,
@@ -480,15 +483,18 @@ export class StudioEditor extends Component {
     /**
      * The name of ``block`` as the level shows it: its label with the
      * technical names at the Detailed level (``outlineLabel``), the text
-     * a reader sees at the Simple one (``simpleLabel``), « Element » for
-     * an element without text of its own. ``detailed``: the level to name
-     * it at, the one on screen by default.
+     * a reader sees at the Simple one (``simpleLabel``, which names a
+     * block from the fields the form shows on the sample record:
+     * ``shownOnSample``), « Element » for an element without text of its
+     * own. ``detailed``: the level to name it at, the one on screen by
+     * default.
      */
     blockLabel(block, detailed = this.detailed) {
         if (detailed) {
             return outlineLabel(block);
         }
-        return simpleLabel(block, (this.data && this.data.fields) || {}) || _t("Element");
+        const fields = (this.data && this.data.fields) || {};
+        return simpleLabel(block, fields, (b) => this.shownOnSample(b)) || _t("Element");
     }
 
     /** The text of the inherited views of the view on screen, for the Detailed level. */
@@ -1850,6 +1856,17 @@ export class StudioEditor extends Component {
     }
 
     /**
+     * Whether the real form shows ``block`` on the sample record: its arch
+     * does not always hide it (``isBaseInvisible``) and its condition does
+     * not hide it there (``hiddenOnSample``). Unlike ``isDrawnChild``, it
+     * reads neither the level nor the selection: a name built from it
+     * stays the same while the selection moves.
+     */
+    shownOnSample(block) {
+        return !isBaseInvisible(block) && !this.hiddenOnSample(block);
+    }
+
+    /**
      * Whether the real form hides ``block`` on the sample record of the
      * payload (``isHiddenOnRecord``): false for a view other than a form or
      * without sample record. The answers are kept per expression until the
@@ -1879,8 +1896,9 @@ export class StudioEditor extends Component {
      * Where the hook (``target``, ``position``) of a form sits: {where,
      * container, containerPath}, null when the tree has no such hook.
      * ``where`` names its neighbours as the canvas shows them (« between A
-     * and B », « before A », « after A », « in C »): an element the draft
-     * removes or a node the canvas does not draw is no neighbour.
+     * and B », « before A », « after A », « in C »), as the level on screen
+     * names them (``blockLabel``): an element the draft removes or a node
+     * the canvas does not draw is no neighbour.
      */
     insertPlace(target, position) {
         const trail = blockTrail(this.root, target);
@@ -1902,8 +1920,8 @@ export class StudioEditor extends Component {
         const index = position === "inside" ? children.length : children.findIndex((c) => c.path === target);
         const prev = children.slice(0, index).findLast(shown);
         const next = children.slice(index).find(shown);
-        const label = (block) => outlineLabel(block);
-        const containerLabel = outlineLabel(container);
+        const label = (block) => this.blockLabel(block);
+        const containerLabel = this.blockLabel(container);
         let where;
         if (prev && next) {
             where = _t("between %(a)s and %(b)s", {a: label(prev), b: label(next)});
@@ -1925,8 +1943,9 @@ export class StudioEditor extends Component {
     /**
      * The hook right after the block at ``path``, as the canvas draws it:
      * {target, position}, the hook before the next sibling that holds one
-     * (not inside a t-if chain, drawn), else the hook at the end of its
-     * container; null when its container shows no « + » (``insertsIn``).
+     * (not inside a t-if chain, drawn, not the value of a label cell:
+     * ``pairRole``), else the hook at the end of its container; null when
+     * its container shows no « + » (``insertsIn``).
      */
     hookAfter(path) {
         const trail = blockTrail(this.root, path);
@@ -1938,7 +1957,12 @@ export class StudioEditor extends Component {
         const children = parent.children || [];
         const next = children
             .slice(children.indexOf(block) + 1)
-            .find((child) => !["elif", "else"].includes(child.chain) && this.isDrawnChild(child));
+            .find(
+                (child) =>
+                    !["elif", "else"].includes(child.chain) &&
+                    this.isDrawnChild(child) &&
+                    pairRole(parent, child) !== "value"
+            );
         return next ? {target: next.path, position: "before"} : {target: parent.path, position: "inside"};
     }
 

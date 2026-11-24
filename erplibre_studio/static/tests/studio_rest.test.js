@@ -251,9 +251,12 @@ describe("the canvas of a form at rest", () => {
         // The tab of a person is left out; the form opens on the other.
         expect(`.o_erplibre_studio_page_tab[data-path="${PRIVATE}"]`).toHaveCount(0);
         expect(`.o_erplibre_studio_page_tab[data-path="${CONTACTS}"]`).toHaveClass("active");
-        // The plan lists them: a click selects one, a muted line at its place.
+        // The plan lists what the canvas draws; its filter finds the
+        // others: a click selects one, a muted line at its place.
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
-        expect(`.o_erplibre_studio_outline_row[data-path="${WARNING}"]`).toHaveCount(1);
+        expect(`.o_erplibre_studio_outline_row[data-path="${WARNING}"]`).toHaveCount(0);
+        expect(`.o_erplibre_studio_outline_row[data-path="${named("job")}"]`).toHaveCount(0);
+        await contains(".o_erplibre_studio_outline_filter").edit("Job");
         await contains(
             `.o_erplibre_studio_outline_row[data-path="${named("job")}"] .o_erplibre_studio_outline_pick`
         ).click();

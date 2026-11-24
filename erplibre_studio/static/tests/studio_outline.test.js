@@ -284,7 +284,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(".o_erplibre_studio_left_tab[data-panel=plan]").toHaveAttribute("aria-selected", "true");
         expect(".o_erplibre_studio_palette [data-tab]").toHaveCount(0);
         expect(".o_erplibre_studio_outline_row").toHaveCount(11);
-        expect(".o_erplibre_studio_outline_count").toHaveText("11 item(s)");
+        expect(".o_erplibre_studio_outline_count").toHaveText("11 items");
         expect(".o_erplibre_studio_outline_changed").toHaveText("Modified · 4");
         expect(`${row(named("x_sponsor"))} .o_erplibre_studio_outline_tag`).toHaveText("new");
         // One margin dot per changed row, as on the canvas, its kinds as
@@ -320,7 +320,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
         // The filter: accents aside, a count, a button that clears it.
         await contains(".o_erplibre_studio_outline_filter").edit("preferee");
         expect(rowLabels()).toEqual(["Sheet", "Tabs", "Sales", "Langue préférée"]);
-        expect(".o_erplibre_studio_outline_count").toHaveText("1 result(s)");
+        expect(".o_erplibre_studio_outline_count").toHaveText("1 result");
         await contains(".o_erplibre_studio_outline_filter").edit("zzz");
         expect(".o_erplibre_studio_outline_empty").toHaveText("No element matches « zzz ».");
         await contains(".o_erplibre_studio_outline_clear").click();
@@ -329,11 +329,11 @@ describe("erplibre_studio editor, plan and change marks", () => {
         // « Modified »: the changed blocks and their containers.
         await contains(".o_erplibre_studio_outline_changed").click();
         expect(".o_erplibre_studio_outline_changed").toHaveAttribute("aria-pressed", "true");
-        expect(".o_erplibre_studio_outline_count").toHaveText("3 result(s)");
+        expect(".o_erplibre_studio_outline_count").toHaveText("3 results");
         expect(".o_erplibre_studio_outline_row:not(.o_erplibre_studio_outline_context)").toHaveCount(3);
         // The removed element shows among them.
         expect(`${row(named("lang"))}:not(.o_erplibre_studio_outline_context)`).toHaveClass(
-            "o_erplibre_studio_outline_removed"
+            "o_erplibre_studio_outline_hidden"
         );
         await contains(".o_erplibre_studio_outline_all").click();
         expect(".o_erplibre_studio_outline_row").toHaveCount(11);

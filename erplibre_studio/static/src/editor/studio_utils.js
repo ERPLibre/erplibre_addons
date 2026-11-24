@@ -783,6 +783,109 @@ export function isButtonBox(block) {
 }
 
 /**
+ * Whether ``block`` is a group of a form that holds groups only, at least
+ * one: the web client lays its groups out side by side, as columns.
+ */
+export function isGroupRow(block) {
+    const children = (block && block.children) || [];
+    return block.tag === "group" && children.length > 0 && children.every(isGroup);
+}
+
+/** The classes of the node of ``block``, as a list. */
+function classesOf(block) {
+    return (((block && block.attrs) || {}).class || "").split(/\s+/).filter(Boolean);
+}
+
+/**
+ * Whether ``block`` takes the label cell of a group of a form, as the
+ * form compiler of the web client lays it out: a <label>, or an element
+ * of class « o_td_label » or « o_wrap_label »; never a field.
+ */
+export function isLabelCell(block) {
+    if (!block || block.kind === "field") {
+        return false;
+    }
+    const classes = classesOf(block);
+    return block.tag === "label" || classes.includes("o_td_label") || classes.includes("o_wrap_label");
+}
+
+/**
+ * The part ``child``, a block of the group ``parent`` of a form, takes in
+ * a line « label | value » of the web client: « label » for a label cell
+ * (``isLabelCell``); « value » for the block right after one, unless it is
+ * a label cell itself, a separator or a field that shows its own label
+ * (no « nolabel »), which start a line of their own; "" otherwise, and in
+ * a group of groups.
+ */
+export function pairRole(parent, child) {
+    if (!parent || !child || parent.tag !== "group" || isGroupRow(parent)) {
+        return "";
+    }
+    if (isLabelCell(child)) {
+        return "label";
+    }
+    const siblings = parent.children || [];
+    const index = siblings.findIndex((block) => block.path === child.path);
+    if (index < 1 || !isLabelCell(siblings[index - 1]) || child.kind === "separator") {
+        return "";
+    }
+    if (child.kind === "field" && !isTrue((child.attrs || {}).nolabel)) {
+        return "";
+    }
+    return "value";
+}
+
+/**
+ * The part of an address ``block`` is in a form, from the class the
+ * address format of the web client gives it (« o_address_city »): one of
+ * « street », « city », « state », « zip », « country », or "".
+ */
+export function addressPart(block) {
+    for (const name of classesOf(block)) {
+        const part = name.startsWith("o_address_") ? name.slice("o_address_".length) : "";
+        if (["street", "city", "state", "zip", "country"].includes(part)) {
+            return part;
+        }
+    }
+    return "";
+}
+
+/** Whether ``block`` is the address of a form, laid out by its parts (« o_address_format »). */
+export function isAddressFormat(block) {
+    return classesOf(block).includes("o_address_format");
+}
+
+/** Whether ``block`` is the picture of the record a form floats at the right of its title (« oe_avatar »). */
+export function isAvatar(block) {
+    return Boolean(block) && block.kind === "field" && classesOf(block).includes("oe_avatar");
+}
+
+/**
+ * The name of a group by its place among the groups of a group of groups
+ * (``column`` and ``columns`` of the payload): « Left column » and « Right
+ * column » for two, « Column 2 » for more; "" for another block.
+ */
+export function columnName(block) {
+    const {column, columns} = block || {};
+    if (!block || block.tag !== "group" || !column || !columns || columns < 2) {
+        return "";
+    }
+    if (columns === 2) {
+        return column === 1 ? _t("Left column") : _t("Right column");
+    }
+    return _t("Column %(number)s", {number: column});
+}
+
+/**
+ * The name of a group without « string » that its place gives: its column
+ * (``columnName``), « Columns » for a group of groups (``isGroupRow``);
+ * "" otherwise.
+ */
+export function placeName(block) {
+    return columnName(block) || (isGroupRow(block) ? _t("Columns") : "");
+}
+
+/**
  * The text of its own that names ``block`` for a reader: its « string »,
  * else its label unless that label is only its tag or its technical name
  * (« name »); "" for none.
@@ -797,14 +900,19 @@ export function ownLabel(block) {
 
 /**
  * The labels of the fields ``block`` holds, at any depth in the order of
- * the arch, ``limit`` at most.
+ * the arch, ``limit`` at most. With ``drawn``, a function of a block, a
+ * block it answers false for is left out with what it holds; a node the
+ * arch always hides (``isBaseInvisible``) always is.
  */
-export function fieldLabelsIn(block, limit) {
+export function fieldLabelsIn(block, limit, drawn = null) {
     const labels = [];
     const walk = (parent) => {
         for (const child of parent.children || []) {
             if (labels.length >= limit) {
                 return;
+            }
+            if (isBaseInvisible(child) || (drawn && !drawn(child))) {
+                continue;
             }
             if (child.kind === "field") {
                 labels.push(child.label || child.name);
@@ -820,9 +928,10 @@ export function fieldLabelsIn(block, limit) {
 /**
  * The fields ``block`` holds, as a reader sees them: the labels of the
  * first two, then « … » when it holds more; "" when it holds none.
+ * ``drawn``: the fields to count (``fieldLabelsIn``).
  */
-export function fieldsSummary(block) {
-    const labels = fieldLabelsIn(block, 3);
+export function fieldsSummary(block, drawn = null) {
+    const labels = fieldLabelsIn(block, 3, drawn);
     const shown = labels.slice(0, 2).join(", ");
     return labels.length > 2 ? `${shown}…` : shown;
 }
@@ -831,11 +940,11 @@ export function fieldsSummary(block) {
  * The readable name of the container ``block`` that has no « string »:
  * « Group: A, B… » for a group, « Tab: A, B… » for a page, « Block: A,
  * B… » for another element, from the first fields it holds
- * (``fieldsSummary``); the bare word when it holds no field. Its
- * technical name (« name ») never shows.
+ * (``fieldsSummary``, of the fields ``drawn`` keeps); the bare word when
+ * it holds no field. Its technical name (« name ») never shows.
  */
-export function contentName(block) {
-    const fields = fieldsSummary(block);
+export function contentName(block, drawn = null) {
+    const fields = fieldsSummary(block, drawn);
     if (block.tag === "group") {
         return fields ? _t("Group: %(fields)s", {fields}) : _t("Group");
     }

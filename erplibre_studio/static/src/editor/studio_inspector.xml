@@ -1185,7 +1185,8 @@
 
     <!-- One change of the list: its margin dot as on the canvas (a failed
          change: its number on a danger badge), kind, text (changeText: a
-         plain sentence at the Simple level) and error. -->
+         plain sentence at the Simple level), its XPath at the Detailed
+         level when the text does not hold it (changeXpath), and error. -->
     <t t-name="erplibre_studio.Inspector.Change">
         <span
             t-if="change.error"
@@ -1201,10 +1202,11 @@
         <span class="d-flex flex-column flex-grow-1">
             <span class="text-muted o_erplibre_studio_change_kind" t-esc="changeKind(change)" />
             <span class="o_erplibre_studio_change_summary" t-esc="changeText(change)" />
+            <t t-set="xpath" t-value="changeXpath(change)" />
             <code
-                t-if="detailed and change.xpath"
+                t-if="xpath"
                 class="small text-muted text-break o_erplibre_studio_tech o_erplibre_studio_change_xpath"
-                t-esc="change.xpath"
+                t-esc="xpath"
             />
             <span t-if="change.error" class="text-danger o_erplibre_studio_change_error">
                 <i class="fa fa-exclamation-triangle me-1" aria-hidden="true" />
