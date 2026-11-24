@@ -43,11 +43,11 @@ export function paletteFieldTypes(fieldTypes, viewType) {
  * The palette of the editor, one column of sections: a search box, the new
  * field types, the existing fields (a section that folds), the layout
  * items (a group, a tab, a separator) and the other items (a ribbon) that
- * drag onto the canvas. Each item is a draggable div that holds a
+ * drag onto the canvas. Each item is a div that holds a
  * ``<button class="o_erplibre_studio_pick">``: the button is the tab stop
  * and the accessible name for the keyboard and assistive technology, and
- * takes no pointer event, so the mouse reaches the div and a drag starts
- * there in every browser. A drag goes through the editor ``editor``; a
+ * takes no pointer event, so the mouse reaches the div, whose pointerdown
+ * arms the drag. A drag goes through the editor ``editor``; a
  * click on the div, or Enter or Space on its button (whose click bubbles
  * to the div), adds the item without a drag (``editor.addFromPalette``).
  * ``palette`` is the state of the palette the editor keeps across its
@@ -200,8 +200,9 @@ export class StudioPalette extends Component {
         return valueLabel(this.viewType === "graph" ? "graph_axis" : "axis", axis) || axis;
     }
 
-    startDrag(ev, item) {
-        this.editor.startDrag(ev, item);
+    /** A pointerdown on an item: it drags once the pointer moves (``pressDrag``). */
+    press(ev, item) {
+        this.editor.pressDrag(ev, item);
     }
 
     /**
@@ -287,9 +288,5 @@ export class StudioPalette extends Component {
     /** The accessible name of an item: what it is, and that it adds it. */
     itemLabel(label) {
         return _t("Add %(item)s", {item: label});
-    }
-
-    endDrag() {
-        this.editor.endDrag();
     }
 }

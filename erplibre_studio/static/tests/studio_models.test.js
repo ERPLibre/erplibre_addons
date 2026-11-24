@@ -493,7 +493,7 @@ describe("erplibre_studio models", () => {
         expect(".o_erplibre_studio_title").toHaveText(/^Loan item\s*Form$/);
         expect(".o_erplibre_studio_crumbs .o_erplibre_studio_xml_id").toHaveText("studio_loans.view_x_loan_item_form");
         // The chatter stays where the view puts it.
-        expect(".o_erplibre_studio_other[data-tag=chatter]").toHaveAttribute("draggable", "false");
+        expect(".o_erplibre_studio_other[data-tag=chatter]").toHaveAttribute("data-draggable", "false");
         expect(`.o_erplibre_studio_hook[data-target='/form/chatter']`).toHaveCount(0);
         expect(`.o_erplibre_studio_other[data-tag=chatter] .o_erplibre_studio_hook`).toHaveCount(0);
         expect(`.o_erplibre_studio_hook[data-target="//group[@name='studio_left']"]`).toHaveCount(1);

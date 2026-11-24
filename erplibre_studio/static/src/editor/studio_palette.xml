@@ -4,10 +4,10 @@
 <templates xml:space="preserve">
     <!-- The palette: a search box, then a section per kind of item; the
          heading of a section carries « data-tab » (new, existing, layout,
-         other). An item is a draggable div around a button: the button is
-         the tab stop and takes Enter and Space, whose click bubbles to the
-         single click handler of the div; it takes no pointer event, so
-         the mouse reaches the div and a drag starts in every browser. -->
+         other). An item is a div around a button: the button is the tab
+         stop and takes Enter and Space, whose click bubbles to the single
+         click handler of the div; it takes no pointer event, so the mouse
+         reaches the div, whose pointerdown arms the drag. -->
     <t t-name="erplibre_studio.Palette">
         <div class="o_erplibre_studio_palette_body d-flex flex-column gap-3 h-100">
             <!-- With the focus on a block of a form: where a click adds. -->
@@ -43,9 +43,8 @@
                         class="o_erplibre_studio_palette_item o_erplibre_studio_new_field d-flex align-items-center gap-2 border rounded px-2 py-1"
                         t-att-data-type="item.ttype"
                         t-att-title="newItemTitle(item)"
-                        draggable="true"
-                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
-                        t-on-dragend="() => this.endDrag()"
+                        data-draggable="true"
+                        t-on-pointerdown="(ev) => this.press(ev, {kind: 'new', ttype: item.ttype})"
                         t-on-click="() => this.add({kind: 'new', ttype: item.ttype})"
                     >
                         <button
@@ -97,9 +96,8 @@
                         class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1 mb-1"
                         t-att-data-name="item.name"
                         t-att-title="existingItemTitle(item)"
-                        draggable="true"
-                        t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
-                        t-on-dragend="() => this.endDrag()"
+                        data-draggable="true"
+                        t-on-pointerdown="(ev) => this.press(ev, {kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                         t-on-click="() => this.add({kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                     >
                         <button
@@ -132,9 +130,8 @@
                     t-att-class="item.className"
                     t-att-data-kind="item.kind"
                     t-att-title="focusItemLabel(item.kind, item.label) or false"
-                    draggable="true"
-                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: item.kind})"
-                    t-on-dragend="() => this.endDrag()"
+                    data-draggable="true"
+                    t-on-pointerdown="(ev) => this.press(ev, {kind: item.kind})"
                     t-on-click="() => this.add({kind: item.kind})"
                 >
                     <button
@@ -166,9 +163,8 @@
                 <div
                     class="o_erplibre_studio_palette_item o_erplibre_studio_widget border rounded px-2 py-1 mb-1"
                     data-widget="web_ribbon"
-                    draggable="true"
-                    t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'widget', widget: 'web_ribbon'})"
-                    t-on-dragend="() => this.endDrag()"
+                    data-draggable="true"
+                    t-on-pointerdown="(ev) => this.press(ev, {kind: 'widget', widget: 'web_ribbon'})"
                     t-on-click="() => this.add({kind: 'widget', widget: 'web_ribbon'})"
                 >
                     <button

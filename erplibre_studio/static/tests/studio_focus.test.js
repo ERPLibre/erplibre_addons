@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {manuallyDispatchProgrammaticEvent, press, queryAll, queryOne} from "@odoo/hoot-dom";
+import {press, queryAll, queryOne} from "@odoo/hoot-dom";
 import {animationFrame} from "@odoo/hoot-mock";
 import {
     contains,
@@ -319,10 +319,10 @@ describe("erplibre_studio focus on a block", () => {
         expect(`.o_erplibre_studio_notebook_head > ${focusBtn(NOTES)}`).toHaveCount(1);
         expect(focusBtn(NOTES)).toHaveAttribute("aria-label", "Focus on Notes");
         // Never during a drag.
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragstart");
+        const dragging = await contains(".o_erplibre_studio_new_field[data-type=date]").drag();
         await animationFrame();
         expect(FOCUS_BTN).toHaveCount(0);
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragend");
+        await dragging.cancel();
         await animationFrame();
         expect(FOCUS_BTN).not.toHaveCount(0);
     });
@@ -505,10 +505,10 @@ describe("erplibre_studio focus on a block", () => {
         await contains(fieldEl("seller")).click();
         expect(SLOT).toHaveAttribute("data-hook", `:before:${named("x_sponsor")}`);
         // Not during a drag.
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragstart");
+        const dragging = await contains(".o_erplibre_studio_new_field[data-type=date]").drag();
         await animationFrame();
         expect(SLOT).toHaveCount(0);
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragend");
+        await dragging.cancel();
         await animationFrame();
         expect(SLOT).toHaveCount(1);
         // Out of the focus, none.

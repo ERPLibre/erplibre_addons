@@ -226,7 +226,7 @@ describe("erplibre_studio editor", () => {
         const item = ".o_erplibre_studio_new_field[data-type=char]";
         const add = `${item} > button.o_erplibre_studio_palette_add`;
         // The draggable div is no tab stop: the button inside it is.
-        expect(item).toHaveAttribute("draggable", "true");
+        expect(item).toHaveAttribute("data-draggable", "true");
         expect(item).not.toHaveAttribute("role");
         expect(item).not.toHaveAttribute("tabindex");
         expect(add).toHaveCount(1);
@@ -276,7 +276,7 @@ describe("erplibre_studio editor", () => {
         expect(pick).toHaveAttribute("aria-pressed", "false");
         // The mouse goes through the button to the draggable div.
         expect(getComputedStyle(queryOne(pick)).pointerEvents).toBe("none");
-        expect(block).toHaveAttribute("draggable", "true");
+        expect(block).toHaveAttribute("data-draggable", "true");
         queryOne(pick).focus();
         await press("Enter");
         await animationFrame();

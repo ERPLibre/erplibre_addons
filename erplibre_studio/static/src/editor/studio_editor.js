@@ -2,7 +2,7 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, onPatched, onWillStart, toRaw, useState} from "@odoo/owl";
+import {Component, onPatched, onWillStart, onWillUnmount, toRaw, useRef, useState} from "@odoo/owl";
 import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
 import {Dropdown} from "@web/core/dropdown/dropdown";
 import {useDropdownState} from "@web/core/dropdown/dropdown_hooks";
@@ -17,6 +17,7 @@ import {useSetupAction} from "@web/search/action_hook";
 import {View} from "@web/views/view";
 import {StudioCanvas} from "./studio_canvas";
 import {StudioChangeRemovalDialog, StudioConfirmDialog} from "./studio_confirm";
+import {PointerDrag} from "./studio_drag";
 import {parseGroupValue} from "./studio_groups";
 import {PERMS, StudioModelDialog, accessGroup, accessRows} from "./studio_models";
 import {StudioSecuritySpace, pickModel, securityModels} from "./studio_security";
@@ -355,6 +356,21 @@ export class StudioEditor extends Component {
             if (callback) {
                 callback();
             }
+        });
+        // The drag of the palette items, of the blocks and of the rows of
+        // the plan (``pressDrag``); the edge of the canvas scrolls it.
+        this.rootRef = useRef("root");
+        this.canvasRef = useRef("canvas");
+        this.pointerDrag = new PointerDrag({
+            start: (item) => this.startDrag(item),
+            end: () => this.endDrag(),
+            scroller: () => this.canvasRef.el,
+            host: () => this.rootRef.el,
+            ghost: () => this.dropItem,
+        });
+        onWillUnmount(() => {
+            this.pointerDrag.stop();
+            this.pointerDrag.unguard();
         });
         onWillStart(() => this.load());
     }
@@ -1067,28 +1083,37 @@ export class StudioEditor extends Component {
 
     // ── drag and drop ───────────────────────────────────────────────────
 
-    startDrag(ev, item) {
+    /**
+     * A pointerdown on the source of ``item`` (a palette item, a block, a
+     * row of the plan): the drag starts once the pointer moves
+     * (``PointerDrag``).
+     */
+    pressDrag(ev, item) {
+        this.pointerDrag.press(ev, item);
+    }
+
+    /**
+     * Start the drag of ``item``; false when it cannot run: the editor is
+     * busy, or no project takes the change.
+     */
+    startDrag(item) {
         if (this.state.busy) {
-            ev.preventDefault();
-            return;
+            return false;
         }
         if (!this.project) {
-            ev.preventDefault();
             this.notification.add(_t("Choose or create a studio project first."), {type: "warning"});
-            return;
+            return false;
         }
         this.state.dragging = item;
         // A drag closes the insertion list: its hooks show the drop instead.
         this.state.insert = null;
-        if (ev.dataTransfer) {
-            ev.dataTransfer.effectAllowed = "move";
-            ev.dataTransfer.setData("text/plain", item.path || item.ttype || item.name || item.kind || "");
-        }
         document.body.classList.add(DRAGGING_CLASS);
         document.body.classList.toggle(DRAGGING_PAGE_CLASS, item.kind === "page");
+        return true;
     }
 
     endDrag() {
+        this.pointerDrag.stop();
         Object.assign(this.state, {dragging: null, hook: null, dropTarget: null, dropScope: null, hookNear: []});
         document.body.classList.remove(DRAGGING_CLASS, DRAGGING_PAGE_CLASS);
     }
@@ -1173,7 +1198,7 @@ export class StudioEditor extends Component {
      * place of the drop, and the event stops there, so the innermost scope
      * wins. A scope without such a hook lets the event pass to the scope
      * around it; the canvas clears the place when no scope takes it
-     * (``overCanvas``). Firefox gives the pointer on dragover, not on drag.
+     * (``overCanvas``). The dragover carries the pointer (``PointerDrag``).
      */
     overScope(ev, scope) {
         const item = this.state.dragging;

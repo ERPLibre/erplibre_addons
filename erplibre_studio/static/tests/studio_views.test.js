@@ -453,7 +453,7 @@ describe("erplibre_studio editor, kanban", () => {
         expect(".o_erplibre_studio_card .o_erplibre_studio_field").toHaveCount(2);
         // The field the view only loads stays where it is.
         expect(".o_erplibre_studio_loaded .o_erplibre_studio_field[data-name=active]").toHaveAttribute(
-            "draggable",
+            "data-draggable",
             "false"
         );
         expect(".o_erplibre_studio_palette [data-tab=new]").toHaveCount(1);
@@ -523,7 +523,7 @@ describe("erplibre_studio editor, kanban", () => {
         expect(hook(`${CARD}/t[2]`, "before")).toHaveCount(0);
         expect(
             ".o_erplibre_studio_container[data-path=\"//t[@t-name='card']/t[2]\"] > .o_erplibre_studio_container_title"
-        ).toHaveAttribute("draggable", "false");
+        ).toHaveAttribute("data-draggable", "false");
 
         // Nothing selected: the properties of the view.
         expect(".o_erplibre_studio_view_properties").toHaveAttribute("data-tag", "kanban");

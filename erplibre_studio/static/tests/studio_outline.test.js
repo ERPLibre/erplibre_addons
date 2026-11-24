@@ -420,10 +420,10 @@ describe("erplibre_studio editor, plan and change marks", () => {
 
         await contains(".o_erplibre_studio_left_tab[data-panel=plan]").click();
         const pick = `${row(named("city"))} .o_erplibre_studio_outline_pick`;
-        // A div, not a button: a mousedown on a button starts no drag in Firefox.
+        // A div, whose pointerdown arms the drag of the block.
         expect(queryOne(pick).tagName).toBe("DIV");
         expect(pick).toHaveAttribute("tabindex", "-1");
-        expect(pick).toHaveAttribute("draggable", "true");
+        expect(pick).toHaveAttribute("data-draggable", "true");
         queryOne(row(named("city"))).focus();
         await press(["Alt", "ArrowDown"]);
         await animationFrame();
@@ -469,7 +469,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
             "aria-label",
             "Chatter: messages, followers and activities"
         );
-        expect(chatter).toHaveAttribute("draggable", "false");
+        expect(chatter).toHaveAttribute("data-draggable", "false");
         queryOne(`${title} > .o_erplibre_studio_pick`).focus();
         await press("Enter");
         await animationFrame();

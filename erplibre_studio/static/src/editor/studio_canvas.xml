@@ -219,7 +219,8 @@
          classes « pickClass » besides its own, and « pickAria » for its
          accessible name when set, else pickLabel. Enter or Space clicks it,
          and the click bubbles to the div of the block. The CSS lets no
-         pointer event reach it, so a drag starts on the div.
+         pointer event reach it, so the pointerdown that arms a drag lands
+         on the div.
          « aria-keyshortcuts » names the keys the editor reads on it;
          nothing shows them on screen. -->
     <t t-name="erplibre_studio.Block.pick">
@@ -479,9 +480,8 @@
             t-att-data-path="block.path"
             t-att-data-name="block.name"
             t-att-data-kind="block.kind"
-            t-att-draggable="canDrag ? 'true' : 'false'"
-            t-on-dragstart="(ev) => this.startDrag(ev)"
-            t-on-dragend="() => editor.endDrag()"
+            t-att-data-draggable="canDrag ? 'true' : 'false'"
+            t-on-pointerdown="(ev) => this.press(ev)"
             t-on-click.stop="() => this.select()"
         >
             <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />
@@ -676,9 +676,8 @@
                     'o_erplibre_studio_group_title': !mutedLine and groupTitle,
                     'o_erplibre_studio_title_chip': !mutedLine and !groupTitle and !detailed and !marginDot,
                 }"
-                t-att-draggable="canDrag ? 'true' : 'false'"
-                t-on-dragstart="(ev) => this.startDrag(ev)"
-                t-on-dragend="() => editor.endDrag()"
+                t-att-data-draggable="canDrag ? 'true' : 'false'"
+                t-on-pointerdown="(ev) => this.press(ev)"
                 t-on-click.stop="() => this.select()"
             >
                 <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />
@@ -747,9 +746,8 @@
             }"
             t-att-data-path="block.path"
             t-att-data-tag="block.tag"
-            t-att-draggable="canDrag ? 'true' : 'false'"
-            t-on-dragstart="(ev) => this.startDrag(ev)"
-            t-on-dragend="() => editor.endDrag()"
+            t-att-data-draggable="canDrag ? 'true' : 'false'"
+            t-on-pointerdown="(ev) => this.press(ev)"
             t-on-click.stop="() => this.select()"
         >
             <t t-if="mutedLine" t-call="erplibre_studio.Block.muted" />

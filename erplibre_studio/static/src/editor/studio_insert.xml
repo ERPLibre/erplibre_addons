@@ -16,7 +16,6 @@
             class="o_erplibre_studio_insert_list"
             t-att-aria-label="title"
             t-on-click.stop="stay"
-            t-on-dragstart.stop="stay"
             t-on-keydown="onRootKeydown"
         >
             <div class="o_erplibre_studio_insert_head">

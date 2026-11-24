@@ -313,7 +313,7 @@ describe("the calm canvas of a form", () => {
         ).toHaveCount(1);
         // The chatter: one collapsed line, selectable, not draggable.
         const chatter = `.o_erplibre_studio_other[data-tag=chatter]`;
-        expect(chatter).toHaveAttribute("draggable", "false");
+        expect(chatter).toHaveAttribute("data-draggable", "false");
         expect(`${chatter} > .o_erplibre_studio_chatter_line`).toHaveAttribute("aria-expanded", "false");
         expect(`${chatter} > .o_erplibre_studio_chatter_line`).toHaveText(/Chatter\s*collapsed/);
         expect(`${chatter} > .o_erplibre_studio_chatter_line`).toHaveClass("o_erplibre_studio_pick");

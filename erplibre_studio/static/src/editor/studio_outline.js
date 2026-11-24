@@ -742,11 +742,10 @@ export class StudioOutline extends Component {
         });
     }
 
-    startDrag(ev, block) {
-        this.editor.startDrag(ev, {kind: "node", path: block.path, name: block.name});
-    }
-
-    endDrag() {
-        this.editor.endDrag();
+    /** A pointerdown on a row: a block that can move arms its drag (``pressDrag``). */
+    press(ev, block) {
+        if (this.canDrag(block)) {
+            this.editor.pressDrag(ev, {kind: "node", path: block.path, name: block.name});
+        }
     }
 }

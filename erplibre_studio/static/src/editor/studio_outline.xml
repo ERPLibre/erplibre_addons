@@ -88,17 +88,16 @@
                         <i class="fa fa-fw" t-att-class="row.open ? 'fa-angle-down' : 'fa-angle-right'" aria-hidden="true" />
                     </button>
                     <span t-else="" class="o_erplibre_studio_outline_spacer" aria-hidden="true" />
-                    <!-- A div, not a button: a mousedown on a button starts no
-                         drag in Firefox. The keys are those of the row. -->
+                    <!-- A div, whose pointerdown arms the drag of the block. The
+                         keys are those of the row. -->
                     <div
                         class="btn btn-sm d-flex align-items-center gap-1 flex-grow-1 min-w-0 text-start px-1 o_erplibre_studio_outline_pick"
                         tabindex="-1"
                         t-att-class="{'fw-bold': isContainer(row.block) and !row.context}"
-                        t-att-draggable="canDrag(row.block) ? 'true' : 'false'"
                         t-att-title="rowTitle(row.block)"
                         t-on-click="() => this.pick(row.block)"
-                        t-on-dragstart="(ev) => this.startDrag(ev, row.block)"
-                        t-on-dragend="() => this.endDrag()"
+                        t-att-data-draggable="canDrag(row.block) ? 'true' : 'false'"
+                        t-on-pointerdown="(ev) => this.press(ev, row.block)"
                     >
                         <span
                             class="o_erplibre_studio_glyph"

@@ -5,6 +5,7 @@
     <t t-name="erplibre_studio.Editor">
         <div
             class="o_erplibre_studio o_action d-flex flex-column h-100 bg-view"
+            t-ref="root"
             t-att-data-view-type="viewType"
             t-att-data-space="state.space"
             t-att-data-level="state.level"
@@ -509,6 +510,7 @@
                     </aside>
                     <main
                         class="o_erplibre_studio_canvas flex-grow-1 overflow-auto p-3"
+                        t-ref="canvas"
                         t-att-class="{'o_erplibre_studio_busy': state.busy}"
                         t-on-click="onCanvasClick"
                         t-on-keydown="onCanvasKey"

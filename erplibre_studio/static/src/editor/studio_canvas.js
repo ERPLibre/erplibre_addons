@@ -64,11 +64,11 @@ import {
  * that state changes, without the props of the blocks above it changing.
  *
  * A field, a container title or another element holds its name in a
- * ``<button class="o_erplibre_studio_pick">`` inside the draggable div:
+ * ``<button class="o_erplibre_studio_pick">`` inside the div that drags:
  * the button is a tab stop, and Enter or Space on it fires a click that
  * bubbles to the ``t-on-click.stop`` of the div, which selects. The
- * button takes no pointer event (CSS), so the mouse lands on the div: a
- * mousedown on a ``<button>`` starts no drag in Firefox. What carries a
+ * button takes no pointer event (CSS), so the mouse lands on the div,
+ * whose pointerdown arms the drag (``pressDrag``). What carries a
  * tooltip (the lock, the margin dot) stays outside the button. The editor
  * reads the other keys of the button (``onCanvasKey``): Alt+Up and
  * Alt+Down move the block, Delete removes it, Escape unselects.
@@ -827,9 +827,11 @@ export class StudioBlock extends Component {
         return {comodel: field.relation};
     }
 
-    startDrag(ev) {
-        ev.stopPropagation();
-        this.editor.startDrag(ev, {kind: "node", path: this.block.path, name: this.block.name});
+    /** A pointerdown on the block: a block that can move arms its drag (``pressDrag``). */
+    press(ev) {
+        if (this.canDrag) {
+            this.editor.pressDrag(ev, {kind: "node", path: this.block.path, name: this.block.name});
+        }
     }
 
     select() {

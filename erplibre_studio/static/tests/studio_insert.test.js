@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {beforeEach, describe, expect, test} from "@odoo/hoot";
-import {manuallyDispatchProgrammaticEvent, press, queryAll, queryOne} from "@odoo/hoot-dom";
+import {press, queryAll, queryOne} from "@odoo/hoot-dom";
 import {animationFrame} from "@odoo/hoot-mock";
 import {contains, defineWebModels, getService, mountWithCleanup, onRpc} from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
@@ -469,10 +469,10 @@ describe("erplibre_studio insert without dragging", () => {
     test("no « + » in a list, during a drag or in the preview", async () => {
         await openEditor();
         expect(PLUS).not.toHaveCount(0);
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragstart");
+        const dragging = await contains(".o_erplibre_studio_new_field[data-type=date]").drag();
         await animationFrame();
         expect(PLUS).toHaveCount(0);
-        await manuallyDispatchProgrammaticEvent(queryOne(".o_erplibre_studio_new_field[data-type=date]"), "dragend");
+        await dragging.cancel();
         await animationFrame();
         expect(PLUS).not.toHaveCount(0);
     });

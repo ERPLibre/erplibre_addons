@@ -339,7 +339,7 @@ describe("an element the draft hides", () => {
         await contains(DETAILED).click();
         expect(`${row} .o_erplibre_studio_outline_tag`).toHaveText("hidden");
         expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("hidden");
-        expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("draggable", "false");
+        expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("data-draggable", "false");
         expect(getComputedStyle(queryOne(`${row} .o_erplibre_studio_outline_label`)).textDecorationLine).toBe("none");
         // The group, closed, counts the three fields left.
         const main = `.o_erplibre_studio_outline_row[data-path="${MAIN}"]`;
