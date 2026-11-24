@@ -25,14 +25,14 @@ COUNTS = {
 }
 
 REPOSITORY_REFERENCE = re.compile(
-    r"^(erplibre|erplibre-home-gnome-extension|streamdeck_game"
-    r"|erplibre_home_mobile):[^:]+::.+$"
+    r"^(erplibre|erplibre_streamdeck|erplibre-home-gnome-extension"
+    r"|streamdeck_game|erplibre_home_mobile):[^:]+::.+$"
 )
 
 # Une référence que plusieurs requis citent : un seul verdict de test doit
 # les atteindre tous.
 SHARED_REFERENCE = (
-    "erplibre:test/test_deck_lock.py::LaCommandeSousVerrou"
+    "erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou"
     "::test_a_busy_deck_runs_nothing_and_exits_two"
 )
 
@@ -168,6 +168,43 @@ class TestStreamdeckRequirementData(TransactionCase):
                     "erplibre-home-gnome-extension:test/python/"
                 )
             )
+        )
+
+    def test_deck_proofs_name_tests_of_the_deck_repository(self):
+        # Les tests du programme du deck vivent dans son propre dépôt :
+        # une preuve qui les cherche encore sous test/ d'ERPLibre ne
+        # recevrait jamais de verdict. Import tardif : le module des
+        # helpers importe celui-ci.
+        from .test_requirement_inventory import (
+            REPO_REFERENCE,
+            assert_repository_proofs_committed,
+            committed_files,
+            repository_checkout,
+        )
+
+        lines = self.requirements.test_ids.filtered(
+            lambda line: line.reference.startswith("erplibre_streamdeck:")
+        )
+        self.assertTrue(lines)
+        for line in lines:
+            self.assertEqual(line.kind, "repo_unittest", line.reference)
+            self.assertRegex(line.reference, REPO_REFERENCE)
+        deck = repository_checkout("erplibre_streamdeck")
+        if deck is None:
+            self.skipTest("no clone of the deck program in this checkout")
+        moved = {
+            "erplibre:test/%s::" % path.split("/", 1)[1]
+            for path in committed_files(deck, "tests/")
+            if re.match(r"tests/test_\w+\.py$", path)
+        }
+        self.assertTrue(moved)
+        self.assertFalse(
+            self.requirements.test_ids.filtered(
+                lambda line: line.reference.startswith(tuple(moved))
+            ).mapped("reference")
+        )
+        assert_repository_proofs_committed(
+            self, [REPO_REFERENCE.match(r) for r in lines.mapped("reference")]
         )
 
     def test_text_with_markup_characters_survives(self):

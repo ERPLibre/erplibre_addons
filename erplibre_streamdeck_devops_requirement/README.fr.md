@@ -75,9 +75,11 @@ manque*, tant que celui-ci n'est pas fait.
 
 Le test `tests/test_requirement_inventory.py` vérifie que chaque preuve
 nomme un test qui existe : un test Odoo est importé et doit tourner sous
-`--test-tags /<module>` ; dans un checkout d'ERPLibre, un test de l'extension
-ou d'ERPLibre doit figurer dans l'arbre commité de son dépôt (ce contrôle est
-sauté hors d'un checkout). Un test Node déclaré dans une boucle
+`--test-tags /<module>` ; dans un checkout d'ERPLibre, un test de l'extension,
+du programme du deck ou d'ERPLibre doit figurer dans l'arbre commité de son
+dépôt, l'extension clonée sous `script/gnome-extension/erplibre_home` et le
+programme du deck sous `script/stream_deck/deck` (ce contrôle est sauté pour
+un dépôt qui n'y est pas cloné). Un test Node déclaré dans une boucle
 `for … of` sur un tableau littéral se nomme une fois par valeur de la
 boucle ; un nom que la boucle ne produit pas n'est pas un test. Chaque test
 des cinq fichiers de test de l'inventaire d'`erplibre_streamdeck` prouve
@@ -136,7 +138,7 @@ un test d'un dépôt :
 
 | Sorte | Dépôt | Identifiant | Exemple |
 |---|---|---|---|
-| Test unitaire de dépôt | `erplibre`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Classe::méthode` | `erplibre:test/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
+| Test unitaire de dépôt | `erplibre`, `erplibre_streamdeck`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Classe::méthode` | `erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
 | Test Node | `erplibre-home-gnome-extension` | le nom du test | `erplibre-home-gnome-extension:test/unit/deck-service.test.js::restart goes through the unit only when it exists` |
 | Test long | `erplibre` | le nom du contrôle | `erplibre:long_test/install_erplibre_home.py::extension-indicators` |
 | Test Python | un module Odoo | son chemin pointé | `odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_manager_reads_the_whole_fleet` |
@@ -155,7 +157,7 @@ models.execute_kw(
     db, uid, api_key,
     "devops.requirement.test", "record_result_by_reference",
     ["repo_unittest",
-     "erplibre:test/test_deck_lock.py::LaCommandeSousVerrou"
+     "erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou"
      "::test_a_busy_deck_runs_nothing_and_exits_two",
      "passed"],
     {"log": output, "duration": 0.8},

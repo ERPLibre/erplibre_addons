@@ -15,10 +15,10 @@ from odoo.tools.translate import TranslationModuleReader
 from .test_requirement_inventory import (
     ANTI_GOAL,
     KINDS,
+    assert_repository_proofs_committed,
     committed,
     erplibre_root,
     node_test_names,
-    python_test_methods,
 )
 from .test_streamdeck_requirement_data import (
     AUDIT_ALIAS,
@@ -77,9 +77,11 @@ TO_DO = ("SD-CTL-R49",)
 ODOO = "odoo.addons.erplibre_streamdeck.tests."
 EXTENSION = "erplibre-home-gnome-extension:test/unit/"
 ERPLIBRE = "erplibre:test/test_erplibre_home_pilot.py::"
-KEYMAP = "erplibre:test/test_erplibre_streamdeck_keymap.py::"
-HOME = "erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::"
-APP = "erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::"
+# Les tests du programme du deck vivent dans son dépôt, sous tests/.
+DECK = "erplibre_streamdeck:tests/"
+KEYMAP = DECK + "test_erplibre_streamdeck_keymap.py::"
+HOME = DECK + "test_erplibre_streamdeck_home.py::LayoutAllocationTest::"
+APP = DECK + "test_erplibre_streamdeck_app.py::KeymapBuildTest::"
 KEY_LAYOUT = ODOO + "test_streamdeck_key_layout.TestStreamdeckKeyLayout."
 
 # Les tests qui tiennent les points de revue du pilotage : chacun prouve un
@@ -217,7 +219,8 @@ class TestRequirementControl(TransactionCase):
     Chaque requis porte un code `SD-CTL-R<nn>` ; chaque ligne de preuve
     nomme un test qui existe, sous la référence que pousse son lanceur :
     test Odoo par son chemin pointé, test node de l'extension et test
-    unitaire d'ERPLibre par `<dépôt>:<chemin>::<test>`.
+    unitaire d'ERPLibre ou du programme du deck par
+    `<dépôt>:<chemin>::<test>`.
     """
 
     @classmethod
@@ -398,18 +401,9 @@ class TestRequirementControl(TransactionCase):
                 self.assertIn(name, names[path])
 
     def test_erplibre_proofs_name_its_committed_tests(self):
-        root = erplibre_root()
-        if not root or not (root / ".git").exists():
-            self.skipTest("this module is not inside an ERPLibre checkout")
-        methods = {}
-        for match in self._references("repo_unittest"):
-            path, class_name, method = match.groups()
-            with self.subTest(reference=match.group(0)):
-                if path not in methods:
-                    source = committed(root, path)
-                    self.assertIsNotNone(source, "%s not committed" % path)
-                    methods[path] = python_test_methods(source)
-                self.assertIn(method, methods[path].get(class_name, ()))
+        assert_repository_proofs_committed(
+            self, self._references("repo_unittest")
+        )
 
     def test_a_done_requirement_has_a_proof_and_nothing_missing(self):
         for requirement in self.requirements:

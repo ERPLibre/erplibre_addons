@@ -15,6 +15,7 @@ MIGRATION_1_4 = "%s/migrations/18.0.1.4.0/post-migrate.py" % MODULE
 INVENTORY = "%s/data/requirement_inventory.xml" % MODULE
 CONTROL = "%s/data/requirement_control.xml" % MODULE
 MONITORING = "%s/data/requirement_monitoring.xml" % MODULE
+AUDIT_PROOFS = "%s/data/devops_requirement_test.xml" % MODULE
 # Une référence de preuve à un test qui n'existe pas, comme celle qu'une
 # base du lot 1 garde d'un test renommé depuis.
 GONE = (
@@ -201,3 +202,33 @@ class TestRequirementUpgrade(TransactionCase):
                         requirement[field], self._in_file(xmlid, field, data)
                     )
                 self.assertTrue(requirement.test_ids)
+
+    def test_an_upgrade_to_1_4_follows_the_deck_tests_to_their_repo(self):
+        # Les tests du programme du deck ont quitté test/ d'ERPLibre pour
+        # tests/ de leur dépôt : une base qui cite encore l'ancien chemin
+        # reçoit le nouveau, et une preuve d'un autre dépôt garde le sien.
+        proofs = {
+            "test_sd_ctl_r43_7": CONTROL,
+            "test_sd_service_r31_4": AUDIT_PROOFS,
+        }
+        for xmlid, data in proofs.items():
+            reference = self._in_file(xmlid, "reference", data)
+            self.assertTrue(reference.startswith("erplibre_streamdeck:"))
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {
+                    "reference": reference.replace(
+                        "erplibre_streamdeck:tests/", "erplibre:test/", 1
+                    )
+                }
+            )
+        other = self.env.ref("%s.test_sd_bundle_r05_1" % MODULE)
+        other.write({"reference": GONE})
+        self._migrate("18.0.1.3.0", MIGRATION_1_4)
+        self.env.invalidate_all()
+        for xmlid, data in proofs.items():
+            with self.subTest(xmlid=xmlid):
+                self.assertEqual(
+                    self.env.ref("%s.%s" % (MODULE, xmlid)).reference,
+                    self._in_file(xmlid, "reference", data),
+                )
+        self.assertEqual(other.reference, GONE)

@@ -2498,13 +2498,13 @@
         <field name="requirement_id" ref="req_sd_ctl_r43" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
     </record>
     <record id="test_sd_ctl_r43_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r43" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
     </record>
     <record id="test_sd_ctl_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r44" />
@@ -2666,13 +2666,13 @@
         <field name="requirement_id" ref="req_sd_ctl_r50" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_loads</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_loads</field>
     </record>
     <record id="test_sd_ctl_r50_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r50" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_valid_layout</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_valid_layout</field>
     </record>
     <record id="test_sd_ctl_r50_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r50" />
@@ -2690,37 +2690,37 @@
         <field name="requirement_id" ref="req_sd_ctl_r51" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
     </record>
     <record id="test_sd_ctl_r51_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r51" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
     </record>
     <record id="test_sd_ctl_r51_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r51" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_the_deck_s_product_id_is_used</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_the_deck_s_product_id_is_used</field>
     </record>
     <record id="test_sd_ctl_r52_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r52" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_file_is_the_literal_config_dir_s_keymap_json</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_file_is_the_literal_config_dir_s_keymap_json</field>
     </record>
     <record id="test_sd_ctl_r52_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r52" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_default_path_is_keymap_file</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_the_default_path_is_keymap_file</field>
     </record>
     <record id="test_sd_ctl_r52_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r52" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_rebuilt_kernel_reads_the_file_again</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_rebuilt_kernel_reads_the_file_again</field>
     </record>
     <record id="test_sd_ctl_r52_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r52" />
@@ -2732,31 +2732,31 @@
         <field name="requirement_id" ref="req_sd_ctl_r53" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_sixteen_models_load</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_sixteen_models_load</field>
     </record>
     <record id="test_sd_ctl_r53_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r53" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_product_id_is_four_lowercase_hex_digits</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_product_id_is_four_lowercase_hex_digits</field>
     </record>
     <record id="test_sd_ctl_r53_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r53" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_the_icon_and_label_limits_admit_what_they_name</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_the_icon_and_label_limits_admit_what_they_name</field>
     </record>
     <record id="test_sd_ctl_r53_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r53" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_label_of_sixteen_code_points_is_kept</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_label_of_sixteen_code_points_is_kept</field>
     </record>
     <record id="test_sd_ctl_r53_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r53" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unknown_fields_are_ignored</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unknown_fields_are_ignored</field>
     </record>
     <record id="test_sd_ctl_r53_6" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r53" />
@@ -2780,223 +2780,223 @@
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_bad_file_is_empty_with_one_line</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_bad_file_is_empty_with_one_line</field>
     </record>
     <record id="test_sd_ctl_r54_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_missing_file_is_empty_and_silent</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_missing_file_is_empty_and_silent</field>
     </record>
     <record id="test_sd_ctl_r54_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_directory_in_place_of_the_file_is_empty</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_directory_in_place_of_the_file_is_empty</field>
     </record>
     <record id="test_sd_ctl_r54_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_over_max_bytes_is_refused_for_its_size</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LoadTest::test_a_valid_file_over_max_bytes_is_refused_for_its_size</field>
     </record>
     <record id="test_sd_ctl_r54_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_hostile_entries_are_skipped_one_problem_each</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_hostile_entries_are_skipped_one_problem_each</field>
     </record>
     <record id="test_sd_ctl_r54_6" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_duplicate_key_or_plugin_is_skipped</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_duplicate_key_or_plugin_is_skipped</field>
     </record>
     <record id="test_sd_ctl_r54_7" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_more_entries_than_keys_keeps_the_automatic_layout</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_more_entries_than_keys_keeps_the_automatic_layout</field>
     </record>
     <record id="test_sd_ctl_r54_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_layout_without_a_keys_list_keeps_the_automatic_layout</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_layout_without_a_keys_list_keeps_the_automatic_layout</field>
     </record>
     <record id="test_sd_ctl_r54_9" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="90" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_model_absent_or_no_file_keeps_the_automatic_layout</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_model_absent_or_no_file_keeps_the_automatic_layout</field>
     </record>
     <record id="test_sd_ctl_r54_10" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="100" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_missing_or_off_plugin_leaves_its_key_empty</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_a_missing_or_off_plugin_leaves_its_key_empty</field>
     </record>
     <record id="test_sd_ctl_r54_11" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="110" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_capped_keeps_the_journal_short</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_capped_keeps_the_journal_short</field>
     </record>
     <record id="test_sd_ctl_r54_12" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="120" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_hostile_keymap_still_starts_the_deck</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_hostile_keymap_still_starts_the_deck</field>
     </record>
     <record id="test_sd_ctl_r54_13" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="130" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_control_character_labels_are_skipped_on_the_deck</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_control_character_labels_are_skipped_on_the_deck</field>
     </record>
     <record id="test_sd_ctl_r54_14" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="140" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_journal_of_a_build_is_capped</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_journal_of_a_build_is_capped</field>
     </record>
     <record id="test_sd_ctl_r54_15" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="150" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_an_off_plugin_leaves_its_named_key_empty</field>
     </record>
     <record id="test_sd_ctl_r54_16" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="160" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_another_model_is_ignored</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_the_layout_of_another_model_is_ignored</field>
     </record>
     <record id="test_sd_ctl_r54_17" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r54" />
         <field name="sequence" eval="170" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_a_named_plugin_not_loaded_leaves_its_key_empty</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_a_named_plugin_not_loaded_leaves_its_key_empty</field>
     </record>
     <record id="test_sd_ctl_r55_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_named_plugins_take_their_keys</field>
     </record>
     <record id="test_sd_ctl_r55_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_an_unnamed_plugin_gets_no_home_key</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_an_unnamed_plugin_gets_no_home_key</field>
     </record>
     <record id="test_sd_ctl_r55_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_fixtures_skip_named_keys</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_fixtures_skip_named_keys</field>
     </record>
     <record id="test_sd_ctl_r55_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_dashboard_takes_tiles_keys_first_then_free_keys</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_dashboard_takes_tiles_keys_first_then_free_keys</field>
     </record>
     <record id="test_sd_ctl_r55_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_without_a_file_the_layout_is_unchanged</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_without_a_file_the_layout_is_unchanged</field>
     </record>
     <record id="test_sd_ctl_r55_6" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_mic_poll_runs_only_while_its_fixture_holds_a_key</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_the_mic_poll_runs_only_while_its_fixture_holds_a_key</field>
     </record>
     <record id="test_sd_ctl_r55_7" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unnamed_plugins_are_reported</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::LayoutForTest::test_unnamed_plugins_are_reported</field>
     </record>
     <record id="test_sd_ctl_r55_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_without_a_file_the_layout_is_unchanged</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_without_a_file_the_layout_is_unchanged</field>
     </record>
     <record id="test_sd_ctl_r55_9" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r55" />
         <field name="sequence" eval="90" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_plugin_without_a_home_button_is_not_said_to_lack_a_key</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_app.py::KeymapBuildTest::test_a_plugin_without_a_home_button_is_not_said_to_lack_a_key</field>
     </record>
     <record id="test_sd_ctl_r56_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r56" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_home.py::LayoutAllocationTest::test_icon_and_label_replace_the_home_face_only</field>
     </record>
     <record id="test_sd_ctl_r57_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_needs_no_deck_and_no_lock</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_needs_no_deck_and_no_lock</field>
     </record>
     <record id="test_sd_ctl_r57_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_lists_plugins_with_a_home_button_icons_and_models</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_lists_plugins_with_a_home_button_icons_and_models</field>
     </record>
     <record id="test_sd_ctl_r57_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_from_the_real_library</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_from_the_real_library</field>
     </record>
     <record id="test_sd_ctl_r57_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_and_list_plugins_are_exclusive</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_catalog_and_list_plugins_are_exclusive</field>
     </record>
     <record id="test_sd_ctl_r57_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_help_names_keymap_json_and_catalog</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_help_names_keymap_json_and_catalog</field>
     </record>
     <record id="test_sd_ctl_r57_6" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_the_catalog_is_valid_for_its_own_layouts</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_the_catalog_is_valid_for_its_own_layouts</field>
     </record>
     <record id="test_sd_ctl_r57_7" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_id_the_format_cannot_name_is_left_out</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_id_the_format_cannot_name_is_left_out</field>
     </record>
     <record id="test_sd_ctl_r57_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_is_listed_by_its_file_without_being_imported</field>
     </record>
     <record id="test_sd_ctl_r57_9" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="90" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_whose_file_shows_no_home_button_is_left_out</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_an_off_plugin_whose_file_shows_no_home_button_is_left_out</field>
     </record>
     <record id="test_sd_ctl_r57_10" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r57" />
         <field name="sequence" eval="100" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_streamdeck_keymap.py::CatalogTest::test_reading_a_repo_plugin_agrees_with_importing_it</field>
+        <field name="reference">erplibre_streamdeck:tests/test_erplibre_streamdeck_keymap.py::CatalogTest::test_reading_a_repo_plugin_agrees_with_importing_it</field>
     </record>
     <record id="test_sd_ctl_r58_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_ctl_r58" />

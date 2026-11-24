@@ -74,8 +74,11 @@ that one is not done.
 The test `tests/test_requirement_inventory.py` checks that each proof names
 a test that exists: an Odoo test is imported and must run under
 `--test-tags /<module>`; inside an ERPLibre checkout, a test of the
-extension or of ERPLibre must be in the committed tree of its repository
-(that check is skipped outside a checkout). A Node test declared in a
+extension, of the deck program or of ERPLibre must be in the committed
+tree of its repository, the extension cloned under
+`script/gnome-extension/erplibre_home` and the deck program under
+`script/stream_deck/deck` (that check is skipped for a repository that is
+not cloned there). A Node test declared in a
 `for … of` loop over a literal array is named once per value of the loop;
 a name the loop does not produce is not a test. Each test of the five
 inventory test files of `erplibre_streamdeck` proves at least one
@@ -133,7 +136,7 @@ a repository:
 
 | Kind | Repository | Test id | Example |
 |---|---|---|---|
-| Repository unit test | `erplibre`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Class::method` | `erplibre:test/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
+| Repository unit test | `erplibre`, `erplibre_streamdeck`, `erplibre-home-gnome-extension`, `streamdeck_game` | `Class::method` | `erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two` |
 | Node test | `erplibre-home-gnome-extension` | the test name | `erplibre-home-gnome-extension:test/unit/deck-service.test.js::restart goes through the unit only when it exists` |
 | Long test | `erplibre` | the check name | `erplibre:long_test/install_erplibre_home.py::extension-indicators` |
 | Python test | an Odoo module | its dotted path | `odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_manager_reads_the_whole_fleet` |
@@ -152,7 +155,7 @@ models.execute_kw(
     db, uid, api_key,
     "devops.requirement.test", "record_result_by_reference",
     ["repo_unittest",
-     "erplibre:test/test_deck_lock.py::LaCommandeSousVerrou"
+     "erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou"
      "::test_a_busy_deck_runs_nothing_and_exits_two",
      "passed"],
     {"log": output, "duration": 0.8},

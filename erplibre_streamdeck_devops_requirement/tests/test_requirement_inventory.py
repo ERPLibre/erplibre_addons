@@ -40,8 +40,16 @@ NODE_REFERENCE = re.compile(
     r"^erplibre-home-gnome-extension:(test/unit/[\w.-]+\.test\.js)::(.+)$"
 )
 REPO_REFERENCE = re.compile(
-    r"^erplibre:(test/test_\w+\.py)::(\w+)::(test_\w+)$"
+    r"^(erplibre|erplibre_streamdeck):(tests?/test_\w+\.py)"
+    r"::(\w+)::(test_\w+)$"
 )
+# Le clone de chaque dépôt qu'une preuve `repo_unittest` nomme, relatif à
+# la racine du checkout ERPLibre : le programme du deck est un dépôt à
+# lui, cloné sous script/stream_deck/deck, ses tests sous tests/.
+REPOSITORIES = {
+    "erplibre": ".",
+    "erplibre_streamdeck": "script/stream_deck/deck",
+}
 KINDS = {
     "python": PYTHON_REFERENCE,
     "node_test": NODE_REFERENCE,
@@ -143,6 +151,16 @@ def erplibre_root():
     return None
 
 
+def repository_checkout(repository):
+    """Le clone de `repository` (une clé de REPOSITORIES) dans le checkout
+    ERPLibre qui porte ce module, ou None quand il n'y est pas."""
+    root = erplibre_root()
+    checkout = root and root / REPOSITORIES[repository]
+    if not checkout or not (checkout / ".git").exists():
+        return None
+    return checkout
+
+
 def committed(repository, path):
     """Le texte de `path` au HEAD du dépôt git `repository`, ou None quand
     le fichier n'y est pas commité."""
@@ -153,6 +171,26 @@ def committed(repository, path):
         check=False,
     )
     return result.stdout if result.returncode == 0 else None
+
+
+def committed_files(repository, directory):
+    """Les chemins des fichiers que le HEAD du dépôt git `repository`
+    porte directement sous `directory` (« tests/ »)."""
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "ls-tree",
+            "--name-only",
+            "HEAD",
+            directory,
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.split() if result.returncode == 0 else []
 
 
 def js_string(literal):
@@ -269,17 +307,57 @@ def node_test_names(source):
 
 
 def python_test_methods(source):
-    """{classe: {méthodes test_*}} d'un fichier de tests Python."""
+    """{classe: {méthodes test_*}} d'un fichier de tests Python, celles
+    qu'une classe hérite d'une autre classe du même fichier comprises :
+    un mixin de scénarios donne ses tests à chaque TestCase qui l'hérite."""
+    classes = {
+        node.name: node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.ClassDef)
+    }
+
+    def methods(name, seen):
+        own = {
+            item.name
+            for item in classes[name].body
+            if isinstance(item, ast.FunctionDef)
+            and item.name.startswith("test_")
+        }
+        for base in classes[name].bases:
+            if (
+                isinstance(base, ast.Name)
+                and base.id in classes
+                and base.id not in seen
+            ):
+                own |= methods(base.id, seen | {base.id})
+        return own
+
+    return {name: methods(name, {name}) for name in classes}
+
+
+def assert_repository_proofs_committed(case, matches):
+    """Chaque REPO_REFERENCE de `matches` nomme une méthode de test que
+    porte le HEAD du clone de son dépôt. Un dépôt sans clone dans ce
+    checkout saute ses preuves, et le test entier saute quand aucune n'a
+    pu être lue."""
     methods = {}
-    for node in ast.parse(source).body:
-        if isinstance(node, ast.ClassDef):
-            methods[node.name] = {
-                item.name
-                for item in node.body
-                if isinstance(item, ast.FunctionDef)
-                and item.name.startswith("test_")
-            }
-    return methods
+    read = False
+    for match in matches:
+        repository, path, class_name, method = match.groups()
+        with case.subTest(reference=match.group(0)):
+            checkout = repository_checkout(repository)
+            if checkout is None:
+                case.skipTest("no clone of %s in this checkout" % repository)
+            if (repository, path) not in methods:
+                source = committed(checkout, path)
+                case.assertIsNotNone(source, "%s not committed" % path)
+                methods[repository, path] = python_test_methods(source)
+            read = True
+            case.assertIn(
+                method, methods[repository, path].get(class_name, ())
+            )
+    if not read:
+        case.skipTest("no repository of these proofs is cloned here")
 
 
 @tagged("post_install", "-at_install")
@@ -289,7 +367,8 @@ class TestRequirementInventory(TransactionCase):
     Chaque requis porte un code `SD-INV-R<nn>` ; chaque ligne de preuve
     nomme un test qui existe, sous la référence que pousse son lanceur :
     test Odoo par son chemin pointé, test node de l'extension et test
-    unitaire d'ERPLibre par `<dépôt>:<chemin>::<test>`.
+    unitaire d'ERPLibre ou du programme du deck par
+    `<dépôt>:<chemin>::<test>`.
     """
 
     @classmethod
@@ -418,18 +497,9 @@ class TestRequirementInventory(TransactionCase):
         self.assertEqual(node_test_names(source), set())
 
     def test_erplibre_proofs_name_its_committed_tests(self):
-        root = erplibre_root()
-        if not root or not (root / ".git").exists():
-            self.skipTest("this module is not inside an ERPLibre checkout")
-        methods = {}
-        for match in self._references("repo_unittest"):
-            path, class_name, method = match.groups()
-            with self.subTest(reference=match.group(0)):
-                if path not in methods:
-                    source = committed(root, path)
-                    self.assertIsNotNone(source, "%s not committed" % path)
-                    methods[path] = python_test_methods(source)
-                self.assertIn(method, methods[path].get(class_name, ()))
+        assert_repository_proofs_committed(
+            self, self._references("repo_unittest")
+        )
 
     def test_a_done_requirement_has_a_proof_and_nothing_missing(self):
         for requirement in self.requirements:
