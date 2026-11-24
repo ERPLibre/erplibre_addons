@@ -4317,7 +4317,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r56" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard</field>
     </record>
     <record id="test_sd_grepo_r56_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r56" />
@@ -4527,13 +4527,13 @@
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="290" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover</field>
     </record>
     <record id="test_sd_grepo_r64_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r64" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_game_targets_are_the_games_of_the_clone</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_games_target_lists_the_games_of_the_clone</field>
     </record>
     <record id="test_sd_grepo_r64_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r64" />
@@ -4647,7 +4647,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r88" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover</field>
     </record>
     <record id="test_sd_grepo_r88_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r88" />
@@ -4749,7 +4749,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r93" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard</field>
     </record>
     <record id="test_sd_grepo_r94_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r94" />
@@ -4905,13 +4905,13 @@
         <field name="requirement_id" ref="req_sd_gsplit_r19" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover</field>
     </record>
     <record id="test_sd_gsplit_r19_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r19" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_game_targets_are_the_games_of_the_clone</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_games_target_lists_the_games_of_the_clone</field>
     </record>
     <record id="test_sd_gsplit_r21_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r21" />
@@ -5217,7 +5217,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r41" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard</field>
     </record>
     <record id="test_sd_gsplit_r42_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r42" />
@@ -9802,6 +9802,18 @@
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestServiceRetire::test_a_failing_systemctl_still_removes_the_files</field>
+    </record>
+    <record id="test_sd_service_r82_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r82" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover</field>
+    </record>
+    <record id="test_sd_service_r82_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_service_r82" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_dry_run_hands_the_game_over_after_the_guard</field>
     </record>
     <record id="test_sd_service_r84_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r84" />

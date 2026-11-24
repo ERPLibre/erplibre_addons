@@ -305,7 +305,6 @@ class TestStreamdeckRequirementData(TransactionCase):
             "SD-MOBPLUG-R90",
             "SD-RENAME-R44",
             "SD-SERVICE-R81",
-            "SD-SERVICE-R82",
             "SD-DEPLOY-R126",
         ):
             requirement = self._requirement(code)

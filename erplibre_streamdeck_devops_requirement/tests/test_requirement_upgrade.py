@@ -461,6 +461,78 @@ class TestRequirementUpgrade(TransactionCase):
         self.assertEqual(named.with_context(lang="en_US").name, name)
         self.assertEqual(named.with_context(lang="fr_CA").name, french[name])
 
+    def test_an_upgrade_to_1_5_follows_the_pattern_rule_of_the_games(self):
+        # ERPLibre lance chaque jeu par une seule règle à motif, à travers
+        # la passation : une base de la version 18.0.1.4.0 cite les tests
+        # make d'une cible par jeu. La preuve suit le test renommé, le texte
+        # d'un requis aussi, retouche gardée, et le risque ouvert que la
+        # règle ferme devient fait, ses preuves posées, dans les deux
+        # langues.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        former = (
+            "erplibre:test/test_streamdeck_entry_points.py::"
+            "TestMakefileUsesTheVenv::"
+            "test_every_game_target_requires_the_games_guard"
+        )
+        proof = self.env.ref("%s.test_sd_grepo_r56_2" % MODULE)
+        proof.write({"reference": former})
+        cited = self.env.ref("%s.req_sd_grepo_r93" % MODULE)
+        text = self._in_file("req_sd_grepo_r93", "achievement", REQUIREMENTS)
+        current = former.replace(
+            "test_every_game_target_requires_the_games_guard",
+            "test_one_pattern_rule_runs_every_game_behind_the_guard",
+        )
+        self.assertIn(current, text)
+        cited.write(
+            {"achievement": text.replace(current, former) + " Edited by hand."}
+        )
+        risk = self.env.ref("%s.req_sd_service_r82" % MODULE)
+        risk.with_context(lang="en_US").write(
+            {
+                "name": "Open risk: make streamdeck_<game> skips the"
+                " hand-over and takes no lock",
+                "done": False,
+                "achievement": "Stated in the install guide.",
+                "missing": "Open risk: a game target runs the game directly.",
+                "notes": "Origin: documented only.",
+            }
+        )
+        risk.with_context(lang="fr_CA").write(
+            {
+                "name": "Risque ouvert : make streamdeck_<game> contourne la"
+                " passation et ne prend aucun verrou"
+            }
+        )
+        self.env.ref("%s.test_sd_service_r82_1" % MODULE).unlink()
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        self.assertEqual(
+            proof.reference,
+            self._in_file("test_sd_grepo_r56_2", "reference", AUDIT_PROOFS),
+        )
+        self.assertEqual(cited.achievement, text + " Edited by hand.")
+        name = self._in_file("req_sd_service_r82", "name", REQUIREMENTS)
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        self.assertEqual(risk.with_context(lang="en_US").name, name)
+        self.assertEqual(risk.with_context(lang="fr_CA").name, french[name])
+        self.assertTrue(risk.done)
+        self.assertFalse(risk.missing)
+        for field in ("achievement", "notes"):
+            self.assertEqual(
+                risk[field],
+                self._in_file("req_sd_service_r82", field, REQUIREMENTS),
+            )
+        restored = self.env.ref("%s.test_sd_service_r82_1" % MODULE)
+        self.assertEqual(restored.requirement_id, risk)
+        self.assertEqual(
+            restored.reference,
+            self._in_file("test_sd_service_r82_1", "reference", AUDIT_PROOFS),
+        )
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

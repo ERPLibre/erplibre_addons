@@ -6342,7 +6342,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_missing_games_stop_the_game_and_gallery_targets; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_deck_tools_are_never_gated</field>
+        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_missing_games_stop_the_game_and_gallery_targets; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_deck_tools_are_never_gated</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r57" model="devops.requirement">
@@ -6446,7 +6446,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_repo.py::LesVraisScans (both tests); erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_game_targets_are_the_games_of_the_clone; all skipped when the games clone is absent.</field>
+        <field name="achievement">erplibre:test/test_streamdeck_games_repo.py::LesVraisScans (both tests); erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_games_target_lists_the_games_of_the_clone; all skipped when the games clone is absent.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r65" model="devops.requirement">
@@ -6755,7 +6755,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">The setUp of erplibre:test/test_streamdeck_games_repo.py::LeManifeste (path); erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_games_cli_witness_is_the_one_of_the_checkout; erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it; erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make; erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
+        <field name="achievement">The setUp of erplibre:test/test_streamdeck_games_repo.py::LeManifeste (path); erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_games_cli_witness_is_the_one_of_the_checkout; erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover; erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make; erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r89" model="devops.requirement">
@@ -6822,7 +6822,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_games_off_stops_a_game_target_with_the_message; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard</field>
+        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_games_off_stops_a_game_target_with_the_message; erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r94" model="devops.requirement">
@@ -7072,7 +7072,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it, and erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_the_game_targets_are_the_games_of_the_clone when the games clone is present.</field>
+        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover, and erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_games_target_lists_the_games_of_the_clone when the games clone is present.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r21" model="devops.requirement">
@@ -7327,7 +7327,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">streamdeck_games_guard in erplibre:conf/make.streamdeck.Makefile. erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_games_off_stops_a_game_target_with_the_message and erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_every_game_target_requires_the_games_guard.</field>
+        <field name="achievement">streamdeck_games_guard in erplibre:conf/make.streamdeck.Makefile. erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_games_off_stops_a_game_target_with_the_message and erplibre:test/test_streamdeck_entry_points.py::TestMakefileUsesTheVenv::test_one_pattern_rule_runs_every_game_behind_the_guard.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r42" model="devops.requirement">
@@ -12489,18 +12489,17 @@ The games and the gallery live in the streamdeck_game repository.</field>
     </record>
     <record id="req_sd_service_r82" model="devops.requirement">
         <field name="code">SD-SERVICE-R82</field>
-        <field name="name">Open risk: make streamdeck_&lt;game&gt; skips the hand-over and takes no lock</field>
+        <field name="name">make streamdeck_&lt;game&gt; runs the game through the hand-over, which stops the service and holds the lock</field>
         <field name="category_id" ref="cat_sd_service" />
         <field name="sequence" eval="860" />
         <field name="moscow">should</field>
         <field name="requirement_type">non_functional</field>
-        <field name="devsecops_stage">plan</field>
+        <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">Stated in erplibre:script/stream_deck/INSTALL.base.md (The deck service).</field>
-        <field name="missing">Open risk: the make streamdeck_&lt;game&gt; targets of erplibre:conf/make.streamdeck.Makefile run $(STREAMDECK_PY) script/stream_deck/games/game_&lt;id&gt;.py directly, and no game of streamdeck_game imports deck_lock: such a game neither stops the service nor takes the lock.</field>
-        <field name="notes">Origin: documented only.</field>
+        <field name="done" eval="True" />
+        <field name="achievement">The streamdeck_% pattern rule of erplibre:conf/make.streamdeck.Makefile runs script/stream_deck/games/game_&lt;id&gt;.py through erplibre:script/install/erplibre_home_streamdeck_handover.sh. erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_game_runs_under_the_venv_through_the_handover and erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_dry_run_hands_the_game_over_after_the_guard.</field>
+        <field name="notes">Origin: documented only; a unit test pins it.</field>
     </record>
     <record id="req_sd_service_r83" model="devops.requirement">
         <field name="code">SD-SERVICE-R83</field>

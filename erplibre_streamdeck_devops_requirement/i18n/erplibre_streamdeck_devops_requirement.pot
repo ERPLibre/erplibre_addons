@@ -3647,7 +3647,8 @@ msgstr ""
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r82
 msgid ""
-"Open risk: make streamdeck_<game> skips the hand-over and takes no lock"
+"make streamdeck_<game> runs the game through the hand-over, which stops the "
+"service and holds the lock"
 msgstr ""
 
 #. module: erplibre_streamdeck_devops_requirement

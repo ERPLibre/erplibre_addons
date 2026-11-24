@@ -15,9 +15,10 @@ this script fills them from the new texts, and a citing field that the
 file no longer carries is emptied. The proofs of DELETED, whose test no
 repository holds any more, are removed.
 
-The text of a requirement names the deck tests and the hand-over too.
-Its citations of them are rewritten in place, by DECK_CITATION and
-HANDOVER_CITATION: the rest of the text, a hand edit included, stays.
+The text of a requirement names the deck tests, the hand-over and the
+make tests of the game targets too. Its citations of them are rewritten
+in place, by DECK_CITATION, HANDOVER_CITATION and MAKE_CITATION: the rest
+of the text, a hand edit included, stays.
 """
 
 import copy
@@ -70,6 +71,19 @@ REWRITTEN = {
         "test_sd_plugin_r117_5",
         "test_sd_rename_r28_1",
         "test_sd_service_r61_1",
+        # ERPLibre runs every game by one streamdeck_% pattern rule, which
+        # renamed the make tests of the game targets.
+        "test_sd_grepo_r56_2",
+        "test_sd_grepo_r62_29",
+        "test_sd_grepo_r64_1",
+        "test_sd_grepo_r88_2",
+        "test_sd_grepo_r93_2",
+        "test_sd_gsplit_r19_1",
+        "test_sd_gsplit_r19_2",
+        "test_sd_gsplit_r41_2",
+        # The proofs of SD-SERVICE-R82, new in this version.
+        "test_sd_service_r82_1",
+        "test_sd_service_r82_2",
     ),
     "data/devops_requirement.xml": (
         "req_sd_bundle_r05",
@@ -105,6 +119,9 @@ REWRITTEN = {
         "req_sd_plugin_r88",
         "req_sd_rename_r28",
         "req_sd_service_r61",
+        # An open risk that the streamdeck_% pattern rule closes: make runs
+        # every game through the hand-over.
+        "req_sd_service_r82",
     ),
 }
 
@@ -181,6 +198,31 @@ HANDOVER_CITATION = re.compile(
     r"(?<![\w-])((?:erplibre:)?(?:script/install/|test/test_))"
     r"erplibre_home_handover(?=\.(?:sh|py)\b)"
 )
+# The make tests of the game targets, former name -> name since the
+# streamdeck_% pattern rule replaced one target per game.
+MAKE_TESTS = {
+    "TestMakefileUsesTheVenv::"
+    "test_every_game_target_requires_the_games_guard": (
+        "TestMakefileUsesTheVenv::"
+        "test_one_pattern_rule_runs_every_game_behind_the_guard"
+    ),
+    "TestMakefileGuard::test_a_present_venv_runs_the_game_under_it": (
+        "TestMakefileGuard::"
+        "test_a_game_runs_under_the_venv_through_the_handover"
+    ),
+    "TestMakefileUsesTheVenv::"
+    "test_the_game_targets_are_the_games_of_the_clone": (
+        "TestMakefileGuard::"
+        "test_the_games_target_lists_the_games_of_the_clone"
+    ),
+}
+# A citation, in the text of a requirement, of one of MAKE_TESTS under its
+# former name.
+MAKE_CITATION = re.compile(
+    r"(?<![\w-])(erplibre:test/test_streamdeck_entry_points\.py::)("
+    + "|".join(re.escape(name) for name in MAKE_TESTS)
+    + r")(?!\w)"
+)
 # The text fields of a requirement that cite tests; neither is translated.
 CITING_FIELDS = ("achievement", "missing")
 
@@ -247,10 +289,15 @@ def _handover_path(match):
     return "%serplibre_home_streamdeck_handover" % match.group(1)
 
 
+def _make_test(match):
+    """The citation of MAKE_CITATION `match` under the test's new name."""
+    return match.group(1) + MAKE_TESTS[match.group(2)]
+
+
 def _follow_citations(env):
-    """Rewrite each DECK_CITATION and HANDOVER_CITATION in the
-    CITING_FIELDS of the requirements of this module; a text without one
-    is not written."""
+    """Rewrite each DECK_CITATION, HANDOVER_CITATION and MAKE_CITATION in
+    the CITING_FIELDS of the requirements of this module; a text without
+    one is not written."""
     ids = (
         env["ir.model.data"]
         .search(
@@ -265,6 +312,7 @@ def _follow_citations(env):
             if text:
                 rewritten = DECK_CITATION.sub(_deck_path, text)
                 rewritten = HANDOVER_CITATION.sub(_handover_path, rewritten)
+                rewritten = MAKE_CITATION.sub(_make_test, rewritten)
                 if rewritten != text:
                     values[name] = rewritten
         if values:
