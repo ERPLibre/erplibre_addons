@@ -2559,7 +2559,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_command_hands_the_deck_over_to_the_streamdeck_venv, ::test_the_command_really_runs_the_game (the command goes through erplibre:script/install/erplibre_home_handover.sh)</field>
+        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_command_hands_the_deck_over_to_the_streamdeck_venv, ::test_the_command_really_runs_the_game (the command goes through erplibre:script/install/erplibre_home_streamdeck_handover.sh)</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_deploy_r21" model="devops.requirement">
@@ -5758,7 +5758,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r08" model="devops.requirement">
@@ -5771,7 +5771,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play; erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (exit code 7 passed through)</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play; erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (exit code 7 passed through)</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r09" model="devops.requirement">
@@ -5784,7 +5784,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r11" model="devops.requirement">
@@ -5869,7 +5869,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
     </record>
     <record id="req_sd_grepo_r17" model="devops.requirement">
         <field name="code">SD-GREPO-R17</field>
-        <field name="name">Inside ERPLibre the gallery launches every game through script/install/erplibre_home_handover.sh</field>
+        <field name="name">Inside ERPLibre the gallery launches every game through script/install/erplibre_home_streamdeck_handover.sh</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="170" />
         <field name="moscow">must</field>
@@ -5903,7 +5903,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything; erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything; erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r20" model="devops.requirement">
@@ -6329,7 +6329,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything (exact line); erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_missing_games_stop_the_game_and_gallery_targets</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything (exact line); erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_missing_games_stop_the_game_and_gallery_targets</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r56" model="devops.requirement">
@@ -6368,7 +6368,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r59" model="devops.requirement">
@@ -6420,7 +6420,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/streamdeck_checkout.py serves Passation (erplibre:test/test_erplibre_home_handover.py), TestMakefileGuard and TestTodoGamesLauncher::test_the_command_really_runs_the_game (erplibre:test/test_streamdeck_entry_points.py). The tests with an absent games/ are those of SD-GREPO-R55 to SD-GREPO-R58.</field>
+        <field name="achievement">erplibre:test/streamdeck_checkout.py serves Passation (erplibre:test/test_erplibre_home_streamdeck_handover.py), TestMakefileGuard and TestTodoGamesLauncher::test_the_command_really_runs_the_game (erplibre:test/test_streamdeck_entry_points.py). The tests with an absent games/ are those of SD-GREPO-R55 to SD-GREPO-R58.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r63" model="devops.requirement">
@@ -7198,7 +7198,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_service.py::LesJeux::test_xdg_config_home_wins and erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home.</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_service.py::LesJeux::test_xdg_config_home_wins and erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r32" model="devops.requirement">
@@ -7352,7 +7352,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:script/install/erplibre_home_handover.sh checks deck_games_enabled before it touches the service. erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything fails when only off is refused.</field>
+        <field name="achievement">erplibre:script/install/erplibre_home_streamdeck_handover.sh checks deck_games_enabled before it touches the service. erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything fails when only off is refused.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r44" model="devops.requirement">
@@ -7377,7 +7377,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play, where a game's exit code 7 comes back, and erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything.</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play, where a game's exit code 7 comes back, and erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r46" model="devops.requirement">
@@ -7542,7 +7542,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_service.py::LesJeux::test_on_off_missing_and_unknown, and erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play with a file that holds only DECK_PROGRAM.</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_service.py::LesJeux::test_on_off_missing_and_unknown, and erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play with a file that holds only DECK_PROGRAM.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_gsplit_r74" model="devops.requirement">
@@ -7715,7 +7715,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:script/install/erplibre_home_handover.sh states that codes 4 and 5 can also come from the game and that the stderr line is the reliable signal.</field>
+        <field name="achievement">erplibre:script/install/erplibre_home_streamdeck_handover.sh states that codes 4 and 5 can also come from the game and that the stderr line is the reliable signal.</field>
         <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_gsplit_r75" model="devops.requirement">
@@ -11433,7 +11433,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_deck.py::LesReglages::test_xdg_config_home_wins_over_dot_config; erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home; erplibre:test/test_erplibre_home_service.py::LaLecture::test_python_and_the_shell_library_read_the_same_value; erplibre:test/test_erplibre_home_service.py::LEcriture::test_python_and_the_installer_write_the_same_text</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_deck.py::LesReglages::test_xdg_config_home_wins_over_dot_config; erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home; erplibre:test/test_erplibre_home_service.py::LaLecture::test_python_and_the_shell_library_read_the_same_value; erplibre:test/test_erplibre_home_service.py::LEcriture::test_python_and_the_installer_write_the_same_text</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r03" model="devops.requirement">
@@ -11500,7 +11500,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again, test_restart_after_game_no_leaves_it_stopped; erplibre:test/test_install_erplibre_home.py::LesOptionsDuService::test_the_defaults_write_unit_and_settings_without_enabling</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again, test_restart_after_game_no_leaves_it_stopped; erplibre:test/test_install_erplibre_home.py::LesOptionsDuService::test_the_defaults_write_unit_and_settings_without_enabling</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r07" model="devops.requirement">
@@ -11826,7 +11826,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again, test_a_unit_waiting_to_restart_is_stopped_too, test_a_stopped_unit_stays_stopped, test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again, test_a_unit_waiting_to_restart_is_stopped_too, test_a_stopped_unit_stays_stopped, test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r31" model="devops.requirement">
@@ -11839,7 +11839,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game, test_a_deck_held_elsewhere_runs_no_game; erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_the_command_runs_under_the_lock_as_game, test_a_busy_deck_runs_nothing_and_exits_two</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game, test_a_deck_held_elsewhere_runs_no_game; erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_the_command_runs_under_the_lock_as_game, test_a_busy_deck_runs_nothing_and_exits_two</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r32" model="devops.requirement">
@@ -11852,7 +11852,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (exact call order), test_restart_after_game_no_leaves_it_stopped, test_the_setting_is_read_after_the_game</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (exact call order), test_restart_after_game_no_leaves_it_stopped, test_the_setting_is_read_after_the_game</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r33" model="devops.requirement">
@@ -11865,7 +11865,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line, test_a_warning_before_not_loaded_stays_visible, test_another_reset_failure_stays_visible</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line, test_a_warning_before_not_loaded_stays_visible, test_another_reset_failure_stays_visible</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r34" model="devops.requirement">
@@ -11878,7 +11878,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (rc 7), test_an_interrupted_game_still_gives_the_deck_back (130/143); erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_the_exit_code_and_a_signal_pass_through (generic pass-through; no code path special-cases 2)</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again (rc 7), test_an_interrupted_game_still_gives_the_deck_back (130/143); erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_the_exit_code_and_a_signal_pass_through (generic pass-through; no code path special-cases 2)</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r35" model="devops.requirement">
@@ -11891,7 +11891,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_unit_only_the_command_runs (journal == ['jeu'])</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_unit_only_the_command_runs (journal == ['jeu'])</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r36" model="devops.requirement">
@@ -11997,7 +11997,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre_streamdeck:tests/test_deck_lock.py::LesCiblesDuSignal::test_sigterm_reaches_every_live_descendant, test_sigint_spares_the_terminal_foreground, test_without_a_terminal_sigint_reaches_everyone; erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_a_signal_reaches_a_game_under_a_shell, test_a_stopped_game_still_ends_on_sigterm, test_sigterm_to_the_wrapper_ends_the_game; erplibre:test/test_erplibre_home_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back, test_sigterm_to_the_script_alone_lets_the_game_finish</field>
+        <field name="achievement">erplibre_streamdeck:tests/test_deck_lock.py::LesCiblesDuSignal::test_sigterm_reaches_every_live_descendant, test_sigint_spares_the_terminal_foreground, test_without_a_terminal_sigint_reaches_everyone; erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_a_signal_reaches_a_game_under_a_shell, test_a_stopped_game_still_ends_on_sigterm, test_sigterm_to_the_wrapper_ends_the_game; erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back, test_sigterm_to_the_script_alone_lets_the_game_finish</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r44" model="devops.requirement">
@@ -12540,7 +12540,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again asserts the exact systemctl call list (is-active, stop, game, reset-failed, start): an extra show call fails it</field>
+        <field name="achievement">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again asserts the exact systemctl call list (is-active, stop, game, reset-failed, start): an extra show call fails it</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r86" model="devops.requirement">
@@ -12579,7 +12579,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="False" />
-        <field name="missing">Nothing refuses an unknown RESTART_AFTER_GAME, and its readers disagree: erplibre:script/install/erplibre_home_handover.sh restarts only on 'yes' ('Yes' reads as no, and the service stays down after a game), while _erplibre_home_streamdeck_options in erplibre:script/todo/streamdeck_menu.py offers '(Y/n)' for anything but 'no' (reads as yes). diagnosis_lines in erplibre:script/todo/erplibre_home_status.py flags an unknown DECK_PROGRAM or GAMES but not this key. The refusal is tied to the entry point, which never reads this key, so which reader owns the check is open; minor.</field>
+        <field name="missing">Nothing refuses an unknown RESTART_AFTER_GAME, and its readers disagree: erplibre:script/install/erplibre_home_streamdeck_handover.sh restarts only on 'yes' ('Yes' reads as no, and the service stays down after a game), while _erplibre_home_streamdeck_options in erplibre:script/todo/streamdeck_menu.py offers '(Y/n)' for anything but 'no' (reads as yes). diagnosis_lines in erplibre:script/todo/erplibre_home_status.py flags an unknown DECK_PROGRAM or GAMES but not this key. The refusal is tied to the entry point, which never reads this key, so which reader owns the check is open; minor.</field>
         <field name="notes">Origin: violated.</field>
     </record>
 </odoo>

@@ -3557,10 +3557,10 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r17
 msgid ""
 "Inside ERPLibre the gallery launches every game through "
-"script/install/erplibre_home_handover.sh"
+"script/install/erplibre_home_streamdeck_handover.sh"
 msgstr ""
 "Dans ERPLibre, la galerie lance chaque jeu par "
-"script/install/erplibre_home_handover.sh"
+"script/install/erplibre_home_streamdeck_handover.sh"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r16

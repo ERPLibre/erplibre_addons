@@ -15,9 +15,9 @@ this script fills them from the new texts, and a citing field that the
 file no longer carries is emptied. The proofs of DELETED, whose test no
 repository holds any more, are removed.
 
-The text of a requirement names the deck tests too. Its citations of
-them are rewritten in place, by DECK_CITATION: the rest of the text, a
-hand edit included, stays.
+The text of a requirement names the deck tests and the hand-over too.
+Its citations of them are rewritten in place, by DECK_CITATION and
+HANDOVER_CITATION: the rest of the text, a hand edit included, stays.
 """
 
 import copy
@@ -76,6 +76,8 @@ REWRITTEN = {
         "req_sd_bundle_r05b",
         "req_sd_deploy_r45",
         "req_sd_deploy_r56",
+        # Its name cites the hand-over, which ERPLibre renamed.
+        "req_sd_grepo_r17",
         "req_sd_grepo_r37",
         "req_sd_grepo_r39",
         "req_sd_grepo_r40",
@@ -149,11 +151,15 @@ DELETED = (
 
 # Reference prefix -> data files whose proofs citing it are loaded again:
 # the tests of the deck program live in their own repository since this
-# version, so a proof that names one changed its reference.
+# version, and the test of ERPLibre's hand-over follows the script's new
+# name, so a proof that names one changed its reference.
 MOVED = {
     "erplibre_streamdeck:": (
         "data/devops_requirement_test.xml",
         "data/requirement_control.xml",
+    ),
+    "erplibre:test/test_erplibre_home_streamdeck_handover.py": (
+        "data/devops_requirement_test.xml",
     ),
 }
 
@@ -167,6 +173,13 @@ DECK_CITATION = re.compile(
     r"|streamdeck_stubs\.py|fixtures/erplibre_streamdeck/"
     r"|test_streamdeck_entry_points\.py(?=::(?:TestRequirements"
     r"|TestTilerCommandLine|TestControllerCommandLine)\b))"
+)
+# A citation, in the text of a requirement, of ERPLibre's hand-over or of
+# its test under their former name, erplibre_home_handover: both carry
+# the name of the service they stop, erplibre_home_streamdeck_handover.
+HANDOVER_CITATION = re.compile(
+    r"(?<![\w-])((?:erplibre:)?(?:script/install/|test/test_))"
+    r"erplibre_home_handover(?=\.(?:sh|py)\b)"
 )
 # The text fields of a requirement that cite tests; neither is translated.
 CITING_FIELDS = ("achievement", "missing")
@@ -197,7 +210,7 @@ def migrate(cr, version):
         proof = env.ref("%s.%s" % (MODULE, xmlid), raise_if_not_found=False)
         if proof:
             proof.unlink()
-    _follow_deck_citations(env)
+    _follow_citations(env)
 
 
 def _cites(record, prefixes):
@@ -229,9 +242,15 @@ def _deck_path(match):
     return "erplibre_streamdeck:tests/%s" % path
 
 
-def _follow_deck_citations(env):
-    """Rewrite each DECK_CITATION in the CITING_FIELDS of the requirements
-    of this module; a text without one is not written."""
+def _handover_path(match):
+    """The citation of HANDOVER_CITATION `match` under the new name."""
+    return "%serplibre_home_streamdeck_handover" % match.group(1)
+
+
+def _follow_citations(env):
+    """Rewrite each DECK_CITATION and HANDOVER_CITATION in the
+    CITING_FIELDS of the requirements of this module; a text without one
+    is not written."""
     ids = (
         env["ir.model.data"]
         .search(
@@ -245,6 +264,7 @@ def _follow_deck_citations(env):
             text = requirement[name]
             if text:
                 rewritten = DECK_CITATION.sub(_deck_path, text)
+                rewritten = HANDOVER_CITATION.sub(_handover_path, rewritten)
                 if rewritten != text:
                     values[name] = rewritten
         if values:

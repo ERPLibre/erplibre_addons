@@ -410,6 +410,57 @@ class TestRequirementUpgrade(TransactionCase):
                 self._in_file("req_sd_grepo_r43", field, REQUIREMENTS),
             )
 
+    def test_an_upgrade_to_1_5_follows_the_renamed_hand_over(self):
+        # La passation d'ERPLibre et son test portent le nom du service
+        # qu'ils arrêtent : une base de la version 18.0.1.4.0 qui cite
+        # l'ancien nom reçoit le nouveau, dans la référence d'une preuve,
+        # le texte d'un requis, retouche gardée, et son nom, dans les deux
+        # langues.
+        self.env["res.lang"]._activate_lang("fr_CA")
+
+        def former(text):
+            return text.replace(
+                "erplibre_home_streamdeck_handover", "erplibre_home_handover"
+            )
+
+        proof = self.env.ref("%s.test_sd_service_r31_1" % MODULE)
+        reference = self._in_file(
+            "test_sd_service_r31_1", "reference", AUDIT_PROOFS
+        )
+        self.assertIn("test_erplibre_home_streamdeck_handover.py", reference)
+        proof.write({"reference": former(reference)})
+        cases = (
+            ("req_sd_gsplit_r43", "achievement", " Edited by hand."),
+            ("req_sd_service_r88", "missing", ""),
+        )
+        for xmlid, field, edit in cases:
+            text = self._in_file(xmlid, field, REQUIREMENTS)
+            self.assertIn("erplibre_home_streamdeck_handover", text)
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {field: former(text) + edit}
+            )
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        named = self.env.ref("%s.req_sd_grepo_r17" % MODULE)
+        name = self._in_file("req_sd_grepo_r17", "name", REQUIREMENTS)
+        self.assertIn("erplibre_home_streamdeck_handover", french[name])
+        named.with_context(lang="en_US").write({"name": former(name)})
+        named.with_context(lang="fr_CA").write({"name": former(french[name])})
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        self.assertEqual(proof.reference, reference)
+        for xmlid, field, edit in cases:
+            with self.subTest(xmlid=xmlid):
+                self.assertEqual(
+                    self.env.ref("%s.%s" % (MODULE, xmlid))[field],
+                    self._in_file(xmlid, field, REQUIREMENTS) + edit,
+                )
+        self.assertEqual(named.with_context(lang="en_US").name, name)
+        self.assertEqual(named.with_context(lang="fr_CA").name, french[name])
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

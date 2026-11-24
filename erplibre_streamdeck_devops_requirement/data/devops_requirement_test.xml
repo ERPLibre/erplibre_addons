@@ -3939,25 +3939,25 @@
         <field name="requirement_id" ref="req_sd_grepo_r07" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
     </record>
     <record id="test_sd_grepo_r08_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r08" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play</field>
     </record>
     <record id="test_sd_grepo_r08_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r08" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_grepo_r09_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r09" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
     </record>
     <record id="test_sd_grepo_r11_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r11" />
@@ -4119,13 +4119,13 @@
         <field name="requirement_id" ref="req_sd_grepo_r19" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_grepo_r19_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r19" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home</field>
     </record>
     <record id="test_sd_grepo_r20_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r20" />
@@ -4299,7 +4299,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r55" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_grepo_r55_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r55" />
@@ -4341,7 +4341,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r58" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_grepo_r59_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r59" />
@@ -4365,121 +4365,121 @@
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_grepo_r62_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line</field>
     </record>
     <record id="test_sd_grepo_r62_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_warning_before_not_loaded_stays_visible</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_warning_before_not_loaded_stays_visible</field>
     </record>
     <record id="test_sd_grepo_r62_5" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_another_reset_failure_stays_visible</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_another_reset_failure_stays_visible</field>
     </record>
     <record id="test_sd_grepo_r62_6" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_unit_waiting_to_restart_is_stopped_too</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_unit_waiting_to_restart_is_stopped_too</field>
     </record>
     <record id="test_sd_grepo_r62_7" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_stopped_unit_stays_stopped</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_stopped_unit_stays_stopped</field>
     </record>
     <record id="test_sd_grepo_r62_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
     </record>
     <record id="test_sd_grepo_r62_9" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="90" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_setting_is_read_after_the_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_setting_is_read_after_the_game</field>
     </record>
     <record id="test_sd_grepo_r62_10" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="100" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_unit_only_the_command_runs</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_unit_only_the_command_runs</field>
     </record>
     <record id="test_sd_grepo_r62_11" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="110" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
     </record>
     <record id="test_sd_grepo_r62_12" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="120" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
     </record>
     <record id="test_sd_grepo_r62_13" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="130" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
     </record>
     <record id="test_sd_grepo_r62_14" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="140" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_sigterm_to_the_script_alone_lets_the_game_finish</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_sigterm_to_the_script_alone_lets_the_game_finish</field>
     </record>
     <record id="test_sd_grepo_r62_15" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="150" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
     </record>
     <record id="test_sd_grepo_r62_16" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="160" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_grepo_r62_17" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="170" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play</field>
     </record>
     <record id="test_sd_grepo_r62_18" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="180" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_games_it_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_grepo_r62_19" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="190" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home</field>
     </record>
     <record id="test_sd_grepo_r62_20" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="200" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_no_command_is_a_usage_error</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_no_command_is_a_usage_error</field>
     </record>
     <record id="test_sd_grepo_r62_21" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="210" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_no_command_is_a_usage_error_even_with_games_off</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_no_command_is_a_usage_error_even_with_games_off</field>
     </record>
     <record id="test_sd_grepo_r62_22" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
@@ -4977,7 +4977,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r31" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home</field>
     </record>
     <record id="test_sd_gsplit_r32_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r32" />
@@ -5229,25 +5229,25 @@
         <field name="requirement_id" ref="req_sd_gsplit_r43" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_gsplit_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r44" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_no_command_is_a_usage_error_even_with_games_off</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_no_command_is_a_usage_error_even_with_games_off</field>
     </record>
     <record id="test_sd_gsplit_r45_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r45" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play</field>
     </record>
     <record id="test_sd_gsplit_r45_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r45" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_off_refuses_before_stopping_anything</field>
     </record>
     <record id="test_sd_gsplit_r46_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r46" />
@@ -5427,7 +5427,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r54" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_games_on_or_missing_still_play</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_games_on_or_missing_still_play</field>
     </record>
     <record id="test_sd_gsplit_r74_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r74" />
@@ -8247,7 +8247,7 @@
         <field name="requirement_id" ref="req_sd_service_r02" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_handover_reads_xdg_config_home</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_handover_reads_xdg_config_home</field>
     </record>
     <record id="test_sd_service_r02_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r02" />
@@ -8325,13 +8325,13 @@
         <field name="requirement_id" ref="req_sd_service_r06" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_service_r06_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r06" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
     </record>
     <record id="test_sd_service_r06_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r06" />
@@ -8877,37 +8877,37 @@
         <field name="requirement_id" ref="req_sd_service_r30" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_service_r30_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r30" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_unit_waiting_to_restart_is_stopped_too</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_unit_waiting_to_restart_is_stopped_too</field>
     </record>
     <record id="test_sd_service_r30_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r30" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_stopped_unit_stays_stopped</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_stopped_unit_stays_stopped</field>
     </record>
     <record id="test_sd_service_r30_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r30" />
         <field name="sequence" eval="40" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_failed_stop_runs_the_game_and_restarts_nothing</field>
     </record>
     <record id="test_sd_service_r31_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r31" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_game_runs_under_the_deck_lock_as_game</field>
     </record>
     <record id="test_sd_service_r31_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r31" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_deck_held_elsewhere_runs_no_game</field>
     </record>
     <record id="test_sd_service_r31_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r31" />
@@ -8925,49 +8925,49 @@
         <field name="requirement_id" ref="req_sd_service_r32" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_service_r32_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r32" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_restart_after_game_no_leaves_it_stopped</field>
     </record>
     <record id="test_sd_service_r32_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r32" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_the_setting_is_read_after_the_game</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_the_setting_is_read_after_the_game</field>
     </record>
     <record id="test_sd_service_r33_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r33" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_unloaded_unit_restarts_without_an_error_line</field>
     </record>
     <record id="test_sd_service_r33_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r33" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_a_warning_before_not_loaded_stays_visible</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_a_warning_before_not_loaded_stays_visible</field>
     </record>
     <record id="test_sd_service_r33_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r33" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_another_reset_failure_stays_visible</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_another_reset_failure_stays_visible</field>
     </record>
     <record id="test_sd_service_r34_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r34" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_service_r34_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r34" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
     </record>
     <record id="test_sd_service_r34_3" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r34" />
@@ -8979,7 +8979,7 @@
         <field name="requirement_id" ref="req_sd_service_r35" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_without_the_unit_only_the_command_runs</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_without_the_unit_only_the_command_runs</field>
     </record>
     <record id="test_sd_service_r36_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r36" />
@@ -9105,13 +9105,13 @@
         <field name="requirement_id" ref="req_sd_service_r43" />
         <field name="sequence" eval="70" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_interrupted_game_still_gives_the_deck_back</field>
     </record>
     <record id="test_sd_service_r43_8" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r43" />
         <field name="sequence" eval="80" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_sigterm_to_the_script_alone_lets_the_game_finish</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_sigterm_to_the_script_alone_lets_the_game_finish</field>
     </record>
     <record id="test_sd_service_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r44" />
@@ -9813,7 +9813,7 @@
         <field name="requirement_id" ref="req_sd_service_r85" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_erplibre_home_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
+        <field name="reference">erplibre:test/test_erplibre_home_streamdeck_handover.py::Passation::test_an_active_unit_is_stopped_then_started_again</field>
     </record>
     <record id="test_sd_service_r86_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r86" />
