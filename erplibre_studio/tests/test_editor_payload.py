@@ -9,7 +9,11 @@ from odoo.tests import new_test_user, tagged
 
 from .. import arch as studio_arch
 from ..models.erplibre_studio_access import PERMS
-from ..models.erplibre_studio_editor import SAMPLE_TEXT_LENGTH, UNSUPPORTED_VIEW_TYPES
+from ..models.erplibre_studio_editor import (
+    SAMPLE_TAGS,
+    SAMPLE_TEXT_LENGTH,
+    UNSUPPORTED_VIEW_TYPES,
+)
 from .common import StudioCase
 
 MODULE = "studio_test_payload_a2"
@@ -752,6 +756,85 @@ class TestEditorPayload(StudioCase):
         self.assertNotIn("contact_address", values)
         self.assertEqual(self.data("list")["sample_values"], {})
         self.assertEqual(self.data("kanban")["sample_values"], {})
+
+    def test_sample_values_of_tags(self):
+        """A many2many gives its count and the names of its first
+        SAMPLE_TAGS records."""
+        company, _contact = self.sample_partner()
+        tags = self.env["res.partner.category"].create(
+            [{"name": f"Studio sample tag {index}"} for index in range(SAMPLE_TAGS + 2)]
+        )
+        company.category_id = tags
+        values = self.sample_values(company, ["category_id"])
+        self.assertEqual(values["category_id"]["count"], SAMPLE_TAGS + 2)
+        self.assertEqual(len(values["category_id"]["names"]), SAMPLE_TAGS)
+        self.assertTrue(
+            set(values["category_id"]["names"]) <= set(tags.mapped("display_name"))
+        )
+
+    def test_record_field_names(self):
+        """The names the invisible conditions of the blocks read and the
+        fields of a radio, each once: none of a constant, of the parent
+        record, or of an expression that does not parse."""
+        blocks = {
+            "attrs": {},
+            "children": [
+                {"attrs": {"invisible": "not is_company"}, "children": []},
+                {"attrs": {"invisible": "1"}},
+                {"attrs": {"invisible": "parent.type == 'x' or type == 'contact'"}},
+                {"attrs": {"invisible": "is_company and ("}},
+                {"attrs": {"required": "ref"}},
+                {"kind": "field", "name": "lang", "attrs": {"widget": "radio"}},
+            ],
+        }
+        self.assertEqual(
+            self.Editor._record_field_names(blocks), ["is_company", "type", "lang"]
+        )
+
+    def test_sample_record_as_the_context_of_an_expression(self):
+        """The raw values an expression reads: a many2one its id, an x2many
+        its ids, a selection its key, False for an empty value; a field not
+        stored is computed, a new field not created yet leaves out."""
+        company, contact = self.sample_partner()
+        names = ["parent_id", "child_ids", "type", "is_company", "ref"]
+        values = self.Editor._sample_record(
+            contact,
+            names + ["contact_address", "image_1920", "x_studio_new"],
+            {"x_studio_new": {"pending": True}},
+        )
+        self.assertEqual(values["parent_id"], company.id)
+        self.assertEqual(values["child_ids"], [])
+        self.assertEqual(values["type"], "invoice")
+        self.assertIs(values["is_company"], False)
+        self.assertIs(values["ref"], False)
+        self.assertIs(values["image_1920"], False)
+        self.assertIsInstance(values["contact_address"], str)
+        self.assertNotIn("x_studio_new", values)
+        values = self.Editor._sample_record(company, ["child_ids", "parent_id"], {})
+        self.assertEqual(sorted(values["child_ids"]), sorted(company.child_ids.ids))
+        self.assertIs(values["parent_id"], False)
+        gone = self.env["res.partner"].browse(contact.id)
+        contact.unlink()
+        self.assertEqual(self.Editor._sample_record(gone, ["name"], {}), {})
+
+    def test_sample_record_of_the_payload(self):
+        """A form gives the values its invisible conditions read on its
+        sample record; a list gives none."""
+        self.sample_partner()
+        view = self.make_view(
+            "form",
+            """<form><sheet><group>
+                <field name="name"/>
+                <field name="ref" invisible="not is_company"/>
+                <field name="is_company"/>
+            </group></sheet></form>""",
+        )
+        data = self.Editor.get_editor_data(
+            "res.partner", view.id, "form", self.project.id
+        )
+        sample = self.env["res.partner"].browse(data["sample_res_id"])
+        self.assertEqual(data["sample_record"], {"is_company": sample.is_company})
+        self.assertEqual(self.data("list")["sample_record"], {})
 
     def test_sample_values_of_a_model_without_record(self):
         """A model the project creates: before Apply, a pending form without

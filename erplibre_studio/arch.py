@@ -160,6 +160,8 @@ SHOWN_ATTRS = (
     "interval",
     "title",
     "bg_color",
+    # The greyed text a label-less field of a form shows while it is empty.
+    "placeholder",
     "t-name",
     "t-if",
     "t-elif",

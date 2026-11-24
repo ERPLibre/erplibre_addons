@@ -24,6 +24,7 @@ import {
 import {
     CHANGE_TAGS,
     NUMBER_TYPES,
+    TAG_WIDGETS,
     TEMPLATED_TYPES,
     attributeLabel,
     canDragBlock,
@@ -46,6 +47,7 @@ import {
     pivotLanes,
     searchColumns,
     searchEndHook,
+    shownWhen,
     valueLabel,
 } from "./studio_utils";
 
@@ -73,6 +75,13 @@ import {
  * flags of the block show at the Detailed level. The outline, the drag
  * handle and the label chip of a block show on hover, on focus, on the
  * selection and during a drag (CSS).
+ *
+ * At rest a field of a form draws as its widget would: an image as a
+ * picture box, a radio as its options, a boolean as a checkbox, tags as
+ * tags, another value on one line (``look``); a field outside a group shows
+ * its value, else its placeholder. A node the real form hides on the
+ * sample record (``sampleHidden``) is not drawn at the Simple level, and is
+ * one folded line « shown when … » at the Detailed level.
  *
  * An element the draft hides from a form or a list (``isGhost``) is one
  * muted line at its place, « label hidden — show », that neither moves
@@ -287,7 +296,7 @@ export class StudioBlock extends Component {
         }
         if (value && typeof value === "object") {
             const count = value.count || 0;
-            return {kind: "count", count, text: _t("%(count)s record(s)", {count})};
+            return {kind: "count", count, names: value.names || [], text: _t("%(count)s record(s)", {count})};
         }
         let text = String(value);
         if (this.field.type === "date") {
@@ -296,6 +305,77 @@ export class StudioBlock extends Component {
             text = formatDateTime(deserializeDateTime(value));
         }
         return {kind: "text", text};
+    }
+
+    /** The widget of the node, "" without one. */
+    get widget() {
+        return (this.block.attrs && this.block.attrs.widget) || "";
+    }
+
+    /**
+     * How the value of a field of a form draws at rest, as its widget
+     * draws it in the real form (rule 1), or null for another block or an
+     * x2many drawn as a sub-list (``subList``):
+     * {kind: « image »}: a picture box;
+     * {kind: « radio », options: [{key, label, checked}]}: the options of a
+     *   selection, the value of the sample record checked;
+     * {kind: « check », checked, text}: a checkbox, empty without value;
+     * {kind: « tags », tags, more}: the names of the records of an x2many
+     *   of a tag widget, ``more`` the count of those left out;
+     * {kind: « text », text, line}: the value of the sample record, on one
+     *   line cut by an ellipsis when ``line`` (any type but a text or an
+     *   html, as an input shows it);
+     * {kind: « empty », text}: no value, ``text`` the placeholder of the
+     *   node, "" without one.
+     */
+    get look() {
+        if (this.props.viewType !== "form" || this.block.kind !== "field" || this.subList) {
+            return null;
+        }
+        const field = this.field;
+        const widget = this.widget;
+        const sample = this.sample;
+        if (widget === "image" || (field.type === "binary" && widget.startsWith("image"))) {
+            return {kind: "image"};
+        }
+        if (widget === "radio" && field.type === "selection" && (field.selection || []).length) {
+            // The key of the value when the payload gives it (sample_record),
+            // else its label.
+            const record = this.editor.data.sample_record || {};
+            const name = this.block.name;
+            const text = sample && sample.kind === "text" ? sample.text : null;
+            return {
+                kind: "radio",
+                options: field.selection.map(([key, label]) => ({
+                    key,
+                    label,
+                    checked: name in record ? key === record[name] : label === text,
+                })),
+            };
+        }
+        if (this.isBoolean) {
+            return {kind: "check", checked: sample ? sample.checked : null, text: sample ? sample.text : ""};
+        }
+        if (sample && sample.kind === "count") {
+            const tags = sample.names || [];
+            return tags.length || sample.count
+                ? {kind: "tags", tags, more: Math.max(0, sample.count - tags.length)}
+                : {kind: "empty", text: this.placeholder};
+        }
+        if (sample) {
+            return {kind: "text", text: sample.text, line: !this.isTitle && !["text", "html"].includes(field.type)};
+        }
+        return {kind: "empty", text: this.placeholder};
+    }
+
+    /** The placeholder of the node, "" without one. */
+    get placeholder() {
+        return (this.block.attrs && this.block.attrs.placeholder) || "";
+    }
+
+    /** The text of the count of the records left out of the tags, "+3". */
+    moreTags(count) {
+        return _t("+%(count)s", {count});
     }
 
     /**
@@ -363,13 +443,53 @@ export class StudioBlock extends Component {
     }
 
     /**
-     * Whether the block draws as one muted line at the Simple level: a
-     * block the draft hides, or the selection when the form never shows
-     * it. In a form or a list, an element the draft hides draws as its
-     * hidden line instead (``isGhost``).
+     * Whether the real form hides the block on the sample record: its
+     * « invisible » condition holds on it (StudioEditor.hiddenOnSample).
+     */
+    get sampleHidden() {
+        // A page is its tab: the notebook leaves the tab out instead.
+        return this.props.viewType === "form" && this.block.tag !== "page" && this.editor.hiddenOnSample(this.block);
+    }
+
+    /** Whether the selection is a block under the block, itself left out. */
+    get selectionInside() {
+        const selected = this.editorState.selected;
+        return (
+            Boolean(selected) &&
+            selected !== this.block.path &&
+            Boolean(findBlock(this.block, (b) => b.path === selected))
+        );
+    }
+
+    /**
+     * Whether the block draws as one muted line. At the Simple level: a
+     * block the draft hides, or the selection when the form does not show
+     * it (always, or on the sample record). At the Detailed level: a block
+     * the form hides on the sample record, folded with its condition
+     * (``shownWhenText``) while the selection is not under it. In a form or
+     * a list, an element the draft hides draws as its hidden line instead
+     * (``isGhost``).
      */
     get mutedLine() {
-        return !this.detailed && !this.isGhost && (this.isHiddenChange || (this.baseInvisible && this.isSelected));
+        if (this.isGhost) {
+            return false;
+        }
+        if (this.detailed) {
+            return this.sampleHidden && !this.selectionInside;
+        }
+        return this.isHiddenChange || ((this.baseInvisible || this.sampleHidden) && this.isSelected);
+    }
+
+    /**
+     * The condition of the folded line of a block the form hides on the
+     * sample record, at the Detailed level: « shown when … » (``shownWhen``
+     * of its « invisible »); "" otherwise.
+     */
+    get shownWhenText() {
+        if (!this.detailed || !this.sampleHidden) {
+            return "";
+        }
+        return _t("shown when %(condition)s", {condition: shownWhen(this.block.attrs.invisible)});
     }
 
     // ── an element the draft hides ────────────────────────────────────
@@ -444,8 +564,21 @@ export class StudioBlock extends Component {
         return this.editor.restoreBlock(this.block);
     }
 
-    /** The text of the muted line (mutedLine). */
+    /**
+     * The label of the muted line: at the Detailed level the technical
+     * caption of a node other than a field (``techCaption``), else its
+     * label (``titleLabel``).
+     */
+    get mutedLabel() {
+        return this.detailed && this.block.kind !== "field" ? this.techCaption : this.titleLabel;
+    }
+
+    /** The accessible name of the button of the muted line (mutedLine). */
     get mutedText() {
+        const condition = this.shownWhenText;
+        if (condition) {
+            return _t("%(label)s, %(condition)s", {label: this.titleLabel, condition});
+        }
         return _t("%(label)s hidden", {label: this.titleLabel});
     }
 
@@ -463,12 +596,17 @@ export class StudioBlock extends Component {
 
     /**
      * Whether the child ``child`` draws on the canvas: at the Simple level
-     * a form does not draw a node its arch always hides (isBaseInvisible),
-     * as the web client does, unless it holds the selection. The plan
-     * lists it all the same.
+     * a form does not draw a node its arch always hides (isBaseInvisible)
+     * nor one it hides on the sample record (hiddenOnSample), as the web
+     * client does, unless it holds the selection. The plan lists it all
+     * the same. StudioEditor.isDrawnChild decides the same; this one reads
+     * the state through the block, which renders again when it changes.
      */
     isDrawn(child) {
-        if (this.detailed || this.props.viewType !== "form" || !isBaseInvisible(child)) {
+        if (this.detailed || this.props.viewType !== "form") {
+            return true;
+        }
+        if (!isBaseInvisible(child) && !this.editor.hiddenOnSample(child)) {
             return true;
         }
         const selected = this.editorState.selected;
@@ -497,6 +635,22 @@ export class StudioBlock extends Component {
         return own ? `<${block.tag}> ${block.label}` : `<${block.tag}>`;
     }
 
+    /**
+     * Whether the block is the box of the smart buttons of a form with no
+     * button drawn, at the Simple level and outside the selection: it
+     * takes no height.
+     */
+    get isEmptyButtonBox() {
+        return (
+            this.props.viewType === "form" &&
+            this.block.label === "button_box" &&
+            !this.detailed &&
+            !this.isSelected &&
+            !this.selectionInside &&
+            !this.drawnChildren.length
+        );
+    }
+
     /** Whether the block is a page without children: it shows a hint. */
     get isEmptyPage() {
         return this.block.tag === "page" && !(this.block.children || []).length;
@@ -514,9 +668,17 @@ export class StudioBlock extends Component {
         return (this.block.children || []).filter((child) => child.tag === "page");
     }
 
+    /**
+     * The page whose tab shows: the one of ``state.pages``, else the first
+     * tab drawn (``isDrawn``), as the form opens on its first visible tab.
+     */
     get activePage() {
-        const index = this.editorState.pages[this.block.path] || 0;
-        return this.pages[index] || this.pages[0];
+        const pages = this.pages;
+        const page = pages[this.editorState.pages[this.block.path] || 0];
+        if (page && this.isDrawn(page)) {
+            return page;
+        }
+        return pages.find((p) => this.isDrawn(p)) || page || pages[0];
     }
 
     get flags() {
@@ -581,18 +743,21 @@ export class StudioBlock extends Component {
     }
 
     /**
-     * The sub-list an x2many field shows in a form: {comodel, label}, or
-     * null. The editor does not descend into it: it is part of the field.
+     * The sub-list an x2many field shows in a form: {comodel}, or null; an
+     * x2many of a tag widget (TAG_WIDGETS) draws as tags instead
+     * (``look``). The editor does not descend into it: it is part of the
+     * field. It reads « label · N record(s) », the comodel at the Detailed
+     * level only.
      */
     get subList() {
         if (this.props.viewType !== "form" || this.block.kind !== "field") {
             return null;
         }
         const field = this.field;
-        if (!X2MANY_TYPES.includes(field.type) || !field.relation) {
+        if (!X2MANY_TYPES.includes(field.type) || !field.relation || TAG_WIDGETS.includes(this.widget)) {
             return null;
         }
-        return {comodel: field.relation, label: this.editor.modelLabel(field.relation)};
+        return {comodel: field.relation};
     }
 
     startDrag(ev) {

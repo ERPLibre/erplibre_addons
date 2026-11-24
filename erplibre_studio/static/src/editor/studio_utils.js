@@ -4,6 +4,7 @@
 
 import {serializeDateTime} from "@web/core/l10n/dates";
 import {_t} from "@web/core/l10n/translation";
+import {evaluateBooleanExpr} from "@web/core/py_js/py";
 import {registry} from "@web/core/registry";
 
 const {DateTime} = luxon;
@@ -529,6 +530,72 @@ export function changeKeysInside(block) {
 export function isBaseInvisible(block) {
     const attrs = (block && block.attrs) || {};
     return isTrue(attrs.invisible) && !(block.change_kinds || []).includes("hidden");
+}
+
+// The widgets of an x2many that draw its records as tags, not a sub-list.
+export const TAG_WIDGETS = [
+    "many2many_tags",
+    "many2many_tags_avatar",
+    "many2many_avatar_user",
+    "many2many_avatar_employee",
+];
+
+/**
+ * Whether the real form hides ``block`` on the record whose expression
+ * context is ``context`` (``sampleContext``): its « invisible » is a
+ * condition that ``evaluateBooleanExpr`` of the web client finds true. A
+ * constant gives false (``isBaseInvisible`` covers it), as do no context,
+ * an element the draft hides, and an expression that reads a name the
+ * context lacks or that does not parse: the canvas draws such a node.
+ */
+export function isHiddenOnRecord(block, context) {
+    const expression = ((block && block.attrs && block.attrs.invisible) || "").trim();
+    if (!context || !expression || isTrue(expression) || (block.change_kinds || []).includes("hidden")) {
+        return false;
+    }
+    try {
+        return evaluateBooleanExpr(expression, context);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * The context the « invisible » expressions of a form read on its sample
+ * record, as the web client builds it for a record: the values of the
+ * payload (``sample_record``), its ``id``, then ``context``, ``uid``,
+ * ``allowed_company_ids`` and ``current_company_id`` of ``user``. Null
+ * without sample record: nothing is evaluated.
+ */
+export function sampleContext(data, user) {
+    if (!data || !data.sample_res_id || !data.sample_record) {
+        return null;
+    }
+    const userContext = (user && user.context) || {};
+    const companies = userContext.allowed_company_ids || [];
+    return {
+        ...data.sample_record,
+        id: data.sample_res_id,
+        context: userContext,
+        uid: user && user.userId,
+        allowed_company_ids: companies,
+        current_company_id: companies[0] || false,
+    };
+}
+
+/**
+ * The condition under which a node whose « invisible » is ``expression``
+ * shows: its negation, written as a reader writes it (« not a » gives
+ * « a », a name « not a », anything else « not (…) »).
+ */
+export function shownWhen(expression) {
+    const text = (expression || "").trim();
+    const negated = /^not\s+([\w.]+|\([^()]*\))$/.exec(text);
+    if (negated) {
+        const inner = negated[1];
+        return inner.startsWith("(") ? inner.slice(1, -1).trim() : inner;
+    }
+    return /^[\w.]+$/.test(text) ? `not ${text}` : `not (${text})`;
 }
 
 /** Every block of the tree ``root``, depth first. */

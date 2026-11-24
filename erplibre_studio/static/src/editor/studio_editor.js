@@ -2,7 +2,7 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {Component, onPatched, onWillStart, useState} from "@odoo/owl";
+import {Component, onPatched, onWillStart, toRaw, useState} from "@odoo/owl";
 import {ConfirmationDialog} from "@web/core/confirmation_dialog/confirmation_dialog";
 import {Dropdown} from "@web/core/dropdown/dropdown";
 import {useDropdownState} from "@web/core/dropdown/dropdown_hooks";
@@ -11,6 +11,7 @@ import {_t} from "@web/core/l10n/translation";
 import {browser} from "@web/core/browser/browser";
 import {useHotkey} from "@web/core/hotkeys/hotkey_hook";
 import {registry} from "@web/core/registry";
+import {user} from "@web/core/user";
 import {useService} from "@web/core/utils/hooks";
 import {useSetupAction} from "@web/search/action_hook";
 import {View} from "@web/views/view";
@@ -53,9 +54,11 @@ import {
     hiddenSentence,
     isBaseInvisible,
     isGhost,
+    isHiddenOnRecord,
     namedKeys,
     newFieldLabel,
     pivotLanes,
+    sampleContext,
     searchColumns,
     searchEndHook,
     typeGlyph,
@@ -83,14 +86,17 @@ export {
     hiddenSentence,
     isBaseInvisible,
     isGhost,
+    isHiddenOnRecord,
     isTrue,
     kindSentence,
     marginDot,
     namedKeys,
     pivotAxes,
     pivotLanes,
+    sampleContext,
     searchColumns,
     selectionToText,
+    shownWhen,
     textToSelection,
     valueLabel,
 } from "./studio_utils";
@@ -1732,16 +1738,46 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * Whether the canvas draws ``child``, as StudioBlock.isDrawn decides: at
-     * the Simple level a form leaves out a node its arch always hides,
-     * unless it holds the selection.
+     * Whether the canvas draws ``child``, for StudioBlock.isDrawn: at the
+     * Simple level a form leaves out a node its arch always hides and one
+     * the real form hides on the sample record (``hiddenOnSample``), unless
+     * it holds the selection.
      */
     isDrawnChild(child) {
-        if (this.detailed || this.viewType !== "form" || !isBaseInvisible(child)) {
+        if (this.detailed || this.viewType !== "form") {
+            return true;
+        }
+        if (!isBaseInvisible(child) && !this.hiddenOnSample(child)) {
             return true;
         }
         const selected = this.state.selected;
         return Boolean(selected) && Boolean(findBlock(child, (b) => b.path === selected));
+    }
+
+    /**
+     * Whether the real form hides ``block`` on the sample record of the
+     * payload (``isHiddenOnRecord``): false for a view other than a form or
+     * without sample record. The answers are kept per expression until the
+     * payload changes.
+     */
+    hiddenOnSample(block) {
+        const expression = block && block.attrs && block.attrs.invisible;
+        if (!expression || this.viewType !== "form") {
+            return false;
+        }
+        const data = toRaw(this.data);
+        let cache = this._sampleCache;
+        if (!cache || cache.data !== data) {
+            cache = this._sampleCache = {data, context: sampleContext(data, user), answers: new Map()};
+        }
+        if (!cache.context) {
+            return false;
+        }
+        const key = `${expression}\u0000${(block.change_kinds || []).includes("hidden")}`;
+        if (!cache.answers.has(key)) {
+            cache.answers.set(key, isHiddenOnRecord(block, cache.context));
+        }
+        return cache.answers.get(key);
     }
 
     /**

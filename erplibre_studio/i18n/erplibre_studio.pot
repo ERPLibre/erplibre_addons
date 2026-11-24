@@ -373,6 +373,12 @@ msgstr ""
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s, %(condition)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s: a setting changed"
 msgstr ""
@@ -711,6 +717,12 @@ msgstr ""
 msgid ""
 "%(view)s view created by the project. Revert removes it with the rest of the"
 " draft."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "+%(count)s"
 msgstr ""
 
 #. module: erplibre_studio
@@ -6740,12 +6752,6 @@ msgid "Studio spreadsheet"
 msgstr ""
 
 #. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
-msgid "Sub-list of"
-msgstr ""
-
-#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__summary
 msgid "Summary"
 msgstr ""
@@ -9529,6 +9535,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "show"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "shown when %(condition)s"
 msgstr ""
 
 #. module: erplibre_studio

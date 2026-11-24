@@ -383,6 +383,12 @@ msgstr "%(label)s reprend son libellé d'origine"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(label)s, %(condition)s"
+msgstr "%(label)s, %(condition)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "%(label)s: a setting changed"
 msgstr "%(label)s : un réglage modifié"
@@ -755,6 +761,12 @@ msgid ""
 msgstr ""
 "Vue %(view)s créée par le projet. Revert la retire avec le reste du "
 "brouillon."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "+%(count)s"
+msgstr "+%(count)s"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6785,12 +6797,6 @@ msgid "Studio spreadsheet"
 msgstr "Feuille de calcul du studio"
 
 #. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
-msgid "Sub-list of"
-msgstr "Sous-liste de"
-
-#. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_change__summary
 msgid "Summary"
 msgstr "Résumé"
@@ -9705,6 +9711,12 @@ msgstr "règles"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "show"
 msgstr "afficher"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "shown when %(condition)s"
+msgstr "affiché si %(condition)s"
 
 #. module: erplibre_studio
 #. odoo-javascript

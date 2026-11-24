@@ -401,8 +401,14 @@ describe("the calm canvas of a form", () => {
         expect(`${line("name")} .o_erplibre_studio_sample_value`).toHaveText("Studio sample company");
         expect(`${line("name")} .o_erplibre_studio_sample_value`).toHaveClass("o_erplibre_studio_label");
         expect(`${line("name")} .o_erplibre_studio_placeholder`).toHaveCount(0);
-        // A text keeps its line break; a date and a datetime in the user's format.
+        // A char on one line as its input shows it, its full text in the
+        // tooltip; a date and a datetime in the user's format.
         expect(`${value("street")} .o_erplibre_studio_sample_value`).toHaveText(/^12 Invented Road\s+Sample City$/);
+        expect(`${value("street")} .o_erplibre_studio_sample_value`).toHaveClass("o_erplibre_studio_one_line");
+        expect(`${value("street")} .o_erplibre_studio_sample_value`).toHaveAttribute(
+            "title",
+            "12 Invented Road\nSample City"
+        );
         expect(`${value("street")} .o_erplibre_studio_placeholder`).toHaveCount(0);
         expect(`${value("birthday")} .o_erplibre_studio_sample_value`).toHaveText(
             formatDate(deserializeDate("2024-03-05"))

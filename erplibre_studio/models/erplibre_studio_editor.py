@@ -1,9 +1,12 @@
 # © 2026 TechnoLibre (http://www.technolibre.ca)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
+
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.tools import html2plaintext
+from odoo.tools.view_validation import get_expression_field_names
 
 from .. import arch as studio_arch
 from .erplibre_studio_project import (
@@ -101,6 +104,16 @@ SAMPLE_TYPES = (
 )
 # The longest text the canvas shows of a value, ellipsis included.
 SAMPLE_TEXT_LENGTH = 80
+# How many names of its records a many2many of the sample record gives at
+# most: the tags the canvas draws.
+SAMPLE_TAGS = 5
+# The field types the context of an expression does not carry on the
+# sample record (``_sample_record``).
+UNEVALUATED_TYPES = ("properties", "properties_definition", "json")
+# The ``invisible`` values that need no record to evaluate.
+CONSTANT_EXPRESSIONS = ("0", "1", "False", "True", "false", "true")
+
+_logger = logging.getLogger(__name__)
 
 
 class ErplibreStudioEditor(models.AbstractModel):
@@ -834,10 +847,16 @@ class ErplibreStudioEditor(models.AbstractModel):
         # The values the canvas of a form shows under the labels: those of
         # the sample record, for a view of the database.
         sample_values = {}
+        sample_record = {}
         if sample and not is_added_view(view):
             sample_values = self._sample_values(
                 Model.browse(sample),
                 self._block_field_names(blocks),
+                fields_info,
+            )
+            sample_record = self._sample_record(
+                Model.browse(sample),
+                self._record_field_names(blocks),
                 fields_info,
             )
         return {
@@ -898,6 +917,7 @@ class ErplibreStudioEditor(models.AbstractModel):
             "preview_key": PREVIEW_KEY,
             "sample_res_id": sample or False,
             "sample_values": sample_values,
+            "sample_record": sample_record,
             "mail_available": Project._studio_mail_available(),
             "spreadsheet_available": Project._studio_spreadsheet_available(),
             "field_name_rule": (project or Project)._studio_field_name_rule(),
@@ -919,6 +939,93 @@ class ErplibreStudioEditor(models.AbstractModel):
         return names
 
     @api.model
+    def _record_field_names(self, block):
+        """The names of the fields the canvas reads on the sample record
+        (``_sample_record``), each once, in the order of the arch: those the
+        ``invisible`` expressions of the blocks under ``block`` read, and a
+        field a radio widget draws, whose option the key of the value
+        checks. A constant, a name of the parent record or an expression
+        that does not parse gives none."""
+        names = []
+        stack = [block]
+        while stack:
+            node = stack.pop()
+            attrs = node.get("attrs") or {}
+            if node.get("kind") == "field" and attrs.get("widget") == "radio":
+                if node.get("name") and node["name"] not in names:
+                    names.append(node["name"])
+            expression = (attrs.get("invisible") or "").strip()
+            if expression and expression not in CONSTANT_EXPRESSIONS:
+                try:
+                    found = get_expression_field_names(expression)
+                except (SyntaxError, ValueError):
+                    found = set()
+                for name in sorted(found):
+                    if "." not in name and name not in names:
+                        names.append(name)
+            stack.extend(reversed(node.get("children") or []))
+        return names
+
+    @api.model
+    def _sample_record(self, record, names, fields_info):
+        """{name: value} of the fields ``names`` on ``record``, as the web
+        client puts them in the context of an expression: a many2one its
+        id, an x2many its ids, a selection its key, a date or a datetime
+        the string of the ORM, a binary whether it is set, False for an
+        empty value. The canvas of a form evaluates the ``invisible``
+        expressions of its nodes on it.
+
+        Unlike ``_sample_values``, a field not stored is computed, as the
+        form computes it to evaluate the same expressions. A field the user
+        may not read, a new field of the project not created yet
+        (``fields_info``), a type of UNEVALUATED_TYPES leaves out; a record
+        the user may not read, gone, or whose read fails gives {}."""
+        readable = []
+        for name in names:
+            field = record._fields.get(name)
+            if (
+                field is None
+                or (fields_info.get(name) or {}).get("pending")
+                or field.type in UNEVALUATED_TYPES
+                or not field.is_accessible(record.env)
+            ):
+                continue
+            readable.append(name)
+        if not record or not readable:
+            return {}
+        try:
+            with self.env.cr.savepoint():
+                rows = record.with_context(bin_size=True).read(readable)
+        except (AccessError, MissingError):
+            return {}
+        except Exception:
+            # A compute that fails leaves the expressions unevaluated: the
+            # canvas draws every node, as without sample record.
+            _logger.info(
+                "Sample record %s not read for the canvas", record, exc_info=True
+            )
+            return {}
+        if not rows:
+            return {}
+        row = rows[0]
+        values = {}
+        for name in readable:
+            ftype = record._fields[name].type
+            value = row[name]
+            if ftype == "many2one":
+                value = value[0] if value else False
+            elif ftype in ("one2many", "many2many"):
+                value = list(value or ())
+            elif ftype == "binary":
+                value = bool(value)
+            elif ftype == "date":
+                value = fields.Date.to_string(value) if value else False
+            elif ftype == "datetime":
+                value = fields.Datetime.to_string(value) if value else False
+            values[name] = value
+        return values
+
+    @api.model
     def _sample_values(self, record, names, fields_info):
         """{name: value} of the fields ``names`` on ``record``, read with
         the rights of the user: the values the canvas of a form shows. A
@@ -930,7 +1037,8 @@ class ErplibreStudioEditor(models.AbstractModel):
 
         A text is cut at SAMPLE_TEXT_LENGTH, an html reduced to its text
         first; a selection gives its label, a many2one the name of its
-        record, an x2many {count}, a date or a datetime the string of the
+        record, an x2many {count}, a many2many also the ``names`` of its
+        first SAMPLE_TAGS records, a date or a datetime the string of the
         ORM, a boolean and a number themselves."""
         readable = []
         for name in names:
@@ -966,7 +1074,9 @@ class ErplibreStudioEditor(models.AbstractModel):
         """The value ``_sample_values`` gives of ``value``, the ``read`` of
         ``field``; None for an empty one."""
         ftype = field.type
-        if ftype in ("one2many", "many2many"):
+        if ftype == "many2many":
+            return {"count": len(value or ()), "names": self._tag_names(field, value)}
+        if ftype == "one2many":
             return {"count": len(value or ())}
         if ftype == "boolean":
             return bool(value)
@@ -987,6 +1097,17 @@ class ErplibreStudioEditor(models.AbstractModel):
         if len(text) > SAMPLE_TEXT_LENGTH:
             text = text[: SAMPLE_TEXT_LENGTH - 1].rstrip() + "…"
         return text or None
+
+    @api.model
+    def _tag_names(self, field, ids):
+        """The display names of the first SAMPLE_TAGS records ``ids`` of the
+        comodel of ``field``, those the user may read; [] when he may read
+        none."""
+        records = self.env[field.comodel_name].browse(list(ids or ())[:SAMPLE_TAGS])
+        try:
+            return [name for name in records.mapped("display_name") if name]
+        except (AccessError, MissingError):
+            return []
 
     @api.model
     def _display_level(self):

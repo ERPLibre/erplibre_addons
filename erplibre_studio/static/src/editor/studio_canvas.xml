@@ -235,16 +235,18 @@
         </button>
     </t>
 
-    <!-- A block at the Simple level as one muted line (mutedLine): its
-         ring dot, then its label in muted text. The canvas writes no
+    <!-- A block as one muted line (mutedLine): its ring dot, then its
+         label in muted text. At the Simple level the canvas writes no
          status on it: « label hidden » is the accessible name of its
-         button only. -->
+         button only. At the Detailed level a block the form hides on the
+         sample record adds its condition, « shown when … ». -->
     <t t-name="erplibre_studio.Block.muted">
         <t t-call="erplibre_studio.Block.gutter" />
         <t t-call="erplibre_studio.Block.pick">
             <t t-set="pickClass" t-value="'o_erplibre_studio_muted_text'" />
             <t t-set="pickAria" t-value="mutedText" />
-            <t t-esc="titleLabel" />
+            <t t-esc="mutedLabel" />
+            <span t-if="shownWhenText" class="o_erplibre_studio_shown_when" t-esc="'· ' + shownWhenText" />
         </t>
     </t>
 
@@ -262,45 +264,121 @@
         </t>
     </t>
 
-    <!-- The value cell of a field: the sub-list of an x2many, with the
-         count of the sample record; else the value of the sample record (a
-         checkbox look for a boolean), or a muted placeholder (an empty box
-         for a checkbox); then the lock of a field the view loads, shown
-         with the outline, and the technical marks. -->
+    <!-- The value of a field as its widget draws it at rest, « fieldLook »
+         being the ``look`` of the block: a picture box, the options of a
+         radio, a checkbox, tags, the value of the sample record (on one
+         line, its full text as a tooltip, when « fieldLook.line »), else
+         the placeholder of the node greyed; without one, « emptyText ».
+         « valueIsLabel » gives the text the class of a label (a node
+         outside a group, the title). -->
+    <t t-name="erplibre_studio.Block.look">
+        <span
+            t-if="fieldLook.kind === 'image'"
+            class="o_erplibre_studio_sample_image"
+            role="img"
+            t-att-aria-label="block.label"
+        >
+            <i class="fa fa-camera" aria-hidden="true" />
+        </span>
+        <span t-elif="fieldLook.kind === 'radio'" class="o_erplibre_studio_sample_radio">
+            <span
+                t-foreach="fieldLook.options"
+                t-as="option"
+                t-key="option.key"
+                class="o_erplibre_studio_radio_option"
+                t-att-data-checked="option.checked ? 'true' : 'false'"
+            >
+                <span class="o_erplibre_studio_radio_dot" aria-hidden="true" />
+                <t t-esc="option.label" />
+            </span>
+        </span>
+        <span
+            t-elif="fieldLook.kind === 'check' and fieldLook.checked !== null"
+            class="o_erplibre_studio_sample_check"
+            t-att-class="{'o_erplibre_studio_sample_checked': fieldLook.checked}"
+            t-att-data-checked="fieldLook.checked ? 'true' : 'false'"
+            role="img"
+            t-att-aria-label="fieldLook.text"
+        >
+            <i t-if="fieldLook.checked" class="fa fa-check" aria-hidden="true" />
+        </span>
+        <span
+            t-elif="fieldLook.kind === 'check'"
+            class="o_erplibre_studio_placeholder o_erplibre_studio_placeholder_check"
+            aria-hidden="true"
+        />
+        <span t-elif="fieldLook.kind === 'tags'" class="o_erplibre_studio_sample_tags">
+            <span
+                t-foreach="fieldLook.tags"
+                t-as="tag"
+                t-key="tag_index"
+                class="o_erplibre_studio_sample_tag"
+                t-att-title="tag"
+                t-esc="tag"
+            />
+            <span
+                t-if="fieldLook.more"
+                class="o_erplibre_studio_sample_tag o_erplibre_studio_sample_more"
+                t-esc="moreTags(fieldLook.more)"
+            />
+        </span>
+        <span
+            t-elif="fieldLook.kind === 'text'"
+            class="o_erplibre_studio_sample_value"
+            t-att-class="{'o_erplibre_studio_one_line': fieldLook.line, 'o_erplibre_studio_label': valueIsLabel}"
+            t-att-title="fieldLook.line ? fieldLook.text : undefined"
+            t-esc="fieldLook.text"
+        />
+        <span
+            t-elif="fieldLook.text"
+            class="o_erplibre_studio_placeholder o_erplibre_studio_placeholder_text"
+            t-att-class="{'o_erplibre_studio_label': valueIsLabel}"
+            t-esc="fieldLook.text"
+        />
+        <span
+            t-else=""
+            class="o_erplibre_studio_placeholder"
+            t-att-class="{'o_erplibre_studio_label': valueIsLabel}"
+            aria-hidden="true"
+            t-esc="emptyText"
+        />
+    </t>
+
+    <!-- The sub-list of an x2many, « sub » being its subList: « label · N
+         record(s) », the count of the sample record, its comodel at the
+         Detailed level only. -->
+    <t t-name="erplibre_studio.Block.sublist">
+        <t t-set="value" t-value="sample" />
+        <span
+            class="o_erplibre_studio_sublist d-block border rounded small text-muted px-2 py-1"
+            t-att-data-comodel="sub.comodel"
+        >
+            <i class="fa fa-list me-1" aria-hidden="true" />
+            <span class="fw-bold o_erplibre_studio_sublist_label" t-esc="block.label" />
+            <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
+            <t t-if="value and value.kind === 'count'">
+                ·
+                <span class="o_erplibre_studio_sample_count" t-esc="value.text" />
+            </t>
+        </span>
+    </t>
+
+    <!-- The value cell of a field: its sub-list (erplibre_studio.Block.sublist),
+         else its look in a form (erplibre_studio.Block.look), « — »
+         without value nor placeholder or in a list; then the lock of a
+         field the view loads, shown with the outline, and the technical
+         marks. -->
     <t t-name="erplibre_studio.Block.value">
         <span class="o_erplibre_studio_line_value">
             <t t-set="sub" t-value="subList" />
-            <t t-set="value" t-value="sample" />
-            <span
-                t-if="sub"
-                class="o_erplibre_studio_sublist d-block border rounded small text-muted px-2 py-1"
-                t-att-data-comodel="sub.comodel"
-            >
-                <i class="fa fa-list me-1" />
-                Sub-list of
-                <span class="fw-bold" t-esc="sub.label" />
-                <code t-if="detailed" class="ms-1 o_erplibre_studio_tech" t-esc="sub.comodel" />
-                <t t-if="value and value.kind === 'count'">
-                    ·
-                    <span class="o_erplibre_studio_sample_count" t-esc="value.text" />
-                </t>
-            </span>
-            <span
-                t-elif="value and value.kind === 'boolean'"
-                class="o_erplibre_studio_sample_check"
-                t-att-class="{'o_erplibre_studio_sample_checked': value.checked}"
-                t-att-data-checked="value.checked ? 'true' : 'false'"
-                role="img"
-                t-att-aria-label="value.text"
-            >
-                <i t-if="value.checked" class="fa fa-check" aria-hidden="true" />
-            </span>
-            <span
-                t-elif="isBoolean"
-                class="o_erplibre_studio_placeholder o_erplibre_studio_placeholder_check"
-                aria-hidden="true"
-            />
-            <span t-elif="value" class="o_erplibre_studio_sample_value" t-esc="value.text" />
+            <t t-set="cellLook" t-value="look" />
+            <t t-if="sub" t-call="erplibre_studio.Block.sublist" />
+            <t t-elif="cellLook" t-call="erplibre_studio.Block.look">
+                <t t-set="fieldLook" t-value="cellLook" />
+                <t t-set="emptyText" t-value="'—'" />
+                <t t-set="valueIsLabel" t-value="false" />
+            </t>
+            <!-- A cell of a list column: a placeholder, the values are a form's. -->
             <span t-else="" class="o_erplibre_studio_placeholder" aria-hidden="true">—</span>
             <!-- The lock keeps its tooltip: it stays out of the button. -->
             <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
@@ -428,28 +506,29 @@
                         <span class="o_erplibre_studio_label" t-esc="block.attrs.title or block.label" />
                         <code t-if="detailed" class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
                     </t>
+                    <t t-elif="subList">
+                        <!-- A sub-list names its field: no label above it. -->
+                        <t t-set="sub" t-value="subList" />
+                        <t t-call="erplibre_studio.Block.sublist" />
+                    </t>
                     <t t-else="">
-                        <!-- The title shows the name of the sample record;
-                             elsewhere the label stands for the value, as a
-                             placeholder. -->
-                        <t t-set="value" t-value="isTitle and sample" />
-                        <span
-                            t-if="value and value.kind === 'text'"
-                            class="o_erplibre_studio_label o_erplibre_studio_sample_value"
-                            t-esc="value.text"
-                        />
-                        <span t-else="" class="o_erplibre_studio_label o_erplibre_studio_placeholder" t-esc="block.label" />
+                        <!-- Its value as its widget draws it, else its
+                             placeholder greyed, as the form shows it in
+                             edit mode; the label stands for the value only
+                             without either. -->
+                        <t t-call="erplibre_studio.Block.look">
+                            <t t-set="fieldLook" t-value="look" />
+                            <t t-set="emptyText" t-value="block.label" />
+                            <t t-set="valueIsLabel" t-value="true" />
+                        </t>
                         <t t-if="detailed">
                             <code class="small text-muted o_erplibre_studio_tech" t-esc="block.name" />
                             <span t-if="field.type" class="badge text-bg-light o_erplibre_studio_tech" t-esc="field.type" />
                         </t>
                     </t>
                 </t>
-                <t t-if="block.kind === 'field' and subList" t-call="erplibre_studio.Block.value" />
-                <t t-else="">
-                    <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
-                    <t t-call="erplibre_studio.Block.marks" />
-                </t>
+                <i t-if="!canDrag and block.kind === 'field'" class="fa fa-lock o_erplibre_studio_lock" title="Loaded by the view" />
+                <t t-call="erplibre_studio.Block.marks" />
             </t>
             <t t-else="">
                 <!-- A card, a search view, an axis: the label in a chip. -->
@@ -507,37 +586,41 @@
                     t-on-dragover="(ev) => editor.overScope(ev, pagesScope)"
                     t-on-drop="(ev) => editor.dropOnScope(ev)"
                 >
-                    <li class="nav-item" t-foreach="pages" t-as="page" t-key="page.path">
-                        <a
-                            href="#"
-                            class="nav-link o_erplibre_studio_page_tab"
-                            t-att-class="{'active': page === activePage}"
-                            t-att-data-path="page.path"
-                            t-on-click.prevent.stop="() => this.selectPage(page_index, page)"
-                        >
-                            <t t-esc="page.label" />
-                            <t t-set="count" t-value="tabCount(page)" />
-                            <span
-                                t-if="count"
-                                role="img"
-                                class="o_erplibre_studio_margin_count"
-                                t-att-aria-label="tabCountLabel(count)"
-                                t-att-title="tabCountLabel(count)"
-                                t-esc="count"
-                            />
-                            <t t-if="detailed">
+                    <!-- A tab the form hides on the sample record is left out at
+                         the Simple level (isDrawn). -->
+                    <t t-foreach="pages" t-as="page" t-key="page.path">
+                        <li t-if="isDrawn(page)" class="nav-item">
+                            <a
+                                href="#"
+                                class="nav-link o_erplibre_studio_page_tab"
+                                t-att-class="{'active': page === activePage}"
+                                t-att-data-path="page.path"
+                                t-on-click.prevent.stop="() => this.selectPage(page_index, page)"
+                            >
+                                <t t-esc="page.label" />
+                                <t t-set="count" t-value="tabCount(page)" />
                                 <span
-                                    t-foreach="changeTagsOf(page)"
-                                    t-as="tag"
-                                    t-key="tag.kind"
-                                    class="badge o_erplibre_studio_change_tag"
-                                    t-att-class="'o_erplibre_studio_change_tag_' + tag.kind"
-                                    t-att-data-kind="tag.kind"
-                                    t-esc="tag.label"
+                                    t-if="count"
+                                    role="img"
+                                    class="o_erplibre_studio_margin_count"
+                                    t-att-aria-label="tabCountLabel(count)"
+                                    t-att-title="tabCountLabel(count)"
+                                    t-esc="count"
                                 />
-                            </t>
-                        </a>
-                    </li>
+                                <t t-if="detailed">
+                                    <span
+                                        t-foreach="changeTagsOf(page)"
+                                        t-as="tag"
+                                        t-key="tag.kind"
+                                        class="badge o_erplibre_studio_change_tag"
+                                        t-att-class="'o_erplibre_studio_change_tag_' + tag.kind"
+                                        t-att-data-kind="tag.kind"
+                                        t-esc="tag.label"
+                                    />
+                                </t>
+                            </a>
+                        </li>
+                    </t>
                     <!-- The hook of a new tab, at the end of the tabs. -->
                     <li t-if="editor.data.operations and editor.data.operations.includes('add_page')" class="nav-item o_erplibre_studio_page_hook">
                         <t t-call="erplibre_studio.Hook">
@@ -560,6 +643,7 @@
             t-att-class="{
                 'o_erplibre_studio_row': isRow,
                 'o_erplibre_studio_button_row': isButtonRow,
+                'o_erplibre_studio_empty_box': isEmptyButtonBox,
                 'o_erplibre_studio_muted_line': mutedLine,
                 'o_erplibre_studio_base_invisible': baseInvisible,
                 'o_erplibre_studio_selected': isSelected,
