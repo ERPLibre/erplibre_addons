@@ -2,9 +2,16 @@
 // © 2026 TechnoLibre (http://www.technolibre.ca)
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import {developerPanelItem} from "@erplibre_developer/debug_items";
 import {_t} from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import {user} from "@web/core/user";
+
+// The section of the debug menu that gathers the entries of the studio and
+// of the Developer panel under one « Studio » heading. The debug menu sorts
+// its sections by the sequence of registry.category("debug_section"): 5
+// puts this one above « Record » (10) and « User Interface » (20).
+export const STUDIO_DEBUG_SECTION = "erplibre_studio";
 
 // The view types the editor opens on. A page shows a timeline, a hierarchy,
 // an activity view, a map or a GeoEngine view only when web_timeline,
@@ -76,7 +83,7 @@ export function customizeViewItem({component, env}) {
             );
         },
         sequence: 206,
-        section: "ui",
+        section: STUDIO_DEBUG_SECTION,
     };
 }
 
@@ -109,9 +116,22 @@ export function customizeSearchViewItem({component, env}) {
             );
         },
         sequence: 207,
-        section: "ui",
+        section: STUDIO_DEBUG_SECTION,
     };
 }
 
-registry.category("debug").category("view").add("erplibreStudioCustomize", customizeViewItem);
-registry.category("debug").category("view").add("erplibreStudioCustomizeSearch", customizeSearchViewItem);
+/**
+ * The « Developer panel » entry of erplibre_developer, moved to the studio
+ * section: same visibility rules and callback, only its ``section`` differs.
+ * Without the studio, the entry stays in « User Interface ».
+ */
+export function studioDeveloperPanelItem(context) {
+    const item = developerPanelItem(context);
+    return item && {...item, section: STUDIO_DEBUG_SECTION};
+}
+
+registry.category("debug_section").add(STUDIO_DEBUG_SECTION, {label: _t("Studio"), sequence: 5});
+const viewDebugItems = registry.category("debug").category("view");
+viewDebugItems.add("erplibreDeveloperPanel", studioDeveloperPanelItem, {force: true});
+viewDebugItems.add("erplibreStudioCustomize", customizeViewItem);
+viewDebugItems.add("erplibreStudioCustomizeSearch", customizeSearchViewItem);

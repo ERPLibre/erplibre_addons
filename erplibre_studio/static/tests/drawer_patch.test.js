@@ -88,4 +88,40 @@ describe("erplibre_studio developer panel buttons", () => {
         expect.verifySteps(["erplibre_studio.editor list 7"]);
         expect(document.body).not.toHaveClass("o_erplibre_dev_open");
     });
+
+    test("the debug menu of a view gathers the studio entries under Studio", async () => {
+        await mountWithCleanup(WebClient);
+        await getService("action").doAction({
+            name: "Partners",
+            res_model: "res.partner",
+            type: "ir.actions.act_window",
+            views: [[false, "list"]],
+        });
+        await contains(".o_debug_manager button").click();
+        await waitFor(".dropdown-menu .dropdown-menu_group");
+        // Headings and entries in the order of the menu, a heading as « # ».
+        const rows = [
+            ...document.querySelectorAll(".dropdown-menu .dropdown-menu_group, .dropdown-menu .dropdown-item"),
+        ].map((el) => (el.classList.contains("dropdown-menu_group") ? "# " : "") + el.textContent.trim());
+        // The Studio section opens the menu with its three entries, and the
+        // next heading closes it.
+        expect(rows.slice(0, 4)).toEqual([
+            "# Studio",
+            "Developer panel",
+            "Customize this view",
+            "Customize the search view",
+        ]);
+        expect(rows[4]).toMatch(/^# /);
+        expect(rows.filter((row) => row === "# Studio")).toHaveLength(1);
+        expect(rows.filter((row) => row === "Developer panel")).toHaveLength(1);
+        // The entries keep their callbacks.
+        patchWithCleanup(getService("action"), {
+            async doAction(action) {
+                expect.step(`${action.tag} ${action.params.view_type}`);
+            },
+        });
+        await contains(".dropdown-menu .dropdown-item:contains('Customize the search view')").click();
+        await animationFrame();
+        expect.verifySteps(["erplibre_studio.editor search"]);
+    });
 });
