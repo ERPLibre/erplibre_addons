@@ -6076,16 +6076,16 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
     </record>
     <record id="req_sd_grepo_r37" model="devops.requirement">
         <field name="code">SD-GREPO-R37</field>
-        <field name="name">games.plain-clone-&lt;date&gt;/ and games.save-&lt;date&gt;/ are ignored by ERPLibre</field>
+        <field name="name">Out of scope: games.plain-clone-&lt;date&gt;/ and games.save-&lt;date&gt;/, which the repo install of the games never makes</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="370" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">No test pins that erplibre:.gitignore ignores script/stream_deck/games.*/: erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_games_directory_is_ignored checks games/ alone.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The installer poses the games by repo sync and sets a games/ that is no repo checkout aside as games.avant-repo-&lt;date&gt;/, which the /script/stream_deck/games.*/ rule of erplibre:.gitignore ignores; no step of ERPLibre makes games.plain-clone-&lt;date&gt;/ or games.save-&lt;date&gt;/. No test pins the games.*/ rule: erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_games_directory_is_ignored checks games/ alone.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r38" model="devops.requirement">
         <field name="code">SD-GREPO-R38</field>
@@ -6112,22 +6112,21 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="approved" eval="True" />
         <field name="done" eval="False" />
         <field name="achievement">The reader is pinned on the extension: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest reads the url and the revision of the extension's project, its attributes over several lines.</field>
-        <field name="missing">No test pins that the games line reads its url and revision from manifest/git_manifest_streamdeck_game.xml: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck checks the path the games are posed at, not the url nor the revision.</field>
+        <field name="missing">No test pins the url nor a revision of the games line read from manifest/git_manifest_streamdeck_game.xml: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck checks the path the games are posed at and the revision main of the summary, erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync the path of the --dry-run line.</field>
         <field name="notes">Origin: unit test missing.</field>
     </record>
     <record id="req_sd_grepo_r40" model="devops.requirement">
         <field name="code">SD-GREPO-R40</field>
-        <field name="name">The installer clones when games/ is absent or holds only real save/ and __pycache__/ directories</field>
+        <field name="name">Out of scope: a list of what games/ may hold and still be cloned over (save/, __pycache__/)</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="400" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck (games/ absent); erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside (games/ holding only save/).</field>
-        <field name="missing">No test pins a games/ holding only __pycache__/: the set-aside is tested with save/ alone.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The repo install keeps no such list: an absent or empty games/ is posed by repo sync, and any other content that is no repo checkout, save/ and __pycache__/ included, is set aside whole as games.avant-repo-&lt;date&gt;/ before the pose (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck; erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r41" model="devops.requirement">
         <field name="code">SD-GREPO-R41</field>
@@ -6144,17 +6143,16 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
     </record>
     <record id="req_sd_grepo_r42" model="devops.requirement">
         <field name="code">SD-GREPO-R42</field>
-        <field name="name">Any other existing directory is left alone (one holding the games, the old repo layout)</field>
+        <field name="name">Out of scope: leaving alone a games/ that holds the games without being a repo checkout</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="420" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">For the extension checkout, the old repo layout stays: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout.</field>
-        <field name="missing">A games/ holding the games without being a repo checkout is set aside, not left alone (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside); no test runs the old repo layout on games/.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The repo install sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, a plain clone of the games included, then poses the games, and puts it back when the pose fails (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside). A repo checkout, the old repo layout included, is synced in place (SD-GREPO-R43; for the extension, erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r43" model="devops.requirement">
         <field name="code">SD-GREPO-R43</field>
@@ -6166,50 +6164,49 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="False" />
-        <field name="missing">No test pins that a second run leaves a repo-posed games/, its .git a link, in place: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_synced_checkout_follows_main syncs the extension checkout again, without asserting that nothing is set aside.</field>
+        <field name="missing">No test runs the installer again over posed games/: for the extension, erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_first_pose_inits_once_without_groups_then_syncs_the_path pins that a second run over its checkout sets nothing aside, its summary empty.</field>
         <field name="notes">Origin: unit test missing.</field>
     </record>
     <record id="req_sd_grepo_r44" model="devops.requirement">
         <field name="code">SD-GREPO-R44</field>
-        <field name="name">The installer clones into a temporary sibling directory renamed once checked out; a failed clone leaves nothing</field>
+        <field name="name">Out of scope: a clone into a temporary sibling directory renamed once checked out</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="440" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">For the extension: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one: a failed first pose of the extension exits 1 and leaves no .git.</field>
-        <field name="missing">repo sync poses the games without a temporary sibling directory; no test pins that a failed first pose of the games leaves no games/ directory.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">repo sync poses the games in place. A failed first pose leaves no partial checkout: repo_restore of erplibre:script/install/install_erplibre_home.sh removes what repo began and puts back the content set aside, pinned for the games by erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside and, without content, for the extension by erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r45" model="devops.requirement">
         <field name="code">SD-GREPO-R45</field>
-        <field name="name">The clone gets the umask mode, not mktemp's 0700</field>
+        <field name="name">Out of scope: a temporary clone directory whose mktemp mode 0700 the games would keep</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="450" />
-        <field name="moscow">must</field>
+        <field name="moscow">wont</field>
         <field name="requirement_type">security</field>
-        <field name="devsecops_stage">test</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
+        <field name="description">The installer makes no temporary directory for the games: repo sync creates games/ under the umask, and the 0700 mode of mktemp -d cannot reach it.</field>
         <field name="security_relevant" eval="True" />
-        <field name="missing">repo sync creates the games directory, without mktemp; no test pins its mode.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r46" model="devops.requirement">
         <field name="code">SD-GREPO-R46</field>
-        <field name="name">The installer clones the games detached on origin/main, with no local branch, and marks the installed commit</field>
+        <field name="name">Out of scope: an installer clone of its own, detached on origin/main without a local branch, with a mark of the installed commit</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="460" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">repo sync poses the games as a checkout that follows main; no test pins a detached clone, the absence of a local branch or the mark of the installed commit.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The games are a project of repo: repo sync leaves a new project on a detached HEAD at the revision of the manifest, and the installer writes no mark of its own. The long test reads HEAD against the commit of that revision (SD-GREPO-R67).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r47" model="devops.requirement">
         <field name="code">SD-GREPO-R47</field>
@@ -6241,43 +6238,42 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
     </record>
     <record id="req_sd_grepo_r49" model="devops.requirement">
         <field name="code">SD-GREPO-R49</field>
-        <field name="name">Revision forms: branch (bare or refs/heads), tag (refs/tags), 40-hex commit</field>
+        <field name="name">Out of scope: the installer reading the branch, tag and commit forms of the revision</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="490" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">repo sync reads the revision of the manifest; no test pins the branch, tag and commit forms for the games.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The installer copies the games project of manifest/git_manifest_streamdeck_game.xml into the local manifest, and repo sync resolves its revision like that of every project of the checkout; only the --dry-run line reads it, as written (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest, on refs/tags/v1.0.0).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r50" model="devops.requirement">
         <field name="code">SD-GREPO-R50</field>
-        <field name="name">--dry-run prints 'games: clone &lt;url&gt; at &lt;revision&gt; into &lt;dir&gt;' or 'games: keep &lt;dir&gt;' (with its reason), at the Stream Deck level only</field>
+        <field name="name">Out of scope: the --dry-run lines 'games: clone …' and 'games: keep …'</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="500" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync: only the Stream Deck level has a games line.</field>
-        <field name="missing">--dry-run prints 'games: repo sync &lt;dir&gt; (&lt;url&gt; at &lt;revision&gt;)', and a set-aside line for a games/ that is no checkout; no line says clone or keep.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">Under --dry-run, the Stream Deck level prints 'games: repo sync &lt;dir&gt; (&lt;url&gt; at &lt;revision&gt;)', after 'games: set aside &lt;dir&gt; to &lt;dir&gt;.avant-repo-&lt;date&gt;' for a games/ that is no repo checkout; the base level prints no games line (erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r51" model="devops.requirement">
         <field name="code">SD-GREPO-R51</field>
-        <field name="name">A kept games/ without the games is named in the summary (dotted names, dangling links, a count of game files)</field>
+        <field name="name">Out of scope: a games/ kept without the games and named in the summary</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="510" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">A games/ that is no checkout is set aside whole (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside); no summary names what such a directory lacks.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">The repo install keeps no games/ that is no repo checkout: it sets it aside whole, and the summary says where, 'games set aside: &lt;dir&gt; moved to &lt;dir&gt;.avant-repo-&lt;date&gt;' (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r52" model="devops.requirement">
         <field name="code">SD-GREPO-R52</field>
@@ -6506,94 +6502,94 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
     </record>
     <record id="req_sd_grepo_r69" model="devops.requirement">
         <field name="code">SD-GREPO-R69</field>
-        <field name="name">streamdeck_games_to_repo.sh runs between repo init and repo sync in every update_manifest_*.sh; a refusal stops the update</field>
+        <field name="name">Out of scope: streamdeck_games_to_repo.sh between repo init and repo sync in the update_manifest_*.sh scripts</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="690" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r70" model="devops.requirement">
         <field name="code">SD-GREPO-R70</field>
-        <field name="name">When repo list -p --all names the path, a plain clone without visible local work moves to games.plain-clone-&lt;date&gt;/, and save/ is copied back</field>
+        <field name="name">Out of scope: moving a plain clone without visible local work to games.plain-clone-&lt;date&gt;/, save/ copied back</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="700" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo. The saves live outside the checkout since contract 1.1 (SD-GREPO-R11).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r71" model="devops.requirement">
         <field name="code">SD-GREPO-R71</field>
-        <field name="name">Visible local work (changes, untracked even with showUntrackedFiles=no, unpushed commits, stash, linked worktrees) stops the update; nothing is deleted</field>
+        <field name="name">Out of scope: stopping the update on visible local work in a plain clone of the games</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="710" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo. What is set aside, local work included, is never deleted; a repo checkout whose local changes make repo sync -l refuse stays as it is, and the summary says the games are not updated (SD-GREPO-R48).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r72" model="devops.requirement">
         <field name="code">SD-GREPO-R72</field>
-        <field name="name">--all is required (without it repo lists only checked-out projects)</field>
+        <field name="name">Out of scope: --all on the repo list of streamdeck_games_to_repo.sh</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="720" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo. The shrink guard of the installer lists the projects by repo list -p --all (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r73" model="devops.requirement">
         <field name="code">SD-GREPO-R73</field>
-        <field name="name">A clone that repo will not extract stays; without repo ready nothing changes; without games nothing happens</field>
+        <field name="name">Out of scope: the cases where streamdeck_games_to_repo.sh changes nothing (a clone repo will not extract, repo not ready, no games)</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="730" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r74" model="devops.requirement">
         <field name="code">SD-GREPO-R74</field>
-        <field name="name">An init leaving a repo-managed games/ out copies save/ to games.save-&lt;date&gt;/</field>
+        <field name="name">Out of scope: copying save/ to games.save-&lt;date&gt;/ when an init leaves a repo-managed games/ out</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="740" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo. A repo sync that would delete games/, which the manifest no longer holds, is refused first by the shrink guard of the installer (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete).</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r75" model="devops.requirement">
         <field name="code">SD-GREPO-R75</field>
-        <field name="name">A .git file not pointing into .repo/ holds the clone back; the old repo layout and a .git pointing into .repo/ count as repo's</field>
+        <field name="name">Out of scope: holding a plain clone back by where its .git file points</field>
         <field name="category_id" ref="cat_sd_grepo" />
         <field name="sequence" eval="750" />
-        <field name="moscow">must</field>
-        <field name="devsecops_stage">test</field>
+        <field name="moscow">wont</field>
+        <field name="devsecops_stage">plan</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="description">ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games by repo sync and sets aside whole, as games.avant-repo-&lt;date&gt;/, a games/ that is no repo checkout, so no step hands a plain clone of the games over to repo. repo_dir_state of erplibre:script/install/install_erplibre_home.sh counts as a repo checkout a .git link and the old layout, a .git directory whose objects/ is a link (for the extension, erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout); anything else, a .git file included, is set aside.</field>
+        <field name="notes">Origin: documented only.</field>
     </record>
     <record id="req_sd_grepo_r76" model="devops.requirement">
         <field name="code">SD-GREPO-R76</field>
@@ -6605,7 +6601,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="False" />
-        <field name="missing">No test pins that update_manifest_local_dev_code_generator.sh passes the streamdeck group to repo init.</field>
+        <field name="missing">No test pins that update_manifest_local_dev_code_generator.sh passes the streamdeck group to repo init: erplibre:test/test_erplibre_home_extension_repo.py::LeManifeste::test_the_code_generator_init_keeps_the_erplibre_home_group checks the erplibre_home group only.</field>
         <field name="notes">Origin: unit test missing.</field>
     </record>
     <record id="req_sd_grepo_r77" model="devops.requirement">

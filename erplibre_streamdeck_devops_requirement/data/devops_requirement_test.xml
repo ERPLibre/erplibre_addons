@@ -4265,30 +4265,6 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest</field>
     </record>
-    <record id="test_sd_grepo_r40_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r40" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck</field>
-    </record>
-    <record id="test_sd_grepo_r40_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r40" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside</field>
-    </record>
-    <record id="test_sd_grepo_r42_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r42" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout</field>
-    </record>
-    <record id="test_sd_grepo_r44_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r44" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one</field>
-    </record>
     <record id="test_sd_grepo_r47_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r47" />
         <field name="sequence" eval="10" />
@@ -4306,12 +4282,6 @@
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_fetch_on_a_checkout_exits_zero_not_updated</field>
-    </record>
-    <record id="test_sd_grepo_r50_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r50" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
     </record>
     <record id="test_sd_grepo_r52_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r52" />

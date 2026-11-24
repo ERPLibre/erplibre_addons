@@ -53,6 +53,28 @@ ORIGIN = re.compile(
 )
 NON_GOAL = re.compile(r"^(Non-goals?|Out of scope)\b")
 
+# Les requis de la pose des jeux par un clone simple et par
+# streamdeck_games_to_repo.sh. La pose par repo n'a ni l'un ni l'autre :
+# ils sont hors périmètre, leur raison dans la description.
+PLAIN_CLONE_INSTALL = (
+    "SD-GREPO-R37",
+    "SD-GREPO-R40",
+    "SD-GREPO-R42",
+    "SD-GREPO-R44",
+    "SD-GREPO-R45",
+    "SD-GREPO-R46",
+    "SD-GREPO-R49",
+    "SD-GREPO-R50",
+    "SD-GREPO-R51",
+    "SD-GREPO-R69",
+    "SD-GREPO-R70",
+    "SD-GREPO-R71",
+    "SD-GREPO-R72",
+    "SD-GREPO-R73",
+    "SD-GREPO-R74",
+    "SD-GREPO-R75",
+)
+
 # Le français des requis suit celui de l'interface d'ERPLibre : « plugin »,
 # « hors périmètre », « se termine avec le code N ».
 FRENCH_LEXICON = re.compile(
@@ -317,7 +339,7 @@ class TestStreamdeckRequirementData(TransactionCase):
             "SD-EXT-R122",
             "SD-EXT-R55",
             "SD-EXT-R58",
-            "SD-GREPO-R45",
+            "SD-GREPO-R66",
         ):
             requirement = self._requirement(code)
             self.assertEqual(requirement.moscow, "must", code)
@@ -348,6 +370,21 @@ class TestStreamdeckRequirementData(TransactionCase):
             self.assertEqual(requirement.moscow, "wont", requirement.code)
             self.assertTrue(requirement.done, requirement.code)
             self.assertFalse(requirement.missing, requirement.code)
+            # Un non-objectif est tenu par ce qui n'est pas fait : aucun
+            # verdict de test ne le prouve.
+            self.assertFalse(requirement.test_ids, requirement.code)
+
+    def test_the_plain_clone_install_of_the_games_is_out_of_scope(self):
+        for code in PLAIN_CLONE_INSTALL:
+            with self.subTest(code=code):
+                requirement = self._requirement(code)
+                self.assertRegex(requirement.name, NON_GOAL)
+                self.assertEqual(requirement.moscow, "wont")
+                self.assertEqual(requirement.devsecops_stage, "plan")
+                self.assertTrue(requirement.done)
+                self.assertTrue(requirement.description)
+                self.assertFalse(requirement.missing)
+                self.assertFalse(requirement.test_ids)
 
     def test_notes_open_on_an_origin(self):
         for requirement in self.requirements:

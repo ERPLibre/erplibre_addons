@@ -18,11 +18,6 @@ msgstr ""
 "X-Generator: Odoo\n"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r72
-msgid "--all is required (without it repo lists only checked-out projects)"
-msgstr "--all est requis (sans lui, repo ne liste que les projets extraits)"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r11
 msgid ""
 "--check also requires graphical-session.target active, checked after the "
@@ -40,15 +35,6 @@ msgstr ""
 "--check se termine avec le code 0 seulement si le programme n'est pas none, "
 "que le python du venv existe et qu'un périphérique USB du fabricant 0fd9 est"
 " présent ; sinon il se termine avec un code non nul et donne une raison"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r50
-msgid ""
-"--dry-run prints 'games: clone <url> at <revision> into <dir>' or 'games: "
-"keep <dir>' (with its reason), at the Stream Deck level only"
-msgstr ""
-"--dry-run affiche 'games: clone <url> at <revision> into <dir>' ou 'games: "
-"keep <dir>' (avec sa raison), au niveau Stream Deck seulement"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_deploy_r73
@@ -249,16 +235,6 @@ msgstr ""
 "inconnu ou illisible, code de sortie 2"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r75
-msgid ""
-"A .git file not pointing into .repo/ holds the clone back; the old repo "
-"layout and a .git pointing into .repo/ count as repo's"
-msgstr ""
-"Un fichier .git qui ne pointe pas dans .repo/ retient le clone ; l'ancienne "
-"disposition de repo et un .git qui pointe dans .repo/ comptent comme "
-"appartenant à repo"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r27
 msgid ""
 "A BMP model given a non-PNG image rejects "
@@ -393,15 +369,6 @@ msgid ""
 msgstr ""
 "Un appel d'un script déplacé par son ancien chemin échoue ; les noms des "
 "cibles make fonctionnent toujours"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r73
-msgid ""
-"A clone that repo will not extract stays; without repo ready nothing "
-"changes; without games nothing happens"
-msgstr ""
-"Un clone que repo n'extraira pas reste en place ; sans repo prêt, rien ne "
-"change ; sans jeux, rien ne se passe"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r42
@@ -747,15 +714,6 @@ msgstr ""
 msgid "A journal line is exactly '[erplibre-home] <plugin>: <reason>'"
 msgstr ""
 "Une ligne du journal est exactement '[erplibre-home] <plugin>: <reason>'"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r51
-msgid ""
-"A kept games/ without the games is named in the summary (dotted names, "
-"dangling links, a count of game files)"
-msgstr ""
-"Un games/ conservé sans les jeux est nommé dans le résumé (noms commençant "
-"par un point, liens brisés, nombre de fichiers de jeux)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_plugin_r57
@@ -1598,14 +1556,6 @@ msgid "An inactive poll is not read"
 msgstr "Un sondage inactif n'est pas lu"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r74
-msgid ""
-"An init leaving a repo-managed games/ out copies save/ to games.save-<date>/"
-msgstr ""
-"Un init qui laisse de côté un games/ géré par repo copie save/ dans "
-"games.save-<date>/"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ctl_r71
 msgid ""
 "An interconnection test holds the keymap format of CONTRACT.md equal to the "
@@ -1844,15 +1794,6 @@ msgid ""
 msgstr ""
 "Anti-objectif : deux activités ouvertes pour un même problème, sur le même "
 "enregistrement, du même type, pour le même utilisateur"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r42
-msgid ""
-"Any other existing directory is left alone (one holding the games, the old "
-"repo layout)"
-msgstr ""
-"Tout autre répertoire existant est laissé tel quel (un répertoire qui "
-"contient les jeux, l'ancienne disposition de repo)"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_ext_r129
@@ -2693,6 +2634,110 @@ msgstr "Déploiement d'ERPLibre Home"
 #: model:devops.requirement.category,name:erplibre_streamdeck_devops_requirement.cat_sd_rename
 msgid "ERPLibre Home rename"
 msgstr "Renommage en ERPLibre Home"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r69
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r73
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r74
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo. A repo sync that would delete games/, which the manifest no longer "
+"holds, is refused first by the shrink guard of the installer "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete)."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo. Un repo sync qui supprimerait games/, que le "
+"manifeste ne retient plus, est refusé d'abord par la garde de rétrécissement"
+" de l'installateur "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r70
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo. The saves live outside the checkout since contract 1.1 (SD-"
+"GREPO-R11)."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo. Les sauvegardes vivent hors du checkout depuis"
+" le contrat 1.1 (SD-GREPO-R11)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r72
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo. The shrink guard of the installer lists the projects by repo list "
+"-p --all "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete)."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo. La garde de rétrécissement de l'installateur "
+"liste les projets par repo list -p --all "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_shrink_guard_stops_before_a_sync_that_would_delete)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r71
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo. What is set aside, local work included, is never deleted; a repo "
+"checkout whose local changes make repo sync -l refuse stays as it is, and "
+"the summary says the games are not updated (SD-GREPO-R48)."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo. Ce qui est mis de côté, travail local compris,"
+" n'est jamais supprimé ; un checkout de repo dont les changements locaux "
+"font refuser repo sync -l reste tel quel, et le bilan dit que les jeux ne "
+"sont pas mis à jour (SD-GREPO-R48)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r75
+msgid ""
+"ERPLibre has no streamdeck_games_to_repo.sh: the installer poses the games "
+"by repo sync and sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, so no step hands a plain clone of the games over "
+"to repo. repo_dir_state of erplibre:script/install/install_erplibre_home.sh "
+"counts as a repo checkout a .git link and the old layout, a .git directory "
+"whose objects/ is a link (for the extension, "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout);"
+" anything else, a .git file included, is set aside."
+msgstr ""
+"ERPLibre n'a pas de streamdeck_games_to_repo.sh : l'installateur pose les "
+"jeux par repo sync et met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo ; aucune étape ne remet donc un "
+"clone simple des jeux à repo. repo_dir_state de "
+"erplibre:script/install/install_erplibre_home.sh tient pour un checkout de "
+"repo un .git en lien et l'ancienne disposition, un .git répertoire dont "
+"objects/ est un lien (pour l'extension, "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout)"
+" ; tout le reste, un fichier .git compris, est mis de côté."
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r35
@@ -4692,6 +4737,262 @@ msgstr ""
 "sa fin"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r72
+msgid "Out of scope: --all on the repo list of streamdeck_games_to_repo.sh"
+msgstr ""
+"Hors périmètre : --all sur le repo list de streamdeck_games_to_repo.sh"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r44
+msgid ""
+"Out of scope: a clone into a temporary sibling directory renamed once "
+"checked out"
+msgstr ""
+"Hors périmètre : un clone dans un répertoire voisin temporaire renommé une "
+"fois extrait"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r51
+msgid "Out of scope: a games/ kept without the games and named in the summary"
+msgstr "Hors périmètre : un games/ gardé sans les jeux et nommé au bilan"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r40
+msgid ""
+"Out of scope: a list of what games/ may hold and still be cloned over "
+"(save/, __pycache__/)"
+msgstr ""
+"Hors périmètre : une liste de ce que games/ peut contenir et être cloné "
+"quand même (save/, __pycache__/)"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r45
+msgid ""
+"Out of scope: a temporary clone directory whose mktemp mode 0700 the games "
+"would keep"
+msgstr ""
+"Hors périmètre : un répertoire de clone temporaire dont les jeux garderaient"
+" le mode 0700 de mktemp"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r46
+msgid ""
+"Out of scope: an installer clone of its own, detached on origin/main without"
+" a local branch, with a mark of the installed commit"
+msgstr ""
+"Hors périmètre : un clone propre à l'installateur, détaché sur origin/main "
+"sans branche locale, avec une marque du commit installé"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r74
+msgid ""
+"Out of scope: copying save/ to games.save-<date>/ when an init leaves a "
+"repo-managed games/ out"
+msgstr ""
+"Hors périmètre : copier save/ dans games.save-<date>/ quand un init laisse "
+"de côté un games/ géré par repo"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r37
+msgid ""
+"Out of scope: games.plain-clone-<date>/ and games.save-<date>/, which the "
+"repo install of the games never makes"
+msgstr ""
+"Hors périmètre : games.plain-clone-<date>/ et games.save-<date>/, que la "
+"pose des jeux par repo ne crée jamais"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r75
+msgid "Out of scope: holding a plain clone back by where its .git file points"
+msgstr ""
+"Hors périmètre : retenir un clone simple selon la cible de son fichier .git"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r42
+msgid ""
+"Out of scope: leaving alone a games/ that holds the games without being a "
+"repo checkout"
+msgstr ""
+"Hors périmètre : laisser en place un games/ qui porte les jeux sans être un "
+"checkout de repo"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r70
+msgid ""
+"Out of scope: moving a plain clone without visible local work to "
+"games.plain-clone-<date>/, save/ copied back"
+msgstr ""
+"Hors périmètre : déplacer un clone simple sans travail local visible dans "
+"games.plain-clone-<date>/, save/ recopié"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r71
+msgid ""
+"Out of scope: stopping the update on visible local work in a plain clone of "
+"the games"
+msgstr ""
+"Hors périmètre : arrêter la mise à jour sur un travail local visible dans un"
+" clone simple des jeux"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r69
+msgid ""
+"Out of scope: streamdeck_games_to_repo.sh between repo init and repo sync in"
+" the update_manifest_*.sh scripts"
+msgstr ""
+"Hors périmètre : streamdeck_games_to_repo.sh entre repo init et repo sync "
+"dans les scripts update_manifest_*.sh"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r50
+msgid "Out of scope: the --dry-run lines 'games: clone …' and 'games: keep …'"
+msgstr ""
+"Hors périmètre : les lignes « games: clone … » et « games: keep … » de "
+"--dry-run"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r73
+msgid ""
+"Out of scope: the cases where streamdeck_games_to_repo.sh changes nothing (a"
+" clone repo will not extract, repo not ready, no games)"
+msgstr ""
+"Hors périmètre : les cas où streamdeck_games_to_repo.sh ne change rien (un "
+"clone que repo n'extrait pas, repo pas prêt, pas de jeux)"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r49
+msgid ""
+"Out of scope: the installer reading the branch, tag and commit forms of the "
+"revision"
+msgstr ""
+"Hors périmètre : la lecture par l'installateur des formes branche, étiquette"
+" et commit de la révision"
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r46
+msgid ""
+"The games are a project of repo: repo sync leaves a new project on a "
+"detached HEAD at the revision of the manifest, and the installer writes no "
+"mark of its own. The long test reads HEAD against the commit of that "
+"revision (SD-GREPO-R67)."
+msgstr ""
+"Les jeux sont un projet de repo : repo sync laisse un nouveau projet sur un "
+"HEAD détaché à la révision du manifeste, et l'installateur n'écrit aucune "
+"marque à lui. Le test long compare HEAD au commit de cette révision (SD-"
+"GREPO-R67)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r49
+msgid ""
+"The installer copies the games project of "
+"manifest/git_manifest_streamdeck_game.xml into the local manifest, and repo "
+"sync resolves its revision like that of every project of the checkout; only "
+"the --dry-run line reads it, as written "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest,"
+" on refs/tags/v1.0.0)."
+msgstr ""
+"L'installateur recopie le projet des jeux de "
+"manifest/git_manifest_streamdeck_game.xml dans le manifeste local, et repo "
+"sync résout sa révision comme celle de chaque projet du checkout ; seule la "
+"ligne de --dry-run la lit, telle qu'écrite "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest,"
+" sur refs/tags/v1.0.0)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r45
+msgid ""
+"The installer makes no temporary directory for the games: repo sync creates "
+"games/ under the umask, and the 0700 mode of mktemp -d cannot reach it."
+msgstr ""
+"L'installateur ne crée aucun répertoire temporaire pour les jeux : repo sync"
+" crée games/ sous l'umask, et le mode 0700 de mktemp -d ne peut pas "
+"l'atteindre."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r37
+msgid ""
+"The installer poses the games by repo sync and sets a games/ that is no repo"
+" checkout aside as games.avant-repo-<date>/, which the "
+"/script/stream_deck/games.*/ rule of erplibre:.gitignore ignores; no step of"
+" ERPLibre makes games.plain-clone-<date>/ or games.save-<date>/. No test "
+"pins the games.*/ rule: "
+"erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_games_directory_is_ignored"
+" checks games/ alone."
+msgstr ""
+"L'installateur pose les jeux par repo sync et met de côté un games/ qui "
+"n'est pas un checkout de repo sous games.avant-repo-<date>/, que la règle "
+"/script/stream_deck/games.*/ d'erplibre:.gitignore ignore ; aucune étape "
+"d'ERPLibre ne crée games.plain-clone-<date>/ ni games.save-<date>/. Aucun "
+"test ne fixe la règle games.*/ : "
+"erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_games_directory_is_ignored"
+" ne vérifie que games/."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r51
+msgid ""
+"The repo install keeps no games/ that is no repo checkout: it sets it aside "
+"whole, and the summary says where, 'games set aside: <dir> moved to "
+"<dir>.avant-repo-<date>' "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+msgstr ""
+"La pose par repo ne garde aucun games/ qui n'est pas un checkout de repo : "
+"elle le met de côté entier, et le bilan dit où, « games set aside: <dir> "
+"moved to <dir>.avant-repo-<date> » "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r40
+msgid ""
+"The repo install keeps no such list: an absent or empty games/ is posed by "
+"repo sync, and any other content that is no repo checkout, save/ and "
+"__pycache__/ included, is set aside whole as games.avant-repo-<date>/ before"
+" the pose "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck;"
+" "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+msgstr ""
+"La pose par repo ne tient aucune liste de ce genre : un games/ absent ou "
+"vide est posé par repo sync, et tout autre contenu qui n'est pas un checkout"
+" de repo, save/ et __pycache__/ compris, est mis de côté entier sous "
+"games.avant-repo-<date>/ avant la pose "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck"
+" ; "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r42
+msgid ""
+"The repo install sets aside whole, as games.avant-repo-<date>/, a games/ "
+"that is no repo checkout, a plain clone of the games included, then poses "
+"the games, and puts it back when the pose fails "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+" A repo checkout, the old repo layout included, is synced in place (SD-"
+"GREPO-R43; for the extension, "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout)."
+msgstr ""
+"La pose par repo met de côté entier, sous games.avant-repo-<date>/, un "
+"games/ qui n'est pas un checkout de repo, un clone simple des jeux compris, "
+"puis pose les jeux, et le remet en place quand la pose échoue "
+"(erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside)."
+" Un checkout de repo, l'ancienne disposition comprise, est synchronisé en "
+"place (SD-GREPO-R43 ; pour l'extension, "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout)."
+
+#. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r50
+msgid ""
+"Under --dry-run, the Stream Deck level prints 'games: repo sync <dir> (<url>"
+" at <revision>)', after 'games: set aside <dir> to <dir>.avant-repo-<date>' "
+"for a games/ that is no repo checkout; the base level prints no games line "
+"(erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync)."
+msgstr ""
+"Sous --dry-run, le niveau Stream Deck affiche « games: repo sync <dir> "
+"(<url> at <revision>) », après « games: set aside <dir> to <dir>.avant-"
+"repo-<date> » pour un games/ qui n'est pas un checkout de repo ; le niveau "
+"de base n'affiche aucune ligne games "
+"(erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync)."
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_service_r82
 msgid ""
 "make streamdeck_<game> runs the game through the hand-over, which stops the "
@@ -5285,14 +5586,6 @@ msgid ""
 msgstr ""
 "« Reprendre » lance gnome-terminal --working-directory=PATH -- bash -lc "
 "'claude --resume; exec bash'"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r49
-msgid ""
-"Revision forms: branch (bare or refs/heads), tag (refs/tags), 40-hex commit"
-msgstr ""
-"Formes de révision : branche (nue ou refs/heads), étiquette (refs/tags), "
-"commit en 40 caractères hexadécimaux"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_gsplit_r65
@@ -6295,11 +6588,6 @@ msgstr ""
 " rechargement à chaud)"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r45
-msgid "The clone gets the umask mode, not mktemp's 0700"
-msgstr "Le clone reçoit le mode de l'umask, pas le 0700 de mktemp"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r76
 msgid "The code generator's repo init keeps the streamdeck group"
 msgstr "Le repo init du générateur de code garde le groupe streamdeck"
@@ -7020,33 +7308,6 @@ msgstr ""
 "Le lien symbolique installé ~/.local/share/gnome-shell/extensions/erplibre-"
 "home@technolibre.ca pointe vers script/gnome-extension/erplibre_home du "
 "checkout"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r44
-msgid ""
-"The installer clones into a temporary sibling directory renamed once checked"
-" out; a failed clone leaves nothing"
-msgstr ""
-"L'installateur clone dans un répertoire temporaire voisin, renommé une fois "
-"l'extraction faite ; un clone raté ne laisse rien"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r46
-msgid ""
-"The installer clones the games detached on origin/main, with no local "
-"branch, and marks the installed commit"
-msgstr ""
-"L'installateur clone les jeux en HEAD détaché sur origin/main, sans branche "
-"locale, et marque le commit installé"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r40
-msgid ""
-"The installer clones when games/ is absent or holds only real save/ and "
-"__pycache__/ directories"
-msgstr ""
-"L'installateur clone quand games/ est absent ou ne contient que de vrais "
-"répertoires save/ et __pycache__/"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r47
@@ -8348,17 +8609,6 @@ msgstr ""
 "etages réécrit"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r71
-msgid ""
-"Visible local work (changes, untracked even with showUntrackedFiles=no, "
-"unpushed commits, stash, linked worktrees) stops the update; nothing is "
-"deleted"
-msgstr ""
-"Du travail local visible (modifications, fichiers non suivis même avec "
-"showUntrackedFiles=no, commits non poussés, stash, worktrees liés) arrête la"
-" mise à jour ; rien n'est supprimé"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r63
 msgid ""
 "Wake-on-key-press is coupled with keepAwake; at boot the app never writes "
@@ -8389,16 +8639,6 @@ msgstr ""
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r35
 msgid "When git init fails, .git and the SQLite row are deleted"
 msgstr "Quand git init échoue, .git et la ligne SQLite sont supprimés"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r70
-msgid ""
-"When repo list -p --all names the path, a plain clone without visible local "
-"work moves to games.plain-clone-<date>/, and save/ is copied back"
-msgstr ""
-"Quand repo list -p --all nomme le chemin, un clone ordinaire sans travail "
-"local visible est déplacé dans games.plain-clone-<date>/, et save/ est "
-"recopié"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_bundle_r15
@@ -9072,13 +9312,6 @@ msgid "gallery_server.py launches a game with shlex.quote(sys.executable)"
 msgstr "gallery_server.py lance un jeu avec shlex.quote(sys.executable)"
 
 #. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r37
-msgid ""
-"games.plain-clone-<date>/ and games.save-<date>/ are ignored by ERPLibre"
-msgstr ""
-"games.plain-clone-<date>/ et games.save-<date>/ sont ignorés par ERPLibre"
-
-#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r24
 msgid "games_cli.CONTRACT_VERSION equals the version in CONTRACT.md"
 msgstr "games_cli.CONTRACT_VERSION est égal à la version de CONTRACT.md"
@@ -9443,6 +9676,25 @@ msgid "recent-paths keeps at most 10 paths"
 msgstr "recent-paths garde au plus 10 chemins"
 
 #. module: erplibre_streamdeck_devops_requirement
+#: model:devops.requirement,description:erplibre_streamdeck_devops_requirement.req_sd_grepo_r44
+msgid ""
+"repo sync poses the games in place. A failed first pose leaves no partial "
+"checkout: repo_restore of erplibre:script/install/install_erplibre_home.sh "
+"removes what repo began and puts back the content set aside, pinned for the "
+"games by "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside"
+" and, without content, for the extension by "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one."
+msgstr ""
+"repo sync pose les jeux en place. Une première pose en échec ne laisse aucun"
+" checkout partiel : repo_restore de "
+"erplibre:script/install/install_erplibre_home.sh retire ce que repo a "
+"commencé et remet en place le contenu mis de côté, fixé pour les jeux par "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside"
+" et, sans contenu, pour l'extension par "
+"erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one."
+
+#. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_mobplug_r45
 msgid ""
 "requestPermission({deckId?}) targets one deck or every deck and resolves "
@@ -9675,15 +9927,6 @@ msgstr ""
 "streamdeck_games_present conditionne streamdeck_games_guard (chaque cible de"
 " jeu) et streamdeck_gallery ; le programme du deck et les outils du deck "
 "n'en dépendent pas"
-
-#. module: erplibre_streamdeck_devops_requirement
-#: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_grepo_r69
-msgid ""
-"streamdeck_games_to_repo.sh runs between repo init and repo sync in every "
-"update_manifest_*.sh; a refusal stops the update"
-msgstr ""
-"streamdeck_games_to_repo.sh s'exécute entre repo init et repo sync dans "
-"chaque update_manifest_*.sh ; un refus arrête la mise à jour"
 
 #. module: erplibre_streamdeck_devops_requirement
 #: model:devops.requirement,name:erplibre_streamdeck_devops_requirement.req_sd_defects_r15

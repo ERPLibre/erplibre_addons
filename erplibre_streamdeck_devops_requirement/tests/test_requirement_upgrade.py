@@ -611,6 +611,75 @@ class TestRequirementUpgrade(TransactionCase):
                         self._in_file(line, "reference", AUDIT_PROOFS),
                     )
 
+    def test_an_upgrade_to_1_5_puts_the_plain_clone_install_out_of_scope(
+        self,
+    ):
+        # La pose des jeux par repo n'a ni clone simple ni
+        # streamdeck_games_to_repo.sh : une base de la version 18.0.1.4.0
+        # qui tient leurs requis pour à faire les reçoit hors périmètre,
+        # leur raison dans la description, dans les deux langues, et sans
+        # preuve.
+        self.env["res.lang"]._activate_lang("fr_CA")
+        french = {
+            entry.msgid: entry.msgstr
+            for entry in polib.pofile(file_path("%s/i18n/fr_CA.po" % MODULE))
+        }
+        cases = {"req_sd_grepo_r40": "test_sd_grepo_r40_1"}
+        cases["req_sd_grepo_r70"] = None
+        for xmlid, line in cases.items():
+            requirement = self.env.ref("%s.%s" % (MODULE, xmlid))
+            requirement.with_context(lang="en_US").write(
+                {
+                    "name": "A step of the plain clone install",
+                    "description": False,
+                    "moscow": "must",
+                    "devsecops_stage": "test",
+                    "done": False,
+                    "missing": "No test pins this requirement.",
+                    "notes": "Origin: unit test missing.",
+                }
+            )
+            if line:
+                self.assertFalse(self._carried(line))
+                proof = self.env["devops.requirement.test"].create(
+                    {
+                        "requirement_id": requirement.id,
+                        "kind": "repo_unittest",
+                        "reference": "erplibre:test/test_install_erplibre"
+                        "_home.py::TestPoseParRepo"
+                        "::test_the_games_are_posed_like_the_deck",
+                    }
+                )
+                self.env["ir.model.data"].create(
+                    {
+                        "module": MODULE,
+                        "name": line,
+                        "model": proof._name,
+                        "res_id": proof.id,
+                        "noupdate": True,
+                    }
+                )
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env["ir.module.module"]._load_module_terms([MODULE], ["fr_CA"])
+        self.env.invalidate_all()
+        for xmlid in cases:
+            with self.subTest(xmlid=xmlid):
+                requirement = self.env.ref("%s.%s" % (MODULE, xmlid))
+                for field in ("name", "description"):
+                    text = self._in_file(xmlid, field, REQUIREMENTS)
+                    self.assertEqual(
+                        requirement.with_context(lang="en_US")[field], text
+                    )
+                    self.assertEqual(
+                        requirement.with_context(lang="fr_CA")[field],
+                        french[text],
+                    )
+                self.assertEqual(requirement.moscow, "wont")
+                self.assertEqual(requirement.devsecops_stage, "plan")
+                self.assertTrue(requirement.done)
+                self.assertFalse(requirement.missing)
+                self.assertFalse(requirement.test_ids)
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

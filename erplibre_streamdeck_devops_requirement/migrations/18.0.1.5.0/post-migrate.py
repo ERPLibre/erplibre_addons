@@ -58,14 +58,9 @@ REWRITTEN = {
         "test_sd_deploy_r56_1",
         "test_sd_deploy_r73_3",
         "test_sd_grepo_r39_1",
-        "test_sd_grepo_r40_1",
-        "test_sd_grepo_r40_2",
-        "test_sd_grepo_r42_2",
-        "test_sd_grepo_r44_1",
         "test_sd_grepo_r47_1",
         "test_sd_grepo_r48_1",
         "test_sd_grepo_r48_2",
-        "test_sd_grepo_r50_2",
         "test_sd_grepo_r52_1",
         "test_sd_grepo_r62_27",
         "test_sd_grepo_r88_3",
@@ -106,6 +101,10 @@ REWRITTEN = {
         "req_sd_deploy_r56",
         # Its name cites the hand-over, which ERPLibre renamed.
         "req_sd_grepo_r17",
+        # The install of the games by a plain clone and by
+        # streamdeck_games_to_repo.sh: out of scope under the install by
+        # repo, its reason in the description, or still to do, its missing
+        # work named.
         "req_sd_grepo_r37",
         "req_sd_grepo_r39",
         "req_sd_grepo_r40",
@@ -140,14 +139,19 @@ REWRITTEN = {
 }
 
 # XML ids of the proofs whose test no longer exists in any repository,
-# or does not prove its requirement, removed from the data files: an
+# does not prove its requirement, or would prove a requirement out of
+# scope, which no test verdict holds, removed from the data files: an
 # upgrade does not delete a noupdate record on its own.
 DELETED = (
     "test_sd_grepo_r37_1",
+    "test_sd_grepo_r40_1",
+    "test_sd_grepo_r40_2",
     "test_sd_grepo_r40_3",
     "test_sd_grepo_r41_1",
     "test_sd_grepo_r42_1",
+    "test_sd_grepo_r42_2",
     "test_sd_grepo_r43_1",
+    "test_sd_grepo_r44_1",
     "test_sd_grepo_r45_1",
     "test_sd_grepo_r46_1",
     "test_sd_grepo_r46_2",
@@ -155,6 +159,7 @@ DELETED = (
     "test_sd_grepo_r47_3",
     "test_sd_grepo_r49_1",
     "test_sd_grepo_r50_1",
+    "test_sd_grepo_r50_2",
     "test_sd_grepo_r51_1",
     "test_sd_grepo_r51_2",
     "test_sd_grepo_r69_1",
