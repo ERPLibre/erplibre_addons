@@ -543,11 +543,10 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">Examples are invented (host-a, SN-MON-1, Employee A); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
-        <field name="missing">No test sweeps the files of the monitoring: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="achievement">Examples are invented (host-a, SN-MON-1, Employee A). A test reads every text file of erplibre_streamdeck and of this module and refuses a machine address, an email or an account path, with the patterns of the commit-msg hook of erplibre:script/git/hooks, which refuses them in a commit body; erplibre:script/analyse/check_comment_hygiene.py reports them in comments. The names of customers and machines live in a private list outside this repository and are not swept.</field>
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
     </record>
     <!-- Ce qui attend SD-MON-R17 : ref() ne nomme qu'un enregistrement déjà
          chargé, et R05 précède R17 quand R18 et R19 le suivent ; le lien
@@ -1325,5 +1324,23 @@
         <field name="sequence" eval="20" />
         <field name="kind">python</field>
         <field name="reference">odoo.addons.erplibre_streamdeck.tests.test_streamdeck_monitor.TestStreamdeckMonitor.test_a_report_never_sends_the_notices_of_its_activities</field>
+    </record>
+    <record id="test_sd_mon_r38_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r38" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_no_file_of_the_modules_carries_identifying_data</field>
+    </record>
+    <record id="test_sd_mon_r38_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r38" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_the_sweep_finds_a_planted_identifying_line</field>
+    </record>
+    <record id="test_sd_mon_r38_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_mon_r38" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_only_the_listed_examples_are_allowed</field>
     </record>
 </odoo>

@@ -14,6 +14,7 @@ MIGRATION_1_3 = "%s/migrations/18.0.1.3.0/post-migrate.py" % MODULE
 MIGRATION_1_4 = "%s/migrations/18.0.1.4.0/post-migrate.py" % MODULE
 INVENTORY = "%s/data/requirement_inventory.xml" % MODULE
 CONTROL = "%s/data/requirement_control.xml" % MODULE
+MONITORING = "%s/data/requirement_monitoring.xml" % MODULE
 # Une référence de preuve à un test qui n'existe pas, comme celle qu'une
 # base du lot 1 garde d'un test renommé depuis.
 GONE = (
@@ -171,3 +172,27 @@ class TestRequirementUpgrade(TransactionCase):
         self.assertEqual(
             renamed.name, self._in_file("req_sd_ctl_r27", "name", CONTROL)
         )
+
+    def test_an_upgrade_to_1_4_marks_the_identifying_data_sweep_done(self):
+        # SD-MON-R38 est fait depuis la version 18.0.1.4.0 : une base qui
+        # le garde à faire, avec son écart, le reçoit fait de la migration.
+        requirement = self.env.ref("%s.req_sd_mon_r38" % MODULE)
+        requirement.write(
+            {
+                "done": False,
+                "achievement": "An outdated way",
+                "missing": "An outdated gap",
+                "notes": "Origin: unit test missing.",
+            }
+        )
+        self._migrate("18.0.1.3.0", MIGRATION_1_4)
+        self.env.invalidate_all()
+        self.assertTrue(requirement.done)
+        self.assertFalse(requirement.missing)
+        for field in ("achievement", "notes"):
+            with self.subTest(field=field):
+                self.assertEqual(
+                    requirement[field],
+                    self._in_file("req_sd_mon_r38", field, MONITORING),
+                )
+        self.assertTrue(requirement.test_ids)

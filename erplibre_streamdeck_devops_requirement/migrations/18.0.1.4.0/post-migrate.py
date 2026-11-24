@@ -32,6 +32,7 @@ REWRITTEN = {
         "req_sd_ctl_r43",
         "req_sd_ctl_r47",
     ),
+    "data/requirement_monitoring.xml": ("req_sd_mon_r38",),
 }
 
 
@@ -48,6 +49,14 @@ def migrate(cr, version):
         xml_import(
             env, MODULE, {}, "init", noupdate=True, xml_filename=path
         ).parse(kept)
+        for record in kept.iter("record"):
+            # The reload writes only the fields the file names: a
+            # requirement whose file states no gap, done since, would
+            # keep its former one.
+            if record.get("model") == "devops.requirement" and not (
+                record.xpath("field[@name='missing']")
+            ):
+                env.ref("%s.%s" % (MODULE, record.get("id"))).missing = False
         for xmlid in xmlids:
             _keep_english_only(env.ref("%s.%s" % (MODULE, xmlid)))
 
