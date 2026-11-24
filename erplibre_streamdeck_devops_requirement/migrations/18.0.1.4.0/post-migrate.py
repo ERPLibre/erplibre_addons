@@ -1,16 +1,15 @@
 # Copyright 2026 TechnoLibre inc. - Mathieu Benoit
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 """Rewrite, from the data files, the requirements whose text changed in
-this version, and the proofs whose test moved to another repository.
+this version.
 
 The data files are noupdate: an upgrade creates the records it does not
 find and leaves the others as they are, so a requirement rewritten since
 would keep its former text, and a proof its former reference. The
-records listed in REWRITTEN, and the proofs that cite a repository of
-MOVED, are loaded again from their file, a hand edit of them included;
-every other record keeps its own. Their translations are dropped but for
-en_US, so that the loading of the catalogs that follows this script
-fills them from the new texts.
+records listed in REWRITTEN are loaded again from their file, a hand
+edit of them included; every other record keeps its own. Their
+translations are dropped but for en_US, so that the loading of the
+catalogs that follows this script fills them from the new texts.
 """
 
 import copy
@@ -35,19 +34,8 @@ REWRITTEN = {
         "test_sd_ctl_r27_1",
         "req_sd_ctl_r43",
         "req_sd_ctl_r47",
-        "test_sd_ctl_r66_1",
     ),
     "data/requirement_monitoring.xml": ("req_sd_mon_r38",),
-}
-
-# Reference prefix -> data files whose proofs citing it are loaded again:
-# the tests of the deck program live in their own repository since this
-# version, so a proof that names one changed its reference.
-MOVED = {
-    "erplibre_streamdeck:": (
-        "data/devops_requirement_test.xml",
-        "data/requirement_control.xml",
-    ),
 }
 
 
@@ -55,15 +43,11 @@ def migrate(cr, version):
     if not version:
         return
     env = api.Environment(cr, SUPERUSER_ID, {})
-    filenames = list(REWRITTEN)
-    filenames += [f for fs in MOVED.values() for f in fs if f not in filenames]
-    for filename in filenames:
-        xmlids = REWRITTEN.get(filename, ())
-        moved = tuple(p for p, files in MOVED.items() if filename in files)
+    for filename, xmlids in REWRITTEN.items():
         path = file_path("%s/%s" % (MODULE, filename))
         kept = etree.Element("odoo")
         for record in etree.parse(path).getroot().iter("record"):
-            if record.get("id") in xmlids or _cites(record, moved):
+            if record.get("id") in xmlids:
                 kept.append(copy.deepcopy(record))
         xml_import(
             env, MODULE, {}, "init", noupdate=True, xml_filename=path
@@ -76,17 +60,8 @@ def migrate(cr, version):
                 record.xpath("field[@name='missing']")
             ):
                 env.ref("%s.%s" % (MODULE, record.get("id"))).missing = False
-        for record in kept.iter("record"):
-            _keep_english_only(env.ref("%s.%s" % (MODULE, record.get("id"))))
-
-
-def _cites(record, prefixes):
-    """True when `record` is a proof whose reference, in the data file,
-    starts with one of `prefixes`."""
-    if not prefixes or record.get("model") != "devops.requirement.test":
-        return False
-    reference = record.xpath("string(field[@name='reference'])")
-    return reference.startswith(prefixes)
+        for xmlid in xmlids:
+            _keep_english_only(env.ref("%s.%s" % (MODULE, xmlid)))
 
 
 def _keep_english_only(record):
