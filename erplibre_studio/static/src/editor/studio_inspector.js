@@ -649,6 +649,18 @@ export class StudioInspector extends Component {
         return Boolean(block) && block.kind !== "field" && isOutlineContainer(block);
     }
 
+    /**
+     * Whether ``block`` is the block in focus (``StudioEditor.focusEntry``),
+     * where a click on the palette adds by default.
+     */
+    isFocusBlock(block) {
+        // Read through the state of the editor: a change of the focus
+        // renders the inspector again.
+        const focus = this.editorState.focus;
+        const entry = focus.on && block ? this.props.editor.focusEntry : null;
+        return Boolean(entry && entry.path === block.path);
+    }
+
     /** How many fields ``block`` holds, or tabs for a notebook. */
     contentsCount(block) {
         const count = outlineCount(block);

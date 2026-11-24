@@ -10368,3 +10368,45 @@ msgstr ""
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "« Always show these options » takes true or false."
 msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "« %(label)s » is no longer in the form: the focus is off."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "The block in focus is no longer in the form: the focus is off."
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "Add a %(type)s field in %(block)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "Add %(item)s in %(block)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "Add a group in %(block)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
+msgid "Add a separator in %(block)s"
+msgstr ""
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
+msgid "Block in focus: the palette adds here by default, after the selected field or at the end."
+msgstr ""

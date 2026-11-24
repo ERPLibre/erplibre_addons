@@ -903,6 +903,9 @@
                     <t t-if="contents(block).length" t-esc="contents(block).join(', ')" />
                     <span t-else="" class="text-muted">empty</span>
                 </div>
+                <p t-if="isFocusBlock(block)" class="small text-muted border-top pt-2 mt-2 mb-0 o_erplibre_studio_focus_note">
+                    Block in focus: the palette adds here by default, after the selected field or at the end.
+                </p>
             </fieldset>
 
             <fieldset t-if="view.any" class="o_erplibre_studio_fieldset o_erplibre_studio_in_view">

@@ -80,7 +80,8 @@ export class StudioPalette extends Component {
 
     /** The accessible name of the existing field ``item``: its technical name at the Detailed level only. */
     existingItemLabel(item) {
-        return this.itemLabel(this.detailed ? `${item.string} (${item.name})` : item.string);
+        const label = this.detailed ? `${item.string} (${item.name})` : item.string;
+        return this.focusItemLabel("existing", label) || this.itemLabel(label);
     }
 
     get data() {
@@ -227,6 +228,55 @@ export class StudioPalette extends Component {
                 ? _t("after « %(label)s »", {label: this.editor.blockLabel(leaf, level === "detailed")})
                 : _t("at the end of the block"),
         };
+    }
+
+    /**
+     * What a click on an item does while the focus is on a block of a
+     * form, as its accessible name and its tooltip: « Add a Text field in
+     * Sales » for a new field type (``kind`` « new », ``label`` its type),
+     * « Add Phone in Sales » for an existing field, « Add a group in
+     * Sales » or « Add a separator in Sales »; null when the focus is off,
+     * and for a tab and a ribbon, which never go into the block.
+     */
+    focusItemLabel(kind, label) {
+        const target = this.focusTarget;
+        if (!target) {
+            return null;
+        }
+        const block = target.block;
+        if (kind === "new") {
+            return _t("Add a %(type)s field in %(block)s", {type: label, block});
+        }
+        if (kind === "existing") {
+            return _t("Add %(item)s in %(block)s", {item: label, block});
+        }
+        if (kind === "group") {
+            return _t("Add a group in %(block)s", {block});
+        }
+        if (kind === "separator") {
+            return _t("Add a separator in %(block)s", {block});
+        }
+        return null;
+    }
+
+    /** The accessible name of the new field type ``item``: the block in focus when the focus is on. */
+    newItemLabel(item) {
+        return this.focusItemLabel("new", item.label) || this.itemLabel(item.label);
+    }
+
+    /** The tooltip of the new field type ``item``: its type, or what a click does in focus. */
+    newItemTitle(item) {
+        return this.focusItemLabel("new", item.label) || item.label;
+    }
+
+    /** The tooltip of the existing field ``item``: what a click does in focus, else its type at the Detailed level. */
+    existingItemTitle(item) {
+        return this.focusItemLabel("existing", item.string) || (this.detailed ? item.type : false);
+    }
+
+    /** The accessible name of the layout item ``item``: the block in focus when it goes there. */
+    layoutItemLabel(item) {
+        return this.focusItemLabel(item.kind, item.label) || this.itemLabel(item.label);
     }
 
     /** Add ``item`` without a drag. */

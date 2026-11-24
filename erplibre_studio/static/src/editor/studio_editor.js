@@ -49,6 +49,7 @@ import {
     focusBlockOf,
     focusBlocks,
     focusEndHook,
+    focusIdentity,
     graphLaneLabel,
     graphLanes,
     hiddenSentence,
@@ -58,6 +59,7 @@ import {
     namedKeys,
     newFieldLabel,
     pivotLanes,
+    resolveFocusBlock,
     sampleContext,
     searchColumns,
     searchEndHook,
@@ -82,6 +84,7 @@ export {
     focusBlockOf,
     focusBlocks,
     focusEndHook,
+    focusIdentity,
     graphAxes,
     graphLanes,
     hiddenSentence,
@@ -94,6 +97,7 @@ export {
     namedKeys,
     pivotAxes,
     pivotLanes,
+    resolveFocusBlock,
     sampleContext,
     searchColumns,
     selectionToText,
@@ -326,6 +330,10 @@ export class StudioEditor extends Component {
             // last one, which the full form offers to go back to.
             focus: {on: false, path: null, last: null},
         });
+        // The identities (``focusIdentity``) of the focus path and of the
+        // last focus path, taken on the payload that drew them: a new
+        // payload finds those blocks again by them (``checkFocus``).
+        this.focusMemory = {path: null, last: null};
         this.previewCount = 0;
         // How many times the user chose a level or « Always show these
         // options » (``setLevel``, ``setAlwaysMoreOptions``).
@@ -1431,9 +1439,11 @@ export class StudioEditor extends Component {
     /**
      * A drop on the hook (``target``, ``position``, ``zone``), or the add
      * of ``addFromPalette``; the event stops there, before the drop scope
-     * around the hook.
+     * around the hook. A relation or a properties field opens its dialog
+     * and answers before the field exists; ``dialog`` ({onCreated,
+     * onCancelled}) then hears how that dialog ends.
      */
-    async dropOnHook(ev, target, position, zone) {
+    async dropOnHook(ev, target, position, zone, dialog = {}) {
         ev.preventDefault();
         if (ev.stopPropagation) {
             ev.stopPropagation();
@@ -1471,12 +1481,12 @@ export class StudioEditor extends Component {
         if (item.kind === "new" && item.ttype === "properties") {
             // A properties field needs its many2one and where its
             // properties are defined.
-            await this.openPropertiesDialog(target, position);
+            await this.openPropertiesDialog(target, position, dialog);
             return;
         }
         if (item.kind === "new" && X2MANY_TYPES.includes(item.ttype)) {
             // A relation needs its comodel, and its inverse or its table.
-            await this.openRelationDialog(item.ttype, target, position);
+            await this.openRelationDialog(item.ttype, target, position, dialog);
             return;
         }
         const operation = this.dropOperation(item, target, position, zone);
@@ -1714,10 +1724,40 @@ export class StudioEditor extends Component {
     // ── relation fields ─────────────────────────────────────────────────
 
     /**
-     * The dialog of a new ``ttype`` field (one2many, many2many) dropped on
-     * the hook ``target`` / ``position``: Create adds it there.
+     * The add of a new field made by a dialog on the hook ``target`` /
+     * ``position``: ``save(field)`` for the dialog, and the options of
+     * ``dialog.add``. Once the field exists, ``onCreated()`` runs; a
+     * dialog closed without it runs ``onCancelled()``.
      */
-    async openRelationDialog(ttype, target, position) {
+    dialogSave(target, position, {onCreated = null, onCancelled = null} = {}) {
+        let created = false;
+        return {
+            save: async (field) => {
+                const data = await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"});
+                if (data) {
+                    created = true;
+                    if (onCreated) {
+                        onCreated();
+                    }
+                }
+                return Boolean(data);
+            },
+            options: {
+                onClose: () => {
+                    if (!created && onCancelled) {
+                        onCancelled();
+                    }
+                },
+            },
+        };
+    }
+
+    /**
+     * The dialog of a new ``ttype`` field (one2many, many2many) dropped on
+     * the hook ``target`` / ``position``: Create adds it there. ``dialog``:
+     * {onCreated, onCancelled} (``dialogSave``).
+     */
+    async openRelationDialog(ttype, target, position, dialog = {}) {
         if (!this.project) {
             return;
         }
@@ -1730,39 +1770,47 @@ export class StudioEditor extends Component {
         }
         const projectId = this.project.id;
         const model = this.params.resModel;
-        this.dialog.add(StudioRelationDialog, {
-            ttype,
-            model,
-            modelLabel: this.data.model_name || model,
-            comodels,
-            projectModels: this.projectModels.map((m) => m.model),
-            loadChoices: (comodel, label) =>
-                this.orm.call(MODEL, "get_relation_choices", [projectId, model, comodel, ttype], {label}),
-            save: async (field) =>
-                Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
-            checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
-        });
+        const {save, options} = this.dialogSave(target, position, dialog);
+        this.dialog.add(
+            StudioRelationDialog,
+            {
+                ttype,
+                model,
+                modelLabel: this.data.model_name || model,
+                comodels,
+                projectModels: this.projectModels.map((m) => m.model),
+                loadChoices: (comodel, label) =>
+                    this.orm.call(MODEL, "get_relation_choices", [projectId, model, comodel, ttype], {label}),
+                save,
+                checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
+            },
+            options
+        );
     }
 
     /**
      * The dialog of a new properties field dropped on the hook ``target`` /
      * ``position``: Create adds it there, with its many2one when the view
-     * lacks it.
+     * lacks it. ``dialog``: {onCreated, onCancelled} (``dialogSave``).
      */
-    openPropertiesDialog(target, position) {
+    openPropertiesDialog(target, position, dialog = {}) {
         if (!this.project) {
             return;
         }
         const projectId = this.project.id;
         const model = this.params.resModel;
-        this.dialog.add(StudioPropertiesDialog, {
-            model,
-            modelLabel: this.data.model_name || model,
-            loadChoices: () => this.orm.call(MODEL, "get_properties_choices", [projectId, model]),
-            save: async (field) =>
-                Boolean(await this.operateAndSelect({type: "add_field", target, position, field}, {kind: "new"})),
-            checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
-        });
+        const {save, options} = this.dialogSave(target, position, dialog);
+        this.dialog.add(
+            StudioPropertiesDialog,
+            {
+                model,
+                modelLabel: this.data.model_name || model,
+                loadChoices: () => this.orm.call(MODEL, "get_properties_choices", [projectId, model]),
+                save,
+                checkName: (comodel, name, label) => this.checkFieldName(comodel, name, false, label),
+            },
+            options
+        );
     }
 
     // ── insertion without dragging ──────────────────────────────────────
@@ -2001,10 +2049,12 @@ export class StudioEditor extends Component {
 
     /**
      * Insert ``item`` at the hook of the open list: the list closes, then
-     * the drop runs on that hook as ``addFromPalette`` does (a relation or
-     * a properties field asks its dialog first, and the list leaves the
-     * rest to it). An element the draft hides (``kind`` « ghost »)
-     * comes back, then moves to the hook. Once a change of the draft made
+     * the drop runs on that hook as ``addFromPalette`` does. A relation or
+     * a properties field asks its dialog first, which keeps the hook: its
+     * Create adds the field there and what follows an insertion runs then
+     * (``afterInsert``); its Cancel gives the focus back to the « + ». An
+     * element the draft hides (``kind`` « ghost ») comes back, then moves
+     * to the hook. Once a change of the draft made
      * it, the new block is selected and focused, ``lastInsert`` holds it
      * and the live region says it.
      */
@@ -2016,12 +2066,16 @@ export class StudioEditor extends Component {
         const newest = this.newestChangeId;
         this.state.insert = null;
         const drop = async (dropped) => {
-            this.state.dragging = dropped;
-            await this.dropOnHook({preventDefault: () => {}}, insert.target, insert.position, insert.zone);
-            // A relation or a properties field asks its dialog first,
-            // which keeps the focus.
             const asks =
                 dropped.kind === "new" && (dropped.ttype === "properties" || X2MANY_TYPES.includes(dropped.ttype));
+            const dialog = asks
+                ? {
+                      onCreated: () => this.afterInsert(insert, newest, item),
+                      onCancelled: () => this.focusInsertButton(insert.key),
+                  }
+                : {};
+            this.state.dragging = dropped;
+            await this.dropOnHook({preventDefault: () => {}}, insert.target, insert.position, insert.zone, dialog);
             if (!asks) {
                 this.afterInsert(insert, newest, item);
             }
@@ -2267,7 +2321,7 @@ export class StudioEditor extends Component {
         if (!entry || !this.canFocus) {
             return false;
         }
-        Object.assign(this.state.focus, {on: true, path: entry.path, last: entry.path});
+        this.assignFocus({on: true, path: entry.path, last: entry.path});
         const selected = this.state.selected;
         if (selected && !blockTrail(entry.block, selected).length) {
             this.state.selected = null;
@@ -2318,21 +2372,57 @@ export class StudioEditor extends Component {
 
     /** Turn the focus off and forget its last block: a view, a project or the preview changes. */
     resetFocus() {
-        Object.assign(this.state.focus, {on: false, path: null, last: null});
+        this.assignFocus({on: false, path: null, last: null});
     }
 
     /**
-     * Keep the focus on a block the payload holds: when its block leaves
-     * the payload, the focus goes off; a last block that left is
-     * forgotten.
+     * Assign ``values`` ({on, path, last}, each optional) to the focus;
+     * ``focusMemory`` takes the identities of its path and of its last
+     * path in the payload on screen.
+     */
+    assignFocus(values) {
+        const focus = this.state.focus;
+        Object.assign(focus, values);
+        const identity = (path) => {
+            const entry = this.focusEntryAt(path);
+            return entry ? focusIdentity(entry) : null;
+        };
+        const path = identity(focus.path);
+        // Mutated, never replaced: the parts get the editor through a
+        // template scope that inherits from it, where an assignment to
+        // ``this.focusMemory`` would shadow the editor's own.
+        Object.assign(this.focusMemory, {path, last: focus.last === focus.path ? path : identity(focus.last)});
+    }
+
+    /**
+     * Follow the block in focus and the last one into a new payload: the
+     * paths of a form are positional, so an Undo, a Revert or an Apply
+     * that adds or removes a block before them gives them other paths, or
+     * gives their paths to other blocks. Each one is found again by its
+     * identity (``resolveFocusBlock``) and takes its new path. When the
+     * block in focus is gone, the focus goes off, and the live region and
+     * a notification say so; a last block that is gone is forgotten.
      */
     checkFocus() {
         const focus = this.state.focus;
-        if (focus.path && !this.focusEntryAt(focus.path)) {
-            Object.assign(focus, {on: false, path: null});
-        }
-        if (focus.last && !this.focusEntryAt(focus.last)) {
-            focus.last = null;
+        const memory = this.focusMemory;
+        const entries = this.focusEntries;
+        const find = (path, identity) => (path ? resolveFocusBlock(entries, identity || {path, tag: null}) : null);
+        const current = find(focus.path, memory.path);
+        const last = focus.last === focus.path ? current : find(focus.last, memory.last);
+        const gone = Boolean(focus.on && focus.path && !current);
+        const label = (memory.path && memory.path.label) || "";
+        this.assignFocus({
+            on: focus.on && Boolean(current),
+            path: current ? current.path : null,
+            last: last ? last.path : null,
+        });
+        if (gone) {
+            const text = label
+                ? _t("« %(label)s » is no longer in the form: the focus is off.", {label})
+                : _t("The block in focus is no longer in the form: the focus is off.");
+            this.announce(text);
+            this.notification.add(text, {type: "info"});
         }
     }
 
@@ -2349,7 +2439,7 @@ export class StudioEditor extends Component {
         }
         const entry = focusBlockOf(this.root, path, this.focusEntries);
         if (entry) {
-            Object.assign(this.state.focus, {path: entry.path, last: entry.path});
+            this.assignFocus({path: entry.path, last: entry.path});
             this.state.insert = null;
         } else {
             this.state.focus.on = false;

@@ -42,7 +42,7 @@
                         t-key="item.ttype"
                         class="o_erplibre_studio_palette_item o_erplibre_studio_new_field d-flex align-items-center gap-2 border rounded px-2 py-1"
                         t-att-data-type="item.ttype"
-                        t-att-title="item.label"
+                        t-att-title="newItemTitle(item)"
                         draggable="true"
                         t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'new', ttype: item.ttype})"
                         t-on-dragend="() => this.endDrag()"
@@ -51,7 +51,7 @@
                         <button
                             type="button"
                             class="o_erplibre_studio_pick o_erplibre_studio_palette_add flex-nowrap gap-2 w-100"
-                            t-att-aria-label="itemLabel(item.label)"
+                            t-att-aria-label="newItemLabel(item)"
                         >
                             <span class="o_erplibre_studio_glyph o_erplibre_studio_glyph_container" aria-hidden="true" t-esc="item.glyph" />
                             <span class="text-truncate" t-esc="item.label" />
@@ -96,7 +96,7 @@
                         t-key="item.name"
                         class="o_erplibre_studio_palette_item o_erplibre_studio_existing_field d-flex flex-wrap align-items-center gap-1 rounded px-2 py-1 mb-1"
                         t-att-data-name="item.name"
-                        t-att-title="detailed ? item.type : false"
+                        t-att-title="existingItemTitle(item)"
                         draggable="true"
                         t-on-dragstart="(ev) => this.startDrag(ev, {kind: 'existing', name: item.name, axes: item.axes, special: item.special})"
                         t-on-dragend="() => this.endDrag()"
@@ -131,6 +131,7 @@
                     class="o_erplibre_studio_palette_item d-flex align-items-center gap-2 border rounded px-2 py-1 mb-1"
                     t-att-class="item.className"
                     t-att-data-kind="item.kind"
+                    t-att-title="focusItemLabel(item.kind, item.label) or false"
                     draggable="true"
                     t-on-dragstart="(ev) => this.startDrag(ev, {kind: item.kind})"
                     t-on-dragend="() => this.endDrag()"
@@ -139,7 +140,7 @@
                     <button
                         type="button"
                         class="o_erplibre_studio_pick o_erplibre_studio_palette_add flex-nowrap gap-2 w-100"
-                        t-att-aria-label="itemLabel(item.label)"
+                        t-att-aria-label="layoutItemLabel(item)"
                     >
                         <i class="fa text-muted" t-att-class="item.icon" aria-hidden="true" />
                         <span t-esc="item.label" />

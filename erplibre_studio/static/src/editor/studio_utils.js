@@ -951,6 +951,98 @@ export function focusBlockOf(root, path, entries = null) {
     return (entries || focusBlocks(root)).find((entry) => paths.has(entry.path)) || null;
 }
 
+/** The technical names of the fields ``block`` holds, at any depth in the order of the arch. */
+export function fieldNamesIn(block) {
+    const names = [];
+    const walk = (parent) => {
+        for (const child of parent.children || []) {
+            if (child.kind === "field") {
+                names.push(child.name);
+            } else {
+                walk(child);
+            }
+        }
+    };
+    walk(block);
+    return names;
+}
+
+/**
+ * What names the focus block ``entry`` across a change of the arch, whose
+ * positional paths (« /form/sheet/group[2] ») shift when a block before it
+ * comes or goes: {path, tag, name, string, fields, label}. ``name`` is
+ * its « name »: the one of its path when the path names it, else the
+ * label the server gives it when that label is neither its « string »
+ * nor its tag (the server labels a block by its « string », else its
+ * « name »); "" when unknown. ``string`` is its « string » or "";
+ * ``fields`` the names of the fields it holds; ``label`` what the editor
+ * shows of it, for a message once it is gone.
+ */
+export function focusIdentity(entry) {
+    const block = entry.block;
+    const string = (block.attrs || {}).string || "";
+    const named = /^\/\/[\w.-]+\[@name='([^']+)'\]$/.exec(entry.path || "");
+    let name = named ? named[1] : "";
+    if (!name && !string && block.label && block.label !== block.tag) {
+        name = block.label;
+    }
+    return {path: entry.path, tag: block.tag, name, string, fields: fieldNamesIn(block), label: String(entry.label)};
+}
+
+/**
+ * The focus block of ``entries`` (``focusBlocks`` of a new payload) that
+ * ``identity`` (``focusIdentity``, taken from an older payload) names, or
+ * null when it left. A block of another tag, or of another « name » when
+ * both have one, is another block. Two « string » that differ make
+ * another block too, unless the two share a field and neither has a
+ * « name »: the block in focus relabelled. A candidate scores 8 for the
+ * same « name », 4 for the same « string », 2 per field the two share, 1
+ * for the same path; one that shares none of these but its path matches
+ * only when one of the two holds no field: a change inside the block in
+ * focus keeps most of its fields, a block that only took its path shares
+ * none. The best score wins; a tie keeps the order of the arch.
+ */
+export function resolveFocusBlock(entries, identity) {
+    if (!identity) {
+        return null;
+    }
+    if (!identity.tag) {
+        return entries.find((entry) => entry.path === identity.path) || null;
+    }
+    const fields = new Set(identity.fields);
+    let best = null;
+    let bestScore = 0;
+    for (const entry of entries) {
+        if (entry.block.tag !== identity.tag) {
+            continue;
+        }
+        const other = focusIdentity(entry);
+        const bothNamed = Boolean(identity.name && other.name);
+        if (bothNamed && identity.name !== other.name) {
+            continue;
+        }
+        const sameName = bothNamed;
+        const shared = other.fields.filter((name) => fields.has(name)).length;
+        const bothStrings = Boolean(identity.string && other.string);
+        const sameString = bothStrings && identity.string === other.string;
+        const relabelled = bothStrings && !sameString && shared > 0 && !identity.name && !other.name;
+        if (bothStrings && !sameString && !sameName && !relabelled) {
+            continue;
+        }
+        const samePath = entry.path === identity.path;
+        const empty = !fields.size || !other.fields.length;
+        if (!sameName && !sameString && !shared && !(samePath && empty)) {
+            continue;
+        }
+        const score = (sameName ? 8 : 0) + (sameString ? 4 : 0) + 2 * shared + (samePath ? 1 : 0);
+        if (score > bestScore) {
+            best = entry;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
 /**
  * The hook at the end of the focus block ``entry``: inside the block,
  * inside its last group for a row of groups, which shows no hook of its

@@ -14,7 +14,13 @@ import {
 } from "@web/../tests/web_test_helpers";
 import {WebClient} from "@web/webclient/webclient";
 import {customizeAction} from "@erplibre_studio/debug_items";
-import {focusBlockOf, focusBlocks, focusEndHook} from "@erplibre_studio/editor/studio_editor";
+import {
+    focusBlockOf,
+    focusBlocks,
+    focusEndHook,
+    focusIdentity,
+    resolveFocusBlock,
+} from "@erplibre_studio/editor/studio_editor";
 
 const SHEET = "/form/sheet";
 const BOX = "/form/sheet/div";
@@ -143,6 +149,29 @@ function formBlocks() {
         changed_inside: false,
     };
     return container("/form", "form", "form", [sheet, chatter]);
+}
+
+/**
+ * A form whose sheet holds groups without a « name », so with positional
+ * paths (« /form/sheet/group[2] »): a group of the address (street,
+ * city), then one of the contact (phone, email). ``extra``: a group
+ * « Extra » the draft adds first, which shifts the paths of the others;
+ * ``sponsor``: a new field the draft adds first in the group of the
+ * contact.
+ */
+function positionalBlocks({extra = false, sponsor = false} = {}) {
+    const groups = [];
+    if (extra) {
+        groups.push(container("", "group", "Extra", [field("barcode")], {attrs: {string: "Extra"}}));
+    }
+    groups.push(container("", "group", "group", [field("street"), field("city")]));
+    const contact = [field("phone"), field("email")];
+    if (sponsor) {
+        contact.unshift(field("x_sponsor", {changes: [SPONSOR_CHANGE], change_kinds: ["new"], changed: true}));
+    }
+    groups.push(container("", "group", "group", contact));
+    groups.forEach((group, index) => (group.path = `${SHEET}/group[${index + 1}]`));
+    return container("/form", "form", "form", [container(SHEET, "sheet", "sheet", groups)]);
 }
 
 function payload(extra = {}) {
@@ -494,6 +523,85 @@ describe("erplibre_studio focus on a block", () => {
         expect(".o_erplibre_studio_empty_hint").toHaveCount(0);
     });
 
+    test("resolveFocusBlock: a block found again by its label or its fields, not by a path another one took", () => {
+        // The labels are translated terms: read them in English.
+        patchTranslations();
+        const before = focusBlocks(positionalBlocks({extra: true}));
+        const after = focusBlocks(positionalBlocks());
+        const [extra, address, contact] = before.map(focusIdentity);
+        expect(address.path).toBe(`${SHEET}/group[2]`);
+        expect(address.fields).toEqual(["street", "city"]);
+        expect([address.name, address.string]).toEqual(["", ""]);
+        expect([extra.name, extra.string]).toEqual(["", "Extra"]);
+        // The group of the address takes the path of the group « Extra »;
+        // the group of the contact takes its old path, which does not
+        // make it the same block.
+        expect(resolveFocusBlock(after, address).path).toBe(`${SHEET}/group[1]`);
+        expect(resolveFocusBlock(after, contact).path).toBe(`${SHEET}/group[2]`);
+        expect(resolveFocusBlock(after, extra)).toBe(null);
+        // A field more or less in the block keeps it.
+        const grown = focusBlocks(positionalBlocks({sponsor: true}));
+        expect(resolveFocusBlock(after, focusIdentity(grown[1])).path).toBe(`${SHEET}/group[2]`);
+        // A « name » that differs is another block, a field they share aside.
+        const named = formBlocks();
+        named.children[0].children.push(container("//group[@name='extra']", "group", "extra", [field("barcode")]));
+        const extraNamed = focusIdentity(focusBlocks(named).at(-1));
+        expect(extraNamed.name).toBe("extra");
+        expect(resolveFocusBlock(focusBlocks(formBlocks()), extraNamed)).toBe(null);
+        // A block relabelled keeps its fields.
+        const relabelled = focusBlocks(positionalBlocks({extra: true}));
+        relabelled[0].block.attrs = {string: "More"};
+        expect(resolveFocusBlock(relabelled, extra).path).toBe(`${SHEET}/group[1]`);
+        // Without an identity, the path alone.
+        expect(resolveFocusBlock(after, {path: `${SHEET}/group[2]`, tag: null}).path).toBe(`${SHEET}/group[2]`);
+    });
+
+    test("Undo of a change outside the block in focus keeps the focus on that block at its new path", async () => {
+        answer = payload({blocks: positionalBlocks({extra: true})});
+        onRpc("erplibre.studio.editor", "project_action", (args) => {
+            expect.step(args.args[1]);
+            answer = payload({blocks: positionalBlocks()});
+            return answer;
+        });
+        await openEditor();
+        await clickFocus(`${SHEET}/group[2]`);
+        expect(`${OPEN} ${fieldEl("street")}`).toHaveCount(1);
+        await contains(".o_erplibre_studio_undo").click();
+        await animationFrame();
+        expect.verifySteps(["action_undo"]);
+        // Its path went to the group of the contact: the focus stays on the address.
+        expect(OPEN).toHaveAttribute("data-focus-path", `${SHEET}/group[1]`);
+        expect(`${OPEN} ${fieldEl("street")}`).toHaveCount(1);
+        expect(`${OPEN} ${fieldEl("phone")}`).toHaveCount(0);
+        expect(folded(`${SHEET}/group[2]`)).toHaveCount(1);
+        expect(".o_notification").toHaveCount(0);
+        expect(".o_erplibre_studio_live").not.toHaveText(/no longer in the form/);
+        // Leaving and coming back finds the same block.
+        await contains(".o_erplibre_studio_focus_leave").click();
+        await contains(".o_erplibre_studio_full_back").click();
+        expect(`${OPEN} ${fieldEl("street")}`).toHaveCount(1);
+    });
+
+    test("Undo of a change inside the block in focus keeps the focus", async () => {
+        answer = payload({blocks: positionalBlocks({sponsor: true})});
+        onRpc("erplibre.studio.editor", "project_action", (args) => {
+            expect.step(args.args[1]);
+            answer = payload({blocks: positionalBlocks()});
+            return answer;
+        });
+        await openEditor();
+        await clickFocus(`${SHEET}/group[2]`);
+        expect(`${OPEN} ${fieldEl("x_sponsor")}`).toHaveCount(1);
+        await contains(".o_erplibre_studio_undo").click();
+        await animationFrame();
+        expect.verifySteps(["action_undo"]);
+        expect(BAR).toHaveCount(1);
+        expect(OPEN).toHaveAttribute("data-focus-path", `${SHEET}/group[2]`);
+        expect(`${OPEN} ${fieldEl("x_sponsor")}`).toHaveCount(0);
+        expect(`${OPEN} ${fieldEl("phone")}`).toHaveCount(1);
+        expect(".o_notification").toHaveCount(0);
+    });
+
     test("Undo that removes the block in focus turns the focus off", async () => {
         const EXTRA = "//group[@name='extra']";
         const blocks = formBlocks();
@@ -508,12 +616,55 @@ describe("erplibre_studio focus on a block", () => {
         await clickFocus(EXTRA);
         expect(OPEN).toHaveAttribute("data-focus-path", EXTRA);
         await contains(".o_erplibre_studio_undo").click();
+        await animationFrame();
         expect.verifySteps(["action_undo"]);
         expect(BAR).toHaveCount(0);
         expect(".o_erplibre_studio_status_focus").toHaveCount(0);
+        // The live region and a notification say why.
+        expect(".o_erplibre_studio_live").toHaveText("« Extra » is no longer in the form: the focus is off.");
+        expect(".o_notification").toHaveText(/« Extra » is no longer in the form: the focus is off\./);
         // The full form again, with its « Focus » buttons.
         expect(FOCUS_BTN).not.toHaveCount(0);
         expect(".o_erplibre_studio_full_bar").toHaveCount(0);
+    });
+
+    test("in focus, the palette names the block its items add to; the inspector of the block says so", async () => {
+        const newChar = ".o_erplibre_studio_new_field[data-type=char]";
+        const existing = ".o_erplibre_studio_existing_field[data-name=website]";
+        await openEditor();
+        expect(`${newChar} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Text");
+        expect(newChar).toHaveAttribute("title", "Text");
+        await contains(`.o_erplibre_studio_page_tab[data-path="${TRADE}"]`).click();
+        await clickFocus(SALE);
+        expect(`${newChar} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add a Text field in Sales");
+        expect(newChar).toHaveAttribute("title", "Add a Text field in Sales");
+        await contains(".o_erplibre_studio_section_toggle[data-tab=existing]").click();
+        expect(`${existing} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Website in Sales");
+        expect(existing).toHaveAttribute("title", "Add Website in Sales");
+        const layout = (kind) => `.o_erplibre_studio_layout_item[data-kind=${kind}]`;
+        expect(`${layout("group")} .o_erplibre_studio_palette_add`).toHaveAttribute(
+            "aria-label",
+            "Add a group in Sales"
+        );
+        expect(layout("separator")).toHaveAttribute("title", "Add a separator in Sales");
+        // A tab goes into the notebook, never into the block.
+        expect(`${layout("page")} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Tab");
+        expect(layout("page")).not.toHaveAttribute("title");
+        // The block in focus, selected: the inspector says where the palette adds.
+        const note = ".o_erplibre_studio_focus_note";
+        await contains(fieldEl("seller")).click();
+        expect(note).toHaveCount(0);
+        await contains(
+            `${OPEN} .o_erplibre_studio_container[data-path="${SALE}"] > .o_erplibre_studio_container_title .o_erplibre_studio_pick`
+        ).click();
+        expect(note).toHaveText(
+            "Block in focus: the palette adds here by default, after the selected field or at the end."
+        );
+        // Out of the focus, the plain names again.
+        await contains(".o_erplibre_studio_focus_leave").click();
+        expect(note).toHaveCount(0);
+        expect(`${newChar} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Text");
+        expect(`${existing} .o_erplibre_studio_palette_add`).toHaveAttribute("aria-label", "Add Website");
     });
 
     test("no focus in a list view", async () => {

@@ -311,6 +311,39 @@ describe("erplibre_studio insert without dragging", () => {
         expect(".o_erplibre_studio_selected").toHaveCount(0);
     });
 
+    test("a relation made through its dialog lands at the hook and counts as the last insertion", async () => {
+        answer = payload({field_types: ["char", "many2many"]});
+        onRpc("erplibre.studio.editor", "get_comodels", () => [["x_badge", "Badge"]]);
+        onRpc("erplibre.studio.editor", "get_relation_choices", () => ({inverses: []}));
+        await openEditor();
+        // Cancel: no field, the « + » takes the focus back.
+        await clickHidden(plusOf(named("email"), "before"));
+        await contains(`${OPTION}[data-key="new:many2many"]`).click();
+        expect(".o_erplibre_studio_relation_dialog").toHaveCount(1);
+        await contains(".o_erplibre_studio_relation_dialog .btn-secondary").click();
+        await animationFrame();
+        await animationFrame();
+        expect(".o_erplibre_studio_relation_dialog").toHaveCount(0);
+        expect(plusOf(named("email"), "before")).toBeFocused();
+        expect.verifySteps([]);
+        // Create: the field goes at the hook of the list, selected, as an insertion.
+        await clickHidden(plusOf(named("email"), "before"));
+        await contains(`${OPTION}[data-key="new:many2many"]`).click();
+        await contains(".o_erplibre_studio_relation_comodel").select("x_badge");
+        await contains(".o_erplibre_studio_relation_save").click();
+        await animationFrame();
+        await animationFrame();
+        expect.verifySteps([`add_field x_loyalty Badge ${named("email")} before`]);
+        expect(".o_erplibre_studio_relation_dialog").toHaveCount(0);
+        expect(".o_erplibre_studio_field[data-name=x_loyalty]").toHaveClass("o_erplibre_studio_selected");
+        expect(pick("x_loyalty")).toBeFocused();
+        expect(".o_erplibre_studio_live").toHaveText("Badge inserted between Name and Email.");
+        expect(".o_erplibre_studio_inspector_changed").toHaveText(
+            /Inserted between Name and Email in Group « Contact »\./
+        );
+        expect(".o_erplibre_studio_cancel_insert").toHaveCount(1);
+    });
+
     test("Escape closes the list and gives the focus back to its « + »; a click outside closes it", async () => {
         await openEditor();
         await clickHidden(plusOf(INFO, "inside"));
