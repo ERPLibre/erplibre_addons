@@ -767,7 +767,7 @@ msgid ""
 "%(view)s view created by the project. Revert removes it with the rest of the"
 " draft."
 msgstr ""
-"Vue %(view)s créée par le projet. Revert la retire avec le reste du "
+"Vue %(view)s créée par le projet. « Défaire » la retire avec le reste du "
 "brouillon."
 
 #. module: erplibre_studio
@@ -1666,7 +1666,7 @@ msgstr "Après"
 msgid ""
 "After Apply, every user sees the changes. « Revert » then removes them from "
 "the database."
-msgstr "Après la mise en application, tous les utilisateurs voient les changements. « Revert » les retire ensuite de la base."
+msgstr "Après la mise en application, tous les utilisateurs voient les changements. « Défaire » les retire ensuite de la base."
 
 #. module: erplibre_studio
 #. odoo-javascript

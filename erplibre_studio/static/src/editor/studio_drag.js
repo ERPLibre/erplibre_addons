@@ -83,7 +83,15 @@ export class PointerDrag {
      * A pointerdown on the source of ``item``: arm the drag. The left
      * button of a mouse or of a pen only; a touch keeps scrolling the page.
      * The handlers of nested sources hear the same event: the innermost
-     * one arms, the others find it armed.
+     * one arms, the others find it armed. A drag still running from an
+     * earlier press is cancelled first, so the editor ends it.
+     *
+     * A finger has no drag: the « + » insertion list and the keyboard
+     * place an item instead. The sources set no ``touch-action``, which
+     * would take the scroll of the palette and of the canvas away from a
+     * finger; a pen on a touch screen may then see the browser pan
+     * instead, and the pointercancel it sends cancels the drag: nothing
+     * drops.
      */
     press(ev, item) {
         if (this.current && this.current.event === ev) {
@@ -92,7 +100,7 @@ export class PointerDrag {
         if (ev.button !== 0 || ev.pointerType === "touch" || (ev.target.closest && ev.target.closest(IGNORED))) {
             return;
         }
-        this.stop();
+        this.cancel();
         this.current = {
             event: ev,
             item,

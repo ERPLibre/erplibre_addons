@@ -449,4 +449,39 @@ describe("erplibre_studio drop zones", () => {
         await animationFrame();
         expect(canvas.scrollTop).toBe(before);
     });
+
+    test("a press while a drag still runs cancels that drag", async () => {
+        await openEditor();
+        await startDrag(".o_erplibre_studio_new_field[data-type=date]");
+        await overNear(scopeOf(RIGHT), 1);
+        expect(ACTIVE).toHaveCount(1);
+        expect(GHOST).toHaveCount(1);
+
+        // The release went unseen (outside the window): the next press
+        // ends the drag before it arms its own.
+        await pointerDown(".o_erplibre_studio_new_field[data-type=char]");
+        await animationFrame();
+        expect(document.body).not.toHaveClass("o_erplibre_studio_dragging");
+        expect(ACTIVE).toHaveCount(0);
+        expect(GHOST).toHaveCount(0);
+        await press("Escape");
+        expect.verifySteps([]);
+    });
+
+    test("an editor unmounted during a drag leaves no drag class on the body", async () => {
+        await openEditor();
+        await startDrag(".o_erplibre_studio_layout_page");
+        expect(document.body).toHaveClass("o_erplibre_studio_dragging");
+        expect(document.body).toHaveClass("o_erplibre_studio_dragging_page");
+
+        // Another action takes the place of the editor, the drag running.
+        await getService("action").doAction(
+            customizeAction({resModel: "res.partner", viewType: "list", viewId: 7})
+        );
+        await animationFrame();
+        expect(document.body).not.toHaveClass("o_erplibre_studio_dragging");
+        expect(document.body).not.toHaveClass("o_erplibre_studio_dragging_page");
+        expect(GHOST).toHaveCount(0);
+        expect.verifySteps([]);
+    });
 });

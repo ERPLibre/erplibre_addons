@@ -368,9 +368,14 @@ export class StudioEditor extends Component {
             host: () => this.rootRef.el,
             ghost: () => this.dropItem,
         });
+        // An unmount in the middle of a drag (the Back of the browser, an
+        // action that replaces the editor) also takes the drag classes off
+        // the body: they style the whole page, not only the editor. The
+        // state of the editor goes with it and needs no reset.
         onWillUnmount(() => {
             this.pointerDrag.stop();
             this.pointerDrag.unguard();
+            document.body.classList.remove(DRAGGING_CLASS, DRAGGING_PAGE_CLASS);
         });
         onWillStart(() => this.load());
     }
