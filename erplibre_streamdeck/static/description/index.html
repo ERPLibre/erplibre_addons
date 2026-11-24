@@ -1,0 +1,734 @@
+<section class="oe_container">
+<h1>ERPLibre — Stream Deck</h1>
+<p>The inventory of the employees' Stream Decks. Each workstation that runs the
+GNOME extension <a href="https://github.com/TechnoLibre/erplibre-home-gnome-extension">ERPLibre Home</a>
+enrolls with this database, then reports its state and its deck events
+here: which decks are plugged in, since when, which program drives them and
+whether their service runs. Odoo never opens a connection to a workstation.</p>
+<p>Odoo also holds the deck settings it wants on each workstation: the deck
+program, the plugins turned off, the session refresh, the games and the
+layout of the home keys of each deck model. The workstation receives them
+in the reply to its report, and its employee applies them with a click
+(see Configuration).</p>
+<p>The inventory belongs to its employee; a manager sees the whole fleet.
+Nobody writes it by hand: only the workstation routes write it.</p>
+<h2>Menus</h2>
+<table>
+<thead>
+<tr>
+<th>Menu</th>
+<th>Who</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stream Deck › My workstations</td>
+<td>every employee</td>
+<td>their workstations; the button <em>Add a workstation</em> shows a pairing code</td>
+</tr>
+<tr>
+<td>Stream Deck › My decks</td>
+<td>every employee</td>
+<td>the decks their workstations hold or have held</td>
+</tr>
+<tr>
+<td>Stream Deck › Fleet › Workstations, Decks, Events</td>
+<td>manager</td>
+<td>everything, read-only, except the name, the archive flag, the token and the configuration of a workstation</td>
+</tr>
+<tr>
+<td>Stream Deck › Configuration › Profiles, Deck models, Key layouts, Catalog, First pilot</td>
+<td>manager</td>
+<td>the configuration layers: reusable profiles, and the settings of each deck model; every key layout and the catalog they choose from; the first-pilot policy</td>
+</tr>
+<tr>
+<td>Stream Deck › Settings</td>
+<td>administrator</td>
+<td>the <em>Stream Deck</em> section of the Settings: the monitoring and the first pilot</td>
+</tr>
+</tbody>
+</table>
+<p>A workstation shows what its last report said: operating system, GNOME
+Shell, extension and contract versions, branch and commit of the ERPLibre
+checkout, deck program and the state of its service since when, its decks
+and its events. Its employee may rename it and revoke its token; the
+manager may also archive it. <em>Fleet › Workstations</em> adds the column
+<em>Silent since</em> and the filter <em>Silent</em>. The filters <em>Configuration
+pending</em> and <em>Configuration refused</em> select the workstations by the state
+of their configuration, and the tab <em>Configuration</em> of a workstation shows
+its profile, its effective settings with the layer and the lock of each,
+its overrides, the key layout of each connected deck, its own key
+layouts and the state of the revision offered to it.</p>
+<p>A workstation and a deck each carry their thread, where the monitoring
+posts its activities and notes. Every list of events names each event by
+its label: the state of the service for a service change (<em>Service
+started</em>, <em>failed</em>, <em>stopped</em>, <em>absent</em>), the kind for any other; the
+history filters on each label.</p>
+<h2>Enrolling a workstation</h2>
+<p>In the extension preferences, page <em>Odoo inventory</em>, add this database by
+its URL and database name, then choose one of three methods:</p>
+<ul>
+<li><strong>Pairing code</strong>: <em>My workstations › Add a workstation</em> shows a code of 8
+  characters, valid 10 minutes, once, for the employee who asked for it.</li>
+<li><strong>API key</strong> of the employee (<em>Preferences › Account Security</em>).</li>
+<li><strong>Login and password</strong> of the employee. An account whose RPC access is
+  limited to API keys, as with two-factor authentication, uses one of the
+  two other methods.</li>
+</ul>
+<p>The key or the password serves the enrollment only and is kept nowhere.
+Enrollment returns a <strong>workstation token</strong>, which the extension keeps in
+the GNOME keyring; Odoo keeps only its SHA-256. Enrolling the same
+workstation again keeps its record and replaces its token. Repeated wrong
+credentials from one address are put on Odoo's login cooldown.</p>
+<h2>Access</h2>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Workstations</th>
+<th>Decks</th>
+<th>Events</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User (every internal user)</td>
+<td>their own: read, rename, revoke the token, pick a selectable profile, override the free settings</td>
+<td>those their workstations hold or have held, read-only</td>
+<td>those of their workstations, and those of a deck they hold or have held, from their first holding on</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>all: read, rename, archive, revoke the token, assign any profile, override and lock settings</td>
+<td>all, read-only</td>
+<td>all, read-only</td>
+</tr>
+</tbody>
+</table>
+<p>A deck lent to another employee follows the workstation that holds it.
+Each employee reads the history of a deck from the moment one of their
+workstations first held it: when the deck was created on it, or when a
+<em>Changed workstation</em> event moved it there. Odoo dates that moment itself,
+never with a time the workstation sent, and keeps it when the deck comes
+back after a loan. The lender therefore still reads the deck and its whole
+history from their first holding on, the events at the other workstation
+included: each event carries a copy of the name of its workstation and of
+its employee, so the lender never needs, nor gets, the other workstation's
+record. The borrower reads nothing from before its arrival. A workstation
+that only sends an event carrying the serial number of a deck held
+elsewhere reads that event and the deck's name on it, never the deck's
+record nor its history.</p>
+<p>When a workstation reports a deck that another workstation holds, the deck
+moves to it without confirmation, and Odoo adds an event <em>Changed
+workstation</em> (<code>moved</code>) dated at the reception. It names the new workstation
+and its employee, and the workstation the deck left, each by a copy of its
+name. Its employee becomes a holder of the deck from that moment, unless
+they held it before; the employee of the former workstation keeps
+reading the deck and its history, even when that workstation never sent
+an event of it. The same workstation reporting the deck again moves
+nothing.</p>
+<p>Archiving a user archives their workstations and revokes their tokens; the
+workstations, their decks and their events stay readable by the manager.
+Pairing codes are readable by nobody.</p>
+<p>The configuration layers. A manager creates and changes the profiles, the
+deck models and every settings line, and alone sets a lock. An employee
+reads the selectable profiles, the profile of each of their workstations
+and every deck-model layer, which hold nothing personal; never a profile
+assigned only to another employee's workstation, nor the overrides of
+another employee. On their own workstations they create, change and
+delete the overrides of the settings that no layer locks, never <em>Locked</em>
+nor <em>Source</em>. They pick a selectable profile, in place of no profile or of
+another selectable one only: a profile the manager assigned without
+making it selectable stays, and an employee never clears a profile. The
+state of the configuration (revisions, offered and applied values, state,
+reason, first-pilot choice) is written by the report route only.</p>
+<p>The key layouts follow the same rules, the lock being on a whole layout:
+an employee reads the layouts of the layers they read, and on their own
+workstations creates, changes and deletes the layouts, and their keys, of
+the deck models that no layer locks, never <em>Locked</em>, <em>Source</em> nor <em>Kept
+in the workstation's file</em>. Only the report route adds to the catalog.
+A plugin's id is the name of its file, and the user's own plugin
+directory holds files of their choosing: an employee reads the
+<code>plugin:&lt;id&gt;</code> actions their own workstations offer, never those only
+another employee's offer, and names no other in a key; the rest of the
+catalog is read by everyone.</p>
+<h2>Monitoring</h2>
+<p>Odoo watches four problems: a deck service that stays failed, a silent
+workstation, a deck unplugged for long and a deck that changed
+workstation. It always writes the history. It opens Odoo activities only
+when <em>Settings › Stream Deck</em> enables them, which is off by default.</p>
+<h3>History, always</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Written by</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Service started</em>, <em>failed</em>, <em>stopped</em>, <em>absent</em> (<code>service_changed</code>)</td>
+<td>the workstation</td>
+<td>its deck service changes state</td>
+</tr>
+<tr>
+<td><em>Workstation silent</em> (<code>silent</code>)</td>
+<td>Odoo</td>
+<td>the workstation has sent no report for the silent delay; dated the end of that delay after its last report</td>
+</tr>
+<tr>
+<td><em>Workstation heard again</em> (<code>heard_again</code>)</td>
+<td>Odoo</td>
+<td>the first report after a silence; dated its reception</td>
+</tr>
+<tr>
+<td><em>Changed workstation</em> (<code>moved</code>)</td>
+<td>Odoo</td>
+<td>a workstation reports a deck that another one holds (see Access)</td>
+</tr>
+</tbody>
+</table>
+<p>A deck unplugged for long has no event of its own: its <code>unplugged</code> event
+already dates it.</p>
+<p>The cron <em>Stream Deck: watch workstations and decks</em> runs every 5
+minutes, which is the granularity of every delay. It marks a workstation
+silent once (<em>Silent since</em>); its next report clears the mark, and so do
+archiving it and removing its token. A workstation that is archived, has
+no token (unenrolled or revoked) or has never reported never goes
+silent. The extension reports every 15 minutes and not while the screen
+is locked: a workstation turned off for the night, asleep or locked
+beyond the delay goes silent, then is heard again at its next report.</p>
+<h3>Activities, on demand</h3>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Activity type, on</th>
+<th>Opens</th>
+<th>Closes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deck service failed</td>
+<td><em>Deck service failed</em>, on the workstation</td>
+<td>the service has stayed <code>failed</code> for its delay</td>
+<td>by itself, at the report that carries another state</td>
+</tr>
+<tr>
+<td>Workstation silent</td>
+<td><em>Workstation silent</em>, on the workstation</td>
+<td>the workstation goes silent</td>
+<td>by itself, at its next report</td>
+</tr>
+<tr>
+<td>Deck unplugged for long</td>
+<td><em>Deck unplugged for long</em>, on the deck</td>
+<td>the deck has been unplugged for its delay, counted from its last sighting or its last <code>unplugged</code> event, whichever is later</td>
+<td>by itself, at the report that shows it plugged in</td>
+</tr>
+<tr>
+<td>Deck changed workstation</td>
+<td><em>Deck changed workstation</em>, on the deck</td>
+<td>at the report that moves the deck</td>
+<td>by a person; while one is open, whoever it is assigned to, a new move opens none and posts a note to the deck's thread</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Recipient.</strong> <em>Employee</em>: the employee of the workstation, or of the
+  workstation that holds the deck; for a move, the new holder, the lender
+  reads the move in the history. <em>Manager</em>, the default: the user named
+  in the Settings. <em>Employee and manager</em>: one activity for each.</li>
+<li><strong>Never a duplicate.</strong> A record has at most one open activity of a type
+  per assigned user. A deck with an open <em>Deck changed workstation</em>
+  activity opens no other at a new move, even for another holder: the
+  move is posted as a note to the deck's thread. A <em>Deck service
+  failed</em> or <em>Deck unplugged for long</em> activity marked done while its
+  problem lasts opens again at the next run of the cron; a silence opens
+  its activity once.</li>
+<li><strong>Closing.</strong> A closed activity stays done, with the feedback « Resolved
+  at <time>: <what happened> », the time in the time zone of the assigned
+  user (UTC without one) and the text in their language. Archiving a
+  workstation or its employee, or revoking its token, closes its
+  activities and the <em>Deck unplugged for long</em> activities of its decks
+  with « the workstation is archived » or « the workstation is
+  unenrolled ». Archiving a user, from the Settings or by their departure,
+  closes the activities still assigned to them, <em>Deck changed workstation</em>
+  included, with « the assigned user is archived », where Odoo would
+  delete them. Closing does not depend on the Settings: an activity opened
+  before they were disabled still closes.</li>
+<li><strong>Archived manager.</strong> When the named manager is archived later, only
+  the employee part opens, and each run of the cron writes a warning to
+  the log, which names nobody.</li>
+<li><strong>Access.</strong> An activity is read with its record. An employee reads the
+  activities of their workstations, the manager's included, and those of
+  the decks they hold or held, from their first holding on, plus those
+  assigned to them; never those of another employee's workstation. The
+  rest of a deck's thread, its messages and attached files, is read from
+  the first holding on as well, the message that closes an activity
+  counting from the opening of that activity. On a workstation's thread,
+  the employee posts, edits their own messages and closes their own
+  activities; only a manager edits, closes or deletes those of others.
+  Only the monitoring creates activities of its four types.</li>
+<li><strong>Notification.</strong> Odoo tells the assigned user of a new activity as it
+  does for any activity (inbox or e-mail, by their preference). The module
+  sends no e-mail and no notification of its own. Such an e-mail goes
+  through Odoo's mail queue: neither a report nor the cron waits on the
+  mail server.</li>
+</ul>
+<h3>Settings › Stream Deck</h3>
+<p>Reserved to administrators, as the whole Settings page. Each setting is
+the <code>ir.config_parameter</code> <code>erplibre_streamdeck.&lt;key&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Key</th>
+<th>Default</th>
+<th>Bound</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stream Deck detection activities</td>
+<td><code>activities_enabled</code></td>
+<td>off</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Activities for</td>
+<td><code>activity_recipient</code></td>
+<td>Manager</td>
+<td>Employee, Manager, Employee and manager</td>
+</tr>
+<tr>
+<td>Activity manager</td>
+<td><code>activity_manager_id</code></td>
+<td>empty</td>
+<td>required to enable the activities for Manager or Employee and manager; offered among the Stream Deck managers</td>
+</tr>
+<tr>
+<td>Deck service failed, Workstation silent, Deck changed workstation, Deck unplugged for long</td>
+<td><code>alert_service_failed</code>, <code>alert_silent</code>, <code>alert_moved</code>, <code>alert_unplugged</code></td>
+<td>on</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Silent after (minutes)</td>
+<td><code>silent_after_min</code></td>
+<td>60</td>
+<td>30 at least: one missed heartbeat is not silence</td>
+</tr>
+<tr>
+<td>Unplugged for long after (hours)</td>
+<td><code>unplugged_after_h</code></td>
+<td>72</td>
+<td>1 at least</td>
+</tr>
+<tr>
+<td>Service failed for (minutes)</td>
+<td><code>service_failed_after_min</code></td>
+<td>10</td>
+<td>0 at least</td>
+</tr>
+<tr>
+<td>First pilot</td>
+<td><code>first_pilot_policy</code></td>
+<td>Ask the employee</td>
+<td>Keep local values, Take Odoo's values; see Configuration</td>
+</tr>
+</tbody>
+</table>
+<p>The silent delay also dates the <em>Workstation silent</em> event, so it holds
+with the activities disabled. The 72 hours cover a weekend without an
+alert for a laptop taken home; the 10 minutes let the deck service restart
+by itself after a brief failure.</p>
+<h3>What stays history only</h3>
+<ul>
+<li>Every problem while the activities are disabled, the default.</li>
+<li>A problem whose box is cleared.</li>
+<li>A deck service failed, or a deck unplugged, for less than its delay.</li>
+<li>Nothing leaves Odoo: no e-mail, push notification or message beyond
+  Odoo activities. The delays are global, never per workstation or per
+  employee, and the health of the deck itself (firmware, keys) is not
+  watched.</li>
+</ul>
+<h2>Configuration</h2>
+<p>Odoo manages a closed list of four settings, each one line of the
+workstation's <code>~/.config/erplibre-home/streamdeck.conf</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Key on the wire</th>
+<th>Line of the file</th>
+<th>Values</th>
+<th>Restarts the deck service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deck program</td>
+<td><code>deck_program</code></td>
+<td><code>DECK_PROGRAM</code></td>
+<td><code>tiler</code>, <code>controller</code>, <code>none</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Plugins turned off</td>
+<td><code>plugins_off</code></td>
+<td><code>DECK_PLUGINS_OFF</code></td>
+<td>at most 64 plugin ids <code>[a-z][a-z0-9_]{0,63}</code>, joined by commas</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Session refresh (seconds)</td>
+<td><code>session_refresh_sec</code></td>
+<td><code>DECK_SESSION_REFRESH_SEC</code></td>
+<td>a number from 0.5 to 60</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Games</td>
+<td><code>games</code></td>
+<td><code>GAMES</code></td>
+<td><code>on</code>, <code>off</code></td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>No path, no command and no plugin to turn on: Odoo cannot make a
+workstation run anything. A value is typed bare in a line (a word, plugin
+ids separated by commas, a number) and stored as JSON; a value outside
+this list is refused at the write. The tab <em>Configuration</em> lists the
+plugins the workstation found on its disk.</p>
+<h3>Layers and locks</h3>
+<p>A setting takes its value from the last of three layers that sets it:</p>
+<ol>
+<li>the <strong>profile</strong> of the workstation (<em>Configuration › Profiles</em>); an
+   archived profile counts for nothing;</li>
+<li>the <strong>deck model</strong>: the settings of the model of each connected deck
+   (<em>Configuration › Deck models</em>, by USB product id). With decks of
+   several models, their layers apply by ascending product id, the
+   highest winning, and the workstation form warns about it;</li>
+<li>the <strong>workstation</strong> itself: its overrides, in its tab <em>Configuration</em>.</li>
+</ol>
+<p>A line marked <em>Locked</em> stops its setting there: a locked profile line
+ignores the models and the workstation, a locked model line ignores the
+next models and the workstation. Only a manager sets a lock. A setting
+that no layer sets stays the employee's, on the workstation, and Odoo
+never adopts it.</p>
+<p>A profile marked <em>Selectable</em> is offered to the employees, who each pick
+one for their own workstations. The manager assigns any profile to any
+workstation.</p>
+<h3>Offer and application</h3>
+<p>At each report of the pilot, Odoo computes the effective configuration
+of the workstation. When its SHA-256 differs from the last one offered,
+the <em>Offered revision</em> grows by one. The reply carries the revision and
+the extension announces it; nothing changes on the workstation until its
+employee clicks <em>Apply</em>. The extension then rewrites the managed lines of
+<code>streamdeck.conf</code>, keeps every other line, and restarts the deck service
+when a setting that needs it changed and the service is running; a
+stopped deck service is never started. Its next report says whether the
+revision was applied or refused, and why.</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unmanaged</td>
+<td>no layer sets a setting of the workstation, it never reported with protocol 1.1, or its extension does not check this database as the pilot; a revision pending until then is withdrawn</td>
+</tr>
+<tr>
+<td>Pending</td>
+<td>a revision is offered and not applied yet, since <em>Configuration pending since</em></td>
+</tr>
+<tr>
+<td>Applied</td>
+<td>the workstation applied the offered revision</td>
+</tr>
+<tr>
+<td>Refused</td>
+<td>the workstation refused it; <em>Refusal reason</em> says why: <code>invalid:&lt;key&gt;</code> (<code>invalid:key_layouts</code> for the key layouts), <code>write_failed</code>, <code>restart_failed</code> or <code>unit_missing</code></td>
+</tr>
+<tr>
+<td>Changed locally</td>
+<td>a setting changed in the file; Odoo offers it again</td>
+</tr>
+</tbody>
+</table>
+<p>An extension older than contract 1.3 reports without being piloted, and
+the form says that it is too old. An extension of contract 1.3 is piloted
+without the key layouts, which start with contract 1.4 (protocol 1.2).</p>
+<h3>First pilot</h3>
+<p>The first time a workstation is piloted, its free settings may hold local
+values that differ from Odoo's. The Stream Deck manager decides in
+<em>Stream Deck › Configuration › First pilot</em>, as a Settings administrator
+does in <em>Settings › Stream Deck</em>:</p>
+<ul>
+<li><strong>Ask the employee</strong>, the default: the extension asks once whether to
+  keep the local values, which then become overrides of the workstation
+  with the source <em>Workstation file</em>, or to take Odoo's. The form says
+  that Odoo waits for this choice and names the settings concerned.</li>
+<li><strong>Keep local values</strong>: Odoo adopts them at once, without asking.</li>
+<li><strong>Take Odoo's values</strong>: nothing is adopted.</li>
+</ul>
+<p>A local value that is empty, or already Odoo's, raises no question.
+Locked settings are always offered for the usual confirmation, whatever
+the choice. The workstation keeps the answer in <em>First pilot choice</em>;
+applying a first revision counts as <em>Take Odoo's values</em>.</p>
+<h3>Local changes</h3>
+<p>After a revision is applied, a managed setting changed in the file, from
+the menu TODO › Stream Deck for instance, is handled at the next report:</p>
+<ul>
+<li>a <strong>free</strong> setting becomes an override of the workstation, with the
+  source <em>Workstation file</em>, and raises no question: the next revision
+  equals the file, and the extension records it applied silently;</li>
+<li>a <strong>locked</strong> setting, or a setting removed from the file or made
+  invalid there, is offered again under a new revision, which the
+  employee confirms as any other.</li>
+</ul>
+<h3>Key layouts</h3>
+<p>The home screen of each deck model is laid out in Odoo. A key layout is
+for one USB product id and belongs to a profile, a deck model or a
+workstation: the tab <em>Key layouts</em> of each, or <em>Configuration › Key
+layouts</em>. Its form lists one line per key: the index (0 the top left
+key, numbered row by row), the action and the icon chosen in the
+catalog, and a label of at most 16 characters without control character.
+<em>Create the keys</em> adds an empty line for each key of the model, and the
+preview shows the grid. An action is the home key of a plugin
+(<code>plugin:&lt;id&gt;</code>), a key of the dashboard (<code>tiles</code>) or a black key
+(<code>empty</code>); a key without action is left to the deck program, which
+places its fixtures and its dashboard there. A plugin can have one home
+key per layout, and a plugin that the layout does not name gets none: the
+form warns of the <em>Plugins without a key</em>, among the plugins its own
+workstation offers for a workstation's layout, else among those that a
+workstation offers in its last report.</p>
+<p>The layouts of a model fold as the settings do, profile &lt; deck model &lt;
+workstation, and <em>Locked</em> holds the whole layout: a locked layout stops
+the fold for its model. The home key of a plugin turned off, by Odoo or
+else by the workstation's file, goes as a black key: the workstation
+refuses a layout naming a plugin turned off. Only the layouts of the connected decks go to
+the workstation, in the setting <code>key_layouts</code> of the revision, which is
+locked when one of them is; the extension writes them to
+<code>~/.config/erplibre-home/keymap.json</code> when the employee applies the
+revision, and keeps there the layouts of the models Odoo does not send.
+Odoo never takes a layout out of the file: a model that no layer lays
+out, or no longer does, keeps there the layout last applied to it, and
+a model the file does not name gets the automatic layout of the deck
+program. The <em>Configuration</em> tab of the workstation says so for each
+connected model that Odoo sends no layout.</p>
+<p>Each workstation gets the layouts within the catalog of its own report,
+since it refuses the whole revision for a key its deck program cannot
+lay out: a model that catalog does not describe gets no layout, a key
+past its number of keys is left out, an action it lacks goes as a black
+key, as the deck program would show it, and an icon it lacks is left
+out. A report without a catalog gets no layout; its settings still go.</p>
+<p>The catalog (<em>Configuration › Catalog</em>) is the union of what the
+workstations report: the actions, the icons and the geometry of each
+deck model. An item that no workstation reports any more stays, with the
+date it was last seen, to the hour; an action keeps the workstations
+whose last report offered it (<em>Offered by</em>). The geometry of a model is a constant
+of its hardware: a model of the table shipped with the module takes the
+table's, and a model outside it keeps the geometry first reported. No
+report changes it, so no workstation decides the keys Odoo lays out for
+the others.</p>
+<p>A layout changed in the file after its revision was applied is handled
+as a setting, by the SHA-256 of each model's layout (canonical JSON: keys
+sorted, no space, every character outside ASCII escaped as <code>\uXXXX</code>):</p>
+<ul>
+<li>a <strong>free</strong> layout becomes a layout of the workstation marked <em>Kept in
+  the workstation's file</em>, with the source <em>Workstation file</em>, and Odoo
+  sends no layout for that model any more; creating or changing one of
+  its keys sends it again. Odoo does not hold the keys of such a layout,
+  so it takes no lock until then: a lock it could never offer again
+  would let a hand edit pass unnoticed;</li>
+<li>a <strong>locked</strong> layout, or one removed from the file, is offered again.</li>
+</ul>
+<p>The first-pilot question covers the free layouts as the free settings:
+a free layout of the file whose hash differs from Odoo's puts
+<code>key_layouts</code> in <code>ask</code>, unless one of the sent layouts is locked, and
+keeping the local values adopts it as above. A workstation piloted before
+protocol 1.2 has made its choice already: a layout then follows the rule
+of a setting newly managed, offered under a new revision.</p>
+<h3>History of the configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Configuration applied</em> (<code>config_applied</code>)</td>
+<td>the workstation reports the offered revision applied; with its revision</td>
+</tr>
+<tr>
+<td><em>Configuration refused</em> (<code>config_refused</code>)</td>
+<td>the workstation reports it refused; with its revision and reason</td>
+</tr>
+<tr>
+<td><em>Local setting adopted</em> (<code>config_adopted</code>)</td>
+<td>a free local value becomes an override; with its settings, <code>key_layouts:&lt;product id&gt;</code> for a layout kept in the file</td>
+</tr>
+<tr>
+<td><em>Setting changed locally</em> (<code>config_drift</code>)</td>
+<td>a locked setting, or a removed one, is offered again; with its settings, <code>key_layouts:&lt;product id&gt;</code> for a layout</td>
+</tr>
+</tbody>
+</table>
+<p>Odoo alone writes them, and they open no activity: the state is read on
+the workstation. The history filters on each of them.</p>
+<h2>Wire protocol 1.2</h2>
+<p>The extension's
+<a href="https://github.com/TechnoLibre/erplibre-home-gnome-extension/blob/main/CONTRACT.md">CONTRACT.md</a>
+describes the same protocol from the workstation side.</p>
+<p>The client first sends <code>GET &lt;url&gt;/web/login?db=&lt;db&gt;</code> with a cookie jar to
+select the database, then each call is a <code>POST</code> of a JSON object, answered
+by a JSON object, under <code>/streamdeck/v1/</code>. Another HTTP method gets 405.
+Every body carries <code>"protocol"</code>: <code>"1.2"</code> for a workstation that takes in
+the key layouts, <code>"1.1"</code> for one that takes in the settings only, <code>"1.0"</code>
+before: an unknown major version is refused, a newer minor version is
+accepted and its unknown keys ignored. Every reply carries <code>"protocol":
+"1.2"</code>; an error reply adds <code>error</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Authentication</th>
+<th>Body</th>
+<th>Reply 200</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enroll</code></td>
+<td>the method's credentials</td>
+<td><code>method</code> (<code>pairing_code</code>, <code>api_key</code> or <code>password</code>), <code>code</code>, <code>key</code> or <code>login</code> + <code>password</code>, <code>fingerprint</code>, <code>hostname</code></td>
+<td><code>workstation_id</code>, <code>token</code></td>
+</tr>
+<tr>
+<td><code>report</code></td>
+<td><code>Authorization: Bearer &lt;token&gt;</code></td>
+<td><code>state</code>, <code>events</code>, <code>lost_events</code>, <code>config</code> (1.1)</td>
+<td><code>accepted</code> (the uuids of the events), <code>heartbeat_s</code> (900), <code>config</code> (1.1, to the pilot of a configured workstation)</td>
+</tr>
+<tr>
+<td><code>unenroll</code></td>
+<td><code>Authorization: Bearer &lt;token&gt;</code></td>
+<td>nothing else</td>
+<td>nothing else; the token is revoked</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>fingerprint</code>: 64 lowercase hexadecimal digits, the HMAC-SHA256 of the
+  machine identifier keyed by the Linux user, the URL and the database; the
+  raw identifier never leaves the workstation.</li>
+<li><code>state</code>: host name, operating system, GNOME Shell, extension and contract
+  versions, ERPLibre branch and commit, deck program, service state
+  (<code>active</code>, <code>failed</code>, <code>inactive</code>, <code>absent</code>) and the decks connected now
+  (serial number, USB product id, USB path, firmware). The decks of the
+  workstation missing from the list become disconnected. In 1.1,
+  <code>deck_plugins</code> lists at most 128 ids of the deck plugins found on the
+  workstation's disk; its repeats are dropped. In 1.2, <code>deck_catalog</code> is
+  the catalog of the deck program, <code>{"format": 1, "actions", "icons",
+  "models": {&lt;product id&gt;: {"cols", "rows", "keys"}}}</code>, added to the
+  catalog of Odoo; larger than 32 KiB, or of another format, it is
+  ignored, and an action or an icon of an unknown form is skipped, as is a
+  model whose geometry fits no key (no key, or more keys than cells). The
+  numbers of a geometry are integers from 0 to 256; anything else is a
+  400 <code>bad_request</code>.</li>
+<li><code>events</code>: <code>plugged</code>, <code>unplugged</code> or <code>service_changed</code>, each with its own
+  uuid and the time it was observed. <code>moved</code>, <code>silent</code>, <code>heard_again</code>
+  and the four <code>config_*</code> kinds are written by Odoo only: a report that
+  carries one is a 400 <code>bad_request</code>. A uuid already stored is
+  acknowledged again without change, so a report sent again creates
+  nothing. A time more than 5 minutes ahead of the reception is replaced
+  by the reception time.</li>
+<li><code>lost_events</code>: the running total of events the workstation dropped
+  unsent; Odoo keeps the largest total received.</li>
+<li><code>config</code> (1.1, ignored in a 1.0 body): <code>{"pilot": false}</code> from a
+  destination that is not the pilot of the workstation, which gets no
+  <code>config</code> back. From the pilot, <code>{"pilot": true, "revision_applied",
+  "current", "result", "choice"}</code>: <code>current</code> the four settings as the file
+  holds them, null when absent or invalid; <code>result</code> the outcome of the
+  last revision, <code>{"revision", "status", "reason", "at"}</code> with <code>status</code>
+  <code>applied</code> or <code>refused</code>; <code>choice</code> the answer to the first-pilot question,
+  <code>keep_local</code> or <code>take_odoo</code>, sent once. A value outside the schema, or
+  an unknown status, reason or choice, is a 400 <code>bad_request</code>; a key
+  outside the four settings is ignored. In 1.2, <code>current.key_layouts</code>
+  maps the product id of each layout of <code>keymap.json</code> to the SHA-256 of
+  that layout, null when the file holds none (at most 128), and the
+  reason <code>invalid:key_layouts</code> is known.</li>
+<li><code>config</code> of the reply: <code>{"revision", "hash", "settings", "locked"}</code>,
+  plus <code>ask</code> during a first pilot under <em>Ask the employee</em>. <code>hash</code> is the
+  SHA-256 of the canonical JSON of <code>settings</code> (keys sorted, no space),
+  <code>locked</code> the locked settings, <code>ask</code> the free settings whose local value
+  differs from Odoo's, <code>key_layouts</code> included. In 1.2,
+  <code>settings.key_layouts</code> maps the product id of each connected deck that
+  Odoo lays out, within the catalog of the report, to <code>{"keys": [{"key",
+  "action", "icon", "label"}]}</code>, by ascending key, <code>icon</code> and <code>label</code>
+  only when set, at most 16 models; <code>locked</code> then lists <code>key_layouts</code>
+  when one of these layouts is locked.</li>
+<li>A deck is known by its serial number, key <code>sn:&lt;serial&gt;</code>; a deck without
+  a readable serial number is known by its workstation, product id and
+  USB path, key <code>nosn:&lt;workstation&gt;:&lt;product&gt;:&lt;path&gt;</code>, and is never
+  merged with a deck of another workstation. A serial outside
+  <code>[A-Za-z0-9._-]{1,64}</code> is a 400 <code>bad_request</code>: having no <code>:</code>, it can
+  never name a deck without serial.</li>
+<li>Every text of a body holds at most 256 characters and no NUL
+  character, a USB product id is 4 hexadecimal digits, and a deck, in
+  <code>state</code> as in an event, carries a serial number or a USB path;
+  anything else is a 400 <code>bad_request</code> and nothing is written.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th><code>error</code></th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td><code>bad_request</code></td>
+<td>the body is not JSON, or a value is missing, of the wrong type or too long; nothing is written</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>protocol_unsupported</code></td>
+<td>unknown major version</td>
+</tr>
+<tr>
+<td>401</td>
+<td><code>credentials_refused</code></td>
+<td>wrong key or password, unknown, used or expired pairing code, or login cooldown</td>
+</tr>
+<tr>
+<td>401</td>
+<td><code>token_invalid</code></td>
+<td>missing, unknown or revoked token</td>
+</tr>
+<tr>
+<td>403</td>
+<td><code>user_inactive</code></td>
+<td>the employee is archived, or is not a Stream Deck user (a portal account, for instance)</td>
+</tr>
+</tbody>
+</table>
+<p>Neither a body, a header nor a reply is logged, and every reply is marked
+<code>Cache-Control: no-store</code>.</p>
+<h2>Translations</h2>
+<p>Canadian French (<code>fr_CA</code>) covers every term of the module: menus, views,
+fields and messages.</p>
+</section>

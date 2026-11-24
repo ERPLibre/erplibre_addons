@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 TechnoLibre inc. - Mathieu Benoit -->
+<!-- License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<!-- Un domaine par spécification d'origine du Stream Deck. noupdate :
+     un domaine renommé à la main garde son nom à la mise à jour du
+     module. -->
+<odoo noupdate="1">
+    <record id="cat_sd_bundle" model="devops.requirement.category">
+        <field name="name">Mobile code bundle</field>
+        <field name="code">sd_bundle</field>
+        <field name="sequence" eval="10" />
+    </record>
+    <record id="cat_sd_defects" model="devops.requirement.category">
+        <field name="name">Deck defects</field>
+        <field name="code">sd_defects</field>
+        <field name="sequence" eval="20" />
+    </record>
+    <record id="cat_sd_deploy" model="devops.requirement.category">
+        <field name="name">ERPLibre Home deployment</field>
+        <field name="code">sd_deploy</field>
+        <field name="sequence" eval="30" />
+    </record>
+    <record id="cat_sd_ext" model="devops.requirement.category">
+        <field name="name">GNOME extension indicators</field>
+        <field name="code">sd_ext</field>
+        <field name="sequence" eval="40" />
+    </record>
+    <record id="cat_sd_grepo" model="devops.requirement.category">
+        <field name="name">Games repository</field>
+        <field name="code">sd_grepo</field>
+        <field name="sequence" eval="50" />
+    </record>
+    <record id="cat_sd_gsplit" model="devops.requirement.category">
+        <field name="name">Games split</field>
+        <field name="code">sd_gsplit</field>
+        <field name="sequence" eval="60" />
+    </record>
+    <record id="cat_sd_mobplug" model="devops.requirement.category">
+        <field name="name">Stream Deck mobile plugin</field>
+        <field name="code">sd_mobplug</field>
+        <field name="sequence" eval="70" />
+    </record>
+    <record id="cat_sd_plugin" model="devops.requirement.category">
+        <field name="name">Deck plugin package</field>
+        <field name="code">sd_plugin</field>
+        <field name="sequence" eval="80" />
+    </record>
+    <record id="cat_sd_rename" model="devops.requirement.category">
+        <field name="name">ERPLibre Home rename</field>
+        <field name="code">sd_rename</field>
+        <field name="sequence" eval="90" />
+    </record>
+    <record id="cat_sd_service" model="devops.requirement.category">
+        <field name="name">Deck service and menu</field>
+        <field name="code">sd_service</field>
+        <field name="sequence" eval="100" />
+    </record>
+</odoo>

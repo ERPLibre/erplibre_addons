@@ -1,0 +1,238 @@
+<section class="oe_container">
+<h1>ERPLibre — Stream Deck requirements</h1>
+<p>The requirements of the ERPLibre Stream Deck — the deck programs, the GNOME
+extension ERPLibre Home, its installation, the games and the mobile plugin —
+as <code>devops.requirement</code> records, each with the repository tests that prove
+it. They come from the audit of the Stream Deck design specifications, row
+by row, and from the designs of the Odoo inventory, of its monitoring and
+of its control of the deck settings and of the key layout, and live here
+instead of in a document.</p>
+<p>The module depends on <code>erplibre_streamdeck</code> and <code>erplibre_devops_requirement</code>,
+and adds no model, no view and no menu: the requirements show in the
+Requirements application, under thirteen domains whose code starts with
+<code>sd_</code>.</p>
+<h2>What the data holds</h2>
+<table>
+<thead>
+<tr>
+<th>Audit row</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>covered, or a unit test added since</td>
+<td>done, with a proof line per test</td>
+</tr>
+<tr>
+<td>no unit test yet</td>
+<td>to do; <em>What is missing</em> says so</td>
+</tr>
+<tr>
+<td>checked by a long test</td>
+<td>done, with a proof of kind <em>Long test</em></td>
+</tr>
+<tr>
+<td>long test to write</td>
+<td>to do; <em>What is missing</em> says what the long test must check</td>
+</tr>
+<tr>
+<td>non-goal, out of scope</td>
+<td>MoSCoW <em>Won't</em>, done, the reason in the description</td>
+</tr>
+<tr>
+<td>design decision</td>
+<td>MoSCoW <em>Should</em>, <em>Non-functional</em>, done, the reason in <em>Achievement</em></td>
+</tr>
+<tr>
+<td>open question, open risk, follow-up</td>
+<td>MoSCoW <em>Should</em>, to do; <em>What is missing</em> says what is left</td>
+</tr>
+<tr>
+<td>security invariant</td>
+<td>MoSCoW <em>Must</em>, type <em>Security</em>, <em>Security relevant</em></td>
+</tr>
+<tr>
+<td>proof in another repository</td>
+<td>done with a proof line per test of that repository; else to do, <em>What is missing</em> names the repository</td>
+</tr>
+<tr>
+<td>violated</td>
+<td>to do, stage <em>Develop</em>; <em>What is missing</em> describes the gap</td>
+</tr>
+</tbody>
+</table>
+<p><em>Achievement</em> and <em>What is missing</em> name files and tests in the same
+<code>&lt;repository&gt;:&lt;path&gt;</code> form as the proofs below, so each pointer resolves in
+its own repository. A done requirement leaves <em>What is missing</em> empty. A
+requirement that protects a secret, an access or a file mode is of type
+<em>Security</em> and marked <em>Security relevant</em>.</p>
+<p><em>Notes</em> opens on the origin of the requirement: what the audit found for
+its row.</p>
+<table>
+<thead>
+<tr>
+<th>Origin</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>covered by a test</td>
+<td>a test of a repository already proved it</td>
+</tr>
+<tr>
+<td>unit test missing</td>
+<td>no unit test proved it</td>
+</tr>
+<tr>
+<td>long test needed</td>
+<td>only the long test, in virtual machines with a GNOME session, can check it</td>
+</tr>
+<tr>
+<td>documented only</td>
+<td>the design states it: a decision, a rule or a non-goal</td>
+</tr>
+<tr>
+<td>proof in another repository</td>
+<td>its test belongs to the games or the mobile repository</td>
+</tr>
+<tr>
+<td>violated</td>
+<td>the code did not hold it</td>
+</tr>
+</tbody>
+</table>
+<p>What follows the origin says what holds the requirement: <em>a unit test
+pins it</em>, <em>an existing test covers it</em>, <em>its unit test shows the
+violation</em>.</p>
+<p>Each requirement carries a stable code <code>SD-&lt;DOMAIN&gt;-R&lt;row&gt;</code>, for example
+<code>SD-DEFECTS-R02</code>. The data is loaded <strong>once</strong>: it is <code>noupdate</code>, so a
+requirement edited by hand keeps its edit when the module is updated. The
+exception is a requirement whose text a new version rewrites: the
+migration of that version loads it again from its file, as it does a
+proof whose reference changed, and its French comes back from the catalog.</p>
+<h2>The Inventory domain</h2>
+<p>The domain <em>Inventory</em> (<code>sd_inv</code>, file <code>data/requirement_inventory.xml</code>)
+holds the requirements of the Odoo inventory of the workstations and their
+decks: one per decision, non-goal and anti-goal of its design, coded
+<code>SD-INV-R&lt;nn&gt;</code>. Its proofs are Odoo tests of <code>erplibre_streamdeck</code>, Node
+tests of the extension and unit tests of ERPLibre. A decision the code does
+not hold yet stays to do, stage <em>Develop</em>, and <em>What is missing</em> describes
+the gap. A requirement whose guarantee rests on another one lists it under
+<em>Depends on</em>, and stays to do, naming it in <em>What is missing</em>, as long as
+that one is not done.</p>
+<p>The test <code>tests/test_requirement_inventory.py</code> checks that each proof names
+a test that exists: an Odoo test is imported and must run under
+<code>--test-tags /&lt;module&gt;</code>; inside an ERPLibre checkout, a test of the
+extension, of the deck program or of ERPLibre must be in the committed
+tree of its repository, the extension cloned under
+<code>script/gnome-extension/erplibre_home</code> and the deck program under
+<code>script/stream_deck/deck</code> (that check is skipped for a repository that is
+not cloned there). A Node test declared in a
+<code>for … of</code> loop over a literal array is named once per value of the loop;
+a name the loop does not produce is not a test. Each test of the five
+inventory test files of <code>erplibre_streamdeck</code> proves at least one
+requirement.</p>
+<h2>The Monitoring domain</h2>
+<p>The domain <em>Monitoring</em> (<code>sd_mon</code>, file <code>data/requirement_monitoring.xml</code>)
+holds the requirements of the monitoring of the workstations and their
+decks: one per user decision, design choice, Odoo-side item, non-goal and
+anti-goal of its design, coded <code>SD-MON-R&lt;nn&gt;</code>, apart from the inventory so
+that each part of the work is checked on its own. Its proofs are Odoo
+tests of <code>erplibre_streamdeck</code>. A design decision that no Odoo test can
+hold, such as a locked workstation counted as silent, is done without a
+proof, MoSCoW <em>Should</em>, <em>Non-functional</em>, its reason in <em>Achievement</em>. A
+gap the code still has stays to do and <em>What is missing</em> describes it. A
+requirement whose guarantee rests on another one lists it under <em>Depends
+on</em>, and stays to do, naming it in <em>What is missing</em>, as long as that one
+is not done.</p>
+<p>The test <code>tests/test_requirement_monitoring.py</code> checks that each proof
+names an Odoo test that runs under <code>--test-tags /&lt;module&gt;</code>, that each test
+of the files <code>test_streamdeck_monitor*.py</code> and <code>test_streamdeck_settings.py</code>
+of <code>erplibre_streamdeck</code> proves at least one requirement, that the
+requirements still to do are exactly those it names, and that none is done
+while one it depends on is not.</p>
+<h2>The Control domain</h2>
+<p>The domain <em>Control</em> (<code>sd_ctl</code>, file <code>data/requirement_control.xml</code>) holds
+the requirements of the control of the deck by Odoo, the third lot: one
+per user decision, design choice and anti-goal of its design, coded
+<code>SD-CTL-R&lt;nn&gt;</code>. <code>SD-CTL-R01</code> to <code>R49</code> cover the settings, the first part
+of the lot; <code>SD-CTL-R50</code> to <code>R71</code> the key layout, the second part, whose
+tests also prove four anti-goals of the first. Its proofs are Odoo tests
+of <code>erplibre_streamdeck</code>, Node tests of the extension and unit tests of
+ERPLibre, since the configuration crosses the three repositories.</p>
+<p>The test <code>tests/test_requirement_control.py</code> checks that each proof names
+a test that exists, under the same rules as the inventory; that each test
+of the files <code>test_streamdeck_config*.py</code> and
+<code>test_streamdeck_key_layout.py</code> of <code>erplibre_streamdeck</code> proves at least
+one requirement; that the tests holding the review points of the
+lot are cited; and that the requirements still to do are exactly those it
+names.</p>
+<h2>Proofs and verdicts</h2>
+<p>A proof line is a <code>devops.requirement.test</code> whose reference names a test of
+a repository:</p>
+<pre><code class="language-text">&lt;repository&gt;:&lt;path&gt;::&lt;test id&gt;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Repository</th>
+<th>Test id</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repository unit test</td>
+<td><code>erplibre</code>, <code>erplibre_streamdeck</code>, <code>erplibre-home-gnome-extension</code>, <code>streamdeck_game</code></td>
+<td><code>Class::method</code></td>
+<td><code>erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou::test_a_busy_deck_runs_nothing_and_exits_two</code></td>
+</tr>
+<tr>
+<td>Node test</td>
+<td><code>erplibre-home-gnome-extension</code></td>
+<td>the test name</td>
+<td><code>erplibre-home-gnome-extension:test/unit/deck-service.test.js::restart goes through the unit only when it exists</code></td>
+</tr>
+<tr>
+<td>Long test</td>
+<td><code>erplibre</code></td>
+<td>the check name</td>
+<td><code>erplibre:long_test/install_erplibre_home.py::extension-indicators</code></td>
+</tr>
+<tr>
+<td>Python test</td>
+<td>an Odoo module</td>
+<td>its dotted path</td>
+<td><code>odoo.addons.erplibre_streamdeck.tests.test_streamdeck_access.TestStreamdeckAccess.test_the_manager_reads_the_whole_fleet</code></td>
+</tr>
+</tbody>
+</table>
+<p>A Python test is an Odoo test, named by the dotted path of its method:
+<code>script/test/odoo_test_report.py --modules erplibre_streamdeck</code> of ERPLibre
+runs the module's tests on a throwaway database and pushes their verdicts.</p>
+<p>A test runner pushes its verdict with the reference alone, through
+<code>record_result_by_reference</code> of <code>erplibre_devops_requirement</code>, as a user of
+the runner group:</p>
+<pre><code class="language-python">models.execute_kw(
+    db, uid, api_key,
+    &quot;devops.requirement.test&quot;, &quot;record_result_by_reference&quot;,
+    [&quot;repo_unittest&quot;,
+     &quot;erplibre_streamdeck:tests/test_deck_lock.py::LaCommandeSousVerrou&quot;
+     &quot;::test_a_busy_deck_runs_nothing_and_exits_two&quot;,
+     &quot;passed&quot;],
+    {&quot;log&quot;: output, &quot;duration&quot;: 0.8},
+)
+</code></pre>
+<p>The verdict reaches every requirement whose proof carries that reference:
+the example above updates two requirements in one call.</p>
+<h2>Translation</h2>
+<p>The requirement names, descriptions and domain names are written in English
+and ship in Canadian French: <code>i18n/fr_CA.po</code> holds the French of every one
+of them, so loading the French language (<code>fr_CA</code>) shows the requirements in
+French. <em>Achievement</em>, <em>What is missing</em> and <em>Notes</em> stay in English in
+both languages: <code>erplibre_devops_requirement</code> does not declare these fields
+translatable, so the module ships no French for them.</p>
+</section>
