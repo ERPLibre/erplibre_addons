@@ -185,3 +185,150 @@ class TestRequirementTestResult(TransactionCase):
             {"devsecops_stage": "test"}
         )
         self.assertEqual(self.requirement.devsecops_stage, "test")
+
+
+@tagged("post_install", "-at_install")
+class TestRecordResultByReference(TransactionCase):
+    """`record_result_by_reference` écrit un verdict par sa seule référence.
+
+    Un lanceur de dépôt ne connaît que (sorte, référence) : le verdict va
+    sur toutes les lignes qui la portent, quel que soit leur requis, et
+    nulle part ailleurs. Mêmes droits, même validation du résultat que
+    `record_result` ; une référence vide ou que personne ne déclare rend
+    0 sans rien créer ni écrire.
+    """
+
+    REFERENCE = "erplibre:test/test_zz.py::ZZ::test_a"
+    OTHER_REFERENCE = "erplibre:test/test_zz.py::ZZ::test_b"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        category = cls.env["devops.requirement.category"].create(
+            {"code": "zz_by_reference", "name": "Test domain"}
+        )
+        cls.requirements = cls.env["devops.requirement"].create(
+            [
+                {"code": code, "name": code, "category_id": category.id}
+                for code in ("ZZ-11", "ZZ-12", "ZZ-13")
+            ]
+        )
+        first, second, third = cls.requirements
+        cls.shared_lines = cls.env["devops.requirement.test"].create(
+            [
+                {
+                    "requirement_id": requirement.id,
+                    "kind": "repo_unittest",
+                    "reference": cls.REFERENCE,
+                }
+                for requirement in (first, second)
+            ]
+        )
+        cls.other_line = cls.env["devops.requirement.test"].create(
+            {
+                "requirement_id": third.id,
+                "kind": "repo_unittest",
+                "reference": cls.OTHER_REFERENCE,
+            }
+        )
+        cls.internal = new_test_user(
+            cls.env, login="zz_ref_internal", groups="base.group_user"
+        )
+        cls.runner = new_test_user(
+            cls.env,
+            login="zz_ref_runner",
+            groups=(
+                "erplibre_devops_requirement.group_devops_requirement_runner"
+            ),
+        )
+
+    def _record(self, user, result="passed", **kwargs):
+        args = dict(kind="repo_unittest", reference=self.REFERENCE)
+        args.update(kwargs)
+        return (
+            self.env["devops.requirement.test"]
+            .with_user(user)
+            .record_result_by_reference(result=result, **args)
+        )
+
+    def _all_lines(self):
+        return self.shared_lines | self.other_line
+
+    def test_one_reference_updates_every_line(self):
+        self.assertEqual(self._record(self.runner, log="ok", duration=1.5), 2)
+        for line in self.shared_lines:
+            self.assertEqual(line.last_result, "passed")
+            self.assertEqual(line.last_duration, 1.5)
+            self.assertEqual(line.last_log, "ok")
+            self.assertTrue(line.last_run)
+        self.assertEqual(self.other_line.last_result, "not_run")
+        self.assertEqual(
+            self.shared_lines.requirement_id.mapped("test_state"),
+            ["passed", "passed"],
+        )
+        self.assertEqual(self.requirements[2].test_state, "not_run")
+
+    def test_unknown_reference_writes_nothing(self):
+        before = self.env["devops.requirement.test"].search_count([])
+        with self.assertLogs(LOGGER, "WARNING"):
+            self.assertEqual(
+                self._record(self.runner, reference="erplibre:zz::missing"),
+                0,
+            )
+        # Une sorte qui ne correspond pas désigne aussi une ligne absente.
+        with self.assertLogs(LOGGER, "WARNING"):
+            self.assertEqual(self._record(self.runner, kind="node_test"), 0)
+        for empty in (False, None, ""):
+            with self.assertLogs(LOGGER, "WARNING"):
+                self.assertEqual(self._record(self.runner, reference=empty), 0)
+            with self.assertLogs(LOGGER, "WARNING"):
+                self.assertEqual(self._record(self.runner, kind=empty), 0)
+        self.assertEqual(
+            self.env["devops.requirement.test"].search_count([]), before
+        )
+        self.assertEqual(
+            set(self._all_lines().mapped("last_result")), {"not_run"}
+        )
+
+    def test_internal_user_is_refused(self):
+        with self.assertRaises(AccessError):
+            self._record(self.internal)
+        self.assertEqual(
+            set(self._all_lines().mapped("last_result")), {"not_run"}
+        )
+
+    def test_admin_records_a_result(self):
+        self.assertEqual(
+            self._record(self.env.ref("base.user_admin"), "failed"), 2
+        )
+        self.assertEqual(
+            set(self.shared_lines.requirement_id.mapped("test_state")),
+            {"failed"},
+        )
+
+    def test_unknown_result_is_refused(self):
+        with self.assertRaises(ValidationError):
+            self._record(self.runner, result="green")
+        self.assertEqual(
+            set(self._all_lines().mapped("last_result")), {"not_run"}
+        )
+
+    def test_log_is_truncated_keeping_the_end(self):
+        log = "x" * LOG_MAX_LENGTH + "AssertionError: zz_end"
+        self._record(self.runner, "failed", log=log)
+        for stored in self.shared_lines.mapped("last_log"):
+            self.assertEqual(len(stored), LOG_MAX_LENGTH)
+            self.assertTrue(stored.startswith(LOG_TRUNCATED_MARK))
+            self.assertTrue(stored.endswith("AssertionError: zz_end"))
+
+    def test_new_kinds_are_offered(self):
+        kinds = dict(
+            self.env["devops.requirement.test"]._fields["kind"].selection
+        )
+        self.assertEqual(kinds.get("repo_unittest"), "Repository unit test")
+        self.assertEqual(kinds.get("node_test"), "Node test")
+        self.assertEqual(kinds.get("long_test"), "Long test")
+        # Les quatre sortes d'origine restent en tête, dans leur ordre.
+        self.assertEqual(
+            list(kinds)[:4], ["python", "tour", "selenium", "manual"]
+        )

@@ -70,6 +70,9 @@ A test line is declared in data, by the project. Its `kind` tells what its
 | `python` | the dotted path of the test method |
 | `selenium` | the path of the script, relative to the repository |
 | `manual` | free text |
+| `repo_unittest` | a unit test of a repository: `<repository>:<path>::<Class>::<method>` |
+| `node_test` | a `node --test` test of a repository: `<repository>:<path>::<test name>` |
+| `long_test` | a long test of a repository, same form |
 
 `test_state`, stored on the requirement, sums up its lines by the worst
 result: no test → `none`; a failure or an error → `failed`; otherwise a test
@@ -96,6 +99,37 @@ models.execute_kw(
 characters, the end kept — it is the end that carries the failing assertion.
 Only the `last_*` fields are written.
 
+### Verdict by reference
+
+A repository test runner — ERPLibre's unit tests, the `node --test` suite of
+an extension, the long tests — knows its test and none of the requirements it
+proves: the link lives in the database only. It writes through
+`record_result_by_reference`, with the `kind` and the `reference` alone:
+
+
+```python
+models.execute_kw(
+    db, uid, password,
+    "devops.requirement.test", "record_result_by_reference",
+    ["repo_unittest", "erplibre:test/test_inventory.py::TestStock::test_count",
+     "passed"],
+    {"log": output, "duration": 0.8},
+)
+```
+
+
+The verdict goes to **every** line that carries this `kind` and this
+`reference`, whatever their requirement: one test that proves several
+requirements updates them all in one call. The method returns the number of
+lines updated; `0`, with a warning in the log, when the `kind` or the
+`reference` is empty or when no line declares them. It creates nothing, and
+shares with `record_result` its rights, the validation of the result and the
+truncation of the log.
+
+A repository reference reads `<repository>:<path>::<test id>`: the
+repository by its name, the path of the test file relative to it, then
+`Class::method` for a unit test or the test name for a Node test.
+
 ## Rights
 
 | Model | Internal user | Test runner | Configuration |
@@ -104,7 +138,7 @@ Only the `last_*` fields are written.
 | `devops.requirement.category` | read | read | all |
 | `devops.requirement.phase` | read | read | all |
 | `devops.requirement.threat` | read | — | all |
-| `devops.requirement.test` | read | read, result through `record_result` | all |
+| `devops.requirement.test` | read | read, result through `record_result` and `record_result_by_reference` | all |
 
 The vocabulary is read-only for the user: its `code` carries counts, and a
 typo there costs more than a badly filled field on a requirement.

@@ -2,12 +2,19 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "ERPLibre DevOps Requirement",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Project",
     "summary": (
         "Track the software requirements of an implementation project in "
         "MoSCoW terms, by domain and by phase, through the DevSecOps loop, "
         "with their threats and the tests that prove them."
+    ),
+    "description": (
+        "Requirement registry of an implementation project. Each "
+        "requirement has a MoSCoW priority, a domain, a phase of the "
+        "DevSecOps loop, its threats and the tests that prove it. Test "
+        "runners record each verdict on the proof lines that cite the test, "
+        "so the registry shows what is proven, failing or still to do."
     ),
     "author": "TechnoLibre",
     "website": "https://erplibre.ca",

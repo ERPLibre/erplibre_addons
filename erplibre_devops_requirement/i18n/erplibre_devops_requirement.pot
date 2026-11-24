@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 06:44+0000\n"
-"PO-Revision-Date: 2026-11-10 06:44+0000\n"
+"POT-Creation-Date: 2026-11-10 07:54+0000\n"
+"PO-Revision-Date: 2026-11-10 07:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -253,7 +253,9 @@ msgstr ""
 msgid ""
 "Guided tour: the tour name. Python test: the dotted path of the test method."
 " Selenium script: the script path, relative to the repository. Manual check:"
-" free text."
+" free text. Repository unit test, Node test, Long test: "
+"<repository>:<path>::<test id>, where the test id is Class::method for a "
+"unit test and the test name for a Node test."
 msgstr ""
 
 #. module: erplibre_devops_requirement
@@ -336,6 +338,11 @@ msgid "Last run"
 msgstr ""
 
 #. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__long_test
+msgid "Long test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
 #: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__priority__low
 msgid "Low"
 msgstr ""
@@ -396,6 +403,11 @@ msgstr ""
 #. module: erplibre_devops_requirement
 #: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__test_state__none
 msgid "No test"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__node_test
+msgid "Node test"
 msgstr ""
 
 #. module: erplibre_devops_requirement
@@ -506,6 +518,11 @@ msgstr ""
 #. module: erplibre_devops_requirement
 #: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement__devsecops_stage__release
 msgid "Release"
+msgstr ""
+
+#. module: erplibre_devops_requirement
+#: model:ir.model.fields.selection,name:erplibre_devops_requirement.selection__devops_requirement_test__kind__repo_unittest
+msgid "Repository unit test"
 msgstr ""
 
 #. module: erplibre_devops_requirement
