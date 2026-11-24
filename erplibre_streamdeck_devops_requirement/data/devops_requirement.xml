@@ -82,8 +82,9 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
+        <field name="done" eval="False" />
+        <field name="missing">No test pins the archive layout: erplibre:test/test_mobile_bundle_transfer.py has no test of the archive key, the indexUrl sidecar, './'-prefixed tar members or a promised file missing from the archive.</field>
+        <field name="notes">Origin: unit test missing.</field>
     </record>
     <record id="req_sd_bundle_r05b" model="devops.requirement">
         <field name="code">SD-BUNDLE-R05b</field>
@@ -94,8 +95,9 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
+        <field name="done" eval="False" />
+        <field name="missing">No test pins the check of the manifest fileCount against the index in erplibre:test/test_mobile_bundle_transfer.py.</field>
+        <field name="notes">Origin: unit test missing.</field>
     </record>
     <record id="req_sd_bundle_r06" model="devops.requirement">
         <field name="code">SD-BUNDLE-R06</field>
@@ -2868,7 +2870,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::Installateur.assertNonSupporte (one stderr line); ::LesRefus::test_a_package_manager_failure_exits_one, ::test_a_failing_gnome_shell_exits_one_without_unsupported; ::TestExtensionSeule::test_un_code_2_d_une_commande_sort_en_1</field>
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::Installateur.assertNonSupporte (one stderr line); ::TestLeScriptEntier::test_a_package_manager_failure_exits_one; ::LesRefus::test_a_failing_gnome_shell_exits_one_without_unsupported; ::TestExtensionSeule::test_un_code_2_d_une_commande_sort_en_1</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_deploy_r46" model="devops.requirement">
@@ -3012,7 +3014,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_venv_gets_the_games_requirements_when_they_are_there</field>
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestVenv::test_an_absent_venv_is_created_by_the_system_python3 checks the pip install -r of the requirements.txt of the deck clone, script/stream_deck/deck/.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_deploy_r57" model="devops.requirement">
@@ -6083,8 +6085,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_the_moved_clone_is_ignored_by_erplibre. The installer's temporary clone games.XXXXXX is ignored by the same pattern of erplibre:.gitignore, /script/stream_deck/games.*/; no test pins that case.</field>
+        <field name="done" eval="False" />
+        <field name="missing">No test pins that erplibre:.gitignore ignores script/stream_deck/games.*/: erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_games_directory_is_ignored checks games/ alone.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r38" model="devops.requirement">
@@ -6111,7 +6113,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_source_is_the_project_of_the_manifest</field>
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest; erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck poses the games through the same manifest.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r40" model="devops.requirement">
@@ -6124,7 +6126,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_missing_games_are_cloned_at_the_pinned_revision; erplibre:test/test_install_erplibre_home.py::TestJeux::test_leftovers_of_the_untrack_are_cloned_around_the_saves; erplibre:test/test_install_erplibre_home.py::TestJeux::test_every_kind_of_entry_holds_the_clone_back</field>
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck (games/ absent); erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside (games/ holding only save/).</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r41" model="devops.requirement">
@@ -6136,8 +6138,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_leftovers_of_the_untrack_are_cloned_around_the_saves</field>
+        <field name="done" eval="False" />
+        <field name="missing">A games/ that is no repo checkout is set aside whole, its save/ included, before repo poses the games (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside); no step carries its saves into the posed games.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r42" model="devops.requirement">
@@ -6149,8 +6151,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_an_existing_directory_with_the_games_is_left_alone; erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_old_repo_layout_is_left_to_repo</field>
+        <field name="done" eval="False" />
+        <field name="achievement">The old repo layout stays: erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout.</field>
+        <field name="missing">A games/ holding the games without being a repo checkout is set aside, not left alone (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside).</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r43" model="devops.requirement">
@@ -6174,8 +6177,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_failed_clone_leaves_no_directory</field>
+        <field name="done" eval="False" />
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one: a failed first pose exits 1 and leaves no .git.</field>
+        <field name="missing">repo sync poses the games without a temporary sibling directory; no test pins that a failed first pose leaves no games/ directory.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r45" model="devops.requirement">
@@ -6188,9 +6192,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
+        <field name="done" eval="False" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_missing_games_are_cloned_at_the_pinned_revision compares the mode of the clone with the umask.</field>
+        <field name="missing">repo sync creates the games directory, without mktemp; no test pins its mode.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r46" model="devops.requirement">
@@ -6202,8 +6206,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed; erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_rewritten_main_upstream_still_moves_the_clone. The installed commit is marked in refs/erplibre/installed.</field>
+        <field name="done" eval="False" />
+        <field name="missing">repo sync poses the games as a checkout that follows main; no test pins a detached clone, the absence of a local branch or the mark of the installed commit.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r47" model="devops.requirement">
@@ -6215,8 +6219,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed; erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_clean_clone_moves_to_a_new_pinned_tag; erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_rewritten_main_upstream_still_moves_the_clone</field>
+        <field name="done" eval="False" />
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_synced_checkout_follows_main: a checkout follows a new commit of main at each run.</field>
+        <field name="missing">No test pins that the games follow a new tag or a main rewritten upstream.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r48" model="devops.requirement">
@@ -6228,8 +6233,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_or_local_work_stays_where_it_is; erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed (the summary line of a failed fetch)</field>
+        <field name="done" eval="False" />
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_fetch_on_a_checkout_exits_zero_not_updated (the summary of a failed fetch); erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_refused_local_sync_on_a_checkout_exits_zero (the summary of a refused repo sync -l).</field>
+        <field name="missing">No test pins that a branch or local work in games/ stays.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r49" model="devops.requirement">
@@ -6241,8 +6247,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_revision_is_a_branch_unless_a_tag_or_a_commit</field>
+        <field name="done" eval="False" />
+        <field name="missing">repo sync reads the revision of the manifest; no test pins the branch, tag and commit forms for the games.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r50" model="devops.requirement">
@@ -6254,8 +6260,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_dry_run_names_the_clone_or_the_kept_directory; erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_line</field>
+        <field name="done" eval="False" />
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync: only the Stream Deck level has a games line.</field>
+        <field name="missing">--dry-run prints 'games: repo sync &lt;dir&gt; (&lt;url&gt; at &lt;revision&gt;)', and a set-aside line for a games/ that is no checkout; no line says clone or keep.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r51" model="devops.requirement">
@@ -6267,8 +6274,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_kept_directory_without_the_games_says_why; erplibre:test/test_install_erplibre_home.py::TestJeux::test_every_kind_of_entry_holds_the_clone_back</field>
+        <field name="done" eval="False" />
+        <field name="missing">A games/ that is no checkout is set aside whole (erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside); no summary names what such a directory lacks.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r52" model="devops.requirement">
@@ -6280,8 +6287,9 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_venv_gets_the_games_requirements_when_they_are_there</field>
+        <field name="done" eval="False" />
+        <field name="achievement">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_the_games_come_before_the_venv_that_takes_their_requirements pins that the games come before the venv.</field>
+        <field name="missing">No test pins that the venv step installs the games' requirements.txt, nor that its failure is only reported.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r53" model="devops.requirement">
@@ -6504,8 +6512,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LesScriptsDeMiseAJour::test_each_update_runs_it_between_repo_init_and_repo_sync</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r70" model="devops.requirement">
@@ -6517,8 +6525,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clean_clone_is_moved_aside_and_its_saves_copied_back</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r71" model="devops.requirement">
@@ -6530,8 +6538,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_local_work_keeps_the_clone_and_exits_1; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_untracked_files_hidden_by_the_user_config_still_count; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_work_the_checks_miss_survives_in_the_moved_clone; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_the_installed_commit_is_not_local_work</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r72" model="devops.requirement">
@@ -6543,8 +6551,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">The faux_repo helper of erplibre:test/test_streamdeck_games_to_repo.py::LeScript answers only with --all, so ::test_a_clean_clone_is_moved_aside_and_its_saves_copied_back and ::test_work_the_checks_miss_survives_in_the_moved_clone, which move the clone, fail without it.</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r73" model="devops.requirement">
@@ -6556,8 +6564,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clone_repo_will_not_extract_stays; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_without_repo_ready_nothing_changes; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_nothing_without_games</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r74" model="devops.requirement">
@@ -6569,8 +6577,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_saves_are_copied_before_repo_removes_its_games</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r75" model="devops.requirement">
@@ -6582,8 +6590,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_git_file_outside_repo_holds_the_clone_back; erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_games_extracted_by_repo_are_left_to_it</field>
+        <field name="done" eval="False" />
+        <field name="missing">streamdeck_games_to_repo.sh and its tests are no longer in ERPLibre: the installer poses the games by repo sync and sets a games/ that is no checkout aside (SD-GREPO-R40). No test pins this requirement.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r76" model="devops.requirement">
@@ -6595,8 +6603,8 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_games_to_repo.py::LesScriptsDeMiseAJour::test_the_code_generator_init_keeps_the_streamdeck_group</field>
+        <field name="done" eval="False" />
+        <field name="missing">No test pins that update_manifest_local_dev_code_generator.sh passes the streamdeck group to repo init.</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r77" model="devops.requirement">
@@ -6744,7 +6752,7 @@ erplibre-home-gnome-extension:metadata.json declares shell-version 45 to 51, and
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">The setUp of erplibre:test/test_streamdeck_games_repo.py::LeManifeste (path); erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_games_cli_witness_is_the_one_of_the_checkout; erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it; erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make; erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_line</field>
+        <field name="achievement">The setUp of erplibre:test/test_streamdeck_games_repo.py::LeManifeste (path); erplibre:test/test_streamdeck_entry_points.py::TestTodoGamesLauncher::test_the_games_cli_witness_is_the_one_of_the_checkout; erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_a_present_venv_runs_the_game_under_it; erplibre-home-gnome-extension:test/unit/project-root.test.js::galleryServerCommand runs the gallery under the venv python, no make; erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_grepo_r89" model="devops.requirement">
@@ -10071,7 +10079,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_tiler_unittest_target_discovers_the_deck_tests checks the discovery directory -s ./test and the pattern -p "test_erplibre_streamdeck*.py".</field>
+        <field name="achievement">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_unittest_targets_run_the_deck_suite_from_the_clone checks that the target runs unittest discover -s tests from the root of the deck clone.</field>
         <field name="notes">Origin: unit test missing; an existing test covers it.</field>
     </record>
     <record id="req_sd_plugin_r89" model="devops.requirement">
@@ -12220,7 +12228,7 @@ The games and the gallery live in the streamdeck_game repository.</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
         <field name="done" eval="True" />
-        <field name="achievement">erplibre:test/test_todo_streamdeck_menu.py::LaDesinstallation::test_each_choice_runs_its_options_after_confirmation, test_no_confirmation_no_uninstall, test_a_failed_uninstall_says_uninstall</field>
+        <field name="achievement">erplibre:test/test_todo_streamdeck_menu.py::LaDesinstallation::test_each_entry_runs_its_options_after_confirmation, test_no_confirmation_no_uninstall, test_a_failed_uninstall_says_uninstall</field>
         <field name="notes">Origin: covered by a test.</field>
     </record>
     <record id="req_sd_service_r62" model="devops.requirement">

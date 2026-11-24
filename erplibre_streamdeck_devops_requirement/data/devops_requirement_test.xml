@@ -9,43 +9,7 @@
         <field name="requirement_id" ref="req_sd_bundle_r01b" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestARepoWithoutContainer::test_a_repo_with_neither_archive_nor_pack_names_the_pack</field>
-    </record>
-    <record id="test_sd_bundle_r05_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_an_archive_repo_is_counted_as_an_archive</field>
-    </record>
-    <record id="test_sd_bundle_r05_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_the_index_is_found_through_index_url</field>
-    </record>
-    <record id="test_sd_bundle_r05_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_dot_slash_members_are_read_back_and_compared</field>
-    </record>
-    <record id="test_sd_bundle_r05_4" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05" />
-        <field name="sequence" eval="40" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_a_promised_file_missing_from_the_archive_is_named</field>
-    </record>
-    <record id="test_sd_bundle_r05b_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05b" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheAnnouncedFileCount::test_a_file_count_that_differs_from_the_index_is_refused</field>
-    </record>
-    <record id="test_sd_bundle_r05b_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_bundle_r05b" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheAnnouncedFileCount::test_a_matching_file_count_is_accepted</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheThreeFailures::test_a_missing_pack_is_named</field>
     </record>
     <record id="test_sd_bundle_r62_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_bundle_r62" />
@@ -1635,7 +1599,7 @@
         <field name="requirement_id" ref="req_sd_deploy_r29" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
-        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::the deck indicator looks the venv up at each click</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/project-root.test.js::the deck indicator looks the venv and the deck up at each click</field>
     </record>
     <record id="test_sd_deploy_r29_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r29" />
@@ -1845,7 +1809,7 @@
         <field name="requirement_id" ref="req_sd_deploy_r45" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LesRefus::test_a_package_manager_failure_exits_one</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestLeScriptEntier::test_a_package_manager_failure_exits_one</field>
     </record>
     <record id="test_sd_deploy_r45_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r45" />
@@ -2025,7 +1989,7 @@
         <field name="requirement_id" ref="req_sd_deploy_r56" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_venv_gets_the_games_requirements_when_they_are_there</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestVenv::test_an_absent_venv_is_created_by_the_system_python3</field>
     </record>
     <record id="test_sd_deploy_r57_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r57" />
@@ -2247,7 +2211,7 @@
         <field name="requirement_id" ref="req_sd_deploy_r73" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_line</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
     </record>
     <record id="test_sd_deploy_r73_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_deploy_r73" />
@@ -4259,149 +4223,71 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_streamdeck_games_repo.py::LaFrontiere::test_the_assets_stay_with_the_controller</field>
     </record>
-    <record id="test_sd_grepo_r37_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r37" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_the_moved_clone_is_ignored_by_erplibre</field>
-    </record>
     <record id="test_sd_grepo_r39_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r39" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_source_is_the_project_of_the_manifest</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_dry_run_line_reads_the_project_of_its_manifest</field>
     </record>
     <record id="test_sd_grepo_r40_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r40" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_missing_games_are_cloned_at_the_pinned_revision</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_games_are_posed_like_the_deck</field>
     </record>
     <record id="test_sd_grepo_r40_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r40" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_leftovers_of_the_untrack_are_cloned_around_the_saves</field>
-    </record>
-    <record id="test_sd_grepo_r40_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r40" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_every_kind_of_entry_holds_the_clone_back</field>
-    </record>
-    <record id="test_sd_grepo_r41_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r41" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_leftovers_of_the_untrack_are_cloned_around_the_saves</field>
-    </record>
-    <record id="test_sd_grepo_r42_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r42" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_an_existing_directory_with_the_games_is_left_alone</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_games_content_that_is_no_checkout_is_set_aside</field>
     </record>
     <record id="test_sd_grepo_r42_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r42" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_old_repo_layout_is_left_to_repo</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_the_old_repo_layout_is_a_checkout</field>
     </record>
     <record id="test_sd_grepo_r43_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r43" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_repo_checkout_with_a_linked_git_is_never_moved</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_synced_checkout_follows_main</field>
     </record>
     <record id="test_sd_grepo_r44_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r44" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_failed_clone_leaves_no_directory</field>
-    </record>
-    <record id="test_sd_grepo_r45_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r45" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_missing_games_are_cloned_at_the_pinned_revision</field>
-    </record>
-    <record id="test_sd_grepo_r46_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r46" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed</field>
-    </record>
-    <record id="test_sd_grepo_r46_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r46" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_rewritten_main_upstream_still_moves_the_clone</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_first_pose_without_content_exits_one</field>
     </record>
     <record id="test_sd_grepo_r47_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r47" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed</field>
-    </record>
-    <record id="test_sd_grepo_r47_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r47" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_clean_clone_moves_to_a_new_pinned_tag</field>
-    </record>
-    <record id="test_sd_grepo_r47_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r47" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_rewritten_main_upstream_still_moves_the_clone</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_synced_checkout_follows_main</field>
     </record>
     <record id="test_sd_grepo_r48_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r48" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_or_local_work_stays_where_it_is</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_refused_local_sync_on_a_checkout_exits_zero</field>
     </record>
     <record id="test_sd_grepo_r48_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r48" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_branch_is_cloned_detached_and_followed</field>
-    </record>
-    <record id="test_sd_grepo_r49_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r49" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_revision_is_a_branch_unless_a_tag_or_a_commit</field>
-    </record>
-    <record id="test_sd_grepo_r50_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r50" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_dry_run_names_the_clone_or_the_kept_directory</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestPoseParRepo::test_a_failed_fetch_on_a_checkout_exits_zero_not_updated</field>
     </record>
     <record id="test_sd_grepo_r50_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r50" />
         <field name="sequence" eval="20" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_line</field>
-    </record>
-    <record id="test_sd_grepo_r51_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r51" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_a_kept_directory_without_the_games_says_why</field>
-    </record>
-    <record id="test_sd_grepo_r51_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r51" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_every_kind_of_entry_holds_the_clone_back</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
     </record>
     <record id="test_sd_grepo_r52_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r52" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::TestJeux::test_the_venv_gets_the_games_requirements_when_they_are_there</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_the_games_come_before_the_venv_that_takes_their_requirements</field>
     </record>
     <record id="test_sd_grepo_r53_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r53" />
@@ -4635,7 +4521,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r62" />
         <field name="sequence" eval="270" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_tiler_unittest_target_discovers_the_deck_tests</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_unittest_targets_run_the_deck_suite_from_the_clone</field>
     </record>
     <record id="test_sd_grepo_r62_28" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r62" />
@@ -4721,96 +4607,6 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_longtest_install_erplibre_home.py::LesCinqEtapes::test_the_stream_deck_stage_checks_rule_venv_service_extension</field>
     </record>
-    <record id="test_sd_grepo_r69_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r69" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LesScriptsDeMiseAJour::test_each_update_runs_it_between_repo_init_and_repo_sync</field>
-    </record>
-    <record id="test_sd_grepo_r70_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r70" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clean_clone_is_moved_aside_and_its_saves_copied_back</field>
-    </record>
-    <record id="test_sd_grepo_r71_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r71" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_local_work_keeps_the_clone_and_exits_1</field>
-    </record>
-    <record id="test_sd_grepo_r71_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r71" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_untracked_files_hidden_by_the_user_config_still_count</field>
-    </record>
-    <record id="test_sd_grepo_r71_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r71" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_work_the_checks_miss_survives_in_the_moved_clone</field>
-    </record>
-    <record id="test_sd_grepo_r71_4" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r71" />
-        <field name="sequence" eval="40" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_the_installed_commit_is_not_local_work</field>
-    </record>
-    <record id="test_sd_grepo_r72_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clean_clone_is_moved_aside_and_its_saves_copied_back</field>
-    </record>
-    <record id="test_sd_grepo_r72_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r72" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_work_the_checks_miss_survives_in_the_moved_clone</field>
-    </record>
-    <record id="test_sd_grepo_r73_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r73" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_clone_repo_will_not_extract_stays</field>
-    </record>
-    <record id="test_sd_grepo_r73_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r73" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_without_repo_ready_nothing_changes</field>
-    </record>
-    <record id="test_sd_grepo_r73_3" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r73" />
-        <field name="sequence" eval="30" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_nothing_without_games</field>
-    </record>
-    <record id="test_sd_grepo_r74_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r74" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_saves_are_copied_before_repo_removes_its_games</field>
-    </record>
-    <record id="test_sd_grepo_r75_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r75" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_a_git_file_outside_repo_holds_the_clone_back</field>
-    </record>
-    <record id="test_sd_grepo_r75_2" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r75" />
-        <field name="sequence" eval="20" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LeScript::test_games_extracted_by_repo_are_left_to_it</field>
-    </record>
-    <record id="test_sd_grepo_r76_1" model="devops.requirement.test">
-        <field name="requirement_id" ref="req_sd_grepo_r76" />
-        <field name="sequence" eval="10" />
-        <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_games_to_repo.py::LesScriptsDeMiseAJour::test_the_code_generator_init_keeps_the_streamdeck_group</field>
-    </record>
     <record id="test_sd_grepo_r78_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r78" />
         <field name="sequence" eval="10" />
@@ -4863,7 +4659,7 @@
         <field name="requirement_id" ref="req_sd_grepo_r88" />
         <field name="sequence" eval="30" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_line</field>
+        <field name="reference">erplibre:test/test_install_erplibre_home.py::LeDryRun::test_only_the_stream_deck_level_has_a_games_sync</field>
     </record>
     <record id="test_sd_grepo_r88_4" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_grepo_r88" />
@@ -5001,7 +4797,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r07" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTilerCommandLine::test_the_deck_program_is_not_a_game</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTheDeckProgramIsNotAGame::test_it_refuses_meta_and_declares_no_game_meta</field>
     </record>
     <record id="test_sd_gsplit_r08_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r08" />
@@ -5061,7 +4857,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r11" />
         <field name="sequence" eval="60" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTilerCommandLine::test_the_deck_program_is_not_a_game</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTheDeckProgramIsNotAGame::test_it_refuses_meta_and_declares_no_game_meta</field>
     </record>
     <record id="test_sd_gsplit_r12_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r12" />
@@ -5151,7 +4947,7 @@
         <field name="requirement_id" ref="req_sd_gsplit_r24" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_tiler_unittest_target_discovers_the_deck_tests</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_unittest_targets_run_the_deck_suite_from_the_clone</field>
     </record>
     <record id="test_sd_gsplit_r25_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_gsplit_r25" />
@@ -7053,7 +6849,7 @@
         <field name="requirement_id" ref="req_sd_plugin_r88" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_tiler_unittest_target_discovers_the_deck_tests</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestMakefileGuard::test_the_unittest_targets_run_the_deck_suite_from_the_clone</field>
     </record>
     <record id="test_sd_plugin_r89_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_plugin_r89" />
@@ -7683,7 +7479,7 @@
         <field name="requirement_id" ref="req_sd_plugin_r117" />
         <field name="sequence" eval="50" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTilerCommandLine::test_the_deck_program_is_not_a_game</field>
+        <field name="reference">erplibre:test/test_streamdeck_entry_points.py::TestTheDeckProgramIsNotAGame::test_it_refuses_meta_and_declares_no_game_meta</field>
     </record>
     <record id="test_sd_plugin_r119_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_plugin_r119" />
@@ -7977,7 +7773,7 @@
         <field name="requirement_id" ref="req_sd_rename_r28" />
         <field name="sequence" eval="10" />
         <field name="kind">node_test</field>
-        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-service.test.js::the controller path is relative to the checkout root</field>
+        <field name="reference">erplibre-home-gnome-extension:test/unit/deck-service.test.js::the controller open runs is a file of the checkout</field>
     </record>
     <record id="test_sd_rename_r29_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_rename_r29" />
@@ -9777,7 +9573,7 @@
         <field name="requirement_id" ref="req_sd_service_r61" />
         <field name="sequence" eval="10" />
         <field name="kind">repo_unittest</field>
-        <field name="reference">erplibre:test/test_todo_streamdeck_menu.py::LaDesinstallation::test_each_choice_runs_its_options_after_confirmation</field>
+        <field name="reference">erplibre:test/test_todo_streamdeck_menu.py::LaDesinstallation::test_each_entry_runs_its_options_after_confirmation</field>
     </record>
     <record id="test_sd_service_r61_2" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_service_r61" />

@@ -289,7 +289,7 @@ class TestRequirementUpgrade(TransactionCase):
                     )
                 }
             )
-        other = self.env.ref("%s.test_sd_bundle_r05_1" % MODULE)
+        other = self.env.ref("%s.test_sd_deploy_r45_2" % MODULE)
         other.write({"reference": GONE})
         self._migrate("18.0.1.4.0", MIGRATION_1_5)
         self.env.invalidate_all()
@@ -300,3 +300,63 @@ class TestRequirementUpgrade(TransactionCase):
                     self._in_file(xmlid, "reference", data),
                 )
         self.assertEqual(other.reference, GONE)
+
+    def test_an_upgrade_to_1_5_follows_the_stale_proofs(self):
+        # Une base de la version 18.0.1.4.0 cite des tests qu'ERPLibre a
+        # renommés ou retirés depuis : la preuve renommée suit son test, la
+        # preuve retirée part, et son requis redevient à faire, son texte
+        # repris du fichier.
+        renamed = self.env.ref("%s.test_sd_deploy_r45_1" % MODULE)
+        renamed.write(
+            {
+                "reference": "erplibre:test/test_install_erplibre_home.py"
+                "::LesRefus::test_a_package_manager_failure_exits_one"
+            }
+        )
+        requirement = self.env.ref("%s.req_sd_grepo_r41" % MODULE)
+        requirement.write(
+            {"done": True, "achievement": "An outdated way", "missing": False}
+        )
+        self.assertFalse(self._carried("test_sd_grepo_r41_1"))
+        gone = self.env["devops.requirement.test"].create(
+            {
+                "requirement_id": requirement.id,
+                "kind": "repo_unittest",
+                "reference": "erplibre:test/test_install_erplibre_home.py"
+                "::TestJeux::test_a_test_removed_since",
+            }
+        )
+        self.env["ir.model.data"].create(
+            {
+                "module": MODULE,
+                "name": "test_sd_grepo_r41_1",
+                "model": gone._name,
+                "res_id": gone.id,
+                "noupdate": True,
+            }
+        )
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env.invalidate_all()
+        self.assertEqual(
+            renamed.reference,
+            self._in_file("test_sd_deploy_r45_1", "reference", AUDIT_PROOFS),
+        )
+        self.assertFalse(gone.exists())
+        self.assertFalse(
+            self.env.ref(
+                "%s.test_sd_grepo_r41_1" % MODULE, raise_if_not_found=False
+            )
+        )
+        self.assertFalse(requirement.done)
+        self.assertFalse(requirement.achievement)
+        self.assertEqual(
+            requirement.missing,
+            self._in_file("req_sd_grepo_r41", "missing", REQUIREMENTS),
+        )
+
+    @staticmethod
+    def _carried(xmlid, data=AUDIT_PROOFS):
+        """True when `data` still carries the record `xmlid`."""
+        return bool(
+            etree.parse(file_path(data)).xpath("//record[@id=$x]", x=xmlid)
+        )
