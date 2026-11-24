@@ -608,11 +608,10 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
+        <field name="done" eval="True" />
         <field name="security_relevant" eval="True" />
-        <field name="achievement">Examples are invented (example.invalid, 192.0.2.x, SN-INVENTED); erplibre:script/analyse/check_comment_hygiene.py reports identifying data in comments, and the commit-msg hook of erplibre:script/git/hooks refuses an address, an email or an account path in a commit body.</field>
-        <field name="missing">No test sweeps the files of the inventory: check_comment_hygiene.py runs by hand and from the pre-commit hook, which lists its findings without blocking the commit.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="achievement">Examples are invented (example.invalid, 192.0.2.x, SN-INVENTED). A test reads every text file of erplibre_streamdeck and of this module and refuses a machine address, an email or an account path, with the patterns of the commit-msg hook of erplibre:script/git/hooks, which refuses them in a commit body; erplibre:script/analyse/check_comment_hygiene.py reports them in comments. The names of customers and machines live in a private list outside this repository and are not swept.</field>
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
     </record>
     <record id="req_sd_inv_r43" model="devops.requirement">
         <field name="code">SD-INV-R43</field>
@@ -2332,5 +2331,23 @@
         <field name="sequence" eval="40" />
         <field name="kind">node_test</field>
         <field name="reference">erplibre-home-gnome-extension:test/unit/inventory.test.js::a serial outside Odoo's pattern goes as none, in the state and the events</field>
+    </record>
+    <record id="test_sd_inv_r42_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r42" />
+        <field name="sequence" eval="10" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_no_file_of_the_modules_carries_identifying_data</field>
+    </record>
+    <record id="test_sd_inv_r42_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r42" />
+        <field name="sequence" eval="20" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_the_sweep_finds_a_planted_identifying_line</field>
+    </record>
+    <record id="test_sd_inv_r42_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_inv_r42" />
+        <field name="sequence" eval="30" />
+        <field name="kind">python</field>
+        <field name="reference">odoo.addons.erplibre_streamdeck_devops_requirement.tests.test_streamdeck_identifying_data.TestStreamdeckIdentifyingData.test_only_the_listed_examples_are_allowed</field>
     </record>
 </odoo>

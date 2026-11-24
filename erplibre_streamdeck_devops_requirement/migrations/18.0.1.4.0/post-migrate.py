@@ -25,7 +25,10 @@ MODULE = "erplibre_streamdeck_devops_requirement"
 
 # Data file -> XML ids of its records rewritten in this version.
 REWRITTEN = {
-    "data/requirement_inventory.xml": ("test_sd_inv_r24_1",),
+    "data/requirement_inventory.xml": (
+        "test_sd_inv_r24_1",
+        "req_sd_inv_r42",
+    ),
     "data/requirement_control.xml": (
         "req_sd_ctl_r27",
         "test_sd_ctl_r27_1",

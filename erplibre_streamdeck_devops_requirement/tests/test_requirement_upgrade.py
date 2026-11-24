@@ -174,25 +174,30 @@ class TestRequirementUpgrade(TransactionCase):
         )
 
     def test_an_upgrade_to_1_4_marks_the_identifying_data_sweep_done(self):
-        # SD-MON-R38 est fait depuis la version 18.0.1.4.0 : une base qui
-        # le garde à faire, avec son écart, le reçoit fait de la migration.
-        requirement = self.env.ref("%s.req_sd_mon_r38" % MODULE)
-        requirement.write(
-            {
-                "done": False,
-                "achievement": "An outdated way",
-                "missing": "An outdated gap",
-                "notes": "Origin: unit test missing.",
-            }
-        )
+        # SD-MON-R38 et SD-INV-R42 sont faits depuis la version 18.0.1.4.0 :
+        # une base qui les garde à faire, avec leur écart, les reçoit faits
+        # de la migration.
+        cases = (("req_sd_mon_r38", MONITORING), ("req_sd_inv_r42", INVENTORY))
+        requirements = {}
+        for xmlid, _data in cases:
+            requirements[xmlid] = self.env.ref("%s.%s" % (MODULE, xmlid))
+            requirements[xmlid].write(
+                {
+                    "done": False,
+                    "achievement": "An outdated way",
+                    "missing": "An outdated gap",
+                    "notes": "Origin: unit test missing.",
+                }
+            )
         self._migrate("18.0.1.3.0", MIGRATION_1_4)
         self.env.invalidate_all()
-        self.assertTrue(requirement.done)
-        self.assertFalse(requirement.missing)
-        for field in ("achievement", "notes"):
-            with self.subTest(field=field):
-                self.assertEqual(
-                    requirement[field],
-                    self._in_file("req_sd_mon_r38", field, MONITORING),
-                )
-        self.assertTrue(requirement.test_ids)
+        for xmlid, data in cases:
+            requirement = requirements[xmlid]
+            with self.subTest(requirement=xmlid):
+                self.assertTrue(requirement.done)
+                self.assertFalse(requirement.missing)
+                for field in ("achievement", "notes"):
+                    self.assertEqual(
+                        requirement[field], self._in_file(xmlid, field, data)
+                    )
+                self.assertTrue(requirement.test_ids)
