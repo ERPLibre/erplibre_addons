@@ -93,9 +93,7 @@ msgstr "%(count)s changement(s) du projet dans cette vue"
 msgid ""
 "%(count)s change(s) to apply. Nothing is written to the database before you "
 "confirm."
-msgstr ""
-"%(count)s changement(s) à appliquer. Rien n'est écrit dans la base avant de "
-"confirmer."
+msgstr "%(count)s changement(s) à mettre en application. Rien n'est écrit dans la base avant de confirmer."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -119,7 +117,7 @@ msgstr "%(count)s champs"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "%(count)s item(s) unchanged since the last Apply"
-msgstr "%(count)s élément(s) inchangé(s) depuis le dernier Apply"
+msgstr "%(count)s élément(s) inchangé(s) depuis la dernière mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -174,7 +172,7 @@ msgstr "%(count)s onglet(s)"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "%(count)s technical name(s) block Apply"
-msgstr "%(count)s nom(s) technique(s) bloque(nt) l'Apply"
+msgstr "%(count)s nom(s) technique(s) bloque(nt) la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -714,13 +712,13 @@ msgstr "%(rights)s droit(s) · %(rules)s règle(s)"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(state)s · %(count)s unapplied change(s)"
-msgstr "%(state)s · %(count)s changement(s) non appliqué(s)"
+msgstr "%(state)s · %(count)s changement(s) non mis en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(state)s · changed since the last Apply"
-msgstr "%(state)s · modifié depuis le dernier Apply"
+msgstr "%(state)s · modifié depuis la dernière mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -759,9 +757,7 @@ msgstr "%(value)s n'est pas une valeur du champ %(name)s."
 msgid ""
 "%(view)s view added to the project, with the default settings: Apply creates"
 " it."
-msgstr ""
-"Vue %(view)s ajoutée au projet, avec les réglages par défaut : l'Apply la "
-"crée."
+msgstr "Vue %(view)s ajoutée au projet, avec les réglages par défaut : la mise en application la crée."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -834,7 +830,7 @@ msgstr ""
 msgid ""
 "A GeoEngine view needs a geo field on %(model)s: add one to its form and "
 "Apply first."
-msgstr "Une vue GeoEngine demande un champ géographique sur %(model)s : ajoutez-en un à son formulaire, puis appliquez d'abord."
+msgstr "Une vue GeoEngine demande un champ géographique sur %(model)s : ajoutez-en un à son formulaire, puis faites d'abord la mise en application."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1228,9 +1224,7 @@ msgstr "Un one2many s'affiche dans un formulaire seulement."
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid ""
 "A pending model changes freely. Once applied, its technical name is fixed."
-msgstr ""
-"Un modèle en attente se modifie librement. Après l'Apply, son nom technique "
-"est figé."
+msgstr "Un modèle en attente se modifie librement. Après la mise en application, son nom technique est figé."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1603,7 +1597,7 @@ msgstr "Ajouter au brouillon"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Added by the project: Apply creates it"
-msgstr "Ajoutée par le projet : l'Apply la crée"
+msgstr "Ajoutée par le projet : la mise en application la crée"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1664,9 +1658,7 @@ msgstr "Après"
 msgid ""
 "After Apply, every user sees the changes. « Revert » then removes them from "
 "the database."
-msgstr ""
-"Après l'Apply, tous les utilisateurs voient les changements. « Revert » les "
-"retire ensuite de la base."
+msgstr "Après la mise en application, tous les utilisateurs voient les changements. « Revert » les retire ensuite de la base."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1767,9 +1759,7 @@ msgstr "Un autre modèle utilise la table %(table)s"
 msgid ""
 "Another module defines a model of this project now: %(models)s. The project "
 "can no longer apply, revert nor generate it."
-msgstr ""
-"Un autre module définit maintenant un modèle de ce projet : %(models)s. Le "
-"projet ne peut plus l'appliquer, le défaire ni le générer."
+msgstr "Un autre module définit maintenant un modèle de ce projet : %(models)s. Le projet ne peut plus le mettre en application, le défaire ni le générer."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1838,17 +1828,17 @@ msgstr "App du projet"
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_view__applied
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__state__applied
 msgid "Applied"
-msgstr "Appliqué"
+msgstr "Mis en application"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__applied_date
 msgid "Applied Date"
-msgstr "Date d'application"
+msgstr "Date de mise en application"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_project__applied_snapshot
 msgid "Applied Snapshot"
-msgstr "État appliqué"
+msgstr "État mis en application"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_rule__global_rule
@@ -1866,25 +1856,25 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
 msgid "Apply"
-msgstr "Appliquer"
+msgstr "Mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "Apply %(count)s change(s)"
-msgstr "Appliquer %(count)s changement(s)"
+msgstr "Mettre en application %(count)s changement(s)"
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_report.py:0
 msgid "Apply %(name)s"
-msgstr "Appliquer %(name)s"
+msgstr "Mise en application de %(name)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Apply and open"
-msgstr "Appliquer et ouvrir"
+msgstr "Mettre en application et ouvrir"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1892,9 +1882,7 @@ msgstr "Appliquer et ouvrir"
 msgid ""
 "Apply created it as a custom field of the database; once the project is "
 "generated and installed, this module holds it."
-msgstr ""
-"L'Apply l'a créé comme champ personnalisé de la base de données ; une "
-"fois le projet généré et installé, ce module le détiendra."
+msgstr "La mise en application l'a créé comme champ personnalisé de la base de données ; une fois le projet généré et installé, ce module le détiendra."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -1902,33 +1890,31 @@ msgstr ""
 msgid ""
 "Apply creates it as a custom field of the database; once the project is "
 "generated and installed, this module holds it."
-msgstr ""
-"L'Apply le crée comme champ personnalisé de la base de données ; une "
-"fois le projet généré et installé, ce module le détiendra."
+msgstr "La mise en application le crée comme champ personnalisé de la base de données ; une fois le projet généré et installé, ce module le détiendra."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.xml:0
 msgid "Apply creates the group: it has no member yet."
-msgstr "Appliquer crée le groupe : il n'a encore aucun membre."
+msgstr "La mise en application crée le groupe : il n'a encore aucun membre."
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "Apply first: the sheet reads the applied view."
-msgstr "Appliquez d'abord : la feuille lit la vue appliquée."
+msgstr "Faites d'abord la mise en application : la feuille lit la vue mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Apply refuses the draft until this is fixed:"
-msgstr "L'Apply refuse le brouillon tant que ceci n'est pas corrigé :"
+msgstr "La mise en application refuse le brouillon tant que ceci n'est pas corrigé :"
 
 #. module: erplibre_studio
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_revert_wizard_view_form
 msgid "Apply removes from the database what the draft no longer has:"
-msgstr "Appliquer retire de la base ce que le brouillon n'a plus :"
+msgstr "La mise en application retire de la base ce que le brouillon n'a plus :"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1936,17 +1922,14 @@ msgstr "Appliquer retire de la base ce que le brouillon n'a plus :"
 msgid ""
 "Apply removes records, values or group members: review what it removes and "
 "confirm it."
-msgstr ""
-"Appliquer retire des enregistrements, des valeurs ou des membres de groupe :"
-" relisez ce qu'il retire et confirmez-le."
+msgstr "La mise en application retire des enregistrements, des valeurs ou des membres de groupe : relisez ce qu'elle retire et confirmez-la."
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Apply the model first: %(type)s needs its records."
-msgstr ""
-"Appliquez d'abord le modèle : %(type)s a besoin de ses enregistrements."
+msgstr "Mettez d'abord le modèle en application : %(type)s a besoin de ses enregistrements."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2204,12 +2187,7 @@ msgid ""
 "record rule shows a user the records of their companies and those of no "
 "company. Turned off after Apply, the next Apply removes the field and its "
 "values, after a confirmation."
-msgstr ""
-"Chaque enregistrement appartient à une société (le champ x_company_id), et "
-"une règle d'enregistrement globale montre à un utilisateur les "
-"enregistrements de ses sociétés et ceux sans société. Désactivée après "
-"l'Apply, le prochain Apply retire son champ et ses valeurs, après une "
-"confirmation."
+msgstr "Chaque enregistrement appartient à une société (le champ x_company_id), et une règle d'enregistrement globale montre à un utilisateur les enregistrements de ses sociétés et ceux sans société. Désactivée après la mise en application, la prochaine mise en application retire son champ et ses valeurs, après une confirmation."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2326,9 +2304,7 @@ msgstr "Filtre du panneau latéral"
 msgid ""
 "Fix each name marked below, a field in its inspector, a model in the Models "
 "space, then Apply."
-msgstr ""
-"Corrigez chaque nom signalé ci-dessous, un champ dans son inspecteur, un "
-"modèle dans l'espace Modèles, puis appliquez."
+msgstr "Corrigez chaque nom signalé ci-dessous, un champ dans son inspecteur, un modèle dans l'espace Modèles, puis faites la mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2376,7 +2352,7 @@ msgstr "Replier la ligne %(label)s"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Frozen at Apply: its name is a column of the table in the database."
-msgstr "Figé à l'Apply : son nom est une colonne de la table dans la base de données."
+msgstr "Figé à la mise en application : son nom est une colonne de la table dans la base de données."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2525,7 +2501,7 @@ msgstr "Isoler ce bloc pour y travailler"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid ""
 "Its technical name changes in a form, list or kanban view, until Apply."
-msgstr "Son nom technique se change dans une vue formulaire, liste ou kanban, jusqu'à l'Apply."
+msgstr "Son nom technique se change dans une vue formulaire, liste ou kanban, jusqu'à la mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2575,7 +2551,7 @@ msgstr "Minuscules, chiffres, _ et points"
 msgid ""
 "Lower case letters, digits, underscores and dots; x_ first unless the "
 "database allows otherwise; it cannot change once applied."
-msgstr "Lettres minuscules, chiffres, soulignés et points ; x_ au début à moins que la base ne permette autrement ; il ne peut plus changer une fois appliqué."
+msgstr "Lettres minuscules, chiffres, soulignés et points ; x_ au début à moins que la base ne permette autrement ; il ne peut plus changer une fois mis en application."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_model__manual_order
@@ -2880,7 +2856,7 @@ msgstr "Production · x_ obligatoire"
 msgid ""
 "Proposed from the label while it is not edited. Frozen at Apply: it becomes "
 "a column of the table."
-msgstr "Proposé d'après le libellé tant qu'il n'est pas modifié. Figé à l'Apply : il devient une colonne de la table."
+msgstr "Proposé d'après le libellé tant qu'il n'est pas modifié. Figé à la mise en application : il devient une colonne de la table."
 
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_geo_layer__classification__quantile
@@ -2922,20 +2898,20 @@ msgstr "Rétablir remet cet élément à sa place."
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Review the draft and apply it, then edit the form of the model"
-msgstr "Réviser le brouillon et l'appliquer, puis modifier le formulaire du modèle"
+msgstr "Réviser le brouillon et le mettre en application, puis modifier le formulaire du modèle"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Apply the model first: the visual editor reads its fields."
-msgstr "Appliquez d'abord le modèle : l'éditeur visuel lit ses champs."
+msgstr "Mettez d'abord le modèle en application : l'éditeur visuel lit ses champs."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "Apply will remove %(count)s member(s) from %(group)s."
-msgstr "Apply retirera %(count)s membre(s) de %(group)s."
+msgstr "La mise en application retirera %(count)s membre(s) de %(group)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3036,12 +3012,12 @@ msgstr "Axe"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.xml:0
 msgid "Back to the changes of the last Apply"
-msgstr "Revenir aux changements du dernier « Appliquer »"
+msgstr "Revenir aux changements de la dernière mise en application"
 
 #. module: erplibre_studio
 #: model_terms:ir.ui.view,arch_db:erplibre_studio.erplibre_studio_project_view_form
 msgid "Back to the changes of the last Apply?"
-msgstr "Revenir aux changements du dernier « Appliquer » ?"
+msgstr "Revenir aux changements de la dernière mise en application ?"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3054,9 +3030,7 @@ msgstr "Retour à l'éditeur"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid ""
 "Back to the last Apply, without what left the database since: %(items)s."
-msgstr ""
-"Retour au dernier « Appliquer », sans ce qui a quitté la base depuis : "
-"%(items)s."
+msgstr "Retour à la dernière mise en application, sans ce qui a quitté la base depuis : %(items)s."
 
 #. module: erplibre_studio
 #: model:ir.model,name:erplibre_studio.model_base
@@ -3181,7 +3155,7 @@ msgstr "Changements de vues"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Changes wait for Apply"
-msgstr "Des changements attendent Appliquer"
+msgstr "Des changements attendent la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3463,7 +3437,7 @@ msgstr "Créé par"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Created by Apply"
-msgstr "Créé par l'Apply"
+msgstr "Créé par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3831,9 +3805,7 @@ msgstr "Vue du studio ERPLibre"
 msgid ""
 "Each checked box is a change of the draft. Nothing is written to the "
 "database before Apply."
-msgstr ""
-"Chaque case cochée est un changement du brouillon. Rien n'est écrit en base "
-"avant Appliquer."
+msgstr "Chaque case cochée est un changement du brouillon. Rien n'est écrit en base avant la mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3887,7 +3859,7 @@ msgstr "Modifier les règles"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Edit this view before Apply creates the model"
-msgstr "Modifier cette vue avant qu'Appliquer crée le modèle"
+msgstr "Modifier cette vue avant que la mise en application crée le modèle"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -3902,9 +3874,7 @@ msgstr "Modifier visuellement"
 msgid ""
 "Editable until Apply. Odoo requires the x_ prefix for the models created "
 "outside the code."
-msgstr ""
-"Modifiable jusqu'à l'Apply. Le préfixe x_ est imposé par Odoo pour les "
-"modèles créés hors code."
+msgstr "Modifiable jusqu'à la mise en application. Le préfixe x_ est imposé par Odoo pour les modèles créés hors code."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4135,7 +4105,7 @@ msgstr "Ajusté"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "Fix what Apply refuses first."
-msgstr "Corrigez d'abord ce que l'Apply refuse."
+msgstr "Corrigez d'abord ce que la mise en application refuse."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4206,9 +4176,7 @@ msgstr "Globale"
 msgid ""
 "Go back to the last Apply? The changes of the draft made since are lost; "
 "without an Apply, the draft is emptied."
-msgstr ""
-"Revenir au dernier Apply ? Les changements du brouillon faits depuis sont "
-"perdus ; sans Apply, le brouillon est vidé."
+msgstr "Revenir à la dernière mise en application ? Les changements du brouillon faits depuis sont perdus ; sans mise en application, le brouillon est vidé."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4270,7 +4238,7 @@ msgstr "Groupe du projet"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 msgid "Group of the project · created by Apply"
-msgstr "Groupe du projet · créé par Appliquer"
+msgstr "Groupe du projet · créé par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4596,9 +4564,7 @@ msgstr "Modèle de l'élément"
 msgid ""
 "Its field exists in the database; turning it off removes the field at the "
 "next Apply."
-msgstr ""
-"Son champ existe dans la base ; la désactiver retire le champ au prochain "
-"Apply."
+msgstr "Son champ existe dans la base ; la désactiver retire le champ à la prochaine mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4678,7 +4644,7 @@ msgstr "Couloir de la chronologie · %(attributes)s"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Last Apply: %(date)s"
-msgstr "Dernier Apply : %(date)s"
+msgstr "Mis en application le %(date)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4761,9 +4727,7 @@ msgstr "Chargement…"
 msgid ""
 "Locked: the table exists since Apply. Another name would make another model,"
 " without its records."
-msgstr ""
-"Verrouillé : la table existe depuis l'Apply. Changer le nom créerait un "
-"autre modèle, sans ses données."
+msgstr "Verrouillé : la table existe depuis la mise en application. Changer le nom créerait un autre modèle, sans ses données."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -4868,9 +4832,7 @@ msgstr "Messages, activités et abonnés sous la fiche."
 msgid ""
 "Messages, followers and activities on the records (mail). Once applied, the "
 "chatter cannot be removed."
-msgstr ""
-"Messages, abonnés et activités sur les enregistrements (mail). Une fois "
-"appliqué, le fil de discussion ne peut plus être retiré."
+msgstr "Messages, abonnés et activités sur les enregistrements (mail). Une fois mis en application, le fil de discussion ne peut plus être retiré."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,field_description:erplibre_studio.field_erplibre_studio_rule__missing_groups
@@ -4946,13 +4908,13 @@ msgstr "Modèle du projet"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Model of the project · created by Apply"
-msgstr "Modèle du projet · créé par l'Apply"
+msgstr "Modèle du projet · créé par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Model of the project · waiting for Apply"
-msgstr "Modèle du projet · en attente d'Apply"
+msgstr "Modèle du projet · en attente de mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5115,7 +5077,7 @@ msgstr "Nécessite le module Discussion (mail), non installé."
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Never applied"
-msgstr "Jamais appliqué"
+msgstr "Jamais mis en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5509,15 +5471,13 @@ msgstr "Rien n'est enregistré : le modèle n'existe pas encore."
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid ""
 "Nothing new to write: Apply removes from the database what left the draft."
-msgstr ""
-"Rien de nouveau à écrire : l'Apply retire de la base ce qui a quitté le "
-"brouillon."
+msgstr "Rien de nouveau à écrire : la mise en application retire de la base ce qui a quitté le brouillon."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "Nothing to apply."
-msgstr "Rien à appliquer."
+msgstr "Rien à mettre en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5568,7 +5528,7 @@ msgstr "Sur %(model)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Once applied, the chatter cannot be removed."
-msgstr "Une fois appliqué, le fil de discussion ne peut plus être retiré."
+msgstr "Une fois mis en application, le fil de discussion ne peut plus être retiré."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -5890,8 +5850,7 @@ msgstr "Aperçu de la frise"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Preview the model before Apply creates it: nothing is saved"
-msgstr ""
-"Prévisualiser le modèle avant qu'Appliquer le crée : rien n'est enregistré"
+msgstr "Prévisualiser le modèle avant que la mise en application le crée : rien n'est enregistré"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6113,10 +6072,7 @@ msgstr "Retirer %(group)s"
 msgid ""
 "Remove %(model)s from the project, with its access rows, its rules and the "
 "changes of its views? Once applied, it leaves the database with its records."
-msgstr ""
-"Retirer %(model)s du projet, avec ses lignes d'accès, ses règles et les "
-"changements de ses vues ? Une fois appliqué, il quitte la base avec ses "
-"enregistrements."
+msgstr "Retirer %(model)s du projet, avec ses lignes d'accès, ses règles et les changements de ses vues ? Une fois le retrait mis en application, il quitte la base avec ses enregistrements."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6224,7 +6180,7 @@ msgstr "Retirer cette vue du brouillon"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Removed at the next Apply"
-msgstr "Retirée au prochain Apply"
+msgstr "Retirée à la prochaine mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6333,10 +6289,7 @@ msgid ""
 "Revert the studio projects %(projects)s first, or install their generated "
 "modules: what they applied would stay in the database with nothing to remove"
 " it."
-msgstr ""
-"Défaites d'abord les projets studio %(projects)s, ou installez leurs modules"
-" générés : ce qu'ils ont appliqué resterait dans la base sans rien pour le "
-"retirer."
+msgstr "Défaites d'abord les projets studio %(projects)s, ou installez leurs modules générés : ce qu'ils ont mis en application resterait dans la base sans rien pour le retirer."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -6354,7 +6307,7 @@ msgstr "Revue"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "Review before Apply"
-msgstr "Revue avant Apply"
+msgstr "Revue avant la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6608,7 +6561,7 @@ msgstr "Définir un attribut"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Set before Apply only: the column exists."
-msgstr "Se règle avant l'Apply seulement : la colonne existe."
+msgstr "Se règle avant la mise en application seulement : la colonne existe."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6730,9 +6683,7 @@ msgstr "Boutons intelligents"
 msgid ""
 "Some of these changes are applied: Apply then removes them from the "
 "database."
-msgstr ""
-"Certains de ces changements sont appliqués : Appliquer les retire alors de "
-"la base de données."
+msgstr "Certains de ces changements sont mis en application : la prochaine mise en application les retire alors de la base de données."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6785,9 +6736,7 @@ msgstr "Commence par une lettre, 63 caractères au plus."
 msgid ""
 "Lower case letters, digits, underscores and dots; x_ is optional on this "
 "development database. It cannot change once applied."
-msgstr ""
-"Lettres minuscules, chiffres, soulignés et points ; x_ est facultatif sur "
-"cette base de développement. Il ne peut plus changer une fois appliqué."
+msgstr "Lettres minuscules, chiffres, soulignés et points ; x_ est facultatif sur cette base de développement. Il ne peut plus changer une fois mis en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6795,9 +6744,7 @@ msgstr ""
 msgid ""
 "Editable until Apply. x_ is optional on this development database: the "
 "generated module writes the name as is."
-msgstr ""
-"Modifiable jusqu'à l'Apply. x_ est facultatif sur cette base de "
-"développement : le module généré écrit le nom tel quel."
+msgstr "Modifiable jusqu'à la mise en application. x_ est facultatif sur cette base de développement : le module généré écrit le nom tel quel."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6805,9 +6752,7 @@ msgstr ""
 msgid ""
 "Starts with x_, then lower case letters, digits and underscores; it cannot "
 "change once applied."
-msgstr ""
-"Commence par x_, puis des lettres minuscules, des chiffres et des soulignés "
-"; il ne peut plus changer une fois appliqué."
+msgstr "Commence par x_, puis des lettres minuscules, des chiffres et des soulignés ; il ne peut plus changer une fois mis en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -6946,9 +6891,7 @@ msgstr "La vue %(view)s quitte le brouillon avec ses changements."
 msgid ""
 "The %(view)s view leaves the draft with its changes; the next Apply removes "
 "it from the database."
-msgstr ""
-"La vue %(view)s quitte le brouillon avec ses changements ; le prochain Apply"
-" la retire de la base."
+msgstr "La vue %(view)s quitte le brouillon avec ses changements ; la prochaine mise en application la retire de la base."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7047,8 +6990,7 @@ msgstr "Les applications du projet et les groupes de leurs utilisateurs"
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_view__arch
 msgid "The arch Apply gives the view, recorded when the line is made."
-msgstr ""
-"L'arch que l'Apply donne à la vue, enregistrée à la création de la ligne."
+msgstr "L'arch que la mise en application donne à la vue, enregistrée à la création de la ligne."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7095,8 +7037,7 @@ msgstr "Les changements des modèles de la base"
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The chatter of %(name)s cannot be removed once applied."
-msgstr ""
-"Le fil de discussion de %(name)s ne peut plus être retiré une fois appliqué."
+msgstr "Le fil de discussion de %(name)s ne peut plus être retiré une fois mis en application."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7122,7 +7063,7 @@ msgstr "Le comodèle n'a aucun many2one vers ce modèle."
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
 msgid "The database has the draft: nothing to apply."
-msgstr "La base a le brouillon : rien à appliquer."
+msgstr "La base a le brouillon : rien à mettre en application."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7170,9 +7111,7 @@ msgstr "Le domaine de la règle %(name)s ne s'applique pas : %(error)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid ""
 "The domain reads well; Apply checks its fields once it created the model."
-msgstr ""
-"Le domaine se lit bien ; Appliquer vérifie ses champs une fois le modèle "
-"créé."
+msgstr "Le domaine se lit bien ; la mise en application vérifie ses champs une fois le modèle créé."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7326,13 +7265,13 @@ msgstr "Le champ %(name)s existe avec un autre type."
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s exists: its shape is set before Apply only."
-msgstr "Le champ %(name)s existe : sa forme se règle avant l'Apply seulement."
+msgstr "Le champ %(name)s existe : sa forme se règle avant la mise en application seulement."
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "The field %(name)s exists: whether it is translatable, indexed and its maximum size are set before Apply only."
-msgstr "Le champ %(name)s existe : traduisible, indexé et taille maximale se règlent avant l'Apply seulement."
+msgstr "Le champ %(name)s existe : traduisible, indexé et taille maximale se règlent avant la mise en application seulement."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7595,7 +7534,7 @@ msgstr "La couche s'affiche à l'ouverture de la carte."
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_view__layer_ids
 msgid "The layers of a GeoEngine view, written to base_geoengine by Apply."
-msgstr "Les couches d'une vue GeoEngine, écrites dans base_geoengine par l'Apply."
+msgstr "Les couches d'une vue GeoEngine, écrites dans base_geoengine par la mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7635,7 +7574,7 @@ msgstr "Le many2one dont l'enregistrement porte la liste des propriétés."
 #: code:addons/erplibre_studio/models/erplibre_studio_review.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "The map of %(field)s needs a GeoEngine view with a raster layer on %(model)s: add one (Add a view) once the field is applied."
-msgstr "La carte de %(field)s a besoin d'une vue GeoEngine avec une couche matricielle sur %(model)s : ajoutez-en une (Ajouter une vue) une fois le champ appliqué."
+msgstr "La carte de %(field)s a besoin d'une vue GeoEngine avec une couche matricielle sur %(model)s : ajoutez-en une (Ajouter une vue) une fois le champ mis en application."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7750,18 +7689,14 @@ msgstr "Le modèle %(name)s a besoin d'au moins un droit d'accès."
 msgid ""
 "The model joins the draft of the project. Nothing is created in the database"
 " before Apply."
-msgstr ""
-"Le modèle s'ajoute au brouillon du projet. Rien n'est créé dans la base "
-"avant l'Apply."
+msgstr "Le modèle s'ajoute au brouillon du projet. Rien n'est créé dans la base avant la mise en application."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_change__model_line_id
 msgid ""
 "The model line whose default view the change is on, before Apply creates the"
 " model: Apply then binds the change to the view."
-msgstr ""
-"La ligne de modèle dont la vue par défaut porte le changement, avant "
-"qu'Appliquer crée le modèle : Appliquer lie alors le changement à la vue."
+msgstr "La ligne de modèle dont la vue par défaut porte le changement, avant que la mise en application crée le modèle : la mise en application lie alors le changement à la vue."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7893,9 +7828,7 @@ msgstr "Le projet n'a pas encore d'application."
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid ""
 "The project has no model waiting for Apply: there is nothing to preview."
-msgstr ""
-"Le projet n'a aucun modèle en attente d'Appliquer : il n'y a rien à "
-"prévisualiser."
+msgstr "Le projet n'a aucun modèle en attente de mise en application : il n'y a rien à prévisualiser."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -7962,10 +7895,7 @@ msgid ""
 "The records are ordered by hand, with the handle of the list (the field "
 "x_sequence). Turned off after Apply, the next Apply removes the field and "
 "its values, after a confirmation."
-msgstr ""
-"Les enregistrements sont ordonnés à la main, avec la poignée de la liste "
-"(le champ x_sequence). Désactivée après l'Apply, le prochain Apply retire "
-"son champ et ses valeurs, après une confirmation."
+msgstr "Les enregistrements sont ordonnés à la main, avec la poignée de la liste (le champ x_sequence). Désactivée après la mise en application, la prochaine mise en application retire son champ et ses valeurs, après une confirmation."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -7990,10 +7920,7 @@ msgstr "Les enregistrements en lignes, une colonne par champ."
 msgid ""
 "The records can be archived (the field x_active). Turned off after Apply, "
 "the next Apply removes the field and its values, after a confirmation."
-msgstr ""
-"Les enregistrements peuvent être archivés (le champ x_active). Désactivée "
-"après l'Apply, le prochain Apply retire son champ et ses valeurs, après "
-"une confirmation."
+msgstr "Les enregistrements peuvent être archivés (le champ x_active). Désactivée après la mise en application, la prochaine mise en application retire son champ et ses valeurs, après une confirmation."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -8216,7 +8143,7 @@ msgstr "Le serveur, avec le brouillon du projet"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_editor.py:0
 msgid "The sheet reads the view as applied: its draft changes are not in it."
-msgstr "La feuille lit la vue telle qu'appliquée : ses changements en brouillon n'y sont pas."
+msgstr "La feuille lit la vue telle que mise en application : ses changements en brouillon n'y sont pas."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -8320,22 +8247,19 @@ msgstr "Le nom technique %(name)s ne s'applique pas : %(message)s"
 msgid ""
 "The technical name of %(name)s cannot change once applied: it is a column of"
 " the table."
-msgstr ""
-"Le nom technique de %(name)s ne peut plus changer une fois appliqué : c'est "
-"une colonne de la table."
+msgstr "Le nom technique de %(name)s ne peut plus changer une fois mis en application : c'est une colonne de la table."
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_model.py:0
 msgid "The technical name of the model %(name)s cannot change once applied."
-msgstr ""
-"Le nom technique du modèle %(name)s ne peut plus changer une fois appliqué."
+msgstr "Le nom technique du modèle %(name)s ne peut plus changer une fois mis en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "The timeline shows here once Apply creates its view."
-msgstr "La frise s'affiche ici une fois que l'Apply a créé sa vue."
+msgstr "La frise s'affiche ici une fois que la mise en application a créé sa vue."
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_project__app_ids
@@ -8379,9 +8303,7 @@ msgstr "La vue elle-même ne peut pas être retirée."
 msgid ""
 "The view line whose view the change is on, before Apply creates the view: "
 "Apply then binds the change to the view."
-msgstr ""
-"La ligne de vue dont la vue porte le changement, avant que l'Apply crée la "
-"vue : l'Apply lie alors le changement à la vue."
+msgstr "La ligne de vue dont la vue porte le changement, avant que la mise en application crée la vue : la mise en application lie alors le changement à la vue."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -8479,9 +8401,7 @@ msgstr "Cette application n'est pas une application du projet."
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.js:0
 msgid "This change is applied: Apply then removes it from the database."
-msgstr ""
-"Ce changement est appliqué : Appliquer le retire alors de la base de "
-"données."
+msgstr "Ce changement est mis en application : la prochaine mise en application le retire alors de la base de données."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -8679,22 +8599,20 @@ msgstr "Désactiver %(option)s"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Turned off: the next Apply removes its field, after its confirmation."
-msgstr ""
-"Désactivée : le prochain Apply retire son champ, après sa confirmation."
+msgstr "Désactivée : la prochaine mise en application retire son champ, après sa confirmation."
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid ""
 "Turning this option off removes at the next Apply, after its confirmation:"
-msgstr ""
-"Désactiver cette option retire au prochain Apply, après sa confirmation :"
+msgstr "Désactiver cette option retire à la prochaine mise en application, après sa confirmation :"
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Two Apply would create the same column."
-msgstr "Deux Apply créeraient la même colonne."
+msgstr "Deux mises en application créeraient la même colonne."
 
 #. module: erplibre_studio
 #: model:ir.model.constraint,message:erplibre_studio.constraint_erplibre_studio_app_xml_name_uniq
@@ -8804,9 +8722,7 @@ msgstr "Désinstallez d'abord le module %(module)s : il possède ses modèles."
 msgid ""
 "Uninstall the module %(module)s first: what the project applied belongs to "
 "it."
-msgstr ""
-"Désinstallez d'abord le module %(module)s : ce que le projet a appliqué lui "
-"appartient."
+msgstr "Désinstallez d'abord le module %(module)s : ce que le projet a mis en application lui appartient."
 
 #. module: erplibre_studio
 #: model:ir.model.fields.selection,name:erplibre_studio.selection__erplibre_studio_project__module_state__uninstallable
@@ -8820,10 +8736,7 @@ msgid ""
 "Uninstalling %(module)s deletes what other studio projects applied on its "
 "models: %(items)s. Revert these projects first, or remove these lines from "
 "them and apply."
-msgstr ""
-"Désinstaller %(module)s supprime ce que d'autres projets studio ont appliqué"
-" sur ses modèles : %(items)s. Défaites d'abord ces projets, ou retirez-en "
-"ces lignes et appliquez."
+msgstr "Désinstaller %(module)s supprime ce que d'autres projets studio ont mis en application sur ses modèles : %(items)s. Défaites d'abord ces projets, ou retirez-en ces lignes, puis faites la mise en application."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -8926,8 +8839,7 @@ msgstr "Domaine valide · %(count)s enregistrement(s)"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_security.js:0
 msgid "Valid domain; Apply checks its fields once it created the model."
-msgstr ""
-"Domaine valide ; Appliquer vérifie ses champs une fois le modèle créé."
+msgstr "Domaine valide ; la mise en application vérifie ses champs une fois le modèle créé."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9032,7 +8944,7 @@ msgstr "Vues du modèle"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.js:0
 msgid "Waiting for Apply"
-msgstr "En attente d'Apply"
+msgstr "En attente de mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9044,7 +8956,7 @@ msgstr "Semaine"
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "What Apply creates or updates"
-msgstr "Ce que l'Apply crée ou met à jour"
+msgstr "Ce que la mise en application crée ou met à jour"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -9301,7 +9213,7 @@ msgstr "icône de l'application %(name)s"
 #: code:addons/erplibre_studio/static/src/editor/studio_confirm.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.xml:0
 msgid "applied"
-msgstr "appliqué"
+msgstr "mis en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9393,7 +9305,7 @@ msgstr "créer"
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
 msgid "created by Apply"
-msgstr "créé par Appliquer"
+msgstr "créé par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9619,7 +9531,7 @@ msgstr "menu %(name)s"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 msgid "messages and activities, created by Apply"
-msgstr "messages et activités, créés par Appliquer"
+msgstr "messages et activités, créés par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9653,7 +9565,7 @@ msgstr "nouveau champ %(field)s du projet %(project)s"
 #: code:addons/erplibre_studio/models/erplibre_studio_preview.py:0
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "new field, created by Apply"
-msgstr "nouveau champ, créé par « Appliquer »"
+msgstr "nouveau champ, créé par la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10022,7 +9934,7 @@ msgstr "Nom technique du many2one"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_relation.py:0
 msgid "The inverse field of %(name)s changes only before Apply."
-msgstr "Le champ inverse de %(name)s ne change qu'avant l'Apply."
+msgstr "Le champ inverse de %(name)s ne change qu'avant la mise en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10048,9 +9960,7 @@ msgstr "Le studio n'ajoute pas de champs à ce modèle."
 msgid ""
 "%(group)s is not the external id of a group of an installed module nor of an"
 " applied group of the project."
-msgstr ""
-"%(group)s n'est l'identifiant externe ni d'un groupe d'un module installé ni"
-" d'un groupe appliqué du projet."
+msgstr "%(group)s n'est l'identifiant externe ni d'un groupe d'un module installé ni d'un groupe mis en application du projet."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -10066,13 +9976,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Apply first"
-msgstr "Appliquer d'abord"
+msgstr "Faites d'abord la mise en application"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "Apply first to name the groups of the project:"
-msgstr "Appliquez d'abord pour nommer les groupes du projet :"
+msgstr "Faites d'abord la mise en application pour nommer les groupes du projet :"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10080,15 +9990,13 @@ msgstr "Appliquez d'abord pour nommer les groupes du projet :"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 msgid "Apply the group %(group)s first: the view names it by its external id."
-msgstr ""
-"Appliquez d'abord le groupe %(group)s : la vue le nomme par son identifiant "
-"externe."
+msgstr "Mettez d'abord le groupe %(group)s en application : la vue le nomme par son identifiant externe."
 
 #. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Apply the model %(model)s first."
-msgstr "Appliquez d'abord le modèle %(model)s."
+msgstr "Mettez d'abord le modèle %(model)s en application."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10211,7 +10119,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Apply the model first: an option names a field created already."
-msgstr "Appliquez d'abord le modèle : une option nomme un champ déjà créé."
+msgstr "Mettez d'abord le modèle en application : une option nomme un champ déjà créé."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10311,7 +10219,7 @@ msgstr ""
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "The map shows once Apply creates the view and its layers."
-msgstr "La carte s'affiche une fois que l'Apply a créé la vue et ses couches."
+msgstr "La carte s'affiche une fois que la mise en application a créé la vue et ses couches."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -10531,7 +10439,7 @@ msgstr "Une plage colorée demande le champ dont les valeurs la colorent : un no
 msgid ""
 "A layer draws a geo field of %(model)s that Apply created: %(field)s is not "
 "one."
-msgstr "Une couche dessine un champ géographique de %(model)s créé par l'Apply : %(field)s n'en est pas un."
+msgstr "Une couche dessine un champ géographique de %(model)s créé par la mise en application : %(field)s n'en est pas un."
 
 #. module: erplibre_studio
 #. odoo-python
@@ -10681,7 +10589,7 @@ msgstr "La couche %(layer)s quitte le brouillon."
 msgid ""
 "The layer %(layer)s leaves the draft; the next Apply removes it from the "
 "map."
-msgstr "La couche %(layer)s quitte le brouillon; le prochain Apply la retire de la carte."
+msgstr "La couche %(layer)s quitte le brouillon; la prochaine mise en application la retire de la carte."
 
 #. module: erplibre_studio
 #. odoo-python

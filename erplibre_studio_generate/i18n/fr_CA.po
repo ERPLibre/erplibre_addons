@@ -72,10 +72,7 @@ msgstr "Un modèle d'un projet ERPLibre studio dont le nom n'a pas de x_ : ERPLi
 msgid ""
 "A module on the addons path defines the model %(name)s or its table: revert "
 "the project, rename it in the draft, then Apply again."
-msgstr ""
-"Un module de l'addons path définit le modèle %(name)s ou sa table : "
-"défaites le projet, renommez-le dans le brouillon, puis appliquez de "
-"nouveau."
+msgstr "Un module de l'addons path définit le modèle %(name)s ou sa table : défaites le projet, renommez-le dans le brouillon, puis faites de nouveau la mise en application."
 
 #. module: erplibre_studio_generate
 #: model:ir.model.fields.selection,name:erplibre_studio_generate.selection__erplibre_studio_project__license__agpl-3
@@ -86,7 +83,7 @@ msgstr "AGPL-3"
 #. odoo-python
 #: code:addons/erplibre_studio_generate/models/erplibre_studio_project.py:0
 msgid "Apply the draft before generating the module."
-msgstr "Appliquez le brouillon avant de générer le module."
+msgstr "Mettez le brouillon en application avant de générer le module."
 
 #. module: erplibre_studio_generate
 #. odoo-python
@@ -94,9 +91,7 @@ msgstr "Appliquez le brouillon avant de générer le module."
 msgid ""
 "Apply the draft first: %(count)s change(s) are on the views of models not "
 "created yet."
-msgstr ""
-"Appliquez d'abord le brouillon : %(count)s modification(s) portent sur les "
-"vues de modèles pas encore créés."
+msgstr "Mettez d'abord le brouillon en application : %(count)s modification(s) portent sur les vues de modèles pas encore créés."
 
 #. module: erplibre_studio_generate
 #: model:ir.model.fields,field_description:erplibre_studio_generate.field_erplibre_studio_project__author
@@ -316,7 +311,7 @@ msgstr "Le champ %(field)s n'a pas d'identifiant externe : le module généré n
 msgid ""
 "The field %(name)s of %(model)s cannot be written in the generated module: "
 "revert the project, rename it in the draft, then Apply again."
-msgstr "Le champ %(name)s de %(model)s ne peut pas être écrit dans le module généré : défaites le projet, renommez-le dans le brouillon, puis appliquez de nouveau."
+msgstr "Le champ %(name)s de %(model)s ne peut pas être écrit dans le module généré : défaites le projet, renommez-le dans le brouillon, puis faites de nouveau la mise en application."
 
 #. module: erplibre_studio_generate
 #. odoo-python
@@ -335,7 +330,7 @@ msgstr ""
 msgid ""
 "The model %(name)s cannot be written in the generated module: revert the "
 "project, rename it in the draft, then Apply again."
-msgstr "Le modèle %(name)s ne peut pas être écrit dans le module généré : défaites le projet, renommez-le dans le brouillon, puis appliquez de nouveau."
+msgstr "Le modèle %(name)s ne peut pas être écrit dans le module généré : défaites le projet, renommez-le dans le brouillon, puis faites de nouveau la mise en application."
 
 #. module: erplibre_studio_generate
 #. odoo-python
