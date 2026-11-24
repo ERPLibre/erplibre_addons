@@ -39,9 +39,11 @@ PYTHON_REFERENCE = re.compile(
 NODE_REFERENCE = re.compile(
     r"^erplibre-home-gnome-extension:(test/unit/[\w.-]+\.test\.js)::(.+)$"
 )
+# Chaque dépôt garde ses tests sous son propre répertoire : test/ pour
+# ERPLibre, tests/ pour le programme du deck.
 REPO_REFERENCE = re.compile(
-    r"^(erplibre|erplibre_streamdeck):(tests?/test_\w+\.py)"
-    r"::(\w+)::(test_\w+)$"
+    r"^(erplibre(?=:test/)|erplibre_streamdeck(?=:tests/))"
+    r":(tests?/test_\w+\.py)::(\w+)::(test_\w+)$"
 )
 # Le clone de chaque dépôt qu'une preuve `repo_unittest` nomme, relatif à
 # la racine du checkout ERPLibre : le programme du deck est un dépôt à
@@ -307,14 +309,29 @@ def node_test_names(source):
 
 
 def python_test_methods(source):
-    """{classe: {méthodes test_*}} d'un fichier de tests Python, celles
-    qu'une classe hérite d'une autre classe du même fichier comprises :
-    un mixin de scénarios donne ses tests à chaque TestCase qui l'hérite."""
+    """{classe: {méthodes test_*}} des classes d'un fichier de tests Python
+    qu'unittest lance, celles qu'une classe hérite d'une autre classe du
+    même fichier comprises : un mixin de scénarios donne ses tests à chaque
+    TestCase qui l'hérite.
+
+    Un mixin n'y figure pas lui-même : une classe dont toute l'ascendance
+    reste dans le fichier et s'arrête à `object` n'est pas un TestCase, et
+    unittest ne lance aucun de ses tests sous son nom. Une base importée
+    d'ailleurs ne se lit pas ici : la classe qui en hérite compte."""
     classes = {
         node.name: node
         for node in ast.parse(source).body
         if isinstance(node, ast.ClassDef)
     }
+
+    def local_bases(name, seen):
+        return [
+            base.id
+            for base in classes[name].bases
+            if isinstance(base, ast.Name)
+            and base.id in classes
+            and base.id not in seen
+        ]
 
     def methods(name, seen):
         own = {
@@ -323,16 +340,23 @@ def python_test_methods(source):
             if isinstance(item, ast.FunctionDef)
             and item.name.startswith("test_")
         }
-        for base in classes[name].bases:
-            if (
-                isinstance(base, ast.Name)
-                and base.id in classes
-                and base.id not in seen
-            ):
-                own |= methods(base.id, seen | {base.id})
+        for base in local_bases(name, seen):
+            own |= methods(base, seen | {base})
         return own
 
-    return {name: methods(name, {name}) for name in classes}
+    def runs(name, seen):
+        for base in classes[name].bases:
+            if isinstance(base, ast.Name) and base.id == "object":
+                continue
+            if not (isinstance(base, ast.Name) and base.id in classes):
+                return True
+        return any(
+            runs(base, seen | {base}) for base in local_bases(name, seen)
+        )
+
+    return {
+        name: methods(name, {name}) for name in classes if runs(name, {name})
+    }
 
 
 def assert_repository_proofs_committed(case, matches):
@@ -495,6 +519,33 @@ class TestRequirementInventory(TransactionCase):
             "    test(`a ${value} value`, () => {});\n"
         )
         self.assertEqual(node_test_names(source), set())
+
+    def test_a_proof_names_a_test_its_runner_runs(self):
+        # Un mixin ne lance aucun test sous son propre nom : seul le
+        # TestCase qui l'hérite en porte les tests. Chaque dépôt range ses
+        # tests sous son propre répertoire.
+        source = (
+            "import unittest\n"
+            "class Scenarios:\n"
+            "    def test_shared(self):\n"
+            "        pass\n"
+            "class Layer(Scenarios, object):\n"
+            "    pass\n"
+            "class Case(Layer, unittest.TestCase):\n"
+            "    def test_own(self):\n"
+            "        pass\n"
+        )
+        self.assertEqual(
+            python_test_methods(source), {"Case": {"test_own", "test_shared"}}
+        )
+        for reference, valid in (
+            ("erplibre:test/test_x.py::Case::test_y", True),
+            ("erplibre_streamdeck:tests/test_x.py::Case::test_y", True),
+            ("erplibre:tests/test_x.py::Case::test_y", False),
+            ("erplibre_streamdeck:test/test_x.py::Case::test_y", False),
+        ):
+            with self.subTest(reference=reference):
+                self.assertEqual(bool(REPO_REFERENCE.match(reference)), valid)
 
     def test_erplibre_proofs_name_its_committed_tests(self):
         assert_repository_proofs_committed(
