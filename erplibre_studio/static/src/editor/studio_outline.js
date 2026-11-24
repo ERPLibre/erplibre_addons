@@ -75,7 +75,7 @@ export function blockGlyph(block, fields = {}) {
 
 /**
  * How many fields ``block`` holds, at any depth; a notebook counts its
- * pages. In a view of ``viewType``, an element the draft removes
+ * pages. In a view of ``viewType``, an element the draft hides
  * (``isGhost``) does not count, nor what it holds.
  */
 export function outlineCount(block, viewType = null) {
@@ -258,7 +258,7 @@ export class StudioOutline extends Component {
         return outlineCount(block, this.props.viewType);
     }
 
-    /** Whether ``block`` is an element the draft removes (``isGhost``): a struck row with a ring. */
+    /** Whether ``block`` is an element the draft hides (``isGhost``): a struck row with a ring. */
     isGhost(block) {
         return isGhost(block, this.props.viewType);
     }
@@ -268,13 +268,13 @@ export class StudioOutline extends Component {
     }
 
     /**
-     * The label of the change of ``block`` the row shows: « removed » for
-     * an element the draft removes, else the first tag, else the first
-     * kind.
+     * The label of the change of ``block`` the row shows: « hidden » for
+     * an element the draft hides from a form or a list, else the first
+     * tag, else the first kind.
      */
     changeLabel(block) {
         if (this.isGhost(block)) {
-            return _t("removed");
+            return _t("hidden");
         }
         const kinds = block.change_kinds || [];
         const kind = CHANGE_TAGS.find((k) => kinds.includes(k)) || kinds[0];
@@ -283,17 +283,52 @@ export class StudioOutline extends Component {
 
     /**
      * The margin dot of the row of ``block`` (``marginDot``): a ring with
-     * the label « removed » for an element the draft removes; null for a
-     * block no change touches.
+     * the label « hidden » for an element the draft hides from a form or a
+     * list; null for a block no change touches. At the Simple level, the
+     * label is the plain sentence of its changes (``changesText``).
      */
     rowDot(block) {
         if (!block.changed) {
             return null;
         }
+        const plain = !this.detailed && this.changesText(block);
         if (this.isGhost(block)) {
-            return {dot: "ring", label: _t("removed")};
+            return {dot: "ring", label: plain || _t("hidden")};
         }
-        return marginDot(block.change_kinds) || {dot: "filled", label: ""};
+        const dot = marginDot(block.change_kinds) || {dot: "filled", label: ""};
+        return plain ? {...dot, label: plain} : dot;
+    }
+
+    /**
+     * The texts of the changes on ``block`` (StudioEditor.blockChangesText):
+     * plain sentences at the Simple level.
+     */
+    changesText(block) {
+        return this.editor.blockChangesText(block);
+    }
+
+    /**
+     * The tooltip of the row of ``block``: its technical name at the
+     * Detailed level; at the Simple level, the plain sentences of its
+     * changes, or none.
+     */
+    rowTitle(block) {
+        if (this.detailed) {
+            return block.name || false;
+        }
+        return (block.changed && this.changesText(block)) || false;
+    }
+
+    /**
+     * The legend of the marks: a ring stands for an element the draft
+     * hides, or, in a view type that hides by removing (``hide_mode``),
+     * for one it removes.
+     */
+    get legend() {
+        if (this.props.data.hide_mode === "remove") {
+            return _t("Filled dot: added or modified. Ring: removed. Number: changes folded inside the block.");
+        }
+        return _t("Filled dot: added or modified. Ring: hidden. Number: changes folded inside the block.");
     }
 
     /**

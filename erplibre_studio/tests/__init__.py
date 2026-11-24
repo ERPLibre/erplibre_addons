@@ -6,6 +6,7 @@ from . import (
     test_arch,
     test_arch_views,
     test_change_removal,
+    test_change_subject,
     test_confirm,
     test_display_level,
     test_editor_models,

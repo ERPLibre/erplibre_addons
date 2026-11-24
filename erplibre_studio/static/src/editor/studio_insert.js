@@ -21,7 +21,7 @@ let nextListId = 1;
  *
  * A search input (a combobox) keeps the focus; the options of its listbox
  * come in groups: the existing fields the form does not show yet (those of
- * the palette, then the fields the draft removes from the form, which come
+ * the palette, then the fields the draft hides in the form, which come
  * back at this place), the new field types the form takes (« Create
  * « text » as… » once a text is typed: the new field takes it as its
  * label), and the layout elements the hook takes. Up and Down move the
@@ -105,8 +105,8 @@ export class StudioInsertList extends Component {
 
     /**
      * The existing fields the hook takes and the search matches: those of
-     * the palette, then the fields the draft removes from the form (an
-     * element the draft removes keeps its node: it comes back here).
+     * the palette, then the fields the draft hides in the form (an
+     * element the draft hides keeps its node: it comes back here).
      */
     get existingOptions() {
         const options = [];
@@ -136,7 +136,7 @@ export class StudioInsertList extends Component {
                     label,
                     name: block.name,
                     glyph: typeGlyph((fields[block.name] || {}).type),
-                    note: _t("removed by this draft"),
+                    note: _t("hidden by this draft"),
                 });
             }
         }

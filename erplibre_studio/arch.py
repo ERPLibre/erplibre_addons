@@ -1262,6 +1262,77 @@ def change_kind(change):
     return "attribute"
 
 
+def _subject_label(node, fields, view_type):
+    """The text a sentence names ``node`` by (``node_label``), or False for
+    a node known only by its tag (a group without a title). A notebook is
+    named by its first tab."""
+    if node is None:
+        return False
+    if node.tag == "notebook" and not node.get("string"):
+        pages = [child for child in elements(node) if child.tag == "page"]
+        return _subject_label(pages[0], fields, view_type) if pages else False
+    label = node_label(node, fields, view_type)
+    if label == node.tag and node.get("name") != label:
+        return False
+    return label
+
+
+def change_subject(arch, change, view_type, fields):
+    """What a plain sentence of ``change`` (a dict of ``change_spec``) names,
+    read in ``arch`` as it stands before the change: {label, tag, kind,
+    anchor, position, value}. ``label`` and ``tag``: the text and the tag
+    of the node the change adds (its first one), moves or touches; ``kind``:
+    the kind of element an « add_node » adds (a tab, a group…); ``anchor``: the
+    text of the node an added or moved one goes before, after or into
+    (``position``); ``value``: the value the change writes, when a scalar.
+    What cannot be read in ``arch`` is False."""
+    ctype = change.get("type")
+    payload = change.get("payload") or {}
+
+    def node_at(xpath):
+        if not xpath:
+            return None
+        try:
+            return locate(arch, xpath)
+        except ArchError:
+            return None
+
+    node = anchor = None
+    position = False
+    if ctype in ADD_CHANGES or ctype == "add_node":
+        try:
+            spec = change_spec(change, view_type)
+        except (ArchError, KeyError, TypeError, ValueError):
+            spec = None
+        main = spec[0] if spec is not None and spec.tag == "data" else spec
+        added = (
+            [c for c in elements(main) if c.tag != "xpath"] if main is not None else []
+        )
+        node = added[0] if added else None
+        anchor = node_at(change.get("xpath"))
+        position = change.get("position") or "after"
+    elif ctype == "move":
+        node = node_at(payload.get("source"))
+        anchor = node_at(change.get("xpath"))
+        position = change.get("position") or "after"
+    else:
+        node = node_at(change.get("xpath"))
+    label = _subject_label(node, fields, view_type)
+    if not label and ctype in ADD_CHANGES:
+        label = payload.get("field_description") or False
+    value = payload.get("value")
+    if not isinstance(value, (str, bool, int, float)):
+        value = False
+    return {
+        "label": label,
+        "tag": node.tag if node is not None else False,
+        "kind": (ctype == "add_node" and payload.get("kind")) or False,
+        "anchor": _subject_label(anchor, fields, view_type),
+        "position": position,
+        "value": value,
+    }
+
+
 def _add_change_mark(node, key, kind):
     tokens = (node.get(CHANGE_MARK) or "").split()
     token = f"{key}:{kind}"
@@ -1308,17 +1379,23 @@ def _apply_tracked(arch, change, view_type):
     return apply_inheritance_specs(candidate, spec)
 
 
-def apply_changes(arch, changes, view_type, message=str, mark=False, track=False):
+def apply_changes(
+    arch, changes, view_type, message=str, mark=False, track=False, observe=None
+):
     """Apply ``changes`` (dicts with a ``key``) in order to a copy of
     ``arch``. Return (arch, errors): a change that does not apply is
     skipped and ``errors`` maps its key to the reason, the text that
     ``message`` gives for the exception. ``mark``: the nodes a change adds
     carry ADDED_MARK, its key. ``track``: each node a change adds, moves,
     hides or sets an attribute of carries CHANGE_MARK (``_apply_tracked``);
-    a node a change removes leaves the arch with its marks."""
+    a node a change removes leaves the arch with its marks. ``observe``:
+    called as ``observe(arch, change)`` with the arch as it stands right
+    before each change, which it must not modify."""
     arch = copy.deepcopy(arch)
     errors = {}
     for change in changes:
+        if observe:
+            observe(arch, change)
         try:
             if track:
                 arch = _apply_tracked(arch, change, view_type)

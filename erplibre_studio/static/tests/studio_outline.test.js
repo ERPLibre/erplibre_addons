@@ -300,7 +300,7 @@ describe("erplibre_studio editor, plan and change marks", () => {
         expect(".o_erplibre_studio_outline_holds").toHaveCount(0);
         // The legend of the marks, under the tree.
         expect(".o_erplibre_studio_outline_legend").toHaveText(
-            "Filled dot: added or modified. Ring: hidden or removed. Number: changes folded inside the block."
+            "Filled dot: added or modified. Ring: hidden. Number: changes folded inside the block."
         );
 
         // A click on a field of a page not shown: the page shows, the

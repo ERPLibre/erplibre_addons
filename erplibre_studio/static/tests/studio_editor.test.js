@@ -368,7 +368,9 @@ describe("erplibre_studio editor", () => {
         expect.verifySteps([`apply_operation remove ${REF}`]);
         expect(".o_erplibre_studio_field").toHaveCount(2);
         expect(pick("email")).toBeFocused();
-        expect(".o_erplibre_studio_live").toHaveText(/Reference removed\. Ctrl\+Z undoes it\./);
+        // A column of the view itself stays in the arch, hidden: the live
+        // region says « hidden », not « removed ».
+        expect(".o_erplibre_studio_live").toHaveText(/Reference hidden in this list\. Ctrl\+Z undoes it\./);
         // The plain arrows still walk.
         await press("ArrowUp");
         expect(pick("name")).toBeFocused();
@@ -391,6 +393,7 @@ describe("erplibre_studio editor", () => {
         await animationFrame();
         expect.verifySteps(["apply_operation remove //field[@name='ref']"]);
         expect(".o_erplibre_studio_field").toHaveCount(2);
+        // A column the draft adds leaves the draft: it is removed.
         expect(".o_erplibre_studio_live").toHaveText(/Reference removed\. Ctrl\+Z undoes it\./);
         expect(pick("email")).toBeFocused();
     });

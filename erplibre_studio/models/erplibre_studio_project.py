@@ -1215,17 +1215,18 @@ class ErplibreStudioProject(models.Model):
         View = self.env["ir.ui.view"].sudo().with_context(**context)
         return View.browse(view.id)._get_combined_arch()
 
-    def _draft_arch(self, view, track=False):
+    def _draft_arch(self, view, track=False, observe=None):
         """(arch, errors): the base arch of ``view`` with the changes of the
         project applied; ``errors`` maps a change id to why it does not
         apply. ``track``: the nodes the changes touch carry
-        ``arch.CHANGE_MARK``, for the editor only."""
+        ``arch.CHANGE_MARK``, for the editor only. ``observe``: see
+        ``arch.apply_changes``."""
         self.ensure_one()
         return self._draft_arch_without(
-            view, self.env["erplibre.studio.change"], track=track
+            view, self.env["erplibre.studio.change"], track=track, observe=observe
         )
 
-    def _draft_arch_without(self, view, skipped, track=False):
+    def _draft_arch_without(self, view, skipped, track=False, observe=None):
         """``_draft_arch`` of ``view`` with the changes ``skipped`` left
         out. On a pending view, a change that shows a field the model will
         not have (the inverse of a one2many that left the draft) does not
@@ -1250,6 +1251,7 @@ class ErplibreStudioProject(models.Model):
             view.type,
             self._arch_message,
             track=track,
+            observe=observe,
         )
         return arch, {**arch_errors, **errors}
 

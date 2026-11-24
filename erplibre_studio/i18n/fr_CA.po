@@ -206,6 +206,18 @@ msgid "%(groups)s group(s) · %(models)s model(s)"
 msgstr "%(groups)s groupe(s) · %(models)s modèle(s)"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+msgid "%(hidden)s, show the line"
+msgstr "%(hidden)s, afficher la ligne"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+msgid "%(hidden)s. Ctrl+Z undoes it."
+msgstr "%(hidden)s. Ctrl+Z l'annule."
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "%(icon)s is not the icon of an installed module."
@@ -233,9 +245,45 @@ msgstr "%(label)s ajouté."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s becomes read-only"
+msgstr "%(label)s passe en lecture seule"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s becomes required"
+msgstr "%(label)s devient requis"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s changed"
+msgstr "%(label)s modifié"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 msgid "%(label)s hidden"
 msgstr "%(label)s masqué"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s hidden in this form"
+msgstr "%(label)s masqué dans ce formulaire"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s hidden in this list"
+msgstr "%(label)s masqué dans cette liste"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s hidden in this view"
+msgstr "%(label)s masqué dans cette vue"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -245,21 +293,105 @@ msgstr "%(label)s inséré %(where)s."
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(label)s removed from the view"
-msgstr "%(label)s retiré de la vue"
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s is no longer optional"
+msgstr "%(label)s n'est plus optionnel"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-msgid "%(label)s removed from the view, show the line"
-msgstr "%(label)s retiré de la vue, afficher la ligne"
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s is no longer read-only"
+msgstr "%(label)s n'est plus en lecture seule"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s is no longer required"
+msgstr "%(label)s n'est plus requis"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s moved"
+msgstr "%(label)s déplacé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s moved after %(anchor)s"
+msgstr "%(label)s déplacé après %(anchor)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s moved before %(anchor)s"
+msgstr "%(label)s déplacé avant %(anchor)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s moved into %(anchor)s"
+msgstr "%(label)s déplacé dans %(anchor)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s optional, hidden by default"
+msgstr "%(label)s optionnel, masqué par défaut"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s optional, shown by default"
+msgstr "%(label)s optionnel, affiché par défaut"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s removed from this view"
+msgstr "%(label)s retiré de cette vue"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s renamed"
+msgstr "%(label)s renommé"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s renamed %(value)s"
+msgstr "%(label)s renommé %(value)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "%(label)s restored."
 msgstr "%(label)s rétabli."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s shown again"
+msgstr "%(label)s affiché de nouveau"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s takes back its original label"
+msgstr "%(label)s reprend son libellé d'origine"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s: a setting changed"
+msgstr "%(label)s : un réglage modifié"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "%(label)s: setting « %(attribute)s » changed"
+msgstr "%(label)s : réglage « %(attribute)s » modifié"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -731,6 +863,12 @@ msgid "A change of a view the project adds is on that view, in its project."
 msgstr ""
 "Un changement d'une vue que le projet ajoute porte sur cette vue, dans son "
 "projet."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "A change of this view"
+msgstr "Un changement de cette vue"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -1540,6 +1678,12 @@ msgstr "Une application a besoin d'un nom."
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "An element"
+msgstr "Un élément"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_relations.xml:0
 msgid "An existing many2one of the comodel"
 msgstr "Un many2one existant du comodèle"
@@ -2078,10 +2222,32 @@ msgid "Field %(label)s (%(name)s)"
 msgstr "Champ %(label)s (%(name)s)"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Field %(label)s added"
+msgstr "Champ %(label)s ajouté"
+
+#. module: erplibre_studio
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "Fields created outside the code carry x_ on a production database."
 msgstr "Les champs créés hors du code portent x_ sur une base de production."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid ""
+"Filled dot: added or modified. Ring: hidden. Number: changes folded inside "
+"the block."
+msgstr "Pastille pleine : ajouté ou modifié. Anneau : masqué. Chiffre : changements repliés dans le bloc."
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
+msgid ""
+"Filled dot: added or modified. Ring: removed. Number: changes folded inside "
+"the block."
+msgstr "Pastille pleine : ajouté ou modifié. Anneau : retiré. Chiffre : changements repliés dans le bloc."
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2182,6 +2348,12 @@ msgstr "Géométrie"
 #: code:addons/erplibre_studio/static/src/editor/studio_widget_options.js:0
 msgid "Height (px)"
 msgstr "Hauteur (px)"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+msgid "Hidden in this view"
+msgstr "Masqué dans cette vue"
 
 #. module: erplibre_studio
 #: model:ir.model.fields,help:erplibre_studio.field_erplibre_studio_model__order
@@ -2304,6 +2476,7 @@ msgstr "JSON"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.xml:0
 msgid "Layout"
 msgstr "Mise en page"
@@ -2390,9 +2563,51 @@ msgstr "Multipolyligne"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New element"
+msgstr "Nouvel élément"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New element %(label)s"
+msgstr "Nouvel élément %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New field %(label)s"
+msgstr "Nouveau champ %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
 msgid "New field…"
 msgstr "Nouveau champ…"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New filter %(label)s"
+msgstr "Nouveau filtre %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New group %(label)s"
+msgstr "Nouveau groupe %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New grouping"
+msgstr "Nouveau regroupement"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New grouping %(label)s"
+msgstr "Nouveau regroupement %(label)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2401,10 +2616,48 @@ msgid "New properties field"
 msgstr "Nouveau champ de propriétés"
 
 #. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New ribbon"
+msgstr "Nouveau ruban"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New ribbon %(label)s"
+msgstr "Nouveau ruban %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New separator"
+msgstr "Nouveau séparateur"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New separator %(label)s"
+msgstr "Nouveau séparateur %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "New tab"
 msgstr "Nouvel onglet"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New tab %(label)s"
+msgstr "Nouvel onglet %(label)s"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "New tooltip on %(label)s"
+msgstr "Nouvelle infobulle sur %(label)s"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -2574,12 +2827,6 @@ msgstr "Quantile"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 msgid "Remove this element from the draft"
 msgstr "Retirer cet élément du brouillon"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
-msgid "Removed from this view"
-msgstr "Retiré de cette vue"
 
 #. module: erplibre_studio
 #. odoo-python
@@ -2883,7 +3130,6 @@ msgstr "Discussion"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_models_space.xml:0
 msgid "Chatter: messages, followers and activities"
@@ -3803,16 +4049,6 @@ msgstr "Filtrer : libellé ou nom technique"
 
 #. module: erplibre_studio
 #. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.xml:0
-msgid ""
-"Filled dot: added or modified. Ring: hidden or removed. Number: changes "
-"folded inside the block."
-msgstr ""
-"Pastille pleine : ajouté ou modifié. Anneau : masqué ou retiré. Chiffre : "
-"changements repliés dans le bloc."
-
-#. module: erplibre_studio
-#. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "Filters"
 msgstr "Filtres"
@@ -3923,6 +4159,7 @@ msgstr "Graphique"
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_review.js:0
@@ -4831,6 +5068,7 @@ msgstr "Nouvelle application"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "New field"
 msgstr "Nouveau champ"
 
@@ -4844,6 +5082,7 @@ msgstr "Nouveaux champs"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "New filter"
 msgstr "Nouveau filtre"
 
@@ -4852,6 +5091,7 @@ msgstr "Nouveau filtre"
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_groups.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "New group"
 msgstr "Nouveau groupe"
 
@@ -6256,6 +6496,7 @@ msgstr "Envoyer vers une feuille de calcul"
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.xml:0
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
@@ -6563,6 +6804,7 @@ msgstr "Résumé : droits et règles se règlent dans Sécurité."
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_editor.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_palette.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
@@ -8341,6 +8583,12 @@ msgstr "Infobulle"
 
 #. module: erplibre_studio
 #. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "Tooltip of %(label)s cleared"
+msgstr "Infobulle de %(label)s effacée"
+
+#. module: erplibre_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
@@ -8673,6 +8921,12 @@ msgstr "Vue de l'aperçu"
 #: code:addons/erplibre_studio/static/src/editor/studio_inspector.xml:0
 msgid "View properties"
 msgstr "Propriétés de la vue"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
+msgid "View setting « %(attribute)s » changed"
+msgstr "Réglage de la vue « %(attribute)s » modifié"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9163,9 +9417,16 @@ msgstr "groupe du projet %(project)s"
 #. module: erplibre_studio
 #. odoo-javascript
 #: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
+#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
 #: code:addons/erplibre_studio/static/src/editor/studio_utils.js:0
 msgid "hidden"
 msgstr "masqué"
+
+#. module: erplibre_studio
+#. odoo-javascript
+#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
+msgid "hidden by this draft"
+msgstr "masqué par ce brouillon"
 
 #. module: erplibre_studio
 #. odoo-javascript
@@ -9414,19 +9675,6 @@ msgstr "règle d'enregistrement %(name)s"
 #: code:addons/erplibre_studio/models/erplibre_studio_project.py:0
 msgid "record rule %(name)s on %(model)s"
 msgstr "règle d'enregistrement %(name)s sur %(model)s"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_canvas.js:0
-#: code:addons/erplibre_studio/static/src/editor/studio_outline.js:0
-msgid "removed"
-msgstr "retiré"
-
-#. module: erplibre_studio
-#. odoo-javascript
-#: code:addons/erplibre_studio/static/src/editor/studio_insert.js:0
-msgid "removed by this draft"
-msgstr "retiré par ce brouillon"
 
 #. module: erplibre_studio
 #. odoo-javascript

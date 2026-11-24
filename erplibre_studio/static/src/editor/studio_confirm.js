@@ -204,7 +204,8 @@ export class StudioChangeRemovalDialog extends Component {
     }
 
     get intro() {
-        const change = this.props.removal.change.summary;
+        const removed = this.props.removal.change;
+        const change = removed.sentence || removed.summary;
         if (this.items.length) {
             return _t("Undoing « %(change)s » also removes the changes that depend on it:", {change});
         }

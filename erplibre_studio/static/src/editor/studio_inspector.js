@@ -282,9 +282,9 @@ export class StudioInspector extends Component {
         return canRemoveBlock(block, this.root, this.viewType);
     }
 
-    // ── an element the draft removes ────────────────────────────────────
+    // ── an element the draft hides ────────────────────────────────────
 
-    /** Whether ``block`` is an element the draft removes (``isGhost``). */
+    /** Whether ``block`` is an element the draft hides (``isGhost``). */
     isGhost(block) {
         return isGhost(block, this.viewType);
     }
@@ -299,7 +299,7 @@ export class StudioInspector extends Component {
         const name = block.name ? ` name="${block.name}"` : "";
         return {
             heading: outlineLabel(block),
-            kind: _t("Removed from this view"),
+            kind: _t("Hidden in this view"),
             note:
                 block.kind === "field"
                     ? _t("The field stays in the database; Restore puts it back where it was.")
@@ -655,9 +655,10 @@ export class StudioInspector extends Component {
     }
 
     /**
-     * The note of the draft changes on ``block``: the summary of its one
-     * change (``blockChange``) when the view lists it, else its kinds as
-     * text; "" for none.
+     * The note of the draft changes on ``block``: the text of its one
+     * change (``blockChange``, ``changeText``: a plain sentence at the
+     * Simple level, the summary at the Detailed one) when the view lists
+     * it, else its kinds as text; "" for none.
      */
     changedNote(block) {
         const kinds = block.change_kinds || [];
@@ -670,8 +671,8 @@ export class StudioInspector extends Component {
         }
         const changeId = this.blockChange(block);
         const change = changeId && this.changes.find((c) => c.id === changeId);
-        if (change && change.summary) {
-            return change.summary;
+        if (change) {
+            return this.changeText(change, outlineLabel(block));
         }
         return _t("Changed by the draft: %(kinds)s.", {kinds: kinds.map((k) => changeKindLabel(k)).join(", ")});
     }
@@ -811,8 +812,17 @@ export class StudioInspector extends Component {
         return this.editor.removeChange(change.id);
     }
 
+    /**
+     * The text of ``change`` at the level shown (StudioEditor.changeText):
+     * its plain sentence at the Simple level, its summary at the Detailed
+     * one.
+     */
+    changeText(change, label = "") {
+        return this.editor.changeText(change, label);
+    }
+
     undoLabel(change) {
-        return _t("Undo this change: %(change)s", {change: change.summary});
+        return _t("Undo this change: %(change)s", {change: this.changeText(change)});
     }
 
     /**

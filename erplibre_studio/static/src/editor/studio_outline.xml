@@ -95,7 +95,7 @@
                         tabindex="-1"
                         t-att-class="{'fw-bold': isContainer(row.block) and !row.context}"
                         t-att-draggable="canDrag(row.block) ? 'true' : 'false'"
-                        t-att-title="detailed and row.block.name ? row.block.name : false"
+                        t-att-title="rowTitle(row.block)"
                         t-on-click="() => this.pick(row.block)"
                         t-on-dragstart="(ev) => this.startDrag(ev, row.block)"
                         t-on-dragend="() => this.endDrag()"
@@ -136,8 +136,9 @@
                             t-esc="holds"
                         />
                         <!-- The dot of the row's own change, as on the canvas:
-                             filled, or a ring for a change that hides; its
-                             kinds as text for a screen reader. -->
+                             filled, or a ring for a change that hides; for a
+                             screen reader, its kinds at the Detailed level,
+                             the sentences of its changes at the Simple one. -->
                         <t t-set="dot" t-value="rowDot(row.block)" />
                         <t t-if="dot">
                             <span class="o_erplibre_studio_margin_dot" t-att-data-dot="dot.dot" aria-hidden="true" />
@@ -167,9 +168,7 @@
             </ul>
             <p t-if="!shown.rows.length" class="small text-muted mb-0 o_erplibre_studio_outline_empty" t-esc="emptyLabel" />
             <div class="small text-muted border-top pt-2 mt-auto">
-                <p class="mb-1 o_erplibre_studio_outline_legend">
-                    Filled dot: added or modified. Ring: hidden or removed. Number: changes folded inside the block.
-                </p>
+                <p class="mb-1 o_erplibre_studio_outline_legend" t-esc="legend" />
                 <p class="mb-0">
                     A click selects the element on the canvas. Drag a row, or press Alt+Up or Alt+Down, to move it.
                 </p>

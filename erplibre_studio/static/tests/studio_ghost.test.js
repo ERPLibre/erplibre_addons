@@ -187,14 +187,15 @@ describe("isGhost", () => {
 });
 
 describe.current.tags("desktop");
-describe("an element the draft removes", () => {
+describe("an element the draft hides", () => {
     test("Simple: one muted line that shows its row, then folds it", async () => {
         await openEditor();
         expect(GHOST).toHaveClass(["o_erplibre_studio_muted_line", "o_erplibre_studio_field"]);
         expect(GHOST).not.toHaveClass("o_erplibre_studio_ghost_open");
         expect(GHOST).toHaveAttribute("draggable", "false");
-        expect(PICK).toHaveText("Fax removed — show");
-        expect(PICK).toHaveAttribute("aria-label", "Fax removed from the view, show the line");
+        // A hide: the line says « hidden », never « removed ».
+        expect(PICK).toHaveText("Fax hidden — show");
+        expect(PICK).toHaveAttribute("aria-label", "Fax hidden in this form, show the line");
         expect(PICK).toHaveAttribute("aria-expanded", "false");
         // Neither moves nor leaves again: Escape is its only key.
         expect(PICK).toHaveAttribute("aria-keyshortcuts", "Escape");
@@ -207,7 +208,7 @@ describe("an element the draft removes", () => {
         await contains(GHOST).click();
         expect(GHOST).toHaveClass(["o_erplibre_studio_ghost_open", "o_erplibre_studio_selected"]);
         expect(PICK).toHaveAttribute("aria-expanded", "true");
-        expect(PICK).toHaveAttribute("aria-label", "Fax removed from the view");
+        expect(PICK).toHaveAttribute("aria-label", "Fax hidden in this form");
         expect(PICK).toHaveText("Fax");
         expect(`${GHOST} s.o_erplibre_studio_ghost_value`).toHaveText("+1 555 0199");
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveText("Restore");
@@ -287,7 +288,7 @@ describe("an element the draft removes", () => {
         const props = ".o_erplibre_studio_ghost_props";
         expect(props).toHaveCount(1);
         expect(`${props} .o_erplibre_studio_inspector_title`).toHaveText("Fax");
-        expect(`${props} .o_erplibre_studio_inspector_kind`).toHaveText("Removed from this view");
+        expect(`${props} .o_erplibre_studio_inspector_kind`).toHaveText("Hidden in this view");
         expect(`${props} .o_erplibre_studio_ghost_note`).toHaveText(
             "The field stays in the database; Restore puts it back where it was."
         );
@@ -312,12 +313,15 @@ describe("an element the draft removes", () => {
         expect(row).toHaveClass("o_erplibre_studio_outline_removed");
         expect(`${row} .o_erplibre_studio_margin_dot[data-dot=ring]`).toHaveCount(1);
         expect(`${row} .o_erplibre_studio_change_dot`).toHaveCount(0);
-        // The Simple level shows the ring alone; its text stays for a
-        // screen reader, and the Detailed level writes it out.
+        // The Simple level shows the ring alone; the sentence of its
+        // change stays for a screen reader and as the tooltip of the row,
+        // and the Detailed level writes its kind out.
         expect(`${row} .o_erplibre_studio_outline_tag`).toHaveCount(0);
-        expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("removed");
+        expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("Fax hidden in this form");
+        expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("title", "Fax hidden in this form");
         await contains(DETAILED).click();
-        expect(`${row} .o_erplibre_studio_outline_tag`).toHaveText("removed");
+        expect(`${row} .o_erplibre_studio_outline_tag`).toHaveText("hidden");
+        expect(`${row} .o_erplibre_studio_outline_dot_text`).toHaveText("hidden");
         expect(`${row} .o_erplibre_studio_outline_pick`).toHaveAttribute("draggable", "false");
         // The group counts the three fields left.
         expect(`.o_erplibre_studio_outline_row[data-path="${MAIN}"] .o_erplibre_studio_outline_pick`).toHaveText(
@@ -340,7 +344,8 @@ describe("an element the draft removes", () => {
         answer = listPayload();
         await openEditor("list");
         expect(GHOST).toHaveAttribute("data-layout", "column");
-        expect(PICK).toHaveText("Fax removed — show");
+        expect(PICK).toHaveText("Fax hidden — show");
+        expect(PICK).toHaveAttribute("aria-label", "Fax hidden in this list, show the line");
         await contains(GHOST).click();
         expect(`${GHOST} .o_erplibre_studio_ghost_restore`).toHaveCount(1);
         expect(`${GHOST} .o_erplibre_studio_ghost_value`).toHaveCount(0);

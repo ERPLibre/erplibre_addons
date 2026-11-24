@@ -778,11 +778,24 @@ class ErplibreStudioEditor(models.AbstractModel):
         Project = self.env["erplibre.studio.project"]
         project = self._project(project_id, pick_project, model)
         view = self._resolve_view(model, view_id, view_type, project)
+        fields_info = self._fields_payload(model, project)
+        # What each change names, read in the arch right before it: the
+        # editor builds its plain sentence from it. A subject that cannot be
+        # read stays out: the editor then says the kind of the change.
+        subjects = {}
+
+        def observe(before, spec):
+            try:
+                subjects[spec["key"]] = studio_arch.change_subject(
+                    before, spec, view.type, fields_info
+                )
+            except Exception:  # noqa: BLE001 - a sentence never blocks the editor
+                subjects.pop(spec["key"], None)
+
         if project:
-            arch, errors = project._draft_arch(view, track=True)
+            arch, errors = project._draft_arch(view, track=True, observe=observe)
         else:
             arch, errors = view._get_combined_arch(), {}
-        fields_info = self._fields_payload(model, project)
         blocks = studio_arch.arch_blocks(arch, view.type, fields_info)
         paths = studio_arch.change_paths(arch)
         studio_arch.strip_change_marks(arch)
@@ -802,6 +815,7 @@ class ErplibreStudioEditor(models.AbstractModel):
                         )
                         or False,
                         "summary": change.summary,
+                        "subject": subjects.get(change.id) or False,
                         "xpath": change.xpath,
                         "path": paths.get(str(change.id)) or False,
                         "error": errors.get(change.id) or False,

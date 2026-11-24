@@ -78,7 +78,7 @@
                     class="o_erplibre_studio_change_removal_item"
                     t-att-data-id="item.id"
                 >
-                    <t t-esc="item.summary" /> · <code class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.view" />
+                    <t t-esc="item.sentence or item.summary" /> · <code class="text-muted o_erplibre_studio_change_removal_view" t-esc="item.view" />
                     <t t-if="item.applied"> · <span class="badge text-bg-secondary">applied</span></t>
                 </li>
             </ul>

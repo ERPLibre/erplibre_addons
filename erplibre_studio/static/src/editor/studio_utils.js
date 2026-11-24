@@ -171,6 +171,155 @@ export function changeDot(change) {
     return change.kind === "hidden" || change.type === "remove" ? "ring" : "filled";
 }
 
+/**
+ * The plain sentence of an element ``label`` hidden in a view of
+ * ``viewType``: « Website hidden in this form ». A hidden element stays in
+ * the arch; only a « remove » change takes it out (``changeSentence``).
+ */
+export function hiddenSentence(label, viewType) {
+    if (viewType === "form") {
+        return _t("%(label)s hidden in this form", {label});
+    }
+    if (viewType === "list") {
+        return _t("%(label)s hidden in this list", {label});
+    }
+    return _t("%(label)s hidden in this view", {label});
+}
+
+// The sentence of a new element of « add_node », by its kind: with its
+// label, and without one.
+function newNodeSentence(kind, label) {
+    const named = {
+        page: () => _t("New tab %(label)s", {label}),
+        notebook: () => _t("New tab %(label)s", {label}),
+        group: () => _t("New group %(label)s", {label}),
+        separator: () => _t("New separator %(label)s", {label}),
+        widget: () => _t("New ribbon %(label)s", {label}),
+        filter: () => _t("New filter %(label)s", {label}),
+        group_by: () => _t("New grouping %(label)s", {label}),
+    };
+    const bare = {
+        page: () => _t("New tab"),
+        notebook: () => _t("New tab"),
+        group: () => _t("New group"),
+        separator: () => _t("New separator"),
+        widget: () => _t("New ribbon"),
+        filter: () => _t("New filter"),
+        group_by: () => _t("New grouping"),
+    };
+    if (label) {
+        return (named[kind] || (() => _t("New element %(label)s", {label})))();
+    }
+    return (bare[kind] || (() => _t("New element")))();
+}
+
+/**
+ * The plain sentence of a change of kind ``kind`` (``change_kinds``) on
+ * the element ``label``, when nothing more is known of it.
+ */
+export function kindSentence(kind, label, viewType) {
+    const name = label || _t("An element");
+    switch (kind) {
+        case "new":
+            return label ? _t("New element %(label)s", {label}) : _t("New element");
+        case "hidden":
+            return hiddenSentence(name, viewType);
+        case "moved":
+            return _t("%(label)s moved", {label: name});
+        case "renamed":
+            return _t("%(label)s renamed", {label: name});
+    }
+    return label ? _t("%(label)s changed", {label}) : _t("A change of this view");
+}
+
+/**
+ * The plain sentence of ``change``, a change of the payload, as the Simple
+ * level shows it: built from the label of its element, never from its
+ * XPath or a technical name (« Phone becomes required », « Email renamed
+ * Work email »). ``subject`` of the change (``change_subject`` of the
+ * server) gives the label, the place and the value; ``label``, the label
+ * of its block on the canvas, stands in when the subject has none.
+ * ``settable``: the ``settable`` of the payload, which names the kind of
+ * an attribute (attributeLabel). A change without a subject (one the
+ * server could not read) gets the sentence of its kind
+ * (``kindSentence``); a type of change it does not know, a sentence that
+ * names the element only.
+ */
+export function changeSentence(change, {viewType = null, label = "", settable = {}} = {}) {
+    if (!change.subject) {
+        return kindSentence(change.kind, label, viewType);
+    }
+    const subject = change.subject;
+    const name = subject.label || label || _t("An element");
+    const value = subject.value;
+    const kind = (subject.tag && (settable[subject.tag] || {})[change.attribute]) || null;
+    switch (change.type) {
+        case "add_field":
+            return subject.label || label ? _t("New field %(label)s", {label: name}) : _t("New field");
+        case "add_existing_field":
+            return _t("Field %(label)s added", {label: name});
+        case "add_node":
+            return newNodeSentence(subject.kind || subject.tag, subject.label || label);
+        case "move": {
+            const anchor = subject.anchor;
+            if (anchor && subject.position === "before") {
+                return _t("%(label)s moved before %(anchor)s", {label: name, anchor});
+            }
+            if (anchor && subject.position === "inside") {
+                return _t("%(label)s moved into %(anchor)s", {label: name, anchor});
+            }
+            if (anchor) {
+                return _t("%(label)s moved after %(anchor)s", {label: name, anchor});
+            }
+            return _t("%(label)s moved", {label: name});
+        }
+        case "hide":
+            return value ? hiddenSentence(name, viewType) : _t("%(label)s shown again", {label: name});
+        case "remove":
+            return _t("%(label)s removed from this view", {label: name});
+        case "relabel":
+            return value
+                ? _t("%(label)s renamed %(value)s", {label: name, value})
+                : _t("%(label)s takes back its original label", {label: name});
+        case "required":
+            return value
+                ? _t("%(label)s becomes required", {label: name})
+                : _t("%(label)s is no longer required", {label: name});
+        case "readonly":
+            return value
+                ? _t("%(label)s becomes read-only", {label: name})
+                : _t("%(label)s is no longer read-only", {label: name});
+        case "help":
+            return value
+                ? _t("New tooltip on %(label)s", {label: name})
+                : _t("Tooltip of %(label)s cleared", {label: name});
+        case "optional":
+            if (value === "show") {
+                return _t("%(label)s optional, shown by default", {label: name});
+            }
+            if (value === "hide") {
+                return _t("%(label)s optional, hidden by default", {label: name});
+            }
+            return _t("%(label)s is no longer optional", {label: name});
+        case "set_attribute": {
+            if (change.attribute === "string") {
+                return value
+                    ? _t("%(label)s renamed %(value)s", {label: name, value})
+                    : _t("%(label)s takes back its original label", {label: name});
+            }
+            const attribute = attributeLabel(change.attribute, kind);
+            if (!change.attribute || attribute === change.attribute) {
+                return _t("%(label)s: a setting changed", {label: name});
+            }
+            if (!subject.label && !label) {
+                return _t("View setting « %(attribute)s » changed", {attribute});
+            }
+            return _t("%(label)s: setting « %(attribute)s » changed", {label: name, attribute});
+        }
+    }
+    return subject.label || label ? _t("%(label)s changed", {label: name}) : _t("A change of this view");
+}
+
 /** ``text`` in lower case without accents, as a filter compares it. */
 export function searchText(text) {
     return (text || "")
@@ -199,16 +348,16 @@ export function blockTrail(root, path) {
     return [];
 }
 
-// The view types whose blocks the draft removes show as a removed line
+// The view types whose blocks the draft hides show as a hidden line
 // (``isGhost``).
 export const GHOST_VIEW_TYPES = ["form", "list"];
 
 /**
- * Whether ``block`` is an element the draft removes from a view of
+ * Whether ``block`` is an element the draft hides in a view of
  * ``viewType`` (GHOST_VIEW_TYPES): « Remove from the view » keeps the node
  * in the arch of a form or a list, hidden by a change of kind « hidden »,
  * so that the other views that locate it keep finding it. The canvas
- * draws it as one removed line that Restore brings back; it neither moves
+ * draws it as one hidden line that Restore brings back; it neither moves
  * nor leaves again, and the drops around it target the real node.
  */
 export function isGhost(block, viewType) {
@@ -218,7 +367,7 @@ export function isGhost(block, viewType) {
 /**
  * Whether ``block`` can be dragged in a view of ``viewType``: what the
  * server lets move, and in a form or a list only the fields and the other
- * leaves, an element the draft removes left out (``isGhost``).
+ * leaves, an element the draft hides left out (``isGhost``).
  */
 export function canDragBlock(block, viewType) {
     if (block.movable === false || isGhost(block, viewType)) {

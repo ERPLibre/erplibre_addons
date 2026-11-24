@@ -309,8 +309,8 @@
     </t>
 
     <t t-name="erplibre_studio.Block">
-        <!-- An element the draft removes from a form or a list (isGhost):
-             one muted line whose button opens it, « label removed — show »;
+        <!-- An element the draft hides from a form or a list (isGhost):
+             one muted line whose button opens it, « label hidden — show »;
              open, its label struck, the value of a form line struck,
              Restore and, at the Simple level, the fold button. The same
              button stays the tab stop in both states. A list draws it as a
@@ -343,7 +343,7 @@
             >
                 <s class="o_erplibre_studio_label o_erplibre_studio_ghost_label" t-esc="titleLabel" />
                 <t t-if="!ghostOpen">
-                    <span class="o_erplibre_studio_ghost_removed" t-esc="' ' + ghostText.removed + ' — '" />
+                    <span class="o_erplibre_studio_ghost_removed" t-esc="' ' + ghostText.hidden + ' — '" />
                     <span class="o_erplibre_studio_ghost_show" t-esc="ghostText.show" />
                 </t>
             </button>

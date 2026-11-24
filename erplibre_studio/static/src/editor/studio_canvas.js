@@ -37,6 +37,7 @@ import {
     graphLaneLabel,
     isFocusContext,
     graphLanes,
+    hiddenSentence,
     isBaseInvisible,
     isGhost,
     isTrue,
@@ -73,8 +74,8 @@ import {
  * handle and the label chip of a block show on hover, on focus, on the
  * selection and during a drag (CSS).
  *
- * An element the draft removes from a form or a list (``isGhost``) is one
- * muted line at its place, « label removed — show », that neither moves
+ * An element the draft hides from a form or a list (``isGhost``) is one
+ * muted line at its place, « label hidden — show », that neither moves
  * nor leaves again; a drop beside it targets its node, which stays in the
  * arch. « show » opens its row, struck, with Restore and a fold button;
  * the Detailed level always shows the row, and draws nothing under it.
@@ -92,7 +93,7 @@ export class StudioBlock extends Component {
 
     setup() {
         this.editorState = useState(this.props.editor.state);
-        // Whether the removed line of an element the draft removes shows
+        // Whether the hidden line of an element the draft hides shows
         // its row at the Simple level (« show »): a state of the block.
         this.ghostState = useState({open: false});
     }
@@ -364,22 +365,22 @@ export class StudioBlock extends Component {
     /**
      * Whether the block draws as one muted line at the Simple level: a
      * block the draft hides, or the selection when the form never shows
-     * it. An element the draft removes from a form or a list draws as a
-     * removed line instead (``isGhost``).
+     * it. In a form or a list, an element the draft hides draws as its
+     * hidden line instead (``isGhost``).
      */
     get mutedLine() {
         return !this.detailed && !this.isGhost && (this.isHiddenChange || (this.baseInvisible && this.isSelected));
     }
 
-    // ── an element the draft removes ────────────────────────────────────
+    // ── an element the draft hides ────────────────────────────────────
 
-    /** Whether the block is an element the draft removes (``isGhost``). */
+    /** Whether the block is an element the draft hides (``isGhost``). */
     get isGhost() {
         return isGhost(this.block, this.props.viewType);
     }
 
     /**
-     * Whether the removed line shows its row (struck label, Restore): at
+     * Whether the hidden line shows its row (struck label, Restore): at
      * the Detailed level always, at the Simple level once « show » opens
      * it.
      */
@@ -387,15 +388,18 @@ export class StudioBlock extends Component {
         return this.detailed || this.ghostState.open;
     }
 
-    /** The texts of the removed line and of its buttons. */
+    /**
+     * The texts of the line of a hidden element and of its buttons: the
+     * draft hides it (the node stays in the arch), so they say « hidden »
+     * (``hiddenSentence``), never « removed ».
+     */
     get ghostText() {
         const label = this.titleLabel;
+        const hidden = hiddenSentence(label, this.props.viewType);
         return {
-            removed: _t("removed"),
+            hidden: _t("hidden"),
             show: _t("show"),
-            pick: this.ghostOpen
-                ? _t("%(label)s removed from the view", {label})
-                : _t("%(label)s removed from the view, show the line", {label}),
+            pick: this.ghostOpen ? hidden : _t("%(hidden)s, show the line", {hidden}),
             fold: _t("Fold the line %(label)s", {label}),
         };
     }
@@ -410,7 +414,7 @@ export class StudioBlock extends Component {
     }
 
     /**
-     * A click on the removed line, or Enter or Space on its button: a
+     * A click on the hidden line, or Enter or Space on its button: a
      * folded line opens and takes the selection; an open one selects as
      * any block does.
      */
@@ -425,7 +429,7 @@ export class StudioBlock extends Component {
         }
     }
 
-    /** Fold the removed line back; its button keeps the focus. */
+    /** Fold the hidden line back; its button keeps the focus. */
     foldGhost(ev) {
         this.ghostState.open = false;
         const holder = ev.currentTarget.closest("[data-path]");

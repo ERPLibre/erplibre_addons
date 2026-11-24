@@ -40,6 +40,7 @@ import {
     canDragBlock,
     canRemoveBlock,
     canSelectBlock,
+    changeSentence,
     columnLabel,
     conditionValue,
     fieldTypeLabel,
@@ -49,6 +50,7 @@ import {
     focusEndHook,
     graphLaneLabel,
     graphLanes,
+    hiddenSentence,
     isBaseInvisible,
     isGhost,
     namedKeys,
@@ -68,6 +70,7 @@ export {
     blockTrail,
     changeDot,
     changeKeysInside,
+    changeSentence,
     conditionValue,
     fieldTypeLabel,
     fieldWidgets,
@@ -77,9 +80,11 @@ export {
     focusEndHook,
     graphAxes,
     graphLanes,
+    hiddenSentence,
     isBaseInvisible,
     isGhost,
     isTrue,
+    kindSentence,
     marginDot,
     namedKeys,
     pivotAxes,
@@ -1506,7 +1511,7 @@ export class StudioEditor extends Component {
         if (trail.length > 1) {
             const parent = trail[trail.length - 2];
             const siblings = parent.children || [];
-            // An element the draft removes takes no place (``isGhost``).
+            // An element the draft hides takes no place (``isGhost``).
             const next = siblings
                 .slice(siblings.indexOf(selected) + 1)
                 .find((b) => !isGhost(b, this.viewType));
@@ -1915,7 +1920,7 @@ export class StudioEditor extends Component {
      * Insert ``item`` at the hook of the open list: the list closes, then
      * the drop runs on that hook as ``addFromPalette`` does (a relation or
      * a properties field asks its dialog first, and the list leaves the
-     * rest to it). An element the draft removes (``kind`` « ghost »)
+     * rest to it). An element the draft hides (``kind`` « ghost »)
      * comes back, then moves to the hook. Once a change of the draft made
      * it, the new block is selected and focused, ``lastInsert`` holds it
      * and the live region says it.
@@ -2415,7 +2420,7 @@ export class StudioEditor extends Component {
      * tab hooks of a notebook, and the hooks of its own column that leave
      * it where it is (right before or after it, at the end of its
      * container when it is the last child) are left out. An element the
-     * draft removes (``isGhost``) takes no place: the hook before it is
+     * draft hides (``isGhost``) takes no place: the hook before it is
      * left out, and the place of the block reads past it. A search view
      * keeps a block in its column: a filter in the column of the fields
      * stays a filter. Only the hooks on screen count: a tab page not
@@ -2430,7 +2435,7 @@ export class StudioEditor extends Component {
         const item = {kind: "node", path: block.path, name: block.name};
         const trail = blockTrail(this.root, block.path);
         const parent = trail[trail.length - 2];
-        // An element the draft removes takes no place: a move past it
+        // An element the draft hides takes no place: a move past it
         // alone would change nothing the view shows.
         const ghost = (b) => isGhost(b, this.viewType);
         const siblings = ((parent && parent.children) || []).filter((b) => b === block || !ghost(b));
@@ -2633,9 +2638,16 @@ export class StudioEditor extends Component {
         }
         const index = this.canvasPicks().indexOf(document.activeElement);
         const label = outlineLabel(block);
+        // An element of the view itself stays in the arch, hidden, unless
+        // the view type hides by removing; one the draft adds leaves it.
+        const hides = this.data.hide_mode !== "remove" && !this.addedByDraft(block);
         this.state.selected = path;
         const removed = () => {
-            this.announce(_t("%(block)s removed. Ctrl+Z undoes it.", {block: label}));
+            this.announce(
+                hides
+                    ? _t("%(hidden)s. Ctrl+Z undoes it.", {hidden: hiddenSentence(label, this.viewType)})
+                    : _t("%(block)s removed. Ctrl+Z undoes it.", {block: label})
+            );
             if (focus && index >= 0) {
                 this.afterRender(() => {
                     const picks = this.canvasPicks();
@@ -3176,9 +3188,55 @@ export class StudioEditor extends Component {
             return;
         }
         this.dialog.add(StudioChangeRemovalDialog, {
-            removal,
+            removal: this.plainRemoval(removal),
             confirm: () => remove([removal.change.id, ...removal.items.map((i) => i.id)]),
         });
+    }
+
+    /**
+     * The text of ``change``, a change of the payload, at the level shown:
+     * at the Detailed level its summary, XPath and technical values
+     * included; at the Simple level its plain sentence (``changeSentence``),
+     * ``label`` standing in for the label of its element.
+     */
+    changeText(change, label = "") {
+        if (this.detailed && change.summary) {
+            return change.summary;
+        }
+        if (!label && change.path) {
+            const block = findBlock(this.root, (b) => b.path === change.path);
+            label = block ? outlineLabel(block) : "";
+        }
+        return changeSentence(change, {viewType: this.viewType, label, settable: this.data.settable || {}});
+    }
+
+    /**
+     * ``removal`` (``get_change_removal``) as the dialog shows it at the
+     * level shown: at the Simple level, each change of this view gets its
+     * plain text (``changeText``) as ``sentence``, which the dialog shows
+     * instead of its summary; a change of another view keeps its summary.
+     */
+    plainRemoval(removal) {
+        if (this.detailed) {
+            return removal;
+        }
+        const known = new Map((this.data.changes || []).map((change) => [change.id, change]));
+        const plain = (item) => (known.has(item.id) ? {...item, sentence: this.changeText(known.get(item.id))} : item);
+        return {...removal, change: plain(removal.change), items: (removal.items || []).map(plain)};
+    }
+
+    /**
+     * The texts of the changes of the draft on ``block`` itself
+     * (``changeText``), joined by « ; », or "" when the payload lists none
+     * of them.
+     */
+    blockChangesText(block) {
+        const keys = (block && block.changes) || [];
+        const label = block ? outlineLabel(block) : "";
+        return (this.data.changes || [])
+            .filter((change) => keys.includes(change.id))
+            .map((change) => this.changeText(change, label))
+            .join("; ");
     }
 
     /**
@@ -3196,7 +3254,7 @@ export class StudioEditor extends Component {
     }
 
     /**
-     * Restore ``block``, an element the draft removes (``isGhost``): undo
+     * Restore ``block``, an element the draft hides (``isGhost``): undo
      * the change that removes it (``removeChange``, which asks first when
      * other changes leave with it). Once it left, the block is back where
      * it was: it takes the selection, the live region says it, and its
@@ -3218,7 +3276,7 @@ export class StudioEditor extends Component {
                     return;
                 }
                 this.state.selected = found.path;
-                // The removed line and the restored block share their
+                // The hidden line and the restored block share their
                 // path: the focus waits for the block to replace the line.
                 for (let frame = 0; frame < 5; frame++) {
                     await new Promise((resolve) => browser.requestAnimationFrame(resolve));
