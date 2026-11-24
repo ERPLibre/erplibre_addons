@@ -82,9 +82,8 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">No test pins the archive layout: erplibre:test/test_mobile_bundle_transfer.py has no test of the archive key, the indexUrl sidecar, './'-prefixed tar members or a promised file missing from the archive.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
     </record>
     <record id="req_sd_bundle_r05b" model="devops.requirement">
         <field name="code">SD-BUNDLE-R05b</field>
@@ -95,9 +94,8 @@
         <field name="devsecops_stage">test</field>
         <field name="accepted" eval="True" />
         <field name="approved" eval="True" />
-        <field name="done" eval="False" />
-        <field name="missing">No test pins the check of the manifest fileCount against the index in erplibre:test/test_mobile_bundle_transfer.py.</field>
-        <field name="notes">Origin: unit test missing.</field>
+        <field name="done" eval="True" />
+        <field name="notes">Origin: unit test missing; a unit test pins it.</field>
     </record>
     <record id="req_sd_bundle_r06" model="devops.requirement">
         <field name="code">SD-BUNDLE-R06</field>

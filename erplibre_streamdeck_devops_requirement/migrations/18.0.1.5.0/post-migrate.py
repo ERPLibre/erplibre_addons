@@ -89,8 +89,17 @@ REWRITTEN = {
         # The proofs of SD-SERVICE-R82, new in this version.
         "test_sd_service_r82_1",
         "test_sd_service_r82_2",
+        # The tests of ERPLibre's bundle checker that prove SD-BUNDLE-R05
+        # and SD-BUNDLE-R05b.
+        "test_sd_bundle_r05_1",
+        "test_sd_bundle_r05_2",
+        "test_sd_bundle_r05_3",
+        "test_sd_bundle_r05_4",
+        "test_sd_bundle_r05b_1",
+        "test_sd_bundle_r05b_2",
     ),
     "data/devops_requirement.xml": (
+        # Done, proved by the tests of ERPLibre's bundle checker.
         "req_sd_bundle_r05",
         "req_sd_bundle_r05b",
         "req_sd_deploy_r45",
@@ -134,12 +143,6 @@ REWRITTEN = {
 # or does not prove its requirement, removed from the data files: an
 # upgrade does not delete a noupdate record on its own.
 DELETED = (
-    "test_sd_bundle_r05_1",
-    "test_sd_bundle_r05_2",
-    "test_sd_bundle_r05_3",
-    "test_sd_bundle_r05_4",
-    "test_sd_bundle_r05b_1",
-    "test_sd_bundle_r05b_2",
     "test_sd_grepo_r37_1",
     "test_sd_grepo_r40_3",
     "test_sd_grepo_r41_1",

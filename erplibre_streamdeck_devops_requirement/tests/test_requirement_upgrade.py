@@ -565,6 +565,52 @@ class TestRequirementUpgrade(TransactionCase):
             self._in_file("test_sd_service_r82_1", "reference", AUDIT_PROOFS),
         )
 
+    def test_an_upgrade_to_1_5_proves_the_bundle_checker_again(self):
+        # Les tests du vérificateur de bundle sont dans test/ d'ERPLibre :
+        # une base de la version 18.0.1.4.0 qui tient ces requis pour à
+        # faire, sans preuve, les reçoit faits, leurs preuves posées.
+        proofs = {
+            "req_sd_bundle_r05": [
+                "test_sd_bundle_r05_%d" % n for n in (1, 2, 3, 4)
+            ],
+            "req_sd_bundle_r05b": [
+                "test_sd_bundle_r05b_%d" % n for n in (1, 2)
+            ],
+        }
+        for xmlid, lines in proofs.items():
+            self.env.ref("%s.%s" % (MODULE, xmlid)).write(
+                {
+                    "done": False,
+                    "missing": "No test pins the bundle checker.",
+                    "notes": "Origin: unit test missing.",
+                }
+            )
+            for line in lines:
+                self.assertTrue(self._carried(line), line)
+                proof = self.env.ref(
+                    "%s.%s" % (MODULE, line), raise_if_not_found=False
+                )
+                if proof:
+                    proof.unlink()
+        self._migrate("18.0.1.4.0", MIGRATION_1_5)
+        self.env.invalidate_all()
+        for xmlid, lines in proofs.items():
+            with self.subTest(xmlid=xmlid):
+                requirement = self.env.ref("%s.%s" % (MODULE, xmlid))
+                self.assertTrue(requirement.done)
+                self.assertFalse(requirement.missing)
+                self.assertEqual(
+                    requirement.notes,
+                    self._in_file(xmlid, "notes", REQUIREMENTS),
+                )
+                for line in lines:
+                    proof = self.env.ref("%s.%s" % (MODULE, line))
+                    self.assertEqual(proof.requirement_id, requirement)
+                    self.assertEqual(
+                        proof.reference,
+                        self._in_file(line, "reference", AUDIT_PROOFS),
+                    )
+
     @staticmethod
     def _carried(xmlid, data=AUDIT_PROOFS):
         """True when `data` still carries the record `xmlid`."""

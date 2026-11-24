@@ -11,6 +11,42 @@
         <field name="kind">repo_unittest</field>
         <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheThreeFailures::test_a_missing_pack_is_named</field>
     </record>
+    <record id="test_sd_bundle_r05_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_an_archive_repo_is_counted_as_an_archive</field>
+    </record>
+    <record id="test_sd_bundle_r05_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_the_index_is_found_through_index_url</field>
+    </record>
+    <record id="test_sd_bundle_r05_3" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05" />
+        <field name="sequence" eval="30" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_dot_slash_members_are_read_back_and_compared</field>
+    </record>
+    <record id="test_sd_bundle_r05_4" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05" />
+        <field name="sequence" eval="40" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheArchiveLayout::test_a_promised_file_missing_from_the_archive_is_named</field>
+    </record>
+    <record id="test_sd_bundle_r05b_1" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05b" />
+        <field name="sequence" eval="10" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheAnnouncedFileCount::test_a_file_count_that_differs_from_the_index_is_refused</field>
+    </record>
+    <record id="test_sd_bundle_r05b_2" model="devops.requirement.test">
+        <field name="requirement_id" ref="req_sd_bundle_r05b" />
+        <field name="sequence" eval="20" />
+        <field name="kind">repo_unittest</field>
+        <field name="reference">erplibre:test/test_mobile_bundle_transfer.py::TestTheAnnouncedFileCount::test_a_matching_file_count_is_accepted</field>
+    </record>
     <record id="test_sd_bundle_r62_1" model="devops.requirement.test">
         <field name="requirement_id" ref="req_sd_bundle_r62" />
         <field name="sequence" eval="10" />
