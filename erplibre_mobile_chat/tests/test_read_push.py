@@ -1,0 +1,775 @@
+# © 2026 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+"""Notifications « lu » et « traité » vers les appareils de l'application,
+présence des navigateurs et appareils silencieux pendant ce temps."""
+
+import hashlib
+import json
+from contextlib import contextmanager
+from datetime import timedelta
+from unittest.mock import patch
+
+import requests
+from odoo import api, fields
+from odoo.exceptions import AccessError
+from odoo.tests import new_test_user, tagged
+from odoo.tests.common import HttpCase, JsonRpcException
+
+from ..tools import app_push as app_push_module
+from .test_app_push import (
+    APP_PUSH,
+    APP_SID,
+    BROWSER_SID,
+    ENDPOINT,
+    answer,
+    bus_request,
+    device_keys,
+    write_browser_presence,
+)
+
+
+@tagged("post_install", "-at_install")
+class TestErplibreReadPush(HttpCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Crée les clés VAPID d'Odoo, sans lesquelles rien ne part.
+        cls.env["mail.push.device"].get_web_push_vapid_public_key()
+        cls.user_a = new_test_user(
+            cls.env,
+            login="read_user_a",
+            groups="base.group_user,base.group_partner_manager",
+        )
+        cls.user_b = new_test_user(
+            cls.env,
+            login="read_user_b",
+            groups="base.group_user",
+            notification_type="inbox",
+        )
+        cls.chat = (
+            cls.env["discuss.channel"]
+            .with_user(cls.user_a)
+            .channel_get([cls.user_b.partner_id.id])
+        )
+        partners = (cls.user_a | cls.user_b).partner_id
+        cls.group = cls.env["discuss.channel"].create(
+            {
+                "name": "Groupe lecture",
+                "channel_type": "group",
+                "channel_member_ids": [
+                    (0, 0, {"partner_id": p.id}) for p in partners
+                ],
+            }
+        )
+        cls.records = cls.env["res.partner"].create(
+            [{"name": "Alice Martin"}, {"name": "Bruno Tremblay"}]
+        )
+
+    def setUp(self):
+        super().setUp()
+        self.env.cr.postcommit.clear()
+
+    def _device(self, user, endpoint=ENDPOINT, **marks):
+        return (
+            self.env["mail.push.device"]
+            .sudo()
+            .create(
+                {
+                    "partner_id": user.partner_id.id,
+                    "endpoint": endpoint,
+                    "keys": json.dumps(device_keys()),
+                    **marks,
+                }
+            )
+        )
+
+    def _app_device(self, user, endpoint=ENDPOINT, **marks):
+        return self._device(user, endpoint, erplibre_app=True, **marks)
+
+    def _post(self, thread, user=None, body="Bonjour", **kwargs):
+        return thread.with_user(user or self.user_a).message_post(
+            body=body,
+            message_type="comment",
+            subtype_xmlid="mail.mt_comment",
+            **kwargs,
+        )
+
+    def _member(self, channel, user):
+        return (
+            self.env["discuss.channel.member"]
+            .with_user(user)
+            .search(
+                [
+                    ("channel_id", "=", channel.id),
+                    ("partner_id", "=", user.partner_id.id),
+                ]
+            )
+        )
+
+    @contextmanager
+    def _capture(self, status=200):
+        """Simule ntfy (`status`) et rend la liste, remplie au fil des
+        envois, des charges en clair passées au chiffrement."""
+        sent = []
+        with (
+            patch.object(
+                requests.Session, "post", return_value=answer(status)
+            ),
+            patch(
+                f"{APP_PUSH}._encrypt_payload",
+                side_effect=lambda content, device: sent.append(
+                    json.loads(content)
+                )
+                or b"x",
+            ),
+        ):
+            yield sent
+
+    def _needaction(self, message, user):
+        """Garantit à `user` une notification de boîte non lue de
+        `message`."""
+        Notification = self.env["mail.notification"].sudo()
+        if not Notification.search(
+            [
+                ("mail_message_id", "=", message.id),
+                ("res_partner_id", "=", user.partner_id.id),
+            ]
+        ):
+            Notification.create(
+                {
+                    "mail_message_id": message.id,
+                    "res_partner_id": user.partner_id.id,
+                    "notification_type": "inbox",
+                    "is_read": False,
+                }
+            )
+
+    def _presence(self, user, poll_age, presence_age):
+        """Écrit la présence d'un navigateur de `user` (voir
+        write_browser_presence)."""
+        write_browser_presence(self.env, user, poll_age, presence_age)
+
+    def _websocket(self, user, sid):
+        """Rejoue une requête du bus de `user` (voir bus_request)."""
+        return bus_request(self.env, user, sid)
+
+    def _read_payload(self, channel, message):
+        return {
+            "erplibre": {
+                "v": 1,
+                "type": "read",
+                "channel_id": channel.id,
+                "last_message_id": message.id,
+            }
+        }
+
+    # Notifications « lu »
+
+    def test_mark_as_read_sends_read_push_after_commit(self):
+        message = self._post(self.chat)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            self._member(self.chat, self.user_b)._mark_as_read(message.id)
+            self.assertEqual(sent, [])
+            self.env.cr.postcommit.run()
+        self.assertEqual(sent, [self._read_payload(self.chat, message)])
+
+    def test_own_post_sends_read_push(self):
+        self._app_device(self.user_a)
+        with self._capture() as sent:
+            message = self._post(self.chat)
+            self.env.cr.postcommit.run()
+        self.assertEqual(sent, [self._read_payload(self.chat, message)])
+
+    def test_no_read_push_when_seen_does_not_advance(self):
+        message = self._post(self.chat)
+        self._app_device(self.user_b)
+        member = self._member(self.chat, self.user_b)
+        member._mark_as_read(message.id)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            member._mark_as_read(message.id)
+            self.env.cr.postcommit.run()
+        self.assertEqual(sent, [])
+
+    def test_two_marks_in_one_request_send_one_read_push_with_the_highest_id(
+        self,
+    ):
+        first = self._post(self.chat)
+        second = self._post(self.chat, body="Encore")
+        in_group = self._post(self.group)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            member = self._member(self.chat, self.user_b)
+            member._mark_as_read(first.id)
+            member._mark_as_read(second.id)
+            self._member(self.group, self.user_b)._mark_as_read(in_group.id)
+            self.env.cr.postcommit.run()
+        self.assertEqual(
+            sorted(sent, key=lambda p: p["erplibre"]["channel_id"]),
+            sorted(
+                [
+                    self._read_payload(self.chat, second),
+                    self._read_payload(self.group, in_group),
+                ],
+                key=lambda p: p["erplibre"]["channel_id"],
+            ),
+        )
+
+    def test_read_push_never_reaches_a_browser_device(self):
+        message = self._post(self.chat)
+        self._device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._member(self.chat, self.user_b)._mark_as_read(message.id)
+            self.env.cr.postcommit.run()
+        post.assert_not_called()
+
+    # Notifications « traité »
+
+    def test_set_message_done_sends_inbox_done_with_threads(self):
+        first, second = self.records
+        messages = (
+            self._post(first, partner_ids=self.user_b.partner_id.ids)
+            | self._post(second, partner_ids=self.user_b.partner_id.ids)
+            | self._post(self.group, partner_ids=self.user_b.partner_id.ids)
+        )
+        for message in messages:
+            self._needaction(message, self.user_b)
+        self._app_device(self.user_b)
+        self._app_device(self.user_a, f"{ENDPOINT}a")
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            result = messages.with_user(self.user_b).set_message_done()
+            self.assertEqual(sent, [])
+            self.env.cr.postcommit.run()
+        self.assertIsNone(result)
+        self.assertEqual(
+            sent,
+            [
+                {
+                    "erplibre": {
+                        "v": 1,
+                        "type": "inbox_done",
+                        "threads": [
+                            ["res.partner", first.id],
+                            ["res.partner", second.id],
+                        ],
+                    }
+                }
+            ],
+        )
+
+    def test_mark_all_as_read_with_domain_sends_one_inbox_done(self):
+        message = self._post(
+            self.records[0], partner_ids=self.user_b.partner_id.ids
+        )
+        self._needaction(message, self.user_b)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            result = (
+                self.env["mail.message"]
+                .with_user(self.user_b)
+                .mark_all_as_read([("id", "=", message.id)])
+            )
+            self.env.cr.postcommit.run()
+        self.assertEqual(result, [message.id])
+        self.assertEqual(
+            sent,
+            [
+                {
+                    "erplibre": {
+                        "v": 1,
+                        "type": "inbox_done",
+                        "threads": [["res.partner", self.records[0].id]],
+                    }
+                }
+            ],
+        )
+
+    def test_mark_all_as_read_over_40_threads_sends_null(self):
+        records = self.env["res.partner"].create(
+            [{"name": f"Fiche {index}"} for index in range(41)]
+        )
+        messages = self.env["mail.message"].create(
+            [
+                {
+                    "model": "res.partner",
+                    "res_id": record.id,
+                    "body": "Bonjour",
+                    "message_type": "comment",
+                    "author_id": self.user_a.partner_id.id,
+                }
+                for record in records
+            ]
+        )
+        for message in messages:
+            self._needaction(message, self.user_b)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            result = (
+                self.env["mail.message"]
+                .with_user(self.user_b)
+                .mark_all_as_read()
+            )
+            self.env.cr.postcommit.run()
+        self.assertIsNone(result)
+        self.assertEqual(
+            sent,
+            [{"erplibre": {"v": 1, "type": "inbox_done", "threads": None}}],
+        )
+        self.assertFalse(
+            self.env["mail.notification"].search_count(
+                [
+                    ("res_partner_id", "=", self.user_b.partner_id.id),
+                    ("is_read", "=", False),
+                ]
+            )
+        )
+
+    def test_inbox_done_without_record_threads_sends_nothing(self):
+        message = self._post(
+            self.group, partner_ids=self.user_b.partner_id.ids
+        )
+        self._needaction(message, self.user_b)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            message.with_user(self.user_b).set_message_done()
+            self.env["mail.message"].with_user(self.user_b).mark_all_as_read()
+            self.env.cr.postcommit.run()
+        self.assertEqual(sent, [])
+
+    def test_inbox_done_work_skipped_without_an_app_device(self):
+        message = self._post(
+            self.records[0], partner_ids=self.user_b.partner_id.ids
+        )
+        self._needaction(message, self.user_b)
+        self._device(self.user_b)
+        Message = type(self.env["mail.message"])
+        with patch.object(
+            Message,
+            "_erplibre_unread_for_me",
+            autospec=True,
+            side_effect=Message._erplibre_unread_for_me,
+        ) as unread:
+            message.with_user(self.user_b).set_message_done()
+            self.env["mail.message"].with_user(self.user_b).mark_all_as_read()
+        unread.assert_not_called()
+        self.assertFalse(
+            self.env["mail.notification"].search_count(
+                [
+                    ("res_partner_id", "=", self.user_b.partner_id.id),
+                    ("is_read", "=", False),
+                ]
+            )
+        )
+
+    # Présence des navigateurs
+
+    def test_browser_presence_written_for_a_browser_session(self):
+        self._app_device(
+            self.user_b,
+            erplibre_browser_mode="quiet",
+            erplibre_session_hash=hashlib.sha256(APP_SID.encode()).hexdigest(),
+        )
+        with self._websocket(self.user_b, BROWSER_SID) as env:
+            env["ir.websocket"]._update_bus_presence(120000, {})
+        presence = self.env["bus.presence"].search(
+            [("user_id", "=", self.user_b.id)]
+        )
+        now = fields.Datetime.now()
+        self.assertTrue(presence.erplibre_browser_poll)
+        self.assertLessEqual(
+            now - presence.erplibre_browser_poll, timedelta(seconds=5)
+        )
+        self.assertLessEqual(
+            abs(
+                now
+                - timedelta(seconds=120)
+                - presence.erplibre_browser_presence
+            ),
+            timedelta(seconds=5),
+        )
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
+
+    def test_the_apps_own_session_never_counts_as_a_browser(self):
+        self._app_device(
+            self.user_b,
+            erplibre_browser_mode="quiet",
+            erplibre_session_hash=hashlib.sha256(APP_SID.encode()).hexdigest(),
+        )
+        with self._websocket(self.user_b, APP_SID) as env:
+            env["ir.websocket"]._update_bus_presence(0, {})
+        presence = self.env["bus.presence"].search(
+            [("user_id", "=", self.user_b.id)]
+        )
+        self.assertTrue(presence.last_poll)
+        self.assertFalse(presence.erplibre_browser_poll)
+        self.assertFalse(presence.erplibre_browser_presence)
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+
+    def test_no_browser_presence_write_without_a_quiet_device(self):
+        self._app_device(self.user_b)
+        Presence = type(self.env["bus.presence"])
+        for user in (self.user_a, self.user_b):
+            with (
+                self.subTest(user=user.login),
+                patch.object(
+                    Presence, "_erplibre_update_browser_presence"
+                ) as write,
+                self._websocket(user, BROWSER_SID) as env,
+            ):
+                env["ir.websocket"]._update_bus_presence(0, {})
+                write.assert_not_called()
+            presence = self.env["bus.presence"].search(
+                [("user_id", "=", user.id)]
+            )
+            self.assertTrue(presence.last_poll)
+            self.assertFalse(presence.erplibre_browser_poll)
+
+    def test_quiet_recipients_cost_one_presence_search(self):
+        users = self.env["res.users"]
+        devices = self.env["mail.push.device"]
+        for index in range(3):
+            user = new_test_user(
+                self.env, login=f"read_quiet_{index}", groups="base.group_user"
+            )
+            users |= user
+            devices |= self._app_device(
+                user, f"{ENDPOINT}q{index}", erplibre_browser_mode="quiet"
+            )
+        group = self.env["discuss.channel"].create(
+            {
+                "name": "Groupe discret",
+                "channel_type": "group",
+                "channel_member_ids": [
+                    (0, 0, {"partner_id": p.id})
+                    for p in (self.user_a | users).partner_id
+                ],
+            }
+        )
+        self._presence(users[0], poll_age=10, presence_age=60)
+        Presence = type(self.env["bus.presence"])
+        searches = []
+        original = Presence._search
+
+        def spy(model, domain, *args, **kwargs):
+            if "erplibre_browser_poll" in str(domain):
+                searches.append(domain)
+            return original(model, domain, *args, **kwargs)
+
+        with (
+            patch.object(Presence, "_search", autospec=True, side_effect=spy),
+            patch.object(
+                requests.Session, "post", return_value=answer(201)
+            ) as post,
+        ):
+            self._post(group)
+            self.env.cr.postcommit.run()
+        self.assertEqual(len(searches), 1)
+        self.assertEqual(
+            sorted(c.args[0] for c in post.call_args_list),
+            sorted(devices[1:].mapped("endpoint")),
+        )
+
+    def test_quiet_device_skipped_while_browser_online(self):
+        quiet = self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        loud = self._app_device(self.user_b, f"{ENDPOINT}loud")
+        self._presence(self.user_b, poll_age=10, presence_age=60)
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post(self.chat)
+            self.env.cr.postcommit.run()
+        endpoints = [c.args[0] for c in post.call_args_list]
+        self.assertEqual(endpoints, [loud.endpoint])
+        self.assertNotIn(quiet.endpoint, endpoints)
+
+    def test_an_away_browser_lets_the_push_through(self):
+        device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        self._presence(self.user_b, poll_age=10, presence_age=31 * 60)
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post(self.chat)
+            self.env.cr.postcommit.run()
+        self.assertEqual(
+            [c.args[0] for c in post.call_args_list], [device.endpoint]
+        )
+
+    def test_a_stale_browser_lets_the_push_through(self):
+        device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        self._presence(self.user_b, poll_age=66, presence_age=66)
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post(self.chat)
+            self.env.cr.postcommit.run()
+        self.assertEqual(
+            [c.args[0] for c in post.call_args_list], [device.endpoint]
+        )
+
+    def test_read_push_sent_even_while_browser_online(self):
+        message = self._post(self.chat)
+        self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        self._presence(self.user_b, poll_age=10, presence_age=60)
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            self._member(self.chat, self.user_b)._mark_as_read(message.id)
+            self.env.cr.postcommit.run()
+        self.assertEqual(sent, [self._read_payload(self.chat, message)])
+
+    # Transactions
+
+    def test_rollback_sends_no_read_push(self):
+        message = self._post(self.chat)
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        self.env.flush_all()
+        member = self._member(self.chat, self.user_b)
+        with (
+            self._capture() as sent,
+            self.registry.cursor() as cr,
+        ):
+            env = api.Environment(cr, self.user_b.id, {})
+            env["discuss.channel.member"].browse(member.id)._mark_as_read(
+                message.id
+            )
+            self.assertTrue(cr.postcommit.data)
+            cr.rollback()
+            cr.postcommit.run()
+        self.assertEqual(sent, [])
+
+    def test_two_transactions_send_two_batches(self):
+        first = self._post(self.chat)
+        second = self._post(self.chat, body="Encore")
+        self._app_device(self.user_b)
+        self.env.cr.postcommit.clear()
+        member = self._member(self.chat, self.user_b)
+        with (
+            self._capture() as sent,
+            patch(
+                f"{APP_PUSH}._deliver", wraps=app_push_module._deliver
+            ) as deliver,
+        ):
+            member._mark_as_read(first.id)
+            self.env.cr.postcommit.run()
+            member._mark_as_read(second.id)
+            self.env.cr.postcommit.run()
+        self.assertEqual(deliver.call_count, 2)
+        self.assertEqual(
+            sent,
+            [
+                self._read_payload(self.chat, first),
+                self._read_payload(self.chat, second),
+            ],
+        )
+
+    # Droits
+
+    def test_presence_update_is_not_callable_over_rpc(self):
+        self._presence(self.user_b, poll_age=3600, presence_age=3600)
+        # La requête lit la base : l'écriture du test doit y être.
+        self.env.flush_all()
+        self.authenticate("read_user_a", "read_user_a")
+        for method in (
+            "erplibre_update_browser_presence",
+            "_erplibre_update_browser_presence",
+        ):
+            with (
+                self.subTest(method=method),
+                self.assertLogs("odoo.http", "WARNING"),
+                self.assertRaises(JsonRpcException),
+            ):
+                self.make_jsonrpc_request(
+                    f"/web/dataset/call_kw/bus.presence/{method}",
+                    {
+                        "model": "bus.presence",
+                        "method": method,
+                        "args": [0, self.user_b.id],
+                        "kwargs": {},
+                    },
+                )
+        self.env.invalidate_all()
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+
+    def test_a_user_cannot_write_the_browser_presence(self):
+        self._presence(self.user_b, poll_age=3600, presence_age=3600)
+        self._presence(self.user_a, poll_age=3600, presence_age=3600)
+        now = fields.Datetime.now()
+        for user in (self.user_b, self.user_a):
+            presence = (
+                self.env["bus.presence"]
+                .with_user(self.user_a)
+                .search([("user_id", "=", user.id)])
+            )
+            with (
+                self.subTest(user=user.login),
+                self.assertRaises(AccessError),
+            ):
+                presence.write(
+                    {
+                        "erplibre_browser_poll": now,
+                        "erplibre_browser_presence": now,
+                    }
+                )
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+
+    def test_a_reassigned_presence_row_never_counts_for_another_user(self):
+        self._app_device(
+            self.user_a, f"{ENDPOINT}a", erplibre_browser_mode="quiet"
+        )
+        device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        with self._websocket(self.user_a, BROWSER_SID) as env:
+            env["ir.websocket"]._update_bus_presence(0, {})
+        self.assertTrue(self.user_a._erplibre_browser_online_users())
+        Presence = self.env["bus.presence"].with_user(self.user_a)
+        Presence.search([("user_id", "=", self.user_b.id)]).unlink()
+        Presence.search([("user_id", "=", self.user_a.id)]).write(
+            {"user_id": self.user_b.id}
+        )
+        self.assertFalse(self.user_b._erplibre_browser_online_users())
+        with patch.object(
+            requests.Session, "post", return_value=answer(201)
+        ) as post:
+            self._post(self.chat)
+            self.env.cr.postcommit.run()
+        # Le message atteint l'appareil silencieux de B ; celui de A reçoit
+        # la notification « lu » de sa propre publication.
+        self.assertIn(
+            device.endpoint, [c.args[0] for c in post.call_args_list]
+        )
+
+    def test_a_user_cannot_write_device_marks(self):
+        for user in (self.user_b, self.user_a):
+            device = self._device(user, f"{ENDPOINT}{user.id}")
+            with (
+                self.subTest(user=user.login),
+                self.assertRaises(AccessError),
+            ):
+                device.with_user(self.user_a).write(
+                    {
+                        "erplibre_app": True,
+                        "erplibre_browser_mode": "quiet",
+                        "erplibre_session_hash": "0" * 64,
+                    }
+                )
+
+    def test_negative_inactivity_counts_as_now(self):
+        self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        with self._websocket(self.user_b, BROWSER_SID) as env:
+            env["ir.websocket"]._update_bus_presence(-600000, {})
+        presence = self.env["bus.presence"].search(
+            [("user_id", "=", self.user_b.id)]
+        )
+        self.assertLessEqual(
+            presence.erplibre_browser_presence, fields.Datetime.now()
+        )
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
+
+    # Module 1.6 : modes de l'appareil
+
+    def test_presence_written_for_wait_and_quiet_devices_only(self):
+        for mode, written in (
+            ("ring", False),
+            ("wait", True),
+            ("quiet", True),
+        ):
+            user = new_test_user(
+                self.env, login=f"read_mode_{mode}", groups="base.group_user"
+            )
+            self._app_device(
+                user,
+                f"{ENDPOINT}{mode}",
+                erplibre_browser_mode=mode,
+                erplibre_payload_v=2,
+            )
+            with self.subTest(mode=mode):
+                with self._websocket(user, BROWSER_SID) as env:
+                    env["ir.websocket"]._update_bus_presence(0, {})
+                presence = self.env["bus.presence"].search(
+                    [("user_id", "=", user.id)]
+                )
+                self.assertTrue(presence.last_poll)
+                self.assertEqual(bool(presence.erplibre_browser_poll), written)
+                self.assertEqual(
+                    bool(user._erplibre_browser_online_users()), written
+                )
+
+    def test_quiet_device_dropped_while_browser_active_five_minutes(self):
+        device = self._app_device(self.user_b, erplibre_browser_mode="quiet")
+        for presence_age, endpoints in (
+            (4 * 60, []),
+            (301, [device.endpoint]),
+        ):
+            with self.subTest(presence_age=presence_age):
+                self._presence(
+                    self.user_b, poll_age=10, presence_age=presence_age
+                )
+                with patch.object(
+                    requests.Session, "post", return_value=answer(201)
+                ) as post:
+                    self._post(self.chat)
+                    self.env.cr.postcommit.run()
+                self.assertEqual(
+                    [c.args[0] for c in post.call_args_list], endpoints
+                )
+
+    def test_wait_device_never_dropped(self):
+        self._app_device(
+            self.user_b, erplibre_browser_mode="wait", erplibre_payload_v=2
+        )
+        self._presence(self.user_b, poll_age=10, presence_age=60)
+        self.assertTrue(self.user_b._erplibre_browser_online_users())
+        with self._capture() as sent:
+            message = self._post(self.chat)
+            self.env.cr.postcommit.run()
+        self.assertEqual(len(sent), 1)
+        self.assertEqual(
+            sent[0]["options"]["data"]["erplibre"],
+            {
+                "v": 2,
+                "message_id": message.id,
+                "channel_type": "chat",
+                "mentioned": False,
+                "browser_online": True,
+            },
+        )
+
+    def test_read_push_stays_v1(self):
+        message = self._post(self.chat)
+        on_record = self._post(
+            self.records[0], partner_ids=self.user_b.partner_id.ids
+        )
+        self._needaction(on_record, self.user_b)
+        self._app_device(
+            self.user_b, erplibre_browser_mode="wait", erplibre_payload_v=2
+        )
+        self.env.cr.postcommit.clear()
+        with self._capture() as sent:
+            self._member(self.chat, self.user_b)._mark_as_read(message.id)
+            on_record.with_user(self.user_b).set_message_done()
+            self.env.cr.postcommit.run()
+        self.assertEqual(
+            sorted(sent, key=lambda p: p["erplibre"]["type"]),
+            [
+                {
+                    "erplibre": {
+                        "v": 1,
+                        "type": "inbox_done",
+                        "threads": [["res.partner", self.records[0].id]],
+                    }
+                },
+                self._read_payload(self.chat, message),
+            ],
+        )

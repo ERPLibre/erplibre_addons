@@ -1,0 +1,153 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* erplibre_mobile_chat
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_message__erplibre_client_uuid
+msgid "Client UUID"
+msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_message__erplibre_body_fingerprint
+msgid "Body Fingerprint"
+msgstr "Empreinte du corps"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_message__erplibre_chat_level
+msgid "ERPLibre Chat Level"
+msgstr "Niveau du clavardage ERPLibre"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_discuss_channel__erplibre_client_uuid
+msgid "Client UUID"
+msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_ir_attachment__erplibre_client_uuid
+msgid "Client UUID"
+msgstr "UUID client"
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "A client UUID identifies a single channel."
+msgstr "Un UUID client désigne un seul canal."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "Only an administrator can remove a member."
+msgstr "Seul un administrateur peut retirer un membre."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "A direct message has no member to remove."
+msgstr "Un message direct n'a pas de membre à retirer."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/models/discuss_channel.py:0
+msgid "This person is not a member of the channel."
+msgstr "Cette personne n'est pas membre du canal."
+
+#. module: erplibre_mobile_chat
+#. odoo-python
+#: code:addons/erplibre_mobile_chat/controllers/attachment.py:0
+msgid "You are not allowed to upload an attachment here."
+msgstr "Vous n'êtes pas autorisé à téléverser une pièce jointe ici."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_app
+msgid "ERPLibre App"
+msgstr "Application ERPLibre"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_app
+msgid "The ERPLibre mobile app receives the notifications of this device: they carry the message id and the channel type, and Odoo's own sending skips it."
+msgstr "L'application mobile ERPLibre reçoit les notifications de cet appareil : elles portent l'identifiant du message et le type du canal, et l'envoi d'Odoo le saute."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_browser_mode
+msgid "While a Browser Is Active"
+msgstr "Quand un navigateur est actif"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_browser_mode
+msgid "Ring: message notifications reach this device as usual. Wait: they say whether a browser of its user is active, and the app holds them. Quiet: none reaches this device while a browser of its user is active."
+msgstr "Sonner : les notifications de message atteignent cet appareil comme d'habitude. Attendre : elles disent si un navigateur de son utilisateur est actif, et l'application les retient. Se taire : aucune n'atteint cet appareil pendant qu'un navigateur de son utilisateur est actif."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__ring
+msgid "Ring"
+msgstr "Sonner"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__wait
+msgid "Wait"
+msgstr "Attendre"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields.selection,name:erplibre_mobile_chat.selection__mail_push_device__erplibre_browser_mode__quiet
+msgid "Quiet"
+msgstr "Se taire"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_payload_v
+msgid "App Payload Version"
+msgstr "Version de la charge de l'application"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_payload_v
+msgid "Version of the message notifications this device receives: 2 adds whether its user is mentioned and whether a browser of its user is active."
+msgstr "Version des notifications de message que reçoit cet appareil : 2 ajoute si son utilisateur est mentionné et si un navigateur de son utilisateur est actif."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash
+msgid "App Session Hash"
+msgstr "Empreinte de la session de l'application"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_mail_push_device__erplibre_session_hash
+msgid "SHA-256 (hexadecimal) of the id of the session that marked this device as the app's."
+msgstr "SHA-256 (hexadécimal) de l'identifiant de la session qui a marqué cet appareil comme celui de l'application."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_poll
+msgid "Last Browser Poll"
+msgstr "Dernier sondage d'un navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_poll
+msgid "Last presence update of a browser of this user; the bus of the ERPLibre mobile app does not count."
+msgstr "Dernière mise à jour de la présence d'un navigateur de cet utilisateur ; le bus de l'application mobile ERPLibre ne compte pas."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_presence
+msgid "Last Browser Presence"
+msgstr "Dernière présence d'un navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_presence
+msgid "Last activity in a browser of this user; the bus of the ERPLibre mobile app does not count."
+msgstr "Dernière activité dans un navigateur de cet utilisateur ; le bus de l'application mobile ERPLibre ne compte pas."
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,field_description:erplibre_mobile_chat.field_bus_presence__erplibre_browser_user_id
+msgid "Browser User"
+msgstr "Utilisateur du navigateur"
+
+#. module: erplibre_mobile_chat
+#: model:ir.model.fields,help:erplibre_mobile_chat.field_bus_presence__erplibre_browser_user_id
+msgid "User whose browser wrote the two browser fields; a row moved to another user keeps it."
+msgstr "Utilisateur dont le navigateur a écrit les deux champs du navigateur ; une ligne passée à un autre utilisateur le garde."

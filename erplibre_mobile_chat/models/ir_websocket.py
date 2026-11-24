@@ -1,0 +1,59 @@
+# © 2026 TechnoLibre (http://www.technolibre.ca)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+"""Mise à jour de la présence des navigateurs à chaque mise à jour de
+présence du bus."""
+
+import hashlib
+
+from odoo import models
+from odoo.addons.bus.websocket import wsrequest
+from odoo.http import request
+
+from .mail_push_device import WATCHED_MODES
+
+
+class IrWebsocket(models.AbstractModel):
+    _inherit = "ir.websocket"
+
+    def _update_bus_presence(self, inactivity_period, im_status_ids_by_model):
+        """Après la mise à jour d'Odoo, écrit la présence d'un navigateur
+        de l'utilisateur connecté (`_erplibre_update_browser_presence` de
+        bus.presence), sauf quand la session du bus est celle qui a marqué
+        un de ses appareils de l'application (`erplibre_session_hash`) : le
+        bus de l'application ne compte jamais comme un navigateur.
+
+        Rien n'est écrit pour l'utilisateur dont aucun appareil de
+        l'application n'attend ni ne se tait pendant qu'un navigateur est
+        actif (`erplibre_browser_mode` dans WATCHED_MODES) : la présence ne
+        sert qu'à eux, et cette écriture validée suivrait chaque mise à
+        jour de présence de chaque onglet. Un appareil qui vient de passer
+        à l'un de ces modes compte le navigateur à sa prochaine mise à
+        jour, au plus une minute après : le client web l'envoie toutes les
+        60 secondes (static/src/im_status_service_patch.js).
+
+        La session est celle de la requête websocket, ou de la requête HTTP
+        de /websocket/update_bus_presence.
+        """
+        super()._update_bus_presence(inactivity_period, im_status_ids_by_model)
+        user = self.env.user
+        if not user or user._is_public():
+            return
+        req = request or wsrequest
+        sid = getattr(req and req.session, "sid", None)
+        if not sid:
+            return
+        session_hash = hashlib.sha256(sid.encode()).hexdigest()
+        devices = self.env["mail.push.device"]._erplibre_app_devices(
+            user.partner_id.ids
+        )
+        if not devices.filtered(
+            lambda device: device.erplibre_browser_mode in WATCHED_MODES
+        ):
+            return
+        if session_hash in devices.mapped("erplibre_session_hash"):
+            return
+        # sudo: bus.presence - les champs du navigateur sont réservés à
+        # l'administrateur ; seule la ligne de env.uid est écrite.
+        self.env["bus.presence"].sudo()._erplibre_update_browser_presence(
+            inactivity_period
+        )
